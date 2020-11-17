@@ -1,44 +1,21 @@
 {
-  "name": "amimet-app",
-  "version": "0.1.13",
+  "name": "amimet-iwp",
+  "version": "0.1.17",
   "description": "",
   "types": "index.d.ts",
   "scripts": {
-    "capinit": "cap init",
-    "add-android": "cap add android",
-    "android": "umi dev --android",
-    "ios": "umi dev --ios",
-    "build-android": "umi build --android",
-    "build-ios": "umi build --ios",
     "start": "umi dev",
     "test": "cross-env BABELRC=none umi test",
     "inspectMode": "node --inspect-brk ./node_modules/.bin/umi dev",
     "analyze": "cross-env ANALYZE=1 umi build",
     "build": "umi build",
-    "check:model": "umi dva list model",
-    "lint:js": "eslint --ext .js src",
-    "lint:style": "stylelint \"src/**/*.less\" --syntax less",
-    "prettier": "prettier --write 'src/**/*.{js,less}'",
     "precommit": "lint-staged",
     "add-locale": "lingui add-locale",
     "extract": "lingui extract",
-    "trans": "lingui extract --clean && node ./scripts/translate.js",
-    "doc": "docsify serve docs"
+    "trans": "lingui extract --clean && node ./scripts/translate.js"
   },
   "engines": {
     "node": ">= 12.0.0"
-  },
-  "lint-staged": {
-    "src/**/*.js": [
-      "eslint --ext .js --fix",
-      "npm run prettier",
-      "git add"
-    ],
-    "**/*.less": [
-      "stylelint --syntax less",
-      "npm run prettier",
-      "git add"
-    ]
   },
   "lingui": {
     "locales": [
