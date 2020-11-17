@@ -1,0 +1,231 @@
+import store from 'store'
+import { verbosity } from 'core/libs'
+import { history } from 'umi'
+import { queryIndexer, config, setLocale } from 'core'
+import jwt from 'jsonwebtoken'
+import * as ui from 'core/libs/ui'
+
+import * as path from 'node_modules/pn/path'
+import * as fs from 'node_modules/pn/fs'
+
+export default {
+  namespace: 'app',
+  state: {
+    language: config.i18n.defaultLanguage,
+    style_prefix: config.app.defaultStyleClass ?? "app_",
+    queryDone: false,
+    env_proccess: process.env,
+    dispatcher: null,
+
+    session_valid: false,
+    session_token: null,
+    session: {},
+
+    account_data: [],
+
+    notifications: [],
+  },
+  subscriptions: {
+    setup({ dispatch }) {
+      dispatch({ type: 'updateState', payload: { dispatcher: dispatch } })
+      dispatch({ type: 'initFrames' })
+      dispatch({ type: 'query' })
+    },
+    setupHistory({ dispatch, history }) {
+      history.listen(location => {
+        dispatch({
+          type: 'updateState',
+          payload: {
+            locationPathname: location.pathname,
+            locationQuery: location.query,
+          },
+        })
+      })
+    },
+    setupRequestCancel({ history }) {
+      history.listen(() => {
+        const { cancelRequest = new Map() } = window
+        cancelRequest.forEach((value, key) => {
+          if (value.pathname !== window.location.pathname) {
+            cancelRequest.delete(key);
+          }
+        })
+      })
+    },
+  },
+  effects: {
+    *query({ payload }, { call, put, select }) {
+      const state = yield select(state => state.app)
+
+      window.changeLocale = setLocale
+      window.dispatcher = state.dispatcher
+      window.Externals = []
+
+      if (state.session) {
+        let updated = {}
+
+        const fromSessionFrame = ["username", "sub", "iat", "fullName", "avatar", "email"]
+
+        fromSessionFrame.forEach((e) => {
+          try {
+            updated[e] = state.session[e]
+          } catch (error) {
+            console.log(error)
+          }
+        })
+
+        state.dispatcher({ type: "updateState", payload: { account_data: updated } })
+      }
+
+      queryIndexer([
+        {
+          match: '/s;:id',
+          to: `/settings?key=:id`,
+        },
+        {
+          match: '/@:id',
+          to: `/@/:id`,
+        }
+      ], (callback) => {
+        window.location = callback
+      })
+
+      window.classToStyle = (key) => {
+        if (typeof (key) !== "string") {
+          try {
+            const toString = JSON.stringify(key)
+            if (toString) {
+              return toString
+            } else {
+              return null
+            }
+          } catch (error) {
+            return null
+          }
+        }
+        if (typeof (state.style_prefix) !== "undefined") {
+          return `${state.style_prefix}${key}`
+        }
+        return key
+      }
+
+      window.Externals.path = path
+      window.Externals.fs = fs
+
+      if (!state.session_valid) {
+        history.push(`/login`)
+      }
+
+      const shouldRedirectFromLogin = () => {
+        const force = JSON.parse(new URLSearchParams(window.location.search).get('force')) ?? false
+        return (window.location.pathname == "/login" || window.location.pathname == "/") && !force
+      }
+
+      if (shouldRedirectFromLogin() && state.session_valid) {
+        history.push(config.app.mainPath)
+      }
+
+    },
+    *login({ payload, callback }, { call, put, select }) {
+      const state = yield select(state => state.app)
+      state.dispatcher({
+        type: "api/request",
+        payload: {
+          endpoint: "login",
+          body: payload
+        },
+        callback: (response) => {
+          if (response.code == 100) {
+            store.set(config.app.storage.signkey, response.data.originKey)
+            store.set(config.app.storage.session_frame, response.data.token)
+            location.reload()
+            if (typeof (callback) !== "undefined") {
+              return callback(false, null)
+            }
+          } else {
+            if (typeof (callback) !== "undefined") {
+              return callback(true, response)
+            }
+          }
+        }
+      })
+    },
+    *isAuth({ payload, callback }, { call, put, select }) {
+      const state = yield select(state => state.app)
+      state.dispatcher({
+        type: "api/request",
+        payload: {
+          endpoint: "isAuth"
+        },
+        callback: (response) => {
+          if(typeof(callback) !== "undefined") {
+            callback(response)
+          }
+          if (response.code == 200 && response.data) {
+            ui.Notify.success("You are authed")
+          }else{
+            ui.Notify.warn("Its seems like you are not authed")
+          }
+        }
+      })
+    },
+    *initFrames({ payload }, { select }) {
+      const state = yield select(state => state.app)
+
+      const signkey = store.get(config.app.storage.signkey)
+      const session = store.get(config.app.storage.session_frame)
+      if (session) {
+        try {
+          if (config.app.certified_signkeys.includes(signkey)) {
+            jwt.verify(session, signkey, (err, decoded) => {
+              if (err) {
+                verbosity([`Invalid token > `, err])
+                state.dispatcher({ type: "logout" })
+              }
+              if (decoded) {
+                state.dispatcher({
+                  type: "updateState", payload: {
+                    session_token: session,
+                    session: decoded,
+                    session_valid: true
+                  }
+                })
+              }
+            })
+          } else {
+            verbosity(`signed key is not an certifed signkey`)
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    },
+    *logout({ payload }, { select }) {
+      const state = yield select(state => state.app)
+      state.dispatcher({
+        type: "api/request",
+        payload: {
+          endpoint: "logout"
+        },
+        callback: (response) => {
+          console.log(response)
+        }
+      })
+      state.dispatcher({ type: "destroySession" })
+    },
+  },
+  reducers: {
+    updateState(state, { payload }) {
+      return {
+        ...state,
+        ...payload,
+      };
+    },
+    destroySession(state) {
+      state.session = false
+      state.session_valid = false
+      store.remove(config.app.storage.session_frame)
+      store.remove(config.app.storage.signkey)
+    }
+  }
+}

@@ -1,0 +1,160 @@
+@import './fonts.css';
+@app_wrapper_background: rgb(248, 246, 248);
+@app_header_background: #ffffff;
+
+@app_header_height: 55px;
+
+@app_menuItemSize: 100px;
+@app_menuItemIconSize: 30px;
+@app_menuItemTextSize: 12px;
+
+.app_header {
+    background-color: @app_header_background;
+    border-radius: 0 0 18px 18px;
+    transition: all ease-in-out 150ms;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    position: sticky;
+    z-index: 100;
+    top: 0;
+    right: 0;
+
+    height: @app_header_height;
+    width: 100vw;
+
+    padding: 12px;
+
+    > div {
+        margin: 0 5px;
+    }
+
+    &.hidden{
+        height: 0;
+        padding: 0;
+    }
+}
+
+.app_wrapper {
+    padding: 12px 8px 34px 8px;
+    height: 100%;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.app_footer {
+    position: fixed;
+    z-index: 100;
+    bottom: 0;
+    left: 0;
+
+    background-color: #fff;
+    padding: 5px 25px;
+    font-size: 10px;
+
+    height: fit-content;
+    width: 100%;
+}
+
+// Menus & Index's
+
+.app_indexMenu {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 10px 10px;
+    grid-template-areas:
+    ". . ."
+    ". . ."
+    ". . .";
+
+    .secondary {
+
+    }
+    
+    > div {
+        margin: auto;
+    }
+    > button {
+        margin: auto;
+    }
+
+    :global {
+        .ant-row {
+            margin: auto;
+        }
+    }
+}
+
+.app_indexMenuBottom {
+    position: relative;
+    bottom: 0;
+    display: flex;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 10px 10px;
+    grid-template-areas:
+    ". . ."
+    ". . ."
+    ". . .";
+
+    > button {
+        margin: auto;
+    }
+
+}
+
+.app_indexMenuItem {
+    cursor: pointer;
+    display: flex!important;
+    flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 8px!important;
+    padding: 10px!important;
+
+    align-items: center;
+    justify-content: center;
+
+    height: @app_menuItemSize!important;
+    width: @app_menuItemSize!important;
+    
+    line-height: unset!important;
+    font-weight: unset!important;
+    white-space: unset!important;
+
+    font-size: unset!important;
+    color: unset!important;
+
+    .icon {
+        svg {
+            height: @app_menuItemIconSize;
+            width: @app_menuItemIconSize;
+        }
+    }
+
+    .title {
+        text-align: center;
+        margin-top: 7px;
+        font-size: @app_menuItemTextSize;
+    }
+
+}
+
+.app_login {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+

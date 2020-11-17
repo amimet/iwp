@@ -1,0 +1,8 @@
+[
+    {
+        "key": "redux",
+        "component": "redux",
+        "title": "Redux State",
+        "icon": "Globe"
+    },
+]

@@ -1,0 +1,315 @@
+[2020-11-12T13:28:49.156] [DEBUG] logs - Finded packageJSON > {"name":"amimet-app","version":"0.1.10","description":"","types":"index.d.ts","scripts":{"capinit":"cap init","add-android":"cap add android","android":"umi dev --android","ios":"umi dev --ios","build-android":"umi build --android","build-ios":"umi build --ios","start":"umi dev","test":"cross-env BABELRC=none umi test","inspectMode":"node --inspect-brk ./node_modules/.bin/umi dev","analyze":"cross-env ANALYZE=1 umi build","build":"umi build","check:model":"umi dva list model","lint:js":"eslint --ext .js src","lint:style":"stylelint \"src/**/*.less\" --syntax less","prettier":"prettier --write 'src/**/*.{js,less}'","precommit":"lint-staged","add-locale":"lingui add-locale","extract":"lingui extract","trans":"lingui extract --clean && node ./scripts/translate.js","doc":"docsify serve docs"},"engines":{"node":">= 10.0.0"},"lint-staged":{"src/**/*.js":["eslint --ext .js --fix","npm run prettier","git add"],"**/*.less":["stylelint --syntax less","npm run prettier","git add"]},"lingui":{"locales":["en","es"],"catalogs":[{"path":"src/locales/{locale}","include":["src/"]}],"localeDir":"src/locales/","srcPathDirs":["src/"],"fallbackLocale":"en","sourceLocale":"en","format":"minimal","extractBabelOptions":{"presets":["@umijs/babel-preset-umi"]}},"author":"","license":"ISC","dependencies":{"@babel/core":"^7.12.3","@capacitor/android":"^2.4.2","@capacitor/cli":"^2.4.2","@capacitor/core":"^2.4.2","@lingui/babel-preset-react":"^2.9.2","@lingui/cli":"^2.9.0","@lingui/loader":"^2.9.0","@lingui/react":"^2.8.0","@ragestudio/nodecore-cli":"^0.2.17","@steveeeie/react-page-transition":"^1.2.0","@types/lodash":"^4.14.164","@types/node":"^14.14.6","@umijs/preset-react":"^1.6.16","axios":"^0.21.0","babel-core":"^7.0.0-bridge.0","babel-plugin-dev-expression":"^0.2.2","babel-plugin-module-resolver":"^4.0.0","classnames":"^2.2.6","concat-stream":"^2.0.0","concurrently":"^5.3.0","cookie_js":"^1.4.0","cross-env":"^7.0.2","dotenv":"^8.2.0","feather-reactjs":"^2.0.13","jsonwebtoken":"^8.5.1","lodash":"^4.17.20","moment":"^2.29.1","nprogress":"^0.2.0","platform":"^1.3.6","react":"^17.0.1","react-dom":"^17.0.1","react-feather":"^2.0.8","react-helmet":"^6.1.0","react-reveal":"^1.2.2","react-scripts":"^4.0.0","react-transition-group":"^4.4.1","socket.io-client":"^2.3.1","store":"^2.0.12","styled-components":"^5.2.1","ts-jest":"^26.4.3","typescript":"^4.0.5","umi":"^3.2.24","wait-on":"^5.2.0"},"devDependencies":{"@babel/plugin-proposal-decorators":"^7.4.4","babel-eslint":"^10.0.1","eslint":"^7.0.0","eslint-config-react-app":"^5.0.0","eslint-plugin-flowtype":"^5.1.0","eslint-plugin-import":"^2.18.0","eslint-plugin-jsx-a11y":"^6.2.1","eslint-plugin-react":"^7.14.0","eslint-plugin-react-hooks":"^4.0.0","husky":"^4.2.0","less-vars-to-js":"^1.3.0","lint-staged":"^10.0.0","stylelint":"^13.2.0","stylelint-config-prettier":"^8.0.0","stylelint-config-standard":"^20.0.0"}}
+[2020-11-12T13:28:49.651] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\debuggers\redux" exists
+[2020-11-12T13:28:49.652] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184129161" exists
+[2020-11-12T13:28:49.652] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184129161"
+[2020-11-12T13:28:49.893] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:28:50.199] [DEBUG] logs - Extracted NaN files in 31.41 ms
+[2020-11-12T13:28:50.201] [DEBUG] logs - Installing from npm > @ragestudio/nodecore-utils < Requested by (debugRedux)
+[2020-11-12T13:29:58.171] [DEBUG] logs - npm installer exit with 0
+[2020-11-12T13:29:58.171] [DEBUG] logs - + @ragestudio/nodecore-utils@0.1.21
+added 168 packages from 42 contributors and audited 3464 packages in 61.462s
+
+212 packages are looking for funding
+  run `npm fund` for details
+
+found 3 low severity vulnerabilities
+  run `npm audit fix` to fix them, or `npm audit` for details
+
+[2020-11-12T13:29:58.172] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:29:58.172] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:29:58.172] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:29:58.172] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:29:58.172] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:29:58.172] [DEBUG] logs - Installing from npm > antd < Requested by (debugRedux)
+[2020-11-12T13:31:11.750] [DEBUG] logs - npm installer exit with 0
+[2020-11-12T13:31:11.750] [DEBUG] logs - + antd@4.8.2
+updated 8 packages and audited 3469 packages in 67.937s
+
+212 packages are looking for funding
+  run `npm fund` for details
+
+found 3 low severity vulnerabilities
+  run `npm audit fix` to fix them, or `npm audit` for details
+
+[2020-11-12T13:31:11.750] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:31:11.753] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:31:11.763] [DEBUG] logs - [nodecore] Installing > elementList < as dependecy of debugRedux
+[2020-11-12T13:31:11.964] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\elementList" exists
+[2020-11-12T13:31:11.964] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184271763" exists
+[2020-11-12T13:31:11.964] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184271763"
+[2020-11-12T13:31:12.209] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:31:12.512] [DEBUG] logs - Extracted NaN files in 27.19 ms
+[2020-11-12T13:31:12.512] [DEBUG] logs - Installing from npm > @ragestudio/nodecore-utils < Requested by (elementList)
+[2020-11-12T13:31:21.668] [DEBUG] logs - Finded packageJSON > {"name":"amimet-app","version":"0.1.10","description":"","types":"index.d.ts","scripts":{"capinit":"cap init","add-android":"cap add android","android":"umi dev --android","ios":"umi dev --ios","build-android":"umi build --android","build-ios":"umi build --ios","start":"umi dev","test":"cross-env BABELRC=none umi test","inspectMode":"node --inspect-brk ./node_modules/.bin/umi dev","analyze":"cross-env ANALYZE=1 umi build","build":"umi build","check:model":"umi dva list model","lint:js":"eslint --ext .js src","lint:style":"stylelint \"src/**/*.less\" --syntax less","prettier":"prettier --write 'src/**/*.{js,less}'","precommit":"lint-staged","add-locale":"lingui add-locale","extract":"lingui extract","trans":"lingui extract --clean && node ./scripts/translate.js","doc":"docsify serve docs"},"engines":{"node":">= 10.0.0"},"lint-staged":{"src/**/*.js":["eslint --ext .js --fix","npm run prettier","git add"],"**/*.less":["stylelint --syntax less","npm run prettier","git add"]},"lingui":{"locales":["en","es"],"catalogs":[{"path":"src/locales/{locale}","include":["src/"]}],"localeDir":"src/locales/","srcPathDirs":["src/"],"fallbackLocale":"en","sourceLocale":"en","format":"minimal","extractBabelOptions":{"presets":["@umijs/babel-preset-umi"]}},"author":"","license":"ISC","dependencies":{"@babel/core":"^7.12.3","@capacitor/android":"^2.4.2","@capacitor/cli":"^2.4.2","@capacitor/core":"^2.4.2","@lingui/babel-preset-react":"^2.9.2","@lingui/cli":"^2.9.0","@lingui/loader":"^2.9.0","@lingui/react":"^2.8.0","@ragestudio/nodecore-cli":"^0.2.17","@ragestudio/nodecore-utils":"^0.1.21","@steveeeie/react-page-transition":"^1.2.0","@types/lodash":"^4.14.164","@types/node":"^14.14.6","@umijs/preset-react":"^1.6.16","antd":"^4.8.2","axios":"^0.21.0","babel-core":"^7.0.0-bridge.0","babel-plugin-dev-expression":"^0.2.2","babel-plugin-module-resolver":"^4.0.0","classnames":"^2.2.6","concat-stream":"^2.0.0","concurrently":"^5.3.0","cookie_js":"^1.4.0","cross-env":"^7.0.2","dotenv":"^8.2.0","feather-reactjs":"^2.0.13","jsonwebtoken":"^8.5.1","lodash":"^4.17.20","moment":"^2.29.1","nprogress":"^0.2.0","platform":"^1.3.6","react":"^17.0.1","react-dom":"^17.0.1","react-feather":"^2.0.8","react-helmet":"^6.1.0","react-reveal":"^1.2.2","react-scripts":"^4.0.0","react-transition-group":"^4.4.1","socket.io-client":"^2.3.1","store":"^2.0.12","styled-components":"^5.2.1","ts-jest":"^26.4.3","typescript":"^4.0.5","umi":"^3.2.24","wait-on":"^5.2.0"},"devDependencies":{"@babel/plugin-proposal-decorators":"^7.4.4","babel-eslint":"^10.0.1","eslint":"^7.0.0","eslint-config-react-app":"^5.0.0","eslint-plugin-flowtype":"^5.1.0","eslint-plugin-import":"^2.18.0","eslint-plugin-jsx-a11y":"^6.2.1","eslint-plugin-react":"^7.14.0","eslint-plugin-react-hooks":"^4.0.0","husky":"^4.2.0","less-vars-to-js":"^1.3.0","lint-staged":"^10.0.0","stylelint":"^13.2.0","stylelint-config-prettier":"^8.0.0","stylelint-config-standard":"^20.0.0"}}
+[2020-11-12T13:31:21.934] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\debuggers\redux" exists
+[2020-11-12T13:31:21.935] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184281672" exists
+[2020-11-12T13:31:21.936] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184281672"
+[2020-11-12T13:31:22.220] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:31:22.523] [DEBUG] logs - Extracted NaN files in 32.21 ms
+[2020-11-12T13:31:22.524] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:31:22.525] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:31:22.525] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:31:22.525] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:31:22.525] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:31:22.525] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:31:22.525] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:31:22.525] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:31:22.528] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:31:22.537] [DEBUG] logs - [nodecore] Installing > elementList < as dependecy of debugRedux
+[2020-11-12T13:31:22.746] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\elementList" exists
+[2020-11-12T13:31:22.746] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184282537" exists
+[2020-11-12T13:31:22.746] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184282537"
+[2020-11-12T13:31:22.981] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:31:23.284] [DEBUG] logs - Extracted NaN files in 22.03 ms
+[2020-11-12T13:31:23.284] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:31:23.284] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:31:23.284] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:31:23.284] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:31:23.284] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T13:31:23.284] [DEBUG] logs - [npm] installed store
+[2020-11-12T13:31:23.284] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:31:23.284] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:31:23.285] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T13:31:23.285] [DEBUG] logs - [npm] installed umi
+[2020-11-12T13:31:23.285] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:31:23.285] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:31:23.286] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:36:47.417] [DEBUG] logs - Finded packageJSON > {"name":"amimet-app","version":"0.1.10","description":"","types":"index.d.ts","scripts":{"capinit":"cap init","add-android":"cap add android","android":"umi dev --android","ios":"umi dev --ios","build-android":"umi build --android","build-ios":"umi build --ios","start":"umi dev","test":"cross-env BABELRC=none umi test","inspectMode":"node --inspect-brk ./node_modules/.bin/umi dev","analyze":"cross-env ANALYZE=1 umi build","build":"umi build","check:model":"umi dva list model","lint:js":"eslint --ext .js src","lint:style":"stylelint \"src/**/*.less\" --syntax less","prettier":"prettier --write 'src/**/*.{js,less}'","precommit":"lint-staged","add-locale":"lingui add-locale","extract":"lingui extract","trans":"lingui extract --clean && node ./scripts/translate.js","doc":"docsify serve docs"},"engines":{"node":">= 10.0.0"},"lint-staged":{"src/**/*.js":["eslint --ext .js --fix","npm run prettier","git add"],"**/*.less":["stylelint --syntax less","npm run prettier","git add"]},"lingui":{"locales":["en","es"],"catalogs":[{"path":"src/locales/{locale}","include":["src/"]}],"localeDir":"src/locales/","srcPathDirs":["src/"],"fallbackLocale":"en","sourceLocale":"en","format":"minimal","extractBabelOptions":{"presets":["@umijs/babel-preset-umi"]}},"author":"","license":"ISC","dependencies":{"@babel/core":"^7.12.3","@capacitor/android":"^2.4.2","@capacitor/cli":"^2.4.2","@capacitor/core":"^2.4.2","@lingui/babel-preset-react":"^2.9.2","@lingui/cli":"^2.9.0","@lingui/loader":"^2.9.0","@lingui/react":"^2.8.0","@ragestudio/nodecore-cli":"^0.2.17","@ragestudio/nodecore-utils":"^0.1.21","@steveeeie/react-page-transition":"^1.2.0","@types/lodash":"^4.14.164","@types/node":"^14.14.6","@umijs/preset-react":"^1.6.16","antd":"^4.8.2","axios":"^0.21.0","babel-core":"^7.0.0-bridge.0","babel-plugin-dev-expression":"^0.2.2","babel-plugin-module-resolver":"^4.0.0","classnames":"^2.2.6","concat-stream":"^2.0.0","concurrently":"^5.3.0","cookie_js":"^1.4.0","cross-env":"^7.0.2","dotenv":"^8.2.0","feather-reactjs":"^2.0.13","jsonwebtoken":"^8.5.1","lodash":"^4.17.20","moment":"^2.29.1","nprogress":"^0.2.0","platform":"^1.3.6","react":"^17.0.1","react-dom":"^17.0.1","react-feather":"^2.0.8","react-helmet":"^6.1.0","react-reveal":"^1.2.2","react-scripts":"^4.0.0","react-transition-group":"^4.4.1","socket.io-client":"^2.3.1","store":"^2.0.12","styled-components":"^5.2.1","ts-jest":"^26.4.3","typescript":"^4.0.5","umi":"^3.2.24","wait-on":"^5.2.0"},"devDependencies":{"@babel/plugin-proposal-decorators":"^7.4.4","babel-eslint":"^10.0.1","eslint":"^7.0.0","eslint-config-react-app":"^5.0.0","eslint-plugin-flowtype":"^5.1.0","eslint-plugin-import":"^2.18.0","eslint-plugin-jsx-a11y":"^6.2.1","eslint-plugin-react":"^7.14.0","eslint-plugin-react-hooks":"^4.0.0","husky":"^4.2.0","less-vars-to-js":"^1.3.0","lint-staged":"^10.0.0","stylelint":"^13.2.0","stylelint-config-prettier":"^8.0.0","stylelint-config-standard":"^20.0.0"}}
+[2020-11-12T13:36:47.819] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\debuggers\redux" exists
+[2020-11-12T13:36:47.820] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184607422" exists
+[2020-11-12T13:36:47.821] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184607422"
+[2020-11-12T13:36:48.083] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:36:48.387] [DEBUG] logs - Extracted NaN files in 30.68 ms
+[2020-11-12T13:36:48.388] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:36:48.389] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:36:48.389] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:36:48.389] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:36:48.389] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:36:48.389] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:36:48.389] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:36:48.389] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:36:48.391] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:36:48.402] [DEBUG] logs - [nodecore] Installing > elementList < as dependecy of debugRedux
+[2020-11-12T13:36:48.610] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\elementList" exists
+[2020-11-12T13:36:48.610] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184608402" exists
+[2020-11-12T13:36:48.610] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184608402"
+[2020-11-12T13:36:48.848] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:36:49.153] [DEBUG] logs - Extracted NaN files in 21.54 ms
+[2020-11-12T13:36:49.154] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:36:49.154] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:36:49.154] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:36:49.154] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:36:49.154] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T13:36:49.154] [DEBUG] logs - [npm] installed store
+[2020-11-12T13:36:49.154] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:36:49.154] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:36:49.154] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T13:36:49.154] [DEBUG] logs - [npm] installed umi
+[2020-11-12T13:36:49.154] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:36:49.154] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:36:49.156] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:38:52.311] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\debuggers\redux" exists
+[2020-11-12T13:38:52.313] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184732007" exists
+[2020-11-12T13:38:52.314] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184732007"
+[2020-11-12T13:38:52.574] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:38:52.878] [DEBUG] logs - Extracted NaN files in 28.65 ms
+[2020-11-12T13:38:52.881] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:38:52.881] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:38:52.882] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:38:52.882] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:38:52.882] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:38:52.882] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:38:52.882] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:38:52.882] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:38:52.885] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:38:52.895] [DEBUG] logs - [nodecore] Installing > elementList < as dependecy of debugRedux
+[2020-11-12T13:38:53.093] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\elementList" exists
+[2020-11-12T13:38:53.093] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184732896" exists
+[2020-11-12T13:38:53.093] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184732896"
+[2020-11-12T13:38:53.414] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:38:53.719] [DEBUG] logs - Extracted NaN files in 22.98 ms
+[2020-11-12T13:38:53.720] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:38:53.720] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:38:53.720] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:38:53.721] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:38:53.721] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T13:38:53.721] [DEBUG] logs - [npm] installed store
+[2020-11-12T13:38:53.722] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:38:53.722] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:38:53.722] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T13:38:53.722] [DEBUG] logs - [npm] installed umi
+[2020-11-12T13:38:53.723] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:38:53.723] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:38:53.725] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:39:10.621] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\debuggers\redux" exists
+[2020-11-12T13:39:10.624] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184750271" exists
+[2020-11-12T13:39:10.624] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\debugRedux_1605184750271"
+[2020-11-12T13:39:10.888] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:39:11.201] [DEBUG] logs - Extracted NaN files in 46.95 ms
+[2020-11-12T13:39:11.206] [DEBUG] logs - Installing from npm > @ragestudio/nodecore-utils < Requested by (debugRedux)
+[2020-11-12T13:40:00.218] [DEBUG] logs - npm installer exit with 0
+[2020-11-12T13:40:00.218] [DEBUG] logs - + @ragestudio/nodecore-utils@0.1.21
+updated 1 package and audited 3465 packages in 44.208s
+
+193 packages are looking for funding
+  run `npm fund` for details
+
+found 3 low severity vulnerabilities
+  run `npm audit fix` to fix them, or `npm audit` for details
+
+[2020-11-12T13:40:00.218] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:40:00.219] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:40:00.219] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:40:00.219] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:40:00.219] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:40:00.220] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:40:00.220] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:40:00.221] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T13:40:00.231] [DEBUG] logs - [nodecore] Installing > elementList < as dependecy of debugRedux
+[2020-11-12T13:40:00.438] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\elementList" exists
+[2020-11-12T13:40:00.439] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184800231" exists
+[2020-11-12T13:40:00.439] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\elementList_1605184800231"
+[2020-11-12T13:40:00.690] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T13:40:00.994] [DEBUG] logs - Extracted NaN files in 29.49 ms
+[2020-11-12T13:40:00.995] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T13:40:00.995] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T13:40:00.996] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T13:40:00.996] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T13:40:00.996] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T13:40:00.996] [DEBUG] logs - [npm] installed store
+[2020-11-12T13:40:00.996] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T13:40:00.996] [DEBUG] logs - [npm] installed react
+[2020-11-12T13:40:00.996] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T13:40:00.996] [DEBUG] logs - [npm] installed umi
+[2020-11-12T13:40:00.997] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T13:40:00.997] [DEBUG] logs - [npm] installed antd
+[2020-11-12T13:40:00.999] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T14:24:30.838] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\pages\debug" exists
+[2020-11-12T14:24:30.841] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\nodecoreDebugger_1605187470518" exists
+[2020-11-12T14:24:30.841] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\nodecoreDebugger_1605187470518"
+[2020-11-12T14:24:31.333] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:24:31.334] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:24:31.640] [DEBUG] logs - Extracted 1 files in 273.71 ms
+[2020-11-12T14:24:31.642] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T14:24:31.642] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T14:24:31.642] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T14:24:31.642] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T14:24:31.643] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T14:24:31.643] [DEBUG] logs - [npm] installed store
+[2020-11-12T14:24:31.643] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T14:24:31.643] [DEBUG] logs - [npm] installed react
+[2020-11-12T14:24:31.644] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T14:24:31.644] [DEBUG] logs - [npm] installed umi
+[2020-11-12T14:24:31.644] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T14:24:31.644] [DEBUG] logs - [npm] installed antd
+[2020-11-12T14:24:31.646] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T14:24:31.657] [DEBUG] logs - [nodecore] Installing > ListedMenu < as dependecy of nodecoreDebugger
+[2020-11-12T14:24:31.883] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\ListedMenu" exists
+[2020-11-12T14:24:31.884] [DEBUG] logs - Creating [installPath] "C:\Development\amimet-app\src\components\ListedMenu"
+[2020-11-12T14:24:31.884] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\ListedMenu_1605187471657" exists
+[2020-11-12T14:24:31.884] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\ListedMenu_1605187471657"
+[2020-11-12T14:24:32.134] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:24:32.135] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:24:32.440] [DEBUG] logs - Extracted 1 files in 36.50 ms
+[2020-11-12T14:24:32.440] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.21
+[2020-11-12T14:24:32.440] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T14:24:32.441] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T14:24:32.441] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T14:24:32.441] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T14:24:32.441] [DEBUG] logs - [npm] installed store
+[2020-11-12T14:24:32.441] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T14:24:32.441] [DEBUG] logs - [npm] installed react
+[2020-11-12T14:24:32.441] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T14:24:32.441] [DEBUG] logs - [npm] installed umi
+[2020-11-12T14:24:32.442] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T14:24:32.442] [DEBUG] logs - [npm] installed antd
+[2020-11-12T14:24:32.442] [DEBUG] logs - classnames is already installed > ^2.2.6
+[2020-11-12T14:24:32.442] [DEBUG] logs - [npm] installed classnames
+[2020-11-12T14:24:32.444] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T14:29:14.426] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\pages\debug" exists
+[2020-11-12T14:29:14.428] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\nodecoreDebugger_1605187754098" exists
+[2020-11-12T14:29:14.428] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\nodecoreDebugger_1605187754098"
+[2020-11-12T14:29:14.681] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:29:14.682] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:29:14.985] [DEBUG] logs - Extracted 1 files in 36.45 ms
+[2020-11-12T14:29:14.988] [DEBUG] logs - Installing from npm > @ragestudio/nodecore-utils < Requested by (nodecoreDebugger)
+[2020-11-12T14:30:02.470] [DEBUG] logs - npm installer exit with 0
+[2020-11-12T14:30:02.470] [DEBUG] logs - + @ragestudio/nodecore-utils@0.1.22
+updated 1 package and audited 3465 packages in 41.912s
+
+193 packages are looking for funding
+  run `npm fund` for details
+
+found 3 low severity vulnerabilities
+  run `npm audit fix` to fix them, or `npm audit` for details
+
+[2020-11-12T14:30:02.470] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T14:30:02.471] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T14:30:02.471] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T14:30:02.471] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T14:30:02.471] [DEBUG] logs - [npm] installed store
+[2020-11-12T14:30:02.471] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T14:30:02.471] [DEBUG] logs - [npm] installed react
+[2020-11-12T14:30:02.472] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T14:30:02.472] [DEBUG] logs - [npm] installed umi
+[2020-11-12T14:30:02.472] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T14:30:02.472] [DEBUG] logs - [npm] installed antd
+[2020-11-12T14:30:02.474] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T14:30:02.482] [DEBUG] logs - [nodecore] Installing > ListedMenu < as dependecy of nodecoreDebugger
+[2020-11-12T14:30:02.809] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\components\ListedMenu" exists
+[2020-11-12T14:30:02.809] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\ListedMenu_1605187802482" exists
+[2020-11-12T14:30:02.809] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\ListedMenu_1605187802482"
+[2020-11-12T14:30:03.030] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:30:03.031] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:30:03.337] [DEBUG] logs - Extracted 1 files in 25.47 ms
+[2020-11-12T14:30:03.338] [DEBUG] logs - @ragestudio/nodecore-utils is already installed > ^0.1.22
+[2020-11-12T14:30:03.338] [DEBUG] logs - [npm] installed @ragestudio/nodecore-utils
+[2020-11-12T14:30:03.338] [DEBUG] logs - feather-reactjs is already installed > ^2.0.13
+[2020-11-12T14:30:03.338] [DEBUG] logs - [npm] installed feather-reactjs
+[2020-11-12T14:30:03.339] [DEBUG] logs - store is already installed > ^2.0.12
+[2020-11-12T14:30:03.339] [DEBUG] logs - [npm] installed store
+[2020-11-12T14:30:03.339] [DEBUG] logs - react is already installed > ^17.0.1
+[2020-11-12T14:30:03.339] [DEBUG] logs - [npm] installed react
+[2020-11-12T14:30:03.339] [DEBUG] logs - umi is already installed > ^3.2.24
+[2020-11-12T14:30:03.340] [DEBUG] logs - [npm] installed umi
+[2020-11-12T14:30:03.340] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T14:30:03.340] [DEBUG] logs - [npm] installed antd
+[2020-11-12T14:30:03.340] [DEBUG] logs - classnames is already installed > ^2.2.6
+[2020-11-12T14:30:03.341] [DEBUG] logs - [npm] installed classnames
+[2020-11-12T14:30:03.343] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T14:36:12.620] [DEBUG] logs - Check if [installPath] "C:\Development\amimet-app\src\theme" exists
+[2020-11-12T14:36:12.623] [DEBUG] logs - Creating [installPath] "C:\Development\amimet-app\src\theme"
+[2020-11-12T14:36:12.623] [DEBUG] logs - Check if [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\antd_basetheme_1605188172302" exists
+[2020-11-12T14:36:12.623] [DEBUG] logs - Creating [downloadPath] "C:\Development\amimet-app\node_modules\@ragestudio\nodecore-cli\dist\dltmp\antd_basetheme_1605188172302"
+[2020-11-12T14:36:12.892] [DEBUG] logs - 0% | Extracting undefined
+[2020-11-12T14:36:12.894] [DEBUG] logs - 0% | Extracting undefined
+[2020-11-12T14:36:12.896] [DEBUG] logs - 0% | Extracting undefined
+[2020-11-12T14:36:12.897] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.899] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.900] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.901] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.903] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.904] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.906] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.907] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.908] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.910] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.911] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:12.912] [DEBUG] logs - 100% | Extracting undefined
+[2020-11-12T14:36:13.273] [DEBUG] logs - Extracted 14 files in 127.50 ms
+[2020-11-12T14:36:13.276] [DEBUG] logs - antd is already installed > ^4.8.2
+[2020-11-12T14:36:13.277] [DEBUG] logs - [npm] installed antd
+[2020-11-12T14:36:13.277] [DEBUG] logs - Installing from npm > less-vars-to-js < Requested by (antd_basetheme)
+[2020-11-12T14:37:08.650] [DEBUG] logs - npm installer exit with 0
+[2020-11-12T14:37:08.650] [DEBUG] logs - + less-vars-to-js@1.3.0
+updated 1 package and audited 3469 packages in 49.91s
+
+212 packages are looking for funding
+  run `npm fund` for details
+
+found 3 low severity vulnerabilities
+  run `npm audit fix` to fix them, or `npm audit` for details
+
+[2020-11-12T14:37:08.651] [DEBUG] logs - [npm] installed less-vars-to-js
+[2020-11-12T14:37:08.655] [DEBUG] logs - Cleaning up temporal files...
+[2020-11-12T14:37:08.662] [DEBUG] logs - No required components [antd_basetheme]
