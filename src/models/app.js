@@ -24,6 +24,7 @@ export default {
     account_data: [],
 
     notifications: [],
+    activeTheme: "light"
   },
   subscriptions: {
     setup({ dispatch }) {

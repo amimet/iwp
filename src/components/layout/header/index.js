@@ -1,10 +1,10 @@
 import React from 'react'
-import { FormattedMessage, FormattedNumber } from 'react-intl'
-import * as Icons from 'feather-reactjs'
+import * as antd from 'antd'
 import classnames from 'classnames'
 
 export default class Header extends React.Component {
     state = {
+        loadingSearch: false,
         hidden: false
     }
 
@@ -35,16 +35,17 @@ export default class Header extends React.Component {
         if (this.state.hidden) {
             return null
         }
-        return <div>{this.renderHeaderBack()} {this.renderHeaderTextDecorator()}</div>
+        return <div>{this.renderHeaderBack()}</div>
     }
 
     render() {
         window.headerVisible = !this.state.hidden
         
         return (
-            <div className={classnames(window.classToStyle("header"), { ["hidden"]: this.state.hidden })}>
+            <antd.Layout.Header className={classnames(window.classToStyle("header"), { ["hidden"]: this.state.hidden })} >
+                <antd.Input.Search className={window.classToStyle("searchBar")} placeholder="Search on app..." loading={this.state.loadingSearch} />
                 {this.renderContent()}
-            </div>
+            </antd.Layout.Header>
         )
     }
 }

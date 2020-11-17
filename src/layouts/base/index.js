@@ -1,20 +1,24 @@
 import React from 'react'
-import * as Icons from 'feather-reactjs'
+import * as antd from 'antd'
+import * as Icons from 'components/Icons'
 import { packagejson, config } from 'core'
-import { PageTransition } from 'components';
+import { PageTransition, Layout } from 'components';
 import { withRouter, connect, history } from 'umi'
 import "./index.less"
 import ngProgress from 'nprogress'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
-
-import Header from 'components/ui/header'
 
 @withRouter
 @connect(({ loading }) => ({ loading }))
 export default class BaseLayout extends React.Component {
     originPath = window.location.pathname
     state = {
+        collapsedSider: false,
         isMobile: null
+    }
+
+    toggleCollapseSider = (to) => {
+        this.setState({ collapsedSider: (to ?? !this.state.collapsedSider) })
     }
 
     handleClickBack() {
@@ -22,12 +26,14 @@ export default class BaseLayout extends React.Component {
     }
 
     componentDidMount() {
+        window.toggleCollapseSider = this.toggleCollapseSider
+
         this.enquireHandler = enquireScreen(mobile => {
             const { isMobile } = this.state
             if (isMobile !== mobile) {
                 window.isMobile = mobile
                 this.setState({
-                    isMobile: mobile,
+                    isMobile: mobile
                 })
             }
         })
@@ -55,19 +61,23 @@ export default class BaseLayout extends React.Component {
             }, 150)
         }
 
-        return <React.Fragment>
-            <Header handleBack={() => this.handleClickBack()} originPath={this.originPath} siteName={config.app.title} />
-            <div className={window.classToStyle("wrapper")} >
-                <PageTransition
-                    preset={config.app.defaultTransitionPreset ?? "moveToLeftFromRight"}
-                    transitionKey={window.location.pathname}
-                >
-                    {children}
-                </PageTransition>
-                <div className={window.classToStyle("footer")}>
-                    <Icons.Info /> | {versionDisplay} | {config.app.title ?? null}
-                </div>
-            </div>
-        </React.Fragment>
+        return <antd.Layout style={{ minHeight: '100vh' }}>
+            <Layout.Sider onCollapse={() => this.toggleCollapseSider()} collapsed={this.state.collapsedSider} />
+            <antd.Layout className={window.classToStyle("layout")}>
+                <Layout.Header handleBack={() => this.handleClickBack()} originPath={this.originPath} siteName={config.app.title} />
+
+                <antd.Layout.Content className={window.classToStyle("wrapper")}>
+                    <Layout.Breadcrumb />
+
+                    <PageTransition
+                        preset={config.app.defaultTransitionPreset ?? "moveToLeftFromRight"}
+                        transitionKey={window.location.pathname}
+                    >
+                        {children}
+                    </PageTransition>
+
+                </antd.Layout.Content>
+            </antd.Layout>
+        </antd.Layout>
     }
 }

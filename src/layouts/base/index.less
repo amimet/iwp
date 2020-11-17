@@ -1,34 +1,44 @@
-@import './fonts.css';
-@app_wrapper_background: rgb(248, 246, 248);
-@app_header_background: #ffffff;
+@app_wrapper_background: #ffffff;
+@app_wrapper_backgroundAccent: #ededed;
 
-@app_header_height: 55px;
+@app_header_background: #ffffff;
+@app_header_height: 58px;
+
+@app_colorAccent: #454545;
 
 @app_menuItemSize: 100px;
 @app_menuItemIconSize: 30px;
 @app_menuItemTextSize: 12px;
 
+.ant-layout-sider-children{
+    margin-top: @app_header_height!important;
+}
+
+// app_
+
+.app_layout{
+    background-color: @app_wrapper_background;
+    max-height: 100vh;
+}
+
 .app_header {
-    background-color: @app_header_background;
-    border-radius: 0 0 18px 18px;
+    background-color: @app_header_background!important;
+    height: @app_header_height;
+    border-bottom: 1px @app_wrapper_backgroundAccent solid;
+
     transition: all ease-in-out 150ms;
 
     display: flex;
     flex-direction: row;
 
     align-items: center;
-    position: sticky;
     z-index: 100;
-    top: 0;
-    right: 0;
 
     height: @app_header_height;
-    width: 100vw;
-
-    padding: 12px;
+    padding: 0 16px;
 
     > div {
-        margin: 0 5px;
+        margin: 0 16px;
     }
 
     &.hidden{
@@ -38,7 +48,7 @@
 }
 
 .app_wrapper {
-    padding: 12px 8px 34px 8px;
+    margin: 0 16px;
     height: 100%;
 
     overflow-x: hidden;
@@ -59,89 +69,29 @@
     width: 100%;
 }
 
+.app_searchBar {
+    color: @app_colorAccent!important;
+    border: 0!important;
+    width: 40%!important;
+    border-radius: 7px!important;
+
+    .ant-input {
+        background-color: @app_wrapper_backgroundAccent!important;
+        color: @app_colorAccent!important;
+        border: 0!important;
+    }
+
+    .ant-input-group{
+        display: flex;
+    }
+    
+    .ant-btn {
+        background-color: transparent!important;
+        border: 0!important;
+    }
+}
+
 // Menus & Index's
-
-.app_indexMenu {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    gap: 10px 10px;
-    grid-template-areas:
-    ". . ."
-    ". . ."
-    ". . .";
-
-    .secondary {
-
-    }
-    
-    > div {
-        margin: auto;
-    }
-    > button {
-        margin: auto;
-    }
-
-    :global {
-        .ant-row {
-            margin: auto;
-        }
-    }
-}
-
-.app_indexMenuBottom {
-    position: relative;
-    bottom: 0;
-    display: flex;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    gap: 10px 10px;
-    grid-template-areas:
-    ". . ."
-    ". . ."
-    ". . .";
-
-    > button {
-        margin: auto;
-    }
-
-}
-
-.app_indexMenuItem {
-    cursor: pointer;
-    display: flex!important;
-    flex-direction: column;
-    background-color: #ffffff;
-    border-radius: 8px!important;
-    padding: 10px!important;
-
-    align-items: center;
-    justify-content: center;
-
-    height: @app_menuItemSize!important;
-    width: @app_menuItemSize!important;
-    
-    line-height: unset!important;
-    font-weight: unset!important;
-    white-space: unset!important;
-
-    font-size: unset!important;
-    color: unset!important;
-
-    .icon {
-        svg {
-            height: @app_menuItemIconSize;
-            width: @app_menuItemIconSize;
-        }
-    }
-
-    .title {
-        text-align: center;
-        margin-top: 7px;
-        font-size: @app_menuItemTextSize;
-    }
-
-}
 
 .app_login {
     height: 100%;

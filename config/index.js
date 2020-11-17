@@ -3,6 +3,7 @@ const packagejson = require("../package.json")
 module.exports = {
     app: {
         title: packagejson.name,
+        app_model: "app",
         defaultStyleClass: "app_",
         defaultTransitionPreset: "moveToLeftFromRight",
         mainPath: '/main',
@@ -27,11 +28,7 @@ module.exports = {
             {
                 key: 'es',
                 title: 'Español',
-            },
-            {
-                key: 'ar',
-                title: 'Arabian',
-            },
+            }
         ],
         defaultLanguage: 'en',
     },
