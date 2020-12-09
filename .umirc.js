@@ -11,6 +11,7 @@ export default defineConfig({
         type: 'none',
     },
     alias: {
+        globals: path.resolve(__dirname, './globals'),
         theme: path.resolve(__dirname, './src/theme'),
         locales: path.resolve(__dirname, './src/locales'),
         core: path.resolve(__dirname, './src/core'),

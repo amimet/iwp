@@ -51,7 +51,7 @@ export default class Breadcrumb extends React.Component {
     render() {
         return (
             <antd.Breadcrumb style={{ margin: '16px 0' }}>
-                { this.renderFromPath()}
+                {this.renderFromPath()}
             </antd.Breadcrumb>
         )
     }

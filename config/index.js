@@ -7,7 +7,7 @@ module.exports = {
         defaultStyleClass: "app_",
         defaultTransitionPreset: "moveToLeftFromRight",
         mainPath: '/main',
-        api_hostname: "http://192.168.137.78:3000",
+        api_hostname: "http://localhost:3000",
 
         storage: { // specify where data is storaged
             session_frame: "session",

@@ -1,0 +1,19 @@
+[
+    {
+        "id": "main",
+        "title": "Dashboard",
+        "icon": "Home"
+    },
+    {
+        "sub": true,
+        "id": "geo",
+        "title": "Geo",
+        "icon": "Globe"
+    },
+    {
+        "id": "regions",
+        "title": "Regions",
+        "icon": "Target",
+        "parent": "geo"
+    }
+]
