@@ -135,12 +135,15 @@ export default {
           endpoint: "login",
           body: payload
         },
-        callback: (response) => {
+        callback: (error, response) => {
           if (response.code == 100) {
             store.set(config.app.storage.signkey, response.data.originKey)
             store.set(config.app.storage.session_frame, response.data.token)
             location.reload()
             if (typeof (callback) !== "undefined") {
+              if (error) {
+                return callback(true, response)
+              }
               return callback(false, null)
             }
           } else {
@@ -158,8 +161,11 @@ export default {
         payload: {
           endpoint: "isAuth"
         },
-        callback: (response) => {
+        callback: (error, response) => {
           if(typeof(callback) !== "undefined") {
+            if (error) {
+              return callback(false)
+            }
             callback(response)
           }
           if (response.code == 200 && response.data) {
@@ -208,8 +214,11 @@ export default {
         payload: {
           endpoint: "logout"
         },
-        callback: (response) => {
-          console.log(response)
+        callback: (error, response) => {
+          if (error) {
+            return console.error(`Falied to logout > ${response}`)
+          }
+          return console.log(response)
         }
       })
       state.dispatcher({ type: "destroySession" })

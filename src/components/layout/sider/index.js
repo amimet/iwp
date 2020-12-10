@@ -7,7 +7,6 @@ import { history } from 'umi'
 
 
 const { Sider } = Layout
-const { SubMenu } = Menu
 
 @withConnector
 export default class Sidebar extends React.Component {

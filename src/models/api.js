@@ -30,7 +30,7 @@ export default {
             })
                 .then((res) => {
                     if (typeof (callback) !== "undefined") {
-                        callback(res.data)
+                        return callback(res.data)
                     }
                     return res.data
                 })
@@ -38,7 +38,7 @@ export default {
                     ui.Notify.error("An network error has occurred")
                     verbosity(err)
                     if (typeof (callback) !== "undefined") {
-                        callback(err)
+                        return callback(true, err)
                     }
                     return null
                 })
