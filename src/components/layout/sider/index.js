@@ -95,10 +95,10 @@ export default class Sidebar extends React.Component {
             return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
         })
     }
-
+    
+    // TODO: Require query API
     renderAuthedMenu() {
         if (this.props.app.session_valid) {
-            console.log(this.props.app.account_data)
             return(
                 <Menu>
                     <Menu.Item>
