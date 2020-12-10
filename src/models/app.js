@@ -3,6 +3,7 @@ import { verbosity } from 'core/libs'
 import { history } from 'umi'
 import { queryIndexer, config, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
+import { defaults } from 'config'
 import * as ui from 'core/libs/ui'
 
 import * as path from 'node_modules/pn/path'
@@ -65,13 +66,22 @@ export default {
       if (state.session) {
         let updated = {}
 
+        const tryDefault = (key) => {
+          if (typeof(defaults[key]) !== "undefined") {
+            return defaults[key]
+          }
+          return null
+        }
         const fromSessionFrame = ["username", "sub", "iat", "fullName", "avatar", "email"]
 
         fromSessionFrame.forEach((e) => {
           try {
-            updated[e] = state.session[e]
+            if (state.session[e] != null) { // if false try to catch from defaults in config
+              return updated[e] = state.session[e]
+            }
+            return updated[e] = tryDefault(e)
           } catch (error) {
-            console.log(error)
+            return console.log(error)
           }
         })
 

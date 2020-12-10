@@ -25,6 +25,10 @@ export default class Breadcrumb extends React.Component {
                         return React.createElement(Icons[fromDecorator.icon])
                     }
                     return null
+                } else {
+                    if (splitedPathnames[0] == e) {
+                        return React.createElement(Icons["Home"])
+                    }
                 }
 
                 return null
@@ -40,8 +44,11 @@ export default class Breadcrumb extends React.Component {
                 return `${e}`
             }
 
+            function isFirst(e) {
+            }
+
             return splitedPathnames.map((e) => {
-                return <antd.Breadcrumb.Item key={e}>{getIcon(e)} {getDecorator(e)}</antd.Breadcrumb.Item>
+                return <antd.Breadcrumb.Item key={e}>{isFirst(e) ? <Icons.Home /> : null} {getIcon(e)} {getDecorator(e)}</antd.Breadcrumb.Item>
             })
         } catch (error) {
             return null

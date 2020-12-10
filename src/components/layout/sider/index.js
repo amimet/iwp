@@ -2,9 +2,10 @@ import React from 'react'
 import * as Icons from 'components/Icons'
 import { Layout, Menu } from 'antd'
 import withConnector from 'core/libs/withConnector'
-import Items from 'globals/sidebar.json'
+import * as antd from 'antd'
 import { history } from 'umi'
 
+import Items from 'globals/sidebar.json'
 
 const { Sider } = Layout
 
@@ -95,12 +96,30 @@ export default class Sidebar extends React.Component {
         })
     }
 
+    renderAuthedMenu() {
+        if (this.props.app.session_valid) {
+            console.log(this.props.app.account_data)
+            return(
+                <Menu>
+                    <Menu.Item>
+                       <antd.Avatar src={this.props.app.account_data["avatar"]} /> @{this.props.app.session.username?? "account"}
+                    </Menu.Item>
+                </Menu>
+            )
+        }
+    }
+
     render() {
         return (
             <Sider theme={this.state.theme} collapsible collapsed={this.props.collapsed} onCollapse={() => this.props.onCollapse()}>
-                <Menu onClick={(e) => this.handleClick(e)} theme={this.state.theme} defaultSelectedKeys={['1']} mode="inline">
-                    {this.renderMenuItems(this.state.menus)}
-                </Menu>
+                <div>
+                    <Menu onClick={(e) => this.handleClick(e)} theme={this.state.theme} defaultSelectedKeys={['1']} mode="inline">
+                        {this.renderMenuItems(this.state.menus)}
+                    </Menu>
+                </div>
+                <div>
+                    { this.renderAuthedMenu() }
+                </div>
             </Sider>
         )
     }

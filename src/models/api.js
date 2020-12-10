@@ -30,7 +30,10 @@ export default {
             })
                 .then((res) => {
                     if (typeof (callback) !== "undefined") {
-                        return callback(res.data)
+                        if (res.status !== 200) { // not successful request
+                            return callback(true, res.data)
+                        }
+                        return callback(false, res.data)
                     }
                     return res.data
                 })
