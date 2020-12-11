@@ -121,7 +121,7 @@ export default class Sidebar extends React.Component {
                     {this.renderMenuItems(item.childrens)}
                 </Menu.SubMenu>
             }
-            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
+            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} ><span>{item.title ?? item.id}</span></Menu.Item>
         })
     }
 
@@ -129,7 +129,6 @@ export default class Sidebar extends React.Component {
         top: () => {
             return <Menu
                 onClick={(e) => this.handleClick(e)}
-                collapsed={this.props.collapsed}
                 theme={this.state.theme}
                 mode="inline"
             >
@@ -139,7 +138,6 @@ export default class Sidebar extends React.Component {
         bottom: () => {
             return <Menu
                 onClick={(e) => this.handleClick(e)}
-                collapsed={this.props.collapsed}
                 theme={this.state.theme}
                 mode="inline"
             >
@@ -158,8 +156,6 @@ export default class Sidebar extends React.Component {
                 collapsible
                 collapsed={this.props.collapsed}
                 onCollapse={() => this.props.onCollapse()}
-                mode="inline"
-
             >
                 <div>
                     {this.returnMenu.top()}
