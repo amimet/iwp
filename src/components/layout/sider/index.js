@@ -4,17 +4,27 @@ import { Layout, Menu } from 'antd'
 import withConnector from 'core/libs/withConnector'
 import * as antd from 'antd'
 import { history } from 'umi'
-
+import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
 import Items from 'globals/sidebar.json'
 
 const { Sider } = Layout
-
+const menuPositions = {
+    top: "topMenus",
+    bottom: "bottomMenus"
+} 
 @withConnector
 export default class Sidebar extends React.Component {
 
+    SidebarItemComponentMap = {
+        account: <Menu.Item key="account">
+            <antd.Avatar src={this.props.app.account_data["avatar"]} /> @{this.props.app.account_data["username"] ?? "account"}
+        </Menu.Item>
+    }
+
     state = {
+        done: false,
         pathResolve: {},
-        menus: [],
+        menus: {},
         theme: this.props.app.activeTheme ?? "light"
     }
 
@@ -27,15 +37,28 @@ export default class Sidebar extends React.Component {
 
     componentDidMount() {
         if (Items) {
-            let menus = this.state.menus ?? []
+            let menus = this.state.menus ?? {}
             let parents = {}
 
-            Items.forEach(item => {
+            Items.forEach(async (item) => {
                 try {
+                    let toState = "top" // by default stash items to top menu
                     let obj = {
                         id: item.id,
                         title: item.title ?? item.id,
                         ...item
+                    }
+                    if (typeof (item.requireState) !== "undefined") {
+                        if (!window.requiresState(item.requireState)) {
+                            return false
+                        }
+                    }
+                    if (typeof(item.position) !== "undefined" && typeof(item.position) == "string" && menuPositions[item.position] ) {
+                        toState = item.position
+                    }
+
+                    if (!Array.isArray(menus[toState])) {
+                        menus[toState] = []
                     }
                     if (typeof (item.icon) !== "undefined" && typeof (Icons[item.icon]) !== "undefined") {
                         obj.icon = React.createElement(Icons[item.icon])
@@ -54,14 +77,15 @@ export default class Sidebar extends React.Component {
                     }
                     if (typeof (item.parent) !== "undefined" && parents[item.parent]) {
                         parents[item.parent].childrens.push(obj)
-                        return menus.push(parents[item.parent])
+                        return menus[toState].push(parents[item.parent])
                     }
-                    return menus.push(obj)
+                    return menus[toState].push(obj)
                 } catch (error) {
                     return console.log(error)
                 }
             })
-            this.setState({ menus })
+
+            this.setState({ menus, done: true })
         }
     }
 
@@ -79,6 +103,11 @@ export default class Sidebar extends React.Component {
         }
 
         return list.map((item) => {
+            if (typeof (item.component) !== "undefined" && item.component != null) {
+                if (this.SidebarItemComponentMap[item.component]) {
+                    return this.SidebarItemComponentMap[item.component]
+                }
+            }
             if (item.sub) {
                 return <Menu.SubMenu
                     // onTitleClick={(e) => {
@@ -95,30 +124,48 @@ export default class Sidebar extends React.Component {
             return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
         })
     }
-    
-    // TODO: Require query API
-    renderAuthedMenu() {
-        if (this.props.app.session_valid) {
-            return(
-                <Menu>
-                    <Menu.Item>
-                       <antd.Avatar src={this.props.app.account_data["avatar"]} /> @{this.props.app.session.username?? "account"}
-                    </Menu.Item>
-                </Menu>
-            )
+
+    returnMenu = {
+        top: () => {
+            return <Menu
+                onClick={(e) => this.handleClick(e)}
+                collapsed={this.props.collapsed}
+                theme={this.state.theme}
+                mode="inline"
+            >
+                {this.renderMenuItems(this.state.menus["top"])}
+            </Menu>
+        },
+        bottom: () => {
+            return <Menu
+                onClick={(e) => this.handleClick(e)}
+                collapsed={this.props.collapsed}
+                theme={this.state.theme}
+                mode="inline"
+            >
+                {this.renderMenuItems(this.state.menus["bottom"])}
+            </Menu>
         }
     }
 
     render() {
+        if (!this.state.done) {
+            return null
+        }
         return (
-            <Sider theme={this.state.theme} collapsible collapsed={this.props.collapsed} onCollapse={() => this.props.onCollapse()}>
+            <Sider
+                theme={this.state.theme}
+                collapsible
+                collapsed={this.props.collapsed}
+                onCollapse={() => this.props.onCollapse()}
+                mode="inline"
+
+            >
                 <div>
-                    <Menu onClick={(e) => this.handleClick(e)} theme={this.state.theme} defaultSelectedKeys={['1']} mode="inline">
-                        {this.renderMenuItems(this.state.menus)}
-                    </Menu>
+                    {this.returnMenu.top()}
                 </div>
-                <div>
-                    { this.renderAuthedMenu() }
+                <div style={{ position: "absolute", bottom: 0, marginBottom: "48px" }}>
+                    {this.returnMenu.bottom()}
                 </div>
             </Sider>
         )

@@ -15,5 +15,13 @@
         "title": "Regions",
         "icon": "Target",
         "parent": "geo"
+    },
+    {
+        "id": "account",
+        "position": "bottom",
+        "component": "account",
+        "requireState": {
+            "session_valid": true
+        }
     }
 ]

@@ -1,6 +1,7 @@
 import store from 'store'
 import { verbosity } from 'core/libs'
 import { history } from 'umi'
+import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
 import { queryIndexer, config, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
 import { defaults } from 'config'
@@ -67,7 +68,7 @@ export default {
         let updated = {}
 
         const tryDefault = (key) => {
-          if (typeof(defaults[key]) !== "undefined") {
+          if (typeof (defaults[key]) !== "undefined") {
             return defaults[key]
           }
           return null
@@ -118,6 +119,24 @@ export default {
           return `${state.style_prefix}${key}`
         }
         return key
+      }
+
+      window.requiresState = (conditions) => {
+        let requirePass = false
+        if (typeof (conditions) !== "undefined") {
+          __legacy__objectToArray(conditions).forEach((condition) => {
+            if (typeof (state[condition.key]) !== "undefined") {
+              if (state[condition.key] == condition.value) {
+                requirePass = true
+              } else {
+                requirePass = false
+              }
+            } else {
+              requirePass = false
+            }
+          })
+        }
+        return requirePass
       }
 
       window.Externals.path = path
@@ -172,7 +191,7 @@ export default {
           endpoint: "isAuth"
         },
         callback: (error, response) => {
-          if(typeof(callback) !== "undefined") {
+          if (typeof (callback) !== "undefined") {
             if (error) {
               return callback(false)
             }
@@ -180,7 +199,7 @@ export default {
           }
           if (response.code == 200 && response.data) {
             ui.Notify.success("You are authed")
-          }else{
+          } else {
             ui.Notify.warn("Its seems like you are not authed")
           }
         }
