@@ -37,8 +37,11 @@ export default {
                     }
                     return res.data
                 })
-                .catch((err) => {
-                    ui.Notify.error("An network error has occurred")
+                .catch((err) => {                   
+                    ui.Notify.error({ 
+                        title: "This request could not be completed",
+                        message: err
+                    })
                     verbosity(err)
                     if (typeof (callback) !== "undefined") {
                         return callback(true, err)
