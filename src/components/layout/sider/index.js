@@ -11,13 +11,16 @@ const { Sider } = Layout
 const menuPositions = {
     top: "topMenus",
     bottom: "bottomMenus"
-} 
+}
 @withConnector
 export default class Sidebar extends React.Component {
 
     SidebarItemComponentMap = {
         account: <Menu.Item key="account">
-            <antd.Avatar src={this.props.app.account_data["avatar"]} /> @{this.props.app.account_data["username"] ?? "account"}
+            <antd.Avatar style={{ marginRight: "8px" }} src={this.props.app.account_data["avatar"]} />
+            <span>
+                {!this.props.collapsed && `@${this.props.app.account_data["username"]}`}
+            </span>
         </Menu.Item>
     }
 
@@ -53,7 +56,7 @@ export default class Sidebar extends React.Component {
                             return false
                         }
                     }
-                    if (typeof(item.position) !== "undefined" && typeof(item.position) == "string" && menuPositions[item.position] ) {
+                    if (typeof (item.position) !== "undefined" && typeof (item.position) == "string" && menuPositions[item.position]) {
                         toState = item.position
                     }
 
@@ -110,18 +113,13 @@ export default class Sidebar extends React.Component {
             }
             if (item.sub) {
                 return <Menu.SubMenu
-                    // onTitleClick={(e) => {
-                    //     if (item.path) {
-                    //         this.handleClick(item.path)
-                    //     }
-                    // }}
                     key={item.id}
                     icon={handleRenderIcon(item.icon)}
-                    title={item.title} >
+                    title={<span>{item.title}</span>}>
                     {this.renderMenuItems(item.childrens)}
                 </Menu.SubMenu>
             }
-            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} ><span>{item.title ?? item.id}</span></Menu.Item>
+            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
         })
     }
 
@@ -157,7 +155,7 @@ export default class Sidebar extends React.Component {
                 collapsed={this.props.collapsed}
                 onCollapse={() => this.props.onCollapse()}
             >
-                <div>
+                <div className={window.classToStyle('sidebar_menu_wrapper')}>
                     {this.returnMenu.top()}
                 </div>
                 <div style={{ position: "absolute", bottom: 0, marginBottom: "48px" }}>

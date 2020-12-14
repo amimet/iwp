@@ -1,0 +1,10 @@
+{
+    "main": {
+        "icon": "Home",
+        "title": "Main"
+    },
+    "account": {
+        "icon": "User",
+        "title": "Account"
+    }
+}

@@ -1,13 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
-
-const pathDecorators = {
-    main: {
-        icon: "Home",
-        title: "Main"
-    }
-}
+import pathDecorators from 'globals/pathDecorators.json'
 
 export default class Breadcrumb extends React.Component {
 
