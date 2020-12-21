@@ -1,5 +1,5 @@
 import { clientInfo } from 'core'
-var { verbosity } = require("@ragestudio/nodecore-utils")
+var { verbosity } = require("@nodecorejs/utils")
 
 if (clientInfo.os.family) {
     if (clientInfo.os.family !== ("Windows" || "Linux")) {

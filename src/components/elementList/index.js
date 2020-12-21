@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import { RefreshCw } from 'feather-reactjs'
-import { __legacy__objectToArray, getCircularReplacer, decycle } from '@ragestudio/nodecore-utils'
+import { objectToArrayMap, getCircularReplacer, decycle } from '@nodecorejs/utils'
 
 const serializeFlags = {
     __cycle_flag: true // with id 0
@@ -113,7 +113,7 @@ const getType = (e) => {
 
 export default function ElementList(data) {
     if (!data) return false
-    return __legacy__objectToArray(decycle(data)).map(e => {
+    return objectToArrayMap(decycle(data)).map(e => {
         try {
             const content = getContent(e)
             return (

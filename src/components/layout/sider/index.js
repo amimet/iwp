@@ -4,7 +4,7 @@ import { Layout, Menu } from 'antd'
 import withConnector from 'core/libs/withConnector'
 import * as antd from 'antd'
 import { history } from 'umi'
-import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
+
 import Items from 'globals/sidebar.json'
 
 const { Sider } = Layout

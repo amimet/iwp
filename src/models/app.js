@@ -1,7 +1,7 @@
 import store from 'store'
 import { verbosity } from 'core/libs'
 import { history } from 'umi'
-import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
+import { objectToArrayMap } from '@nodecorejs/utils'
 import { queryIndexer, config, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
 import { defaults } from 'config'
@@ -124,7 +124,7 @@ export default {
       window.requiresState = (conditions) => {
         let requirePass = false
         if (typeof (conditions) !== "undefined") {
-          __legacy__objectToArray(conditions).forEach((condition) => {
+          objectToArrayMap(conditions).forEach((condition) => {
             if (typeof (state[condition.key]) !== "undefined") {
               if (state[condition.key] == condition.value) {
                 requirePass = true
