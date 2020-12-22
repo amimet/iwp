@@ -23,5 +23,10 @@
         "requireState": {
             "session_valid": true
         }
+    },
+    {
+        "id": "vault",
+        "title": "Vault",
+        "icon": "Archive"
     }
 ]
