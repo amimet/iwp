@@ -28,31 +28,11 @@ export default class FormGenerator extends React.Component {
         verbosity(`Cannot handleFinish cause the callback prop is not set`)
     }
 
-    componentDidMount() {
-        if (!this.props.items) {
-            verbosity(`items not provided, nothing to render`)
-            return null
-        }
-        // set handlers to current window
-        if (typeof (window.currentForms) == "undefined") {
-            window.currentForms = {}
-        }
-
-        window.currentForms[`${this.props.name ?? this.props.id}`] = {
-            handleFormError: (id, error) => {
-                this.handleFormError(id, error)
-            },
-            formItemShake: (id) => {
-                this.formItemShake(id)
-            },
-            toogleValidation: (to) => {
-                if (typeof (to) !== "undefined") {
-                    return this.setState({ validating: to })
-                }
-                this.setState({ validating: !this.state.validating })
-                return this.state.validating
-            }
-        }
+    formItemShake(id) {
+        this.setState({ shakeItem: id })
+        setTimeout(() => {
+            this.setState({ shakeItem: false })
+        }, 50)
     }
 
     handleFormError(item, error) {
@@ -97,11 +77,31 @@ export default class FormGenerator extends React.Component {
         }
     }
 
-    formItemShake(id) {
-        this.setState({ shakeItem: id })
-        setTimeout(() => {
-            this.setState({ shakeItem: false })
-        }, 50)
+    componentDidMount() {
+        if (!this.props.items) {
+            verbosity(`items not provided, nothing to render`)
+            return null
+        }
+        // set handlers to current window
+        if (typeof (window.currentForms) == "undefined") {
+            window.currentForms = {}
+        }
+
+        window.currentForms[`${this.props.name ?? this.props.id}`] = {
+            handleFormError: (id, error) => {
+                this.handleFormError(id, error)
+            },
+            formItemShake: (id) => {
+                this.formItemShake(id)
+            },
+            toogleValidation: (to) => {
+                if (typeof (to) !== "undefined") {
+                    return this.setState({ validating: to })
+                }
+                this.setState({ validating: !this.state.validating })
+                return this.state.validating
+            }
+        }
     }
 
     renderItems() {
@@ -111,18 +111,33 @@ export default class FormGenerator extends React.Component {
         if (Array.isArray(elements)) {
             try {
                 return elements.map((e) => {
-                    const formID = e.id ?? Math.random().toFixed(2)
-                    const failStatement = fails["all"] ? fails["all"] : fails[formID]
+                    let { id, label, title, formItem, formElement } = e
 
-                    const { formItem, formElement } = e ?? {}
-
-                    const renderLabel = () => {
-                        if (e.label) {
-                            return e.label
-                        }
+                    if (typeof (id) == "undefined") {
+                        id = Math.random().toFixed(2)
+                    }
+                    if (typeof (formItem) == "undefined") {
+                        formItem = {}
+                    }
+                    if (typeof (formElement) == "undefined") {
+                        formElement = {}
                     }
 
-                    const itemElementPrefix = () => {
+                    const failStatement = fails["all"] ? fails["all"] : fails[id]
+                    const rules = formItem.rules ?? null
+                    const hasFeedback = formItem.hasFeedback ?? true
+
+                    let elementProps = {}
+                    let itemProps = {}
+
+                    if (typeof (formElement.props) !== "undefined") {
+                        elementProps = formElement.props
+                    }
+                    if (typeof (formItem.props) !== "undefined") {
+                        itemProps = formItem.props
+                    }
+
+                    const renderElementPrefix = () => {
                         if (formElement.icon) {
                             let renderIcon = null
 
@@ -145,23 +160,14 @@ export default class FormGenerator extends React.Component {
                                     break
                                 }
                             }
-
                             if (renderIcon) {
                                 // try to generate icon with props 
                                 return React.cloneElement(renderIcon, (formElement.iconProps ? { ...formElement.iconProps } : null))
                             }
-
                         } else {
                             return formType.prefix ?? null
                         }
-
                     }
-
-                    let elementProps = formElement.props ?? {}
-                    let itemProps = formItem.props?? {}
-
-                    const rules = formItem.rules ?? null
-                    const hasFeedback = formItem.hasFeedback ?? true
 
                     switch (formElement.element) {
                         case "Button": {
@@ -173,7 +179,7 @@ export default class FormGenerator extends React.Component {
                         }
                         case "Input": {
                             itemProps = {
-                                name: formID,
+                                ...itemProps,
                                 hasFeedback,
                                 rules,
                                 onChange: (e) => this.handleItemChange(e),
@@ -181,8 +187,9 @@ export default class FormGenerator extends React.Component {
                                 validateStatus: failStatement ? 'error' : null,
                             }
                             elementProps = {
-                                id: formID,
-                                prefix: itemElementPrefix() ?? null,
+                                ...elementProps,
+                                id: id,
+                                prefix: renderElementPrefix() ?? null,
                                 placeholder: formElement.placeholder,
                             }
                             break
@@ -191,11 +198,11 @@ export default class FormGenerator extends React.Component {
                             break;
                     }
 
-                    return <div key={formID}>
-                        <HeadShake spy={this.shouldShakeItem(formID)}>
-                            <Form.Item {...itemProps}>
-                                {renderLabel()}
-                                {React.createElement(formItems[formElement.element], elementProps, formElement.renderChildren)} 
+                    return <div key={id}>
+                        { title ?? null }
+                        <HeadShake spy={this.shouldShakeItem(id)}>
+                            <Form.Item label={label} name={id} key={id} {...itemProps}>
+                                {React.createElement(formItems[formElement.element], elementProps)}
                             </Form.Item>
                         </HeadShake>
                     </div>
@@ -221,7 +228,7 @@ export default class FormGenerator extends React.Component {
         >
             {this.renderItems()}
             <Form.Item
-                name="result"
+                key="result"
                 help={this.state.failed["result"] ? this.state.failed["result"] : null}
                 validateStatus={this.state.failed["result"] ? 'error' : null}
             />

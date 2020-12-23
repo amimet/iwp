@@ -1,13 +1,10 @@
 import React from 'react'
 import * as antd from 'antd'
 import { objectToArrayMap } from '@nodecorejs/utils'
-import * as Icons from 'components/Icons'
 import { FormGenerator } from 'components'
 
-import { Drawer, Form, Button, Col, Row, Input, Select, DatePicker } from 'antd'
+import { Drawer, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-
-const { Option } = Select
 
 const types = {
     "Computer desktop": "01",
@@ -96,7 +93,7 @@ class AddVaultDevice extends React.Component {
     formInstance = [
         {
             id: "type",
-            label: "Type",
+            title: "Type",
             formElement: {
                 props: {
                     children: this.renderRegions()
@@ -115,7 +112,7 @@ class AddVaultDevice extends React.Component {
         },
         {
             id: "region",
-            label: "Region",
+            title: "Region",
             formElement: {
                 element: "Input",
                 icon: "Lock",
