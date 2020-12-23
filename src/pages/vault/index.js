@@ -1,7 +1,8 @@
 import React from 'react'
 import * as antd from 'antd'
-import { objectToArrayMap } from '@nodecorejs/utils' 
+import { objectToArrayMap } from '@nodecorejs/utils'
 import * as Icons from 'components/Icons'
+import { FormGenerator } from 'components'
 
 import { Drawer, Form, Button, Col, Row, Input, Select, DatePicker } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
@@ -12,91 +13,152 @@ const types = {
     "Computer desktop": "01",
     "Laptop": "02",
     "Network material": "03",
-    "Server": "04", 
+    "Server": "04",
     "Mobile & Tablet": "05",
     "Other": "00",
 }
 
+const categoriesKeys = {
+    chipsets: {
+        "I": "Intel Chipset",
+        "A": "Amd Chipset",
+        "N": "Null"
+    },
+    year: {
+
+    },
+    tier: {
+        "L": "Low/end tier",
+        "M": "Mid tier",
+        "H": "High tier",
+        "N": "Null"
+    }
+}
+
+
 class AddVaultDevice extends React.Component {
 
-    state = { visible: false }
+    state = {
+        visible: false,
+        regions: [],
+        device: {
+            type: 0,
+            region: 0,
+            cat: 0,
+            stash: 0,
+            serial: ''
+        }
+    }
 
-    showDrawer = () => {
+    toogleDrawer = () => {
         this.setState({
-            visible: true,
+            visible: !this.state.visible,
         })
     }
 
-    onClose = () => {
-        this.setState({
-            visible: false,
-        })
-    }
-    onChange(value) {
-        console.log(`selected ${value}`);
-    }
-
-    onBlur() {
-        console.log('blur');
-    }
-
-    onFocus() {
-        console.log('focus');
-    }
-
-    onSearch(val) {
-        console.log('search:', val);
+    updateDeviceState = (type, value) => {
+        let state = this.state.device
+        state[type] = value
+        this.setState(state)
     }
 
     renderTypesOptions() {
         return objectToArrayMap(types).map((type) => {
-            return <Option value={type.value}> {type.key} </Option>
+            return <Option key={type.key} value={type.value}> {type.key} </Option>
         })
     }
 
+    renderRegions() {
+        return this.state.regions.map((region) => {
+            return <Option key={region.id} value={region.id}> {region.data.name} </Option>
+        })
+    }
+
+    renderCategories() {
+
+    }
+
+    componentDidMount() {
+        window.dispatcher({
+            type: "api/request",
+            payload: {
+                method: "GET",
+                endpoint: "regions"
+            },
+            callback: (err, res) => {
+                if (!err) {
+                    this.setState({ regions: res.data })
+                }
+            }
+        })
+    }
+
+    formInstance = [
+        {
+            id: "type",
+            label: "Type",
+            formElement: {
+                props: {
+                    children: this.renderRegions()
+                },
+                element: "Select",
+            },
+            formItem: {
+                hasFeedback: true,
+                rules: [
+                    {
+                        required: true,
+                        message: 'Select an type!',
+                    },
+                ]
+            }
+        },
+        {
+            id: "region",
+            label: "Region",
+            formElement: {
+                element: "Input",
+                icon: "Lock",
+                placeholder: "Password"
+            },
+            formItem: {
+                hasFeedback: true,
+                rules: [
+                    {
+                        required: true,
+                        message: 'Select an region!',
+                    },
+                ],
+            }
+        }
+    ]
+
     render() {
         return <>
-            <Button type="primary" onClick={this.showDrawer}> <PlusOutlined /> Add Device </Button>
+            <Button type="primary" onClick={this.toogleDrawer}> <PlusOutlined /> Add Device </Button>
             <Drawer
-                title="Create a new account"
-                width={720}
-                onClose={this.onClose}
+                title="Add to Vault"
+                width={"40%"}
+                onClose={this.toogleDrawer}
                 visible={this.state.visible}
                 bodyStyle={{ paddingBottom: 80 }}
                 footer={
                     <div style={{ textAlign: 'right' }}>
-                        <Button onClick={this.onClose} style={{ marginRight: 8 }}>Cancel</Button>
-                        <Button onClick={this.onClose} type="primary">Submit</Button>
+                        <Button onClick={this.toogleDrawer} style={{ marginRight: 8 }}>Cancel</Button>
+                        <Button onClick={this.toogleDrawer} type="primary">Submit</Button>
                     </div>
                 }
             >
-                <Form layout="vertical" hideRequiredMark>
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item
-                                name="type"
-                                label="Electronic Type"
-                                rules={[{ required: true, message: 'Please select an type' }]}
-                            >
-                                <Select
-                                    showSearch
-                                    style={{ width: 200 }}
-                                    placeholder="Select a type"
-                                    optionFilterProp="children"
-                                    onChange={this.onChange}
-                                    onFocus={this.onFocus}
-                                    onBlur={this.onBlur}
-                                    onSearch={this.onSearch}
-                                    filterOption={(input, option) =>
-                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                    }
-                                >
-                                    { this.renderTypesOptions() }
-                                </Select>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
+
+                <FormGenerator
+                    name="vault_additem"
+                    items={this.formInstance}
+                    onFinish={(...context) => {
+                        window.currentForms["vault_additem"].toogleValidation(true)
+                        console.log(context)
+                    }}
+                />
+
             </Drawer>
         </>
     }

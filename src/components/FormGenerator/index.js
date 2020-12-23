@@ -2,9 +2,11 @@ import React from 'react'
 import { connect } from 'umi'
 import { verbosity } from 'core/libs'
 
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete } from 'antd';
 import HeadShake from 'react-reveal/HeadShake';
 import * as antd from 'antd'
+
+const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete }
 
 import * as Icons from 'components/Icons'
 
@@ -108,37 +110,34 @@ export default class FormGenerator extends React.Component {
 
         if (Array.isArray(elements)) {
             try {
-                const formItemsToMap = {
-                    "Input": antd.Input,
-                    "Button": antd.Button
-                }
-
                 return elements.map((e) => {
-                    let elementProps = null
-                    let itemProps = null
+                    const formID = e.id ?? Math.random().toFixed(2)
+                    const failStatement = fails["all"] ? fails["all"] : fails[formID]
 
-                    const FormID = e.id ?? "new_formitem"
-                    const failStatement = fails["all"] ? fails["all"] : fails[FormID]
+                    const { formItem, formElement } = e ?? {}
 
-                    const form = e.form ?? {}
-                    const type = e.type ?? {}
+                    const renderLabel = () => {
+                        if (e.label) {
+                            return e.label
+                        }
+                    }
 
                     const itemElementPrefix = () => {
-                        if (type.icon) {
+                        if (formElement.icon) {
                             let renderIcon = null
 
-                            const iconType = typeof (type.icon)
+                            const iconType = typeof (formElement.icon)
                             switch (iconType) {
                                 case "string": {
-                                    if (typeof (Icons[type.icon]) !== "undefined") {
-                                        renderIcon = React.createElement(Icons[type.icon])
+                                    if (typeof (Icons[formElement.icon]) !== "undefined") {
+                                        renderIcon = React.createElement(Icons[formElement.icon])
                                     } else {
                                         verbosity("providen icon is not avialable on icons libs")
                                     }
                                     break
                                 }
                                 case "object": {
-                                    renderIcon = type.icon
+                                    renderIcon = formElement.icon
                                     break
                                 }
                                 default: {
@@ -149,24 +148,23 @@ export default class FormGenerator extends React.Component {
 
                             if (renderIcon) {
                                 // try to generate icon with props 
-                                return React.cloneElement(renderIcon, (type.iconProps ? { ...type.iconProps } : null))
+                                return React.cloneElement(renderIcon, (formElement.iconProps ? { ...formElement.iconProps } : null))
                             }
 
                         } else {
-                            return type.prefix ?? null
+                            return formType.prefix ?? null
                         }
 
                     }
 
-                    const rules = form.rules ?? null
-                    const hasFeedback = form.hasFeedback ?? true
+                    let elementProps = formElement.props ?? {}
+                    let itemProps = formItem.props?? {}
 
-                    switch (type.element) {
+                    const rules = formItem.rules ?? null
+                    const hasFeedback = formItem.hasFeedback ?? true
+
+                    switch (formElement.element) {
                         case "Button": {
-                            if (typeof (type.props) !== "undefined") {
-                                elementProps = type.props
-
-                            }
                             if (e.withValidation) {
                                 elementProps.icon = this.state.validating ? <Icons.LoadingOutlined spin style={{ marginRight: "7px" }} /> : null
                                 elementProps.disabled = this.state.validating
@@ -175,19 +173,17 @@ export default class FormGenerator extends React.Component {
                         }
                         case "Input": {
                             itemProps = {
-                                name: FormID,
+                                name: formID,
                                 hasFeedback,
                                 rules,
                                 onChange: (e) => this.handleItemChange(e),
                                 help: failStatement ? failStatement : null,
                                 validateStatus: failStatement ? 'error' : null,
-                                ...form.props
                             }
                             elementProps = {
-                                id: FormID,
+                                id: formID,
                                 prefix: itemElementPrefix() ?? null,
-                                placeholder: type.placeholder,
-                                ...type.props
+                                placeholder: formElement.placeholder,
                             }
                             break
                         }
@@ -195,10 +191,11 @@ export default class FormGenerator extends React.Component {
                             break;
                     }
 
-                    return <div key={FormID}>
-                        <HeadShake spy={this.shouldShakeItem(FormID)}>
+                    return <div key={formID}>
+                        <HeadShake spy={this.shouldShakeItem(formID)}>
                             <Form.Item {...itemProps}>
-                                {React.createElement(formItemsToMap[type.element], elementProps)}
+                                {renderLabel()}
+                                {React.createElement(formItems[formElement.element], elementProps, formElement.renderChildren)} 
                             </Form.Item>
                         </HeadShake>
                     </div>
@@ -216,10 +213,11 @@ export default class FormGenerator extends React.Component {
             return null
         }
         return <Form
+            hideRequiredMark={this.props.hideRequiredMark ?? false}
             name={this.props.name ?? "new_form"}
             onFinish={(e) => this.handleFinish(e)}
             ref={this.FormRef}
-            {...this.props.extraProps}
+            {...this.props.formProps}
         >
             {this.renderItems()}
             <Form.Item

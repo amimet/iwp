@@ -5,16 +5,16 @@ import { FormGenerator } from 'components'
 import { FormattedMessage, FormattedNumber } from 'react-intl'
 
 
-const loginItems = [
+const formInstance = [
     {
         id: "username",
-        type: {
+        formElement: {
             element: "Input",
             icon: "User",
             placeholder: "Username",
             props: null
         },
-        form: {
+        formItem: {
             hasFeedback: true,
             rules: [
                 {
@@ -27,7 +27,7 @@ const loginItems = [
     },
     {
         id: "password",
-        type: {
+        formElement: {
             element: "Input",
             icon: "Lock",
             placeholder: "Password",
@@ -35,7 +35,7 @@ const loginItems = [
                 type: "password"
             }
         },
-        form: {
+        formItem: {
             hasFeedback: true,
             rules: [
                 {
@@ -48,7 +48,7 @@ const loginItems = [
     {
         id: "login_btn",
         withValidation: true,
-        type: {
+        formElement: {
             element: "Button",
             props: {
                 icon: "User",
@@ -96,7 +96,7 @@ export default class Login extends React.Component {
                 <FormGenerator
                     name="normal_login"
                     className="login-form"
-                    items={loginItems}
+                    items={formInstance}
                     onFinish={(...context) => {
                         window.currentForms["normal_login"].toogleValidation(true)
                         this.handleSend(...context)
