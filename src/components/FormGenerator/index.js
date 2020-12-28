@@ -9,9 +9,10 @@ import * as antd from 'antd'
 const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider }
 
 import * as Icons from 'components/Icons'
-
 @connect(({ app }) => ({ app }))
 export default class FormGenerator extends React.Component {
+    discardValuesFromID = []
+
     state = {
         validating: false,
         items: this.props.items,
@@ -23,6 +24,16 @@ export default class FormGenerator extends React.Component {
 
     handleFinish(payload) {
         if (typeof (this.props.onFinish) !== "undefined") {
+            try {
+                const keys = Object.keys(payload)
+                this.discardValuesFromID.forEach((id) => {
+                    if (keys.includes(id)) {
+                        delete payload[id]
+                    }
+                })
+            } catch (error) {
+                // terrible
+            }
             return this.props.onFinish(payload)
         }
         verbosity(`Cannot handleFinish cause the callback prop is not set`)
@@ -121,13 +132,16 @@ export default class FormGenerator extends React.Component {
         const fails = this.state.failed
         const elements = this.state.items
 
+        let AutoIncrement = 0
+
         if (Array.isArray(elements)) {
             try {
                 return elements.map((e) => {
-                    let { id, label, title, formItem, formElement } = e
+                    let { id, label, title, ignore, formItem, formElement } = e
 
                     if (typeof (id) == "undefined") {
-                        id = Math.random().toFixed(2)
+                        AutoIncrement++
+                        id = `${formElement.element}_${AutoIncrement}`
                     }
                     if (typeof (formItem) == "undefined") {
                         formItem = {}
@@ -136,7 +150,7 @@ export default class FormGenerator extends React.Component {
                         formElement = {}
                     }
 
-                    if (typeof(formItems[formElement.element]) == "undefined") {
+                    if (typeof (formItems[formElement.element]) == "undefined") {
                         console.warn(`${formElement.element} is not available on formItems`)
                         return null
                     }
@@ -157,6 +171,9 @@ export default class FormGenerator extends React.Component {
                     }
                     if (typeof (formItem.props) !== "undefined") {
                         itemProps = { ...elementProps, ...formItem.props }
+                    }
+                    if (typeof (ignore) !== "undefined") {
+                        this.discardValuesFromID.push(id)
                     }
 
                     const renderElementPrefix = () => {
@@ -193,7 +210,7 @@ export default class FormGenerator extends React.Component {
 
                     switch (formElement.element) {
                         case "Divider": {
-
+                            this.discardValuesFromID.push(id)
                             break
                         }
                         case "Button": {
@@ -238,7 +255,7 @@ export default class FormGenerator extends React.Component {
                         default:
                             break;
                     }
-                
+
                     return <div key={id}>
                         {title ?? null}
                         <HeadShake spy={this.shouldShakeItem(id)}>
