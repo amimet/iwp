@@ -61,7 +61,7 @@ class AddVaultDevice extends React.Component {
 
     renderTypesOptions() {
         return objectToArrayMap(types).map((type) => {
-            return <Option key={type.key} value={type.value}> {type.key} </Option>
+            return <Select.Option key={type.key} value={type.value}> {type.key} </Select.Option>
         })
     }
 
@@ -90,8 +90,13 @@ class AddVaultDevice extends React.Component {
         })
     }
 
-    handleSubmit() {
-        window.currentForms["vault_additem"].handleFinish()
+    handleSubmit(context) {
+        window.currentForms["vault_additem"].toogleValidation(true)
+
+        console.log(context)
+        setTimeout(() => {
+            window.currentForms["vault_additem"].toogleValidation(false)
+        }, 4000)
     }
 
     render() {
@@ -109,7 +114,7 @@ class AddVaultDevice extends React.Component {
                 footer={
                     <div style={{ textAlign: 'right' }}>
                         <Button onClick={this.toogleDrawer} style={{ marginRight: 8 }}>Cancel</Button>
-                        <Button onClick={this.handleSubmit} type="primary">Submit</Button>
+                        <Button onClick={() => window.currentForms["vault_additem"].handleFinish()} type="primary">Submit</Button>
                     </div>
                 }
             >
@@ -117,17 +122,14 @@ class AddVaultDevice extends React.Component {
                 <FormGenerator
                     name="vault_additem"
                     renderLoadingIcon
-                    onFinish={(context) => {
-                        window.currentForms["vault_additem"].toogleValidation(true)
-                        console.log(context)
-                    }}
+                    onFinish={(context) => this.handleSubmit(context)}
                     items={[
                         {
                             id: "type",
                             title: "Type",
                             formElement: {
                                 element: "Select",
-                                renderItem: this.renderRegions(),
+                                renderItem: this.renderTypesOptions(),
                             },
                             formItem: {
                                 hasFeedback: true,
@@ -155,7 +157,30 @@ class AddVaultDevice extends React.Component {
                                     },
                                 ],
                             }
-                        }
+                        },
+                        {
+                            formElement: {
+                                element: "Divider",
+                                props: { dashed: true }
+                            }
+                        },
+                        {
+                            id: "cat",
+                            title: "Category",
+                            formElement: {
+                                element: "Select",
+                                renderItem: this.renderRegions(),
+                            },
+                            formItem: {
+                                hasFeedback: true,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Select an region!',
+                                    },
+                                ],
+                            }
+                        },
                     ]}
                 />
 

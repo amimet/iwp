@@ -95,6 +95,7 @@ export default class Login extends React.Component {
             <div className={window.classToStyle("login")}>
                 <FormGenerator
                     name="normal_login"
+                    renderLoadingIcon
                     className="login-form"
                     items={formInstance}
                     onFinish={(...context) => {

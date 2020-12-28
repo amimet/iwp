@@ -2,11 +2,11 @@ import React from 'react'
 import { connect } from 'umi'
 import { verbosity } from 'core/libs'
 
-import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete } from 'antd';
+import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider } from 'antd';
 import HeadShake from 'react-reveal/HeadShake';
 import * as antd from 'antd'
 
-const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete }
+const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider }
 
 import * as Icons from 'components/Icons'
 
@@ -100,6 +100,11 @@ export default class FormGenerator extends React.Component {
                     return this.setState({ validating: to })
                 }
                 this.setState({ validating: !this.state.validating })
+                // if (typeof(this.props.validationTimeout) !== "number" || timeout) {
+                //     setTimeout(() => {
+                //         this.setState({ validating: !this.state.validating })
+                //     }, this.props.validationTimeout || timeout)
+                // }
                 return this.state.validating
             }
         }
@@ -129,6 +134,11 @@ export default class FormGenerator extends React.Component {
                     }
                     if (typeof (formElement) == "undefined") {
                         formElement = {}
+                    }
+
+                    if (typeof(formItems[formElement.element]) == "undefined") {
+                        console.warn(`${formElement.element} is not available on formItems`)
+                        return null
                     }
 
                     const failStatement = fails["all"] ? fails["all"] : fails[id]
@@ -182,6 +192,10 @@ export default class FormGenerator extends React.Component {
                     }
 
                     switch (formElement.element) {
+                        case "Divider": {
+
+                            break
+                        }
                         case "Button": {
                             if (e.withValidation) {
                                 elementProps.icon = this.state.validating ? <Icons.LoadingOutlined spin style={{ marginRight: "7px" }} /> : null
@@ -212,7 +226,7 @@ export default class FormGenerator extends React.Component {
                             if (typeof (formElement.options) !== "undefined" && !formElement.renderItem) {
                                 if (!Array.isArray(formElement.options)) {
                                     console.warn(`Invalid options data type, expecting Array > recived ${typeof (formElement.options)}`)
-                                    return false
+                                    return null
                                 }
                                 elementProps.children = formElement.options.map((option) => {
                                     return <Select.Option key={option.id ?? Math.random} value={option.value ?? option.id}> {option.name ?? null} </Select.Option>
@@ -224,7 +238,7 @@ export default class FormGenerator extends React.Component {
                         default:
                             break;
                     }
-
+                
                     return <div key={id}>
                         {title ?? null}
                         <HeadShake spy={this.shouldShakeItem(id)}>
