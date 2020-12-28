@@ -7,12 +7,12 @@ import { Drawer, Button, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 
 const types = {
-    "Computer desktop": "01",
-    "Laptop": "02",
-    "Network material": "03",
-    "Server": "04",
-    "Mobile & Tablet": "05",
-    "Other": "00",
+    "Computer desktop": "1",
+    "Laptop": "2",
+    "Network material": "3",
+    "Server": "4",
+    "Mobile & Tablet": "5",
+    "Other": "0",
 }
 
 const categoriesKeys = {
@@ -33,26 +33,13 @@ const categoriesKeys = {
 class AddVaultDevice extends React.Component {
     state = {
         visible: false,
-        regions: [],
-        device: {
-            type: 0,
-            region: 0,
-            cat: 0,
-            stash: 0,
-            serial: ''
-        }
+        regions: []
     }
 
     toogleDrawer = () => {
         this.setState({
             visible: !this.state.visible,
         })
-    }
-
-    updateDeviceState = (type, value) => {
-        let state = this.state.device
-        state[type] = value
-        this.setState(state)
     }
 
     renderTypesOptions() {
@@ -90,12 +77,56 @@ class AddVaultDevice extends React.Component {
     }
 
     handleSubmit(context) {
-        window.currentForms["vault_additem"].toogleValidation(true)
+        let fixed = {}
 
-        console.log(context)
-        setTimeout(() => {
+        window.currentForms["vault_additem"].toogleValidation(true)
+        try {
+            const keys = Object.keys(context)
+            keys.forEach((key) => {
+                const element = context[key]
+                if (typeof (element) !== "undefined") {
+                    switch (key) {
+                        case "manufacture":{
+                            fixed[key] = element.year()
+                            break
+                        }
+                        default: {
+                            fixed[key] = element
+                            break
+                        }
+                    }
+            
+                }
+            })
+            console.log(fixed)
+
+            window.dispatcher({
+                type: "api/request",
+                payload: {
+                    method: "PUT",
+                    endpoint: "itemVault",
+                    body: fixed
+                },
+                callback: (err, res) => {
+                    console.log(err, res)
+                    window.currentForms["vault_additem"].handleFormError("all", false)
+
+                    if (res.code == 110) {
+                        window.currentForms["vault_additem"].handleFormError("result", res.err)
+                        window.currentForms["vault_additem"].toogleValidation(false)
+                    }
+                    if (res.code == 100) {
+                        window.currentForms["vault_additem"].toogleValidation(false)
+                        this.toogleDrawer()
+                    }
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            window.currentForms["vault_additem"].handleFormError("result", "Error processing")
             window.currentForms["vault_additem"].toogleValidation(false)
-        }, 4000)
+        }
+
     }
 
     render() {
@@ -123,6 +154,22 @@ class AddVaultDevice extends React.Component {
                     renderLoadingIcon
                     onFinish={(context) => this.handleSubmit(context)}
                     items={[
+                        {
+                            id: "title",
+                            title: "Device name",
+                            formElement: {
+                                element: "Input"
+                            },
+                            formItem: {
+                                hasFeedback: true,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Input an name for Device',
+                                    },
+                                ],
+                            }
+                        },
                         {
                             id: "type",
                             title: "Type",
@@ -222,10 +269,36 @@ class AddVaultDevice extends React.Component {
                             ],
                         },
                         {
-                            id: "stash",
+                            formElement: {
+                                element: "Divider",
+                                props: { dashed: true }
+                            }
+                        },
+                        {
+                            id: "serial",
+                            title: "Serial Number",
                             formElement: {
                                 element: "Input",
+                                props: {
+                                    maxLength: 5
+                                }
                             },
+                            formItem: {
+                                hasFeedback: true,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Input the last 5 digits of serial number',
+                                    },
+                                ],
+                            }
+                        },
+                        {
+                            id: "active",
+                            title: "On service",
+                            formElement: {
+                                element: "Switch",
+                            }
                         },
                     ]}
                 />
@@ -260,15 +333,21 @@ export default class Vault extends React.Component {
     render() {
         return (
             <div className={window.classToStyle('vault_wrapper')}>
-                <antd.Card>
+                <antd.Card style={{ marginBottom: "18px" }}>
                     <AddVaultDevice />
                 </antd.Card>
                 <antd.List
                     dataSource={this.state.data}
-                    renderItem={(item) => {
-                        return <div>
-                            {JSON.stringify(item)}
-                        </div>
+                    renderItem={(i) => {
+                        console.log(i)
+                        return <antd.Card key={i.id}>
+                            #{i.id}
+                            <div>
+                                <h1>{ i.item?.title ?? "Device" }</h1>
+                                <antd.Tag color={i.item?.active ? "green" : "red"} > {i.item?.active ? "On service" : "Retired"} </antd.Tag>
+                                <antd.Tag> {i.item?.state ?? "Unknown"} </antd.Tag>
+                            </div> 
+                        </antd.Card>
                     }}
                 />
             </div>

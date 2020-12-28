@@ -2,11 +2,11 @@ import React from 'react'
 import { connect } from 'umi'
 import { verbosity } from 'core/libs'
 
-import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider } from 'antd';
+import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider, Switch } from 'antd';
 import HeadShake from 'react-reveal/HeadShake';
 import * as antd from 'antd'
 
-const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider }
+const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider, Switch }
 
 import * as Icons from 'components/Icons'
 @connect(({ app }) => ({ app }))
@@ -54,7 +54,7 @@ export default class FormGenerator extends React.Component {
         this.formItemShake(item)
     }
 
-    handleItemChange(event) {
+    handleFailChange(event) {
         const itemID = event.target.id
         if (itemID) {
             let fails = this.state.failed
@@ -98,6 +98,9 @@ export default class FormGenerator extends React.Component {
         }
 
         window.currentForms[`${this.props.name ?? this.props.id}`] = {
+            clearErrors: () => {
+                this.setState({ failed: {} })
+            },
             handleFinish: () => this.FormRef.current.submit(),
             handleFormError: (id, error) => {
                 this.handleFormError(id, error)
@@ -148,7 +151,7 @@ export default class FormGenerator extends React.Component {
                         formElement = {}
                     }
 
-                    if (typeof(group) !== "undefined") {
+                    if (typeof (group) !== "undefined") {
                         return <div style={{ display: "flex" }} key={id}>
                             {this.renderItems(group)}
                         </div>
@@ -228,7 +231,7 @@ export default class FormGenerator extends React.Component {
                                 ...itemProps,
                                 hasFeedback,
                                 rules,
-                                onChange: (e) => this.handleItemChange(e),
+                                onChange: (e) => this.handleFailChange(e),
                                 help: failStatement ? failStatement : null,
                                 validateStatus: failStatement ? 'error' : null,
                             }
@@ -254,14 +257,24 @@ export default class FormGenerator extends React.Component {
                                 })
                             }
                             itemProps = {
-                                ...itemProps, 
+                                ...itemProps,
+                                hasFeedback,
+                                rules,
                                 validateStatus: failStatement ? 'error' : null,
                                 help: failStatement ? failStatement : null,
                             }
                             break
                         }
-                        default:
-                            break;
+                        default: {
+                            itemProps = {
+                                ...itemProps,
+                                hasFeedback,
+                                rules,
+                                validateStatus: failStatement ? 'error' : null,
+                                help: failStatement ? failStatement : null,
+                            }
+                            break
+                        }
                     }
 
                     return <div style={{ margin: "auto", width: "100%", padding: "0 10px" }} key={id}>
@@ -281,6 +294,8 @@ export default class FormGenerator extends React.Component {
     }
 
     render() {
+        const helpStatus = this.state.failed["all"] ? (this.state.failed["all"] ?? null) : (this.state.failed["result"] ?? null)
+        const validateStatus = this.state.failed["all"] ? (this.state.failed["all"] ? "error" : null) : (this.state.failed["result"] ? 'error' : null)
         if (!this.state.items) {
             verbosity(`Nothing to render`)
             return null
@@ -296,8 +311,8 @@ export default class FormGenerator extends React.Component {
                 {this.renderItems(this.state.items)}
                 <Form.Item
                     key="result"
-                    help={this.state.failed["result"] ? this.state.failed["result"] : null}
-                    validateStatus={this.state.failed["result"] ? 'error' : null}
+                    help={helpStatus}
+                    validateStatus={validateStatus}
                 />
             </Form>
             {this.renderValidationIcon()}
