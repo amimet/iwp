@@ -3,7 +3,7 @@ import * as antd from 'antd'
 import { objectToArrayMap } from '@nodecorejs/utils'
 import { FormGenerator } from 'components'
 
-import { Drawer, Button } from 'antd'
+import { Drawer, Button, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 
 const types = {
@@ -67,7 +67,7 @@ class AddVaultDevice extends React.Component {
 
     renderRegions() {
         return this.state.regions.map((region) => {
-            return <Option key={region.id} value={region.id}> {region.data.name} </Option>
+            return <Select.Option key={region.id} value={region.id}> {region.data.name} </Select.Option>
         })
     }
 
@@ -84,53 +84,20 @@ class AddVaultDevice extends React.Component {
             },
             callback: (err, res) => {
                 if (!err) {
-                    this.setState({ regions: res.data })
+                    this.setState({ loading: false, regions: res.data })
                 }
             }
         })
     }
 
-    formInstance = [
-        {
-            id: "type",
-            title: "Type",
-            formElement: {
-                props: {
-                    children: this.renderRegions()
-                },
-                element: "Select",
-            },
-            formItem: {
-                hasFeedback: true,
-                rules: [
-                    {
-                        required: true,
-                        message: 'Select an type!',
-                    },
-                ]
-            }
-        },
-        {
-            id: "region",
-            title: "Region",
-            formElement: {
-                element: "Input",
-                icon: "Lock",
-                placeholder: "Password"
-            },
-            formItem: {
-                hasFeedback: true,
-                rules: [
-                    {
-                        required: true,
-                        message: 'Select an region!',
-                    },
-                ],
-            }
-        }
-    ]
+    handleSubmit() {
+        window.currentForms["vault_additem"].handleFinish()
+    }
 
     render() {
+        if (this.state.loading) {
+            return <div> Loading </div>
+        }
         return <>
             <Button type="primary" onClick={this.toogleDrawer}> <PlusOutlined /> Add Device </Button>
             <Drawer
@@ -142,18 +109,54 @@ class AddVaultDevice extends React.Component {
                 footer={
                     <div style={{ textAlign: 'right' }}>
                         <Button onClick={this.toogleDrawer} style={{ marginRight: 8 }}>Cancel</Button>
-                        <Button onClick={this.toogleDrawer} type="primary">Submit</Button>
+                        <Button onClick={this.handleSubmit} type="primary">Submit</Button>
                     </div>
                 }
             >
 
                 <FormGenerator
                     name="vault_additem"
-                    items={this.formInstance}
-                    onFinish={(...context) => {
+                    renderLoadingIcon
+                    onFinish={(context) => {
                         window.currentForms["vault_additem"].toogleValidation(true)
                         console.log(context)
                     }}
+                    items={[
+                        {
+                            id: "type",
+                            title: "Type",
+                            formElement: {
+                                element: "Select",
+                                renderItem: this.renderRegions(),
+                            },
+                            formItem: {
+                                hasFeedback: true,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Select an type!',
+                                    },
+                                ]
+                            }
+                        },
+                        {
+                            id: "region",
+                            title: "Region",
+                            formElement: {
+                                element: "Select",
+                                renderItem: this.renderRegions(),
+                            },
+                            formItem: {
+                                hasFeedback: true,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Select an region!',
+                                    },
+                                ],
+                            }
+                        }
+                    ]}
                 />
 
             </Drawer>

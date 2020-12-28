@@ -88,6 +88,7 @@ export default class FormGenerator extends React.Component {
         }
 
         window.currentForms[`${this.props.name ?? this.props.id}`] = {
+            handleFinish: () => this.FormRef.current.submit(),
             handleFormError: (id, error) => {
                 this.handleFormError(id, error)
             },
@@ -102,6 +103,13 @@ export default class FormGenerator extends React.Component {
                 return this.state.validating
             }
         }
+    }
+
+    renderValidationIcon() {
+        if (this.props.renderLoadingIcon && this.state.validating) {
+            return <Icons.LoadingOutlined spin style={{ marginTop: "7px" }} />
+        }
+        return null
     }
 
     renderItems() {
@@ -127,14 +135,18 @@ export default class FormGenerator extends React.Component {
                     const rules = formItem.rules ?? null
                     const hasFeedback = formItem.hasFeedback ?? true
 
-                    let elementProps = {}
-                    let itemProps = {}
+                    let elementProps = {
+                        disabled: this.state.validating,
+                    }
+                    let itemProps = {
+
+                    }
 
                     if (typeof (formElement.props) !== "undefined") {
-                        elementProps = formElement.props
+                        elementProps = { ...elementProps, ...formElement.props }
                     }
                     if (typeof (formItem.props) !== "undefined") {
-                        itemProps = formItem.props
+                        itemProps = { ...elementProps, ...formItem.props }
                     }
 
                     const renderElementPrefix = () => {
@@ -173,7 +185,6 @@ export default class FormGenerator extends React.Component {
                         case "Button": {
                             if (e.withValidation) {
                                 elementProps.icon = this.state.validating ? <Icons.LoadingOutlined spin style={{ marginRight: "7px" }} /> : null
-                                elementProps.disabled = this.state.validating
                             }
                             break
                         }
@@ -194,12 +205,28 @@ export default class FormGenerator extends React.Component {
                             }
                             break
                         }
+                        case "Select": {
+                            if (typeof (formElement.renderItem) !== "undefined") {
+                                elementProps.children = formElement.renderItem
+                            }
+                            if (typeof (formElement.options) !== "undefined" && !formElement.renderItem) {
+                                if (!Array.isArray(formElement.options)) {
+                                    console.warn(`Invalid options data type, expecting Array > recived ${typeof (formElement.options)}`)
+                                    return false
+                                }
+                                elementProps.children = formElement.options.map((option) => {
+                                    return <Select.Option key={option.id ?? Math.random} value={option.value ?? option.id}> {option.name ?? null} </Select.Option>
+                                })
+                            }
+
+                            break
+                        }
                         default:
                             break;
                     }
 
                     return <div key={id}>
-                        { title ?? null }
+                        {title ?? null}
                         <HeadShake spy={this.shouldShakeItem(id)}>
                             <Form.Item label={label} name={id} key={id} {...itemProps}>
                                 {React.createElement(formItems[formElement.element], elementProps)}
@@ -219,19 +246,22 @@ export default class FormGenerator extends React.Component {
             verbosity(`Nothing to render`)
             return null
         }
-        return <Form
-            hideRequiredMark={this.props.hideRequiredMark ?? false}
-            name={this.props.name ?? "new_form"}
-            onFinish={(e) => this.handleFinish(e)}
-            ref={this.FormRef}
-            {...this.props.formProps}
-        >
-            {this.renderItems()}
-            <Form.Item
-                key="result"
-                help={this.state.failed["result"] ? this.state.failed["result"] : null}
-                validateStatus={this.state.failed["result"] ? 'error' : null}
-            />
-        </Form>
+        return <div>
+            <Form
+                hideRequiredMark={this.props.hideRequiredMark ?? false}
+                name={this.props.name ?? "new_form"}
+                onFinish={(e) => this.handleFinish(e)}
+                ref={this.FormRef}
+                {...this.props.formProps}
+            >
+                {this.renderItems()}
+                <Form.Item
+                    key="result"
+                    help={this.state.failed["result"] ? this.state.failed["result"] : null}
+                    validateStatus={this.state.failed["result"] ? 'error' : null}
+                />
+            </Form>
+            {this.renderValidationIcon()}
+        </div>
     }
 }
