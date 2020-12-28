@@ -12,6 +12,7 @@ import * as Icons from 'components/Icons'
 @connect(({ app }) => ({ app }))
 export default class FormGenerator extends React.Component {
     discardValuesFromID = []
+    FormRef = React.createRef()
 
     state = {
         validating: false,
@@ -19,8 +20,6 @@ export default class FormGenerator extends React.Component {
         shakeItem: false,
         failed: {}
     }
-
-    FormRef = React.createRef()
 
     handleFinish(payload) {
         if (typeof (this.props.onFinish) !== "undefined") {
@@ -128,16 +127,15 @@ export default class FormGenerator extends React.Component {
         return null
     }
 
-    renderItems() {
+    renderItems(elements) {
         const fails = this.state.failed
-        const elements = this.state.items
 
         let AutoIncrement = 0
 
         if (Array.isArray(elements)) {
             try {
                 return elements.map((e) => {
-                    let { id, label, title, ignore, formItem, formElement } = e
+                    let { id, label, title, ignore, group, formItem, formElement } = e
 
                     if (typeof (id) == "undefined") {
                         AutoIncrement++
@@ -148,6 +146,12 @@ export default class FormGenerator extends React.Component {
                     }
                     if (typeof (formElement) == "undefined") {
                         formElement = {}
+                    }
+
+                    if (typeof(group) !== "undefined") {
+                        return <div style={{ display: "flex" }} key={id}>
+                            {this.renderItems(group)}
+                        </div>
                     }
 
                     if (typeof (formItems[formElement.element]) == "undefined") {
@@ -204,7 +208,7 @@ export default class FormGenerator extends React.Component {
                                 return React.cloneElement(renderIcon, (formElement.iconProps ? { ...formElement.iconProps } : null))
                             }
                         } else {
-                            return formType.prefix ?? null
+                            return formItem.prefix ?? null
                         }
                     }
 
@@ -249,14 +253,18 @@ export default class FormGenerator extends React.Component {
                                     return <Select.Option key={option.id ?? Math.random} value={option.value ?? option.id}> {option.name ?? null} </Select.Option>
                                 })
                             }
-
+                            itemProps = {
+                                ...itemProps, 
+                                validateStatus: failStatement ? 'error' : null,
+                                help: failStatement ? failStatement : null,
+                            }
                             break
                         }
                         default:
                             break;
                     }
 
-                    return <div key={id}>
+                    return <div style={{ margin: "auto", width: "100%", padding: "0 10px" }} key={id}>
                         {title ?? null}
                         <HeadShake spy={this.shouldShakeItem(id)}>
                             <Form.Item label={label} name={id} key={id} {...itemProps}>
@@ -285,7 +293,7 @@ export default class FormGenerator extends React.Component {
                 ref={this.FormRef}
                 {...this.props.formProps}
             >
-                {this.renderItems()}
+                {this.renderItems(this.state.items)}
                 <Form.Item
                     key="result"
                     help={this.state.failed["result"] ? this.state.failed["result"] : null}

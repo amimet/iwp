@@ -16,25 +16,21 @@ const types = {
 }
 
 const categoriesKeys = {
-    chipsets: {
+    chipset: {
         "I": "Intel Chipset",
         "A": "Amd Chipset",
-        "N": "Null"
-    },
-    year: {
-
+        "N": "Not apply"
     },
     tier: {
         "L": "Low/end tier",
         "M": "Mid tier",
         "H": "High tier",
-        "N": "Null"
+        "N": "Not apply"
     }
 }
 
 
 class AddVaultDevice extends React.Component {
-
     state = {
         visible: false,
         regions: [],
@@ -71,8 +67,11 @@ class AddVaultDevice extends React.Component {
         })
     }
 
-    renderCategories() {
-
+    renderCategories(type) {
+        if (!type) return false
+        return objectToArrayMap(categoriesKeys[type]).map((e) => {
+            return <Select.Option id={e.value} value={e.key}> {e.value} </Select.Option>
+        })
     }
 
     componentDidMount() {
@@ -166,20 +165,67 @@ class AddVaultDevice extends React.Component {
                         },
                         {
                             id: "cat",
-                            title: "Category",
-                            formElement: {
-                                element: "Select",
-                                renderItem: this.renderRegions(),
-                            },
-                            formItem: {
-                                hasFeedback: true,
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: 'Select an region!',
+                            group: [
+                                {
+                                    id: "chipset",
+                                    title: "Chipset",
+                                    formElement: {
+                                        element: "Select",
+                                        renderItem: this.renderCategories("chipset"),
                                     },
-                                ],
-                            }
+                                    formItem: {
+                                        hasFeedback: true,
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: 'Select an chipset!',
+                                            },
+                                        ],
+                                    }
+                                },
+                                {
+                                    id: "manufacture",
+                                    title: "Year",
+                                    formElement: {
+                                        element: "DatePicker",
+                                        props: {
+                                            picker: "year",
+                                        }
+                                    },
+                                    formItem: {
+                                        hasFeedback: true,
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: 'Select an year!',
+                                            },
+                                        ],
+                                    }
+                                },
+                                {
+                                    id: "tier",
+                                    title: "Tier",
+                                    formElement: {
+                                        element: "Select",
+                                        renderItem: this.renderCategories("tier"),
+                                    },
+                                    formItem: {
+                                        hasFeedback: true,
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: 'Select an tier!',
+                                            },
+                                        ],
+                                    }
+                                },
+                            ],
+                        },
+                        {
+                            id: "stash",
+                            formElement: {
+                                element: "Input",
+                            },
                         },
                     ]}
                 />
