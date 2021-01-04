@@ -188,8 +188,38 @@ class AddVaultDevice extends React.Component {
                             }
                         },
                         {
+                            id: "state",
+                            title: "State",
+                            formElement: {
+                                element: "Input",
+                            }
+                        },
+                        {
+                            formElement: {
+                                element: "Divider",
+                                props: { dashed: true, children: "Geo info" }
+                            }
+                        },
+                        {
                             id: "region",
-                            title: "Region",
+                            title: "Origin",
+                            formElement: {
+                                element: "Select",
+                                renderItem: this.renderRegions(),
+                            },
+                            formItem: {
+                                hasFeedback: true,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Select an region!',
+                                    },
+                                ],
+                            }
+                        },
+                        {
+                            id: "currentLocation",
+                            title: "Location",
                             formElement: {
                                 element: "Select",
                                 renderItem: this.renderRegions(),
@@ -294,10 +324,24 @@ class AddVaultDevice extends React.Component {
                             }
                         },
                         {
+                            formElement: {
+                                element: "Divider",
+                                props: { dashed: true }
+                            }
+                        },
+                        {
                             id: "active",
                             title: "On service",
                             formElement: {
                                 element: "Switch",
+                            }
+                        },
+                        {
+                            id: "comment",
+                            title: "Comment",
+                            formElement: {
+                                element: "Input",
+    
                             }
                         },
                     ]}
