@@ -6,6 +6,7 @@ import * as antd from 'antd'
 import { history } from 'umi'
 
 import Items from 'globals/sidebar.json'
+import { objectToArrayMap } from '@nodecorejs/utils'
 
 const { Sider } = Layout
 const menuPositions = {
@@ -41,28 +42,21 @@ export default class Sidebar extends React.Component {
     componentDidMount() {
         if (Items) {
             let menus = this.state.menus ?? {}
-            let parents = {}
 
             Items.forEach(async (item) => {
                 try {
-                    let toState = "top" // by default stash items to top menu
                     let obj = {
                         id: item.id,
                         title: item.title ?? item.id,
-                        ...item
+                        position: item.position ?? "top",
+                        component: item.component
                     }
                     if (typeof (item.requireState) !== "undefined") {
                         if (!window.requiresState(item.requireState)) {
                             return false
                         }
                     }
-                    if (typeof (item.position) !== "undefined" && typeof (item.position) == "string" && menuPositions[item.position]) {
-                        toState = item.position
-                    }
 
-                    if (!Array.isArray(menus[toState])) {
-                        menus[toState] = []
-                    }
                     if (typeof (item.icon) !== "undefined" && typeof (Icons[item.icon]) !== "undefined") {
                         obj.icon = React.createElement(Icons[item.icon])
                     }
@@ -71,32 +65,37 @@ export default class Sidebar extends React.Component {
                         resolvers[item.id] = item.path
                         this.setState({ pathResolve: resolvers })
                     }
+
                     if (typeof (item.sub) !== "undefined" && item.sub) {
-                        return parents[item.id] = {
-                            id: item.id,
+                        return menus[item.id] = {
                             childrens: [],
                             ...obj
                         }
                     }
-                    if (typeof (item.parent) !== "undefined" && parents[item.parent]) {
-                        parents[item.parent].childrens.push(obj)
-                        return menus[toState].push(parents[item.parent])
+                    if (typeof (item.parent) !== "undefined" && menus[item.parent]) {
+                        return menus[item.parent].childrens.push(obj)
                     }
-                    return menus[toState].push(obj)
+
+                    return menus[item.id] = obj
                 } catch (error) {
                     return console.log(error)
                 }
             })
-
             this.setState({ menus, done: true })
         }
     }
 
-    renderMenuItems(list) {
-        if (!Array.isArray(list)) {
-            console.log(`Invalid render menus, list is not an array`)
-            return false
-        }
+    renderMenus(data) {
+        let menus = {}
+
+        data.forEach((item) => {
+            const position = item.value.position ?? "top"
+            if (!menus[position]) {
+                menus[position] = []
+            }
+            menus[position].push(item.value)
+        })
+
 
         const handleRenderIcon = (icon) => {
             if (typeof (icon) !== "object") {
@@ -104,44 +103,37 @@ export default class Sidebar extends React.Component {
             }
             return icon
         }
-
-        return list.map((item) => {
-            if (typeof (item.component) !== "undefined" && item.component != null) {
-                if (this.SidebarItemComponentMap[item.component]) {
-                    return this.SidebarItemComponentMap[item.component]
+        const renderMenuItems = (items) => {
+            return items.map((item) => {
+                if (item.component != null) {
+                    if (this.SidebarItemComponentMap[item.component]) {
+                        return this.SidebarItemComponentMap[item.component]
+                    }
                 }
-            }
-            if (item.sub) {
-                return <Menu.SubMenu
-                    key={item.id}
-                    icon={handleRenderIcon(item.icon)}
-                    title={<span>{item.title}</span>}>
-                    {this.renderMenuItems(item.childrens)}
-                </Menu.SubMenu>
-            }
-            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
-        })
-    }
-
-    returnMenu = {
-        top: () => {
-            return <Menu
-                onClick={(e) => this.handleClick(e)}
-                theme={this.state.theme}
-                mode="inline"
-            >
-                {this.renderMenuItems(this.state.menus["top"])}
-            </Menu>
-        },
-        bottom: () => {
-            return <Menu
-                onClick={(e) => this.handleClick(e)}
-                theme={this.state.theme}
-                mode="inline"
-            >
-                {this.renderMenuItems(this.state.menus["bottom"])}
-            </Menu>
+                if (Array.isArray(item.childrens)) {
+                    return <Menu.SubMenu
+                        key={item.id}
+                        icon={handleRenderIcon(item.icon)}
+                        title={<span>{item.title}</span>}
+                    >
+                        {renderMenuItems(item.childrens)}
+                    </Menu.SubMenu>
+                }
+                return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
+            })
         }
+
+        return objectToArrayMap(menus).map((item) => {
+            return <div key={item.key} className={window.classToStyle(`sidebarMenu_${item.key}`)}>
+                <Menu
+                    mode="inline"
+                    onClick={(e) => this.handleClick(e)}
+                    theme={this.state.theme}
+                >
+                    {renderMenuItems(item.value)}
+                </Menu>
+            </div>
+        })
     }
 
     render() {
@@ -156,10 +148,7 @@ export default class Sidebar extends React.Component {
                 onCollapse={() => this.props.onCollapse()}
             >
                 <div className={window.classToStyle('sidebar_menu_wrapper')}>
-                    {this.returnMenu.top()}
-                </div>
-                <div style={{ position: "absolute", bottom: 0, marginBottom: "48px" }}>
-                    {this.returnMenu.bottom()}
+                    {this.renderMenus(objectToArrayMap(this.state.menus))}
                 </div>
             </Sider>
         )

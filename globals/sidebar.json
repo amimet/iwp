@@ -6,9 +6,27 @@
     },
     {
         "sub": true,
+        "id": "users",
+        "title": "Users",
+        "icon": "Users"
+    },
+    {
+        "id": "employers",
+        "title": "Employers",
+        "icon": "User",
+        "parent": "users"
+    },
+    {
+        "id": "workload",
+        "title": "Workload",
+        "icon": "GitCommit",
+        "parent": "users"
+    },
+    {
+        "sub": true,
         "id": "geo",
         "title": "Geo",
-        "icon": "Globe"
+        "icon": "MapPin"
     },
     {
         "id": "regions",
