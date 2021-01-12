@@ -40,7 +40,8 @@ export default class Geo extends React.Component {
                 <div style={{ float: "right" }}>
                     {GoogleMap({
                         zoom: 15,
-                        center: { lat: item.geo.lat, lng: item.geo.lng },
+                        lat: item.geo.lat,
+                        lng: item.geo.lng,
                         markerText: item.data.name
                     })}
                 </div>
