@@ -11,13 +11,13 @@
         "icon": "Users"
     },
     {
-        "id": "employers",
+        "id": "users",
         "title": "Employers",
         "icon": "User",
         "parent": "users"
     },
     {
-        "id": "workload",
+        "id": "users/workload",
         "title": "Workload",
         "icon": "GitCommit",
         "parent": "users"
