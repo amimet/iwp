@@ -34,9 +34,9 @@ export default class Sidebar extends React.Component {
 
     handleClick(e) {
         if (typeof (this.state.pathResolve[e.key]) !== "undefined") {
-            return history.push(`${this.state.pathResolve[e.key]}`)
+            return history.push(`/${this.state.pathResolve[e.key]}`)
         }
-        return history.push(`${e.key}`)
+        return history.push(`/${e.key}`)
     }
 
     componentDidMount() {

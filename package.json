@@ -92,7 +92,7 @@
     "@capacitor/android": "^2.4.2",
     "@capacitor/cli": "^2.4.2",
     "@capacitor/core": "^2.4.2",
-    "@umijs/preset-react": "^1.6.11",
+    "@umijs/preset-react": "^1.7.8",
     "babel-eslint": "^10.0.1",
     "eslint": "^7.13.0",
     "eslint-config-react-app": "^5.0.0",
@@ -107,6 +107,6 @@
     "stylelint": "^13.2.0",
     "stylelint-config-prettier": "^8.0.0",
     "stylelint-config-standard": "^20.0.0",
-    "umi": "^3.2.24"
+    "umi": "^3.3.4"
   }
 }
