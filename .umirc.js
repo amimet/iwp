@@ -8,7 +8,7 @@ export default defineConfig({
   targets: { ie: 11 },
   ignoreMomentLocale: true,
   nodeModulesTransform: {
-    type: 'none',
+    type: 'all',
   },
   alias: {
     globals: path.resolve(__dirname, './globals'),
