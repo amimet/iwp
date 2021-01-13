@@ -8,7 +8,7 @@ export default defineConfig({
   targets: { ie: 11 },
   ignoreMomentLocale: true,
   nodeModulesTransform: {
-    type: 'all',
+    type: 'none',
   },
   alias: {
     globals: path.resolve(__dirname, './globals'),
@@ -33,4 +33,8 @@ export default defineConfig({
       'lodash',
     ],
   ],
+  extraBabelIncludes: [
+    'fs',
+    'process'
+  ]
 })
