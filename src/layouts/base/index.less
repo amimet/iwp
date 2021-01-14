@@ -171,3 +171,40 @@
     bottom: 0;
     margin-bottom: 48px;
 }
+
+// User Card
+@userCard_borderColor_active: rgba(51,51,51,1);
+@userCard_borderColor_normal: rgba(51,51,51,0.3);
+
+.app_user_card {
+    width: 100%;
+    border: @userCard_borderColor_normal 1px solid;
+    border-radius: 8px;
+    transition: all 150ms ease-in-out;
+
+    margin-bottom: 12px;
+    padding: 10px;
+
+    display: flex;
+    > div {
+        margin: 7px;
+    }
+}
+
+.app_user_card:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 8px 0px rgba(51,51,51,0.5);
+    border: @userCard_borderColor_active 1px solid;
+}
+
+.app_user_card_title {
+    width: 100%;
+
+    font-family: 'Roboto Mono', monospace;
+    h1 {
+        font-size: 16px;
+    } 
+    h3 {
+        font-size: 13px;
+    }
+}
