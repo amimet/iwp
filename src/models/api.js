@@ -24,6 +24,7 @@ export default {
                 method: method ?? "POST",
                 url: `${state.api_hostname}/${endpoint}`,
                 headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': `Bearer ${session_token ?? null}`
                 },
                 data: body
