@@ -35,6 +35,9 @@ export default class Users extends React.Component {
                 endpoint: "user",
                 body: {
                     username: user
+                },
+                params: {
+                    username: user
                 }
             },
             callback: (err, res) => {
