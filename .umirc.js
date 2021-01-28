@@ -11,7 +11,8 @@ export default defineConfig({
     type: 'none',
   },
   alias: {
-    globals: path.resolve(__dirname, './globals'),
+    schemas: path.resolve(__dirname, './schemas'),
+    interface: path.resolve(__dirname, './interface'),
     theme: path.resolve(__dirname, './src/theme'),
     locales: path.resolve(__dirname, './src/locales'),
     core: path.resolve(__dirname, './src/core'),
@@ -19,7 +20,6 @@ export default defineConfig({
     pages: path.resolve(__dirname, './src/pages'),
     components: path.resolve(__dirname, './src/components'),
     models: path.resolve(__dirname, './src/models'),
-    node_modules: path.resolve(__dirname, './node_modules')
   },
   extraBabelPresets: ['@lingui/babel-preset-react'],
   extraBabelPlugins: [
@@ -32,9 +32,5 @@ export default defineConfig({
       },
       'lodash',
     ],
-  ],
-  extraBabelIncludes: [
-    'fs',
-    'process'
   ]
 })

@@ -5,7 +5,7 @@ import withConnector from 'core/libs/withConnector'
 import * as antd from 'antd'
 import { history } from 'umi'
 
-import Items from 'globals/sidebar.json'
+import Items from 'schemas/sidebar.json'
 import { objectToArrayMap } from '@nodecorejs/utils'
 
 const { Sider } = Layout

@@ -1,14 +1,18 @@
 import React from 'react'
 import * as antd from 'antd'
+import { objectToArrayMap } from '@nodecorejs/utils'
+import { api } from 'interface'
 
 export default class Users extends React.Component {
     state = {
+        users: {},
         list: [],
-        selectedUser: null,
+        openUser: null,
         selectedUsers: [],
     }
 
     componentDidMount() {
+        console.log(api)
         window.dispatcher({
             type: "api/request",
             payload: {
@@ -16,39 +20,29 @@ export default class Users extends React.Component {
                 endpoint: "users"
             },
             callback: (err, res) => {
-                console.log(res)
-                this.setState({ list: res.data })
+                let updated = {}
+                objectToArrayMap(res.data).forEach((user) => {
+                    updated[user.value.username] = user.value
+                })
+                this.setState({ users: updated, list: res.data })
             }
         })
     }
 
-    selectedUser(user) {
+    selectUser(user) {
 
     }
 
     openUserDrawer(user) {
-        console.log(user)
-        window.dispatcher({
-            type: "api/request",
-            payload: {
-                method: "GET",
-                endpoint: "user",
-                body: {
-                    username: user
-                },
-                params: {
-                    username: user
-                }
-            },
-            callback: (err, res) => {
-                console.log(res)
-                this.setState({ selectedUser: res.data })
-            }
-        })
+        if (typeof(user) == "string") {
+            this.setState({ openUser: user })
+        }else {
+            console.log(`Invalid data`)
+        }
     }
 
     closeUserDrawer() {
-        this.setState({ selectedUser: null })
+        this.setState({ openUser: null })
     }
 
     renderRoles(roles) {
@@ -58,18 +52,19 @@ export default class Users extends React.Component {
     }
 
     renderUserDrawer() {
-        console.log(this.state.selectedUser)
-        return <div>
-            {this.state.selectedUser?.username}
-        </div>
+        const userData = this.state.users[this.state.openUser]
+        if (typeof (userData) !== "undefined") {
+            return <div>
+                {userData.username}
+            </div>
+        }
     }
 
     render() {
-
         return <div>
             <antd.Drawer
                 onClose={() => { this.closeUserDrawer() }}
-                visible={this.state.selectedUser}
+                visible={this.state.openUser}
             >
                 {this.renderUserDrawer()}
             </antd.Drawer>
@@ -77,7 +72,7 @@ export default class Users extends React.Component {
                 dataSource={this.state.list}
                 renderItem={(item) => {
                     console.log(item)
-                    return <div onDoubleClick={() => this.openUserDrawer(item.username)} onClick={() => this.selectedUser(item.username)} key={item._id} className={window.classToStyle("user_card")}>
+                    return <div onDoubleClick={() => this.openUserDrawer(item.username)} onClick={() => this.selectUser(item.username)} key={item._id} className={window.classToStyle("user_card")}>
                         <div>
                             <antd.Avatar shape="square" src={item.avatar || "https://www.flaticon.com/svg/static/icons/svg/149/149071.svg"} />
                         </div>

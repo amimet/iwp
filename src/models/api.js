@@ -4,7 +4,7 @@ import { verbosity } from 'core/libs'
 import axios from 'axios'
 import * as ui from 'core/libs/ui'
 import { objectToArrayMap } from '@nodecorejs/utils'
-import qs from 'qs'
+import qs from 'qs';
 
 export default {
     namespace: 'api',
@@ -34,21 +34,14 @@ export default {
             const address = `${state.api_hostname}/${endpoint}`
             console.log(address, body)
 
-            axios.interceptors.request.use(config => {
-                config.paramsSerializer = params => qs.stringify(params)
-                return config
-            })
-
             axios({
-                url: address,
                 method: method ?? "POST",
+                url: address,
+                data: qs.stringify(body),
                 headers: {
-                    "Accept": "application/json, application/x-www-form-urlencoded",
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'Authorization': `Bearer ${session_token ?? null}`
                 },
-                data: body,
-                params: params,
             })
                 .then((res) => {
                     console.log(res)

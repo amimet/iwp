@@ -7,9 +7,6 @@ import jwt from 'jsonwebtoken'
 import { defaults } from 'config'
 import * as ui from 'core/libs/ui'
 
-import * as path from 'node_modules/pn/path'
-import * as fs from 'node_modules/pn/fs'
-
 export default {
   namespace: 'app',
   state: {
@@ -138,9 +135,6 @@ export default {
         }
         return requirePass
       }
-
-      window.Externals.path = path
-      window.Externals.fs = fs
 
       if (!state.session_valid) {
         history.push(`/login`)
