@@ -51,7 +51,7 @@
     "@lingui/cli": "^2.9.0",
     "@lingui/loader": "^2.9.0",
     "@lingui/react": "^2.8.0",
-    "@ragestudio/nodecorejs": "^0.16.19",
+    "@ragestudio/nodecorejs": "^0.16.20",
     "@steveeeie/react-page-transition": "^1.2.0",
     "@types/lodash": "^4.14.165",
     "@types/node": "^14.14.7",
