@@ -2,11 +2,12 @@ import * as antd from 'antd'
 import React from 'react'
 import withConnector from 'core/libs/withConnector'
 import GoogleMap from 'components/googleMap'
+import { LoadingSpinner } from 'components'
 
 @withConnector
 export default class Geo extends React.Component {
     state = {
-        data: []
+        data: null
     }
 
     componentDidMount() {
@@ -18,7 +19,7 @@ export default class Geo extends React.Component {
             },
             callback: (err, res) => {
                 if (!err) {
-                    this.setState({ data: res.data })
+                    this.setState({ data: res })
                 }
             }
         })
@@ -50,9 +51,8 @@ export default class Geo extends React.Component {
     }
 
     render() {
-        if (!this.state.data) {
-            return <div> Loading... </div>
-        }
+        if (!this.state.data) return <LoadingSpinner />
+
         return (
             <div className={window.classToStyle("regions_wrapper")} >
                 { this.renderRegions(this.state.data)}

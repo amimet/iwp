@@ -5,6 +5,7 @@ import { FormGenerator } from 'components'
 
 import { Drawer, Button, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
+import { LoadingSpinner } from 'components'
 
 const types = {
     "Computer desktop": "1",
@@ -69,24 +70,25 @@ class AddVaultDevice extends React.Component {
                 endpoint: "regions"
             },
             callback: (err, res) => {
-                if (!err) {
-                    this.setState({ loading: false, regions: res.data })
+                if (err) {
+                    return false
                 }
+                this.setState({ loading: false, regions: res })
             }
         })
     }
 
     handleSubmit(context) {
         let fixed = {}
-
         window.currentForms["vault_additem"].toogleValidation(true)
+
         try {
             const keys = Object.keys(context)
             keys.forEach((key) => {
                 const element = context[key]
                 if (typeof (element) !== "undefined") {
                     switch (key) {
-                        case "manufacture":{
+                        case "manufacture": {
                             fixed[key] = element.year()
                             break
                         }
@@ -95,10 +97,9 @@ class AddVaultDevice extends React.Component {
                             break
                         }
                     }
-            
+
                 }
             })
-            console.log(fixed)
 
             window.dispatcher({
                 type: "api/request",
@@ -108,17 +109,16 @@ class AddVaultDevice extends React.Component {
                     body: fixed
                 },
                 callback: (err, res) => {
-                    console.log(err, res)
                     window.currentForms["vault_additem"].handleFormError("all", false)
 
-                    if (res.code == 110) {
+                    if (err) {
                         window.currentForms["vault_additem"].handleFormError("result", res.err)
                         window.currentForms["vault_additem"].toogleValidation(false)
+                        return
                     }
-                    if (res.code == 100) {
-                        window.currentForms["vault_additem"].toogleValidation(false)
-                        this.toogleDrawer()
-                    }
+
+                    window.currentForms["vault_additem"].toogleValidation(false)
+                    this.toogleDrawer()
                 }
             })
         } catch (error) {
@@ -341,7 +341,7 @@ class AddVaultDevice extends React.Component {
                             title: "Comment",
                             formElement: {
                                 element: "Input",
-    
+
                             }
                         },
                     ]}
@@ -353,9 +353,8 @@ class AddVaultDevice extends React.Component {
 }
 
 export default class Vault extends React.Component {
-
     state = {
-        data: []
+        data: null
     }
 
     componentDidMount() {
@@ -367,14 +366,14 @@ export default class Vault extends React.Component {
             },
             callback: (err, res) => {
                 if (!err) {
-                    this.setState({ data: res.data })
+                    this.setState({ data: res })
                 }
             }
         })
     }
 
-
     render() {
+        if (!this.state.data) return <LoadingSpinner />
         return (
             <div className={window.classToStyle('vault_wrapper')}>
                 <antd.Card style={{ marginBottom: "18px" }}>
@@ -387,10 +386,10 @@ export default class Vault extends React.Component {
                         return <antd.Card key={i.id}>
                             #{i.id}
                             <div>
-                                <h1>{ i.item?.title ?? "Device" }</h1>
+                                <h1>{i.item?.title ?? "Device"}</h1>
                                 <antd.Tag color={i.item?.active ? "green" : "red"} > {i.item?.active ? "On service" : "Retired"} </antd.Tag>
                                 <antd.Tag> {i.item?.state ?? "Unknown"} </antd.Tag>
-                            </div> 
+                            </div>
                         </antd.Card>
                     }}
                 />

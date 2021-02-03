@@ -3,11 +3,12 @@ import * as antd from 'antd'
 import { objectToArrayMap } from '@nodecorejs/utils'
 import * as ui from 'core/libs/ui'
 import { defaults } from 'config'
+import { LoadingSpinner } from 'components'
 
 export default class Users extends React.Component {
     state = {
         users: {},
-        list: [],
+        list: null,
         openUser: null,
         selectedUsers: [],
     }
@@ -19,15 +20,17 @@ export default class Users extends React.Component {
                 method: "GET",
                 endpoint: "users"
             },
-            callback: (err, res) => {
+            callback: (err, res, status) => {
                 if (err) {
                     ui.Notify.error({
                         title: "Error fetching users",
-                        message: `API Response with code [${res.code}] > ${res.data}`
+                        message: `API Response with code [${status}] > ${res}`
                     })
                     return false
                 }
-                this.handleDataResponse(res)
+                if (typeof(res) == "object") {
+                    this.handleDataResponse(res)
+                }
             }
         })
     }
@@ -35,10 +38,10 @@ export default class Users extends React.Component {
     handleDataResponse(res) {
         let updated = {}
 
-        objectToArrayMap(res.data).forEach((user) => {
+        objectToArrayMap(res).forEach((user) => {
             updated[user.value.username] = user.value
         })
-        this.setState({ users: updated, list: res.data })
+        this.setState({ users: updated, list: res })
     }
 
     selectUser(user) {
@@ -90,6 +93,8 @@ export default class Users extends React.Component {
     }
 
     render() {
+        if (!this.state.list) return <LoadingSpinner />
+
         return <div>
             <antd.Drawer
                 onClose={() => { this.closeUserDrawer() }}

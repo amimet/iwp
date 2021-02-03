@@ -45,9 +45,9 @@ export default {
                         let isError = false
                         if (res.status !== 200) isError = true
 
-                        return callback(isError ?? false, res)
+                        return callback(isError ?? false, res.data, res.status)
                     }
-                    return res
+                    return res.data
                 })
                 .catch((err) => {
                     ui.Notify.error({
