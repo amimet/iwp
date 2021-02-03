@@ -159,20 +159,17 @@ export default {
           body: payload
         },
         callback: (error, response) => {
-          if (response.code == 100) {
-            store.set(config.app.storage.signkey, response.data.originKey)
-            store.set(config.app.storage.session_frame, response.data.token)
-            location.reload()
-            if (typeof (callback) !== "undefined") {
-              if (error) {
-                return callback(true, response)
-              }
-              return callback(false, null)
-            }
-          } else {
-            if (typeof (callback) !== "undefined") {
+          if (error) {
+            return callback(true, response)
+          }
+          store.set(config.app.storage.signkey, response.data.originKey)
+          store.set(config.app.storage.session_frame, response.data.token)
+          location.reload()
+          if (typeof (callback) !== "undefined") {
+            if (error) {
               return callback(true, response)
             }
+            return callback(false, null)
           }
         }
       })
