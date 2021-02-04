@@ -1,6 +1,6 @@
 {
   "name": "amimet-server",
-  "version": "0.2.40",
+  "version": "0.4.04",
   "description": "",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -24,7 +24,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.12.1",
-    "@nodecorejs/utils": "^0.16.21",
+    "@nodecorejs/utils": "^0.16.23",
     "@types/express": "^4.17.8",
     "@types/lodash": "^4.14.162",
     "@types/node": "^14.11.2",

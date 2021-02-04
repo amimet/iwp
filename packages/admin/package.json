@@ -1,6 +1,6 @@
 {
   "name": "amimet-iwp",
-  "version": "0.1.17",
+  "version": "0.4.04",
   "description": "",
   "types": "index.d.ts",
   "scripts": {
@@ -51,7 +51,7 @@
     "@lingui/cli": "^2.9.0",
     "@lingui/loader": "^2.9.0",
     "@lingui/react": "^2.8.0",
-    "@nodecorejs/utils": "^0.16.21",
+    "@nodecorejs/utils": "^0.16.23",
     "@steveeeie/react-page-transition": "^1.2.0",
     "@types/lodash": "^4.14.165",
     "@types/node": "^14.14.7",

@@ -1,4 +1,5 @@
 {
+    "name": "iwp",
     "git": "https://github.com/amimet/iwp",
     "private": true,
     "workspaces": [
@@ -13,6 +14,6 @@
         "start:server": "cd packages/server && npm start"
     },
     "dependencies": {
-        "@ragestudio/nodecorejs": "0.16.21"
+        "@ragestudio/nodecorejs": "0.16.23"
     }
 }
