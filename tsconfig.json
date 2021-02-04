@@ -18,7 +18,7 @@
   "include": [
     "src/**/*",
     "config/**/*",
-    ".umirc.js",
+    "packages/admin/.umirc.js",
     "typings.d.ts"
   ]
 }

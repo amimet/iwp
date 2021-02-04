@@ -1,0 +1,76 @@
+[
+    {
+        "method": "GET",
+        "path": "/region",
+        "controller": "RegionController"
+    },
+    {
+        "method": "GET",
+        "path": "/regions",
+        "controller": "RegionController",
+        "exec": "getAll"
+    },
+    {
+        "method": "GET",
+        "path": "/roles",
+        "controller": "RolesController"
+    },
+    {
+        "method": "GET",
+        "path": "/users",
+        "controller": "UserController",
+        "middleware": "ensureAuthenticated"
+    },
+    {
+        "method": "GET",
+        "path": "/user",
+        "controller": "UserController",
+        "exec": "getOne",
+        "middleware": "ensureAuthenticated"
+    },
+    {
+        "method": "GET",
+        "path": "/itemVault",
+        "controller": "VaultController",
+        "middleware": "ensureAuthenticated"
+    },
+    {
+        "method": "PUT",
+        "path": "/itemVault",
+        "controller": "VaultController",
+        "middleware": "ensureAuthenticated",
+        "exec": "set"
+    },
+    {
+        "method": "GET",
+        "path": "/vault",
+        "controller": "VaultController",
+        "middleware": "ensureAuthenticated",
+        "exec": "getAll"
+    },
+    {
+        "method": "POST",
+        "path": "/login",
+        "controller": "UserController",
+        "exec": "login"
+    },
+    {
+        "method": "POST",
+        "path": "/logout",
+        "controller": "UserController",
+        "exec": "logout"
+    },
+    {
+        "method": "POST",
+        "path": "/register",
+        "controller": "UserController",
+        "exec": "register"
+    },
+    {
+        "method": "POST",
+        "path": "/isAuth",
+        "controller": "UserController",
+        "exec": "isAuth",
+        "middleware": "ensureAuthenticated"
+    }
+]
