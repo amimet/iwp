@@ -1,76 +1,84 @@
 [
     {
-        "method": "GET",
-        "path": "/region",
-        "controller": "RegionController"
-    },
-    {
-        "method": "GET",
-        "path": "/regions",
-        "controller": "RegionController",
-        "exec": "getAll"
-    },
-    {
-        "method": "GET",
-        "path": "/roles",
-        "controller": "RolesController"
-    },
-    {
-        "method": "GET",
-        "path": "/users",
-        "controller": "UserController",
-        "middleware": "ensureAuthenticated"
-    },
-    {
-        "method": "GET",
-        "path": "/user",
-        "controller": "UserController",
-        "exec": "getOne",
-        "middleware": "ensureAuthenticated"
-    },
-    {
-        "method": "GET",
         "path": "/itemVault",
+        "method": "GET",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated"
     },
     {
-        "method": "PUT",
         "path": "/itemVault",
+        "method": "PUT",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated",
         "exec": "set"
     },
     {
-        "method": "GET",
         "path": "/vault",
+        "method": "GET",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated",
         "exec": "getAll"
     },
     {
+        "path": "/region",
+        "method": "GET",
+        "controller": "RegionController"
+    },
+    {
+        "path": "/regions",
+        "method": "GET",
+        "controller": "RegionController",
+        "exec": "getAll"
+    },
+    {
+        "path": "/hasPermissions",
         "method": "POST",
+        "controller": "RolesController",
+        "middleware": ["ensureAuthenticated", "hasPermissions"],
+        "exec": "hasPermissions"
+    },
+    {
+        "path": "/roles",
+        "method": "GET",
+        "controller": "RolesController"
+    },
+    {
+        "path": "/users",
+        "method": "GET",
+        "controller": "UserController",
+        "middleware": "ensureAuthenticated"
+    },
+    {
+        "path": "/user",
+        "method": "GET",
+        "controller": "UserController",
+        "middleware": "ensureAuthenticated",
+        "exec": "getOne"
+    },
+    {
         "path": "/login",
+        "method": "POST",
         "controller": "UserController",
         "exec": "login"
     },
     {
-        "method": "POST",
         "path": "/logout",
+        "method": "POST",
         "controller": "UserController",
+        "middleware": "ensureAuthenticated",
         "exec": "logout"
     },
     {
-        "method": "POST",
         "path": "/register",
+        "method": "POST",
         "controller": "UserController",
         "exec": "register"
     },
     {
-        "method": "POST",
         "path": "/isAuth",
+        "method": "POST",
         "controller": "UserController",
-        "exec": "isAuth",
-        "middleware": "ensureAuthenticated"
+        "middleware": "ensureAuthenticated",
+        "exec": "isAuth"
     }
 ]

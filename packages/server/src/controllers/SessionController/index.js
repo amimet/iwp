@@ -2,11 +2,9 @@ import { Session } from '../../models'
 
 export const SessionController = {
     set: (id, token) => {
-        Session.findOne({ user_id: id }).then((sessiondata) => {
+        Session.findOne({ user_id: id }).then(async (sessiondata) => {
             if (sessiondata) {
-                Session.findOneAndDelete({ _id: sessiondata._id }).then(() => {
-
-                })
+                await Session.findOneAndDelete({ _id: sessiondata._id })
             }
             return SessionController.add(id, token)
         })

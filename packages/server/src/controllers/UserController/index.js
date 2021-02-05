@@ -7,17 +7,7 @@ import SessionController from '../SessionController'
 
 export const UserController = {
     isAuth: (req, res, next) => {
-        passport.authenticate('jwt', { session: false }, (err, user, info) => {
-            if (err) {
-                return res.status(401).send("Invalid session")
-            }
-
-            if (!user) {
-                return res.status(401).send("User not exists")
-            }
-
-            return res.send(true)
-        })
+        return res.json(`You look nice today 😎`)
     },
     get: (req, res, next) => {
         const { id, username } = req.query
@@ -34,7 +24,7 @@ export const UserController = {
             if (response) {
                 return res.send(response)
             } else {
-                return res.status(404).send("No user finded")
+                return res.status(404).json("No user finded")
             }
         })
     },
@@ -53,7 +43,7 @@ export const UserController = {
             if (response) {
                 return res.send(response)
             } else {
-                return res.status(404).send("No user finded")
+                return res.status(404).json("No user finded")
             }
         })
     },
@@ -61,7 +51,7 @@ export const UserController = {
         User.findOne({ username: req.body.username })
             .then((data) => {
                 if (data) {
-                    return res.status(409).send("Username is already exists")
+                    return res.status(409).json("Username is already exists")
                 }
                 else {
                     var hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
@@ -85,25 +75,27 @@ export const UserController = {
     },
     login: (req, res, next) => {
         passport.authenticate("local", { session: false }, (error, user) => {
-            if (error || !user) {
-                return res.status(401).send("invalid credentials")
-            } else {
-                const payload = {
-                    sub: user._id,
-                    exp: Date.now() + parseInt(process.env.signLifetime),
-                    username: user.username,
-                    fullName: user.fullName,
-                    avatar: user.avatar,
-                    email: user.email
-                }
-
-                const token = jwt.sign(JSON.stringify(payload), process.env.server_key)
-                SessionController.set(user._id, token)
-
-                res.cookie('st', token, { maxAge: 900000, httpOnly: true })
-                res.send({ token: token, originKey: process.env.server_key })
+            if (error) {
+                return res.status(401).json("Invalid credentials")
+            }
+            if (!user) {
+                return res.status(404).json("User not exist")
             }
 
+            const payload = {
+                sub: user._id,
+                exp: Date.now() + parseInt(process.env.signLifetime),
+                username: user.username,
+                fullName: user.fullName,
+                avatar: user.avatar,
+                email: user.email
+            }
+
+            const token = jwt.sign(JSON.stringify(payload), process.env.server_key)
+            SessionController.set(user._id, token)
+
+            res.cookie('st', token, { maxAge: 900000, httpOnly: true })
+            res.json({ token: token, originKey: process.env.server_key })
         })(req, res)
     },
     logout: (req, res, next) => {
