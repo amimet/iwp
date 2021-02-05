@@ -7,6 +7,8 @@ import { history } from 'umi'
 
 import Items from 'schemas/sidebar.json'
 import { objectToArrayMap } from '@nodecorejs/utils'
+import { ConnectionStatus } from 'components'
+
 import { logo } from 'config'
 
 const { Sider } = Layout
@@ -149,8 +151,13 @@ export default class Sidebar extends React.Component {
                 onCollapse={() => this.props.onCollapse()}
                 className={window.classToStyle('sidebar_sider')}
             >
-                <div className={window.classToStyle('sidebar_branding')}>
-                    <img src={logo?.alt ?? null} />
+                <div className={window.classToStyle('sidebar_header')}>
+                    <div className={window.classToStyle('sidebar_header_logo')}>
+                        <img src={logo?.alt ?? null} />
+                    </div>
+                    <div>
+                        <ConnectionStatus />
+                    </div>
                 </div>
                 <div className={window.classToStyle('sidebar_menu_wrapper')}>
                     {this.renderMenus(objectToArrayMap(this.state.menus))}
