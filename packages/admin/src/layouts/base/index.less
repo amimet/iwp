@@ -177,6 +177,7 @@
 @userCard_borderColor_normal: rgba(51,51,51,0.3);
 
 .app_user_card {
+    user-select: none;
     width: 100%;
     border: @userCard_borderColor_normal 1px solid;
     border-radius: 8px;
@@ -203,9 +204,11 @@
     font-family: 'Roboto Mono', monospace;
     h1 {
         font-size: 16px;
+        user-select: all;
     } 
     h3 {
         font-size: 13px;
+        user-select: all;
     }
 }
 

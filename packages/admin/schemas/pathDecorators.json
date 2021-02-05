@@ -6,5 +6,17 @@
     "account": {
         "icon": "User",
         "title": "Account"
+    },
+    "users": {
+        "icon": "Users",
+        "title": "Users"
+    },
+    "regions": {
+        "icon": "Globe",
+        "title": "Regions"
+    },
+    "vault": {
+        "icon": "Archive",
+        "title": "Vault"
     }
 }
