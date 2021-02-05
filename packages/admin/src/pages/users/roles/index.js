@@ -5,12 +5,9 @@ import * as ui from 'core/libs/ui'
 import { defaults } from 'config'
 import { LoadingSpinner } from 'components'
 
-export default class Users extends React.Component {
+export default class Roles extends React.Component {
     state = {
-        users: {},
-        list: null,
-        openUser: null,
-        selectedUsers: [],
+        data: null,
     }
 
     componentDidMount() {
@@ -18,12 +15,12 @@ export default class Users extends React.Component {
             type: "api/request",
             payload: {
                 method: "GET",
-                endpoint: "users"
+                endpoint: "roles"
             },
             callback: (err, res, status) => {
                 if (err) {
                     ui.Notify.error({
-                        title: "Error fetching users",
+                        title: "Error fetching roles",
                         message: `API Response with code [${status}] > ${res}`
                     })
                     return false

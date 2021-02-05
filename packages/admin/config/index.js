@@ -1,6 +1,9 @@
 const packagejson = require("../package.json")
 
 module.exports = {
+    logo: {
+        alt: "https://dl.amimet.es/branding/amimet_alt/SVG/index.svg"
+    },
     app: {
         title: packagejson.name,
         app_model: "app",
