@@ -35,20 +35,4 @@ export function genPassword(password) {
     };
 }
 
-export function handleResponse(res, payload, status) {
-    if (typeof (status) == "undefined") {
-        status = 0
-    }
-    if (typeof (res) == "undefined") {
-        verbosity.log(`req not sended`)
-        return false
-    }
-    try {
-        return res.send({ code: status, data: payload })
-    } catch (error) {
-        verbosity.log(error)
-        return false
-    }
-}
-
 export * from '@nodecorejs/utils'
