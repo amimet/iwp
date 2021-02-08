@@ -13,6 +13,19 @@
         "exec": "set"
     },
     {
+        "path": "/workload",
+        "method": "GET",
+        "controller": "WorkloadController",
+        "middleware": "ensureAuthenticated"
+    },
+    {
+        "path": "/workload",
+        "method": "POST",
+        "controller": "WorkloadController",
+        "middleware": "ensureAuthenticated",
+        "exec": "set"
+    },
+    {
         "path": "/vault",
         "method": "GET",
         "controller": "VaultController",
@@ -36,6 +49,12 @@
         "controller": "RolesController",
         "middleware": ["ensureAuthenticated", "hasPermissions"],
         "exec": "hasPermissions"
+    },
+    {
+        "path": "/role",
+        "method": "POST",
+        "controller": "RolesController",
+        "exec": "set"
     },
     {
         "path": "/roles",

@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const RoleSchema = Schema({
     name: String,
+    description: String,
     apply: Object
 })
 
@@ -27,7 +28,8 @@ const SessionSchema = Schema({
 const GeoRegionSchema = Schema({
     id: Number,
     geo: Object,
-    data: Object
+    data: Object,
+    sub: Object,
 })
 
 const VaultSchema = Schema({
@@ -35,6 +37,18 @@ const VaultSchema = Schema({
     created_date: String,
     current_location: String,
     item: Object
+})
+
+const WorkloadSchema = Schema({
+    id: String,
+    created_date: String,
+    current_location: String,
+    item: Object
+})
+
+const FabricSchema = Schema({
+    name: String,
+    objects: Object,
 })
 
 const ContractSchema = Schema({
@@ -47,6 +61,8 @@ const ContractSchema = Schema({
     monetary_value: String,
 })
 
+export const Fabric = mongoose.model('Fabric', FabricSchema, "fabric")
+export const Workload = mongoose.model('Workload', WorkloadSchema, "workload")
 export const Role = mongoose.model('Role', RoleSchema, 'roles')
 export const Vault = mongoose.model('Vault', VaultSchema, "vault")
 export const GeoRegion = mongoose.model('GeoRegion', GeoRegionSchema, "regions")
