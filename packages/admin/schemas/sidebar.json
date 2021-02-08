@@ -17,6 +17,12 @@
         "parent": "users"
     },
     {
+        "id": "users/roles",
+        "title": "Roles",
+        "icon": "Link",
+        "parent": "users"
+    },
+    {
         "id": "users/workload",
         "title": "Workload",
         "icon": "GitCommit",

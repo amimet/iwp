@@ -1,19 +1,25 @@
-import { app } from 'config'
+import config from 'config'
 import axios from 'axios'
-import * as ui from 'core/libs/ui'
+import { ui } from 'core/libs'
 import { objectToArrayMap, verbosity } from '@nodecorejs/utils'
+
+const ignoreErrorCodes = [404, 403]
 
 export default {
     namespace: 'api',
     state: {
-        api_hostname: app.api_hostname
+        api_hostname: config.app.api_hostname
     },
     effects: {
         *request({ payload, callback }, { put, call, select }) {
-            const session_token = yield select(state => state.app.session_token)
-            const state = yield select(state => state.api)
+            const state = yield select(states => states.api)
+            const session_token = yield select(states => states.app.session_token)
 
-            let { method, endpoint, body, params } = payload
+            let { method, endpoint, body, params, ignoreErrorHandler } = payload
+
+            if (typeof(ignoreErrorHandler) == "undefined") {
+                ignoreErrorHandler = false
+            }
 
             if (!endpoint) {
                 verbosity.log(`endpoint not defined`)
@@ -36,7 +42,7 @@ export default {
                 data: body,
                 params,
                 headers: {
-                    'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'content-type': 'application/json',
                     'Authorization': `Bearer ${session_token ?? null}`
                 },
             })
@@ -47,27 +53,24 @@ export default {
 
                         return callback(isError ?? false, res.data, res.status)
                     }
-                    return res.data
                 })
                 .catch((err) => {
-                    ui.Notify.error({
-                        title: "This request could not be completed",
-                        message: err
-                    })
-                    verbosity.log(err)
-                    if (typeof (callback) !== "undefined") {
-                        return callback(true, err)
+                    if (!ignoreErrorCodes.includes(err.response?.status) && !ignoreErrorCodes) {
+                        ui.Notify.error({
+                            title: "This request could not be completed",
+                            message: err.response
+                        })
+                        verbosity.log(err)
                     }
-                    return null
+                    if (typeof (callback) !== "undefined") {
+                        return callback(true, err.response, err.response?.status)
+                    }
                 })
         }
     },
     reducers: {
         updateState(state, { payload }) {
-            return {
-                ...state,
-                ...payload,
-            }
+            return { ...state, ...payload }
         },
     }
 }
