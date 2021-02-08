@@ -12,10 +12,6 @@ let settingList = [
 ]
 
 function WithAccountData(childrenClass) {
-    childrenClass.prototype.accountData = function () {
-        return this.props.app.accountData
-    }
-
     return connect(({ app }) => ({ app }))(childrenClass)
 }
 
@@ -46,7 +42,7 @@ export default class Settings extends React.Component {
     render() {
         return (
             <div>
-                <antd.Drawer placement="bottom" onClose={this.setting.close()} visible={this.state.openSetting} >
+                <antd.Drawer placement="bottom" onClose={() => this.setting.close()} visible={this.state.openSetting} >
 
                 </antd.Drawer>
                 {this.renderAccountCard()}
