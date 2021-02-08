@@ -162,8 +162,8 @@ export default {
           if (error) {
             return callback(true, response)
           }
-          store.set(config.app.storage.signkey, response.data.originKey)
-          store.set(config.app.storage.session_frame, response.data.token)
+          store.set(config.app.storage.signkey, response.originKey)
+          store.set(config.app.storage.session_frame, response.token)
           location.reload()
           if (typeof (callback) !== "undefined") {
             if (error) {
@@ -181,17 +181,12 @@ export default {
         payload: {
           endpoint: "isAuth"
         },
-        callback: (error, response) => {
+        callback: (error, response, status) => {
           if (typeof (callback) !== "undefined") {
             if (error) {
-              return callback(false)
+              return callback(true)
             }
-            callback(response)
-          }
-          if (response.code == 200 && response.data) {
-            ui.Notify.success("You are authed")
-          } else {
-            ui.Notify.warn("Its seems like you are not authed")
+            callback(false, response)
           }
         }
       })
