@@ -9,6 +9,7 @@ import { objectToArrayMap } from '@nodecorejs/utils'
 import { ConnectionStatus } from 'components'
 import { logo } from 'config'
 
+import DefaultItemsKeys from 'schemas/defaultSidebar.json'
 import Items from 'schemas/sidebar.json'
 import BottomItems from 'schemas/bottomSidebar.json'
 
@@ -42,10 +43,33 @@ export default class Sidebar extends React.Component {
 
     componentDidMount() {
         if (Items) {
+            const custom = this.props.app.sidebar
+
+            let scope = []
             let menus = this.state.menus ?? {}
             const itemsmix = [...BottomItems, ...Items]
 
-            itemsmix.forEach(async (item) => {
+            let objs = {}
+            
+            if (Array.isArray(custom)) {
+                custom.forEach((key) => {
+                    scope.push(key)
+                })
+            }else {
+                scope = DefaultItemsKeys
+            } 
+
+            BottomItems.forEach((entry) => {
+                scope.push(entry.id) // avoid excluding bottom items
+            })
+
+            itemsmix.forEach((entry) => {
+                objs[entry.id] = entry
+            })
+
+            scope.forEach(async (key) => {
+                const item = objs[key]
+                
                 try {
                     let obj = {
                         id: item.id,

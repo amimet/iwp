@@ -20,7 +20,7 @@ export default {
 
     account_data: [],
 
-    sidebar: [],
+    sidebar: null,
 
     notifications: [],
     activeTheme: "light"
@@ -146,7 +146,18 @@ export default {
         history.push(config.app.mainPath)
       }
 
-      settings.get("sidebarItems")
+      try {
+        const sidebarCustom = settings.getValue("sidebarItems")
+
+        if (sidebarCustom) {
+          state.dispatcher({
+            type: "updateState",
+            payload: { sidebar: JSON.parse(sidebarCustom) }
+          })
+        }
+      } catch (error) {
+        verbosity.error(`Failed to proccess sidebar items >`, error.message)
+      }
 
     },
     *login({ payload, callback }, { call, put, select }) {
