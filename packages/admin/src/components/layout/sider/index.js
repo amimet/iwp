@@ -5,17 +5,15 @@ import withConnector from 'core/libs/withConnector'
 import * as antd from 'antd'
 import { history } from 'umi'
 
-import Items from 'schemas/sidebar.json'
 import { objectToArrayMap } from '@nodecorejs/utils'
 import { ConnectionStatus } from 'components'
-
 import { logo } from 'config'
 
+import Items from 'schemas/sidebar.json'
+import BottomItems from 'schemas/bottomSidebar.json'
+
 const { Sider } = Layout
-const menuPositions = {
-    top: "topMenus",
-    bottom: "bottomMenus"
-}
+
 @withConnector
 export default class Sidebar extends React.Component {
 
@@ -45,8 +43,9 @@ export default class Sidebar extends React.Component {
     componentDidMount() {
         if (Items) {
             let menus = this.state.menus ?? {}
+            const itemsmix = [...BottomItems, ...Items]
 
-            Items.forEach(async (item) => {
+            itemsmix.forEach(async (item) => {
                 try {
                     let obj = {
                         id: item.id,
@@ -98,7 +97,6 @@ export default class Sidebar extends React.Component {
             }
             menus[position].push(item.value)
         })
-
 
         const handleRenderIcon = (icon) => {
             if (typeof (icon) !== "object") {

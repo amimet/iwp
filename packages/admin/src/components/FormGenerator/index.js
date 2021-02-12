@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'umi'
-import { verbosity } from 'core/libs'
+import { verbosity } from '@nodecorejs/utils'
 
 import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider, Switch } from 'antd';
 import HeadShake from 'react-reveal/HeadShake';

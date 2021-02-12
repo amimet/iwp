@@ -1,5 +1,1 @@
-import Notify from './notify'
-
-export {
-    Notify
-}
+export { default as Notify } from './notify'
