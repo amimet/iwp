@@ -14,7 +14,8 @@ module.exports = {
 
         storage: { // specify where data is storaged
             session_frame: "session",
-            signkey: "certified"
+            signkey: "certified",
+            settings: "app_settings"
         },
 
         certified_signkeys: [

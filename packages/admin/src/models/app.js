@@ -4,6 +4,7 @@ import { objectToArrayMap, verbosity } from '@nodecorejs/utils'
 import { queryIndexer, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
 import config from 'config'
+import { settings } from 'core/libs'
 
 export default {
   namespace: 'app',
@@ -57,8 +58,11 @@ export default {
     *earlyInit({ payload }, { call, put, select }) {
       const state = yield select(state => state.app)
 
+      window.controllers = {}
       window.changeLocale = setLocale
       window.dispatcher = state.dispatcher
+
+      window.controllers.settings = settings
 
       window.classToStyle = (key) => {
         if (typeof (key) !== "string") {
@@ -141,6 +145,8 @@ export default {
       if (shouldRedirectFromLogin() && state.session_valid) {
         history.push(config.app.mainPath)
       }
+
+      settings.get("sidebarItems")
 
     },
     *login({ payload, callback }, { call, put, select }) {
