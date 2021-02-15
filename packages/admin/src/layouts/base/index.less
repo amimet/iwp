@@ -80,6 +80,7 @@
     border: 0!important;
     width: 40%!important;
     border-radius: 7px!important;
+    margin: 12px 0;
 
     .ant-input {
         background-color: @app_wrapper_backgroundAccent!important;
@@ -90,8 +91,10 @@
     .ant-input-group{
         display: flex;
     }
-    
+
+    // .ant-input-search-button
     .ant-btn {
+        margin-right: 12px;
         background-color: transparent!important;
         border: 0!important;
     }
@@ -164,6 +167,56 @@
 //  SIDEBAR
 .app_sidebar_sider .ant-layout-sider-children{
     margin-top: 15px!important;
+    transition: all 150ms ease-in-out;
+}
+
+.app_sidebar_sider_edit .ant-layout-sider-children{
+    margin-top: 15px!important;
+    transition: all 150ms ease-in-out;
+    //transform: translate(35px, 120px);
+
+    .app_sidebar_menu_wrapper {
+        .ant-menu {
+            border-radius: 0 12px 12px 0;
+            background-color: #45454531;
+        }
+        
+        .app_sidebarMenu_top ul{
+            > .ant-menu-item li {
+                user-select: none;
+                span {
+                    user-select: none;
+                }
+                margin: 15px 0;
+            }
+            > .ant-menu-submenu {
+                user-select: none;
+                margin: 15px 0;
+            }
+        }
+    }
+} 
+
+.app_sidebar_menu_wrapper_edit {
+    align-items: center;
+    align-content: center;
+
+    .ant-menu {
+        width: 100%!important;
+        border-radius: 0 12px 12px 0;
+        background-color: #45454531;
+    }
+    
+    .app_sidebarMenu_top ul{
+        > .ant-menu-item {
+            user-select: none;
+            margin: 15px 0;
+        }
+        > .ant-menu-submenu {
+            user-select: none;
+            margin: 15px 0;
+        }
+    }
 }
 
 .app_sidebar_header {

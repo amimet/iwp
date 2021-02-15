@@ -1,12 +1,12 @@
 import React from 'react'
 import * as Icons from 'components/Icons'
 import { Layout, Menu } from 'antd'
-import withConnector from 'core/libs/withConnector'
 import * as antd from 'antd'
 import { history } from 'umi'
 
+import { Controller, withConnector } from 'core/libs'
+
 import { objectToArrayMap } from '@nodecorejs/utils'
-import { ConnectionStatus } from 'components'
 import { logo } from 'config'
 
 import DefaultItemsKeys from 'schemas/defaultSidebar.json'
@@ -17,6 +17,7 @@ const { Sider } = Layout
 
 @withConnector
 export default class Sidebar extends React.Component {
+    sidebarController = new Controller({ id: "sidebar", locked: true })
 
     SidebarItemComponentMap = {
         account: <Menu.Item key="account">
@@ -28,6 +29,7 @@ export default class Sidebar extends React.Component {
     }
 
     state = {
+        editMode: false,
         done: false,
         pathResolve: {},
         menus: {},
@@ -41,7 +43,15 @@ export default class Sidebar extends React.Component {
         return history.push(`/${e.key}`)
     }
 
+    toogleEditMode(to) {
+        return this.setState({ editMode: to ?? !this.state.editMode })
+    }
+
     componentDidMount() {
+        this.sidebarController.add("toogleEdit", (to) => {
+            return this.toogleEditMode(to)
+        }, { lock: true })
+
         if (Items) {
             const custom = this.props.app.sidebar
 
@@ -50,14 +60,14 @@ export default class Sidebar extends React.Component {
             const itemsmix = [...BottomItems, ...Items]
 
             let objs = {}
-            
+
             if (Array.isArray(custom)) {
                 custom.forEach((key) => {
                     scope.push(key)
                 })
-            }else {
+            } else {
                 scope = DefaultItemsKeys
-            } 
+            }
 
             BottomItems.forEach((entry) => {
                 scope.push(entry.id) // avoid excluding bottom items
@@ -69,7 +79,7 @@ export default class Sidebar extends React.Component {
 
             scope.forEach(async (key) => {
                 const item = objs[key]
-                
+
                 try {
                     let obj = {
                         id: item.id,
@@ -111,78 +121,99 @@ export default class Sidebar extends React.Component {
         }
     }
 
-    renderMenus(data) {
-        let menus = {}
-
-        data.forEach((item) => {
-            const position = item.value.position ?? "top"
-            if (!menus[position]) {
-                menus[position] = []
-            }
-            menus[position].push(item.value)
-        })
-
+    renderMenuItems(items) {        
         const handleRenderIcon = (icon) => {
             if (typeof (icon) !== "object") {
                 return null
             }
             return icon
         }
-        const renderMenuItems = (items) => {
-            return items.map((item) => {
-                if (item.component != null) {
-                    if (this.SidebarItemComponentMap[item.component]) {
-                        return this.SidebarItemComponentMap[item.component]
-                    }
+        
+        return items.map((item) => {
+            if (item.component != null) {
+                if (this.SidebarItemComponentMap[item.component]) {
+                    return this.SidebarItemComponentMap[item.component]
                 }
-                if (Array.isArray(item.childrens)) {
-                    return <Menu.SubMenu
-                        key={item.id}
-                        icon={handleRenderIcon(item.icon)}
-                        title={<span>{item.title}</span>}
-                    >
-                        {renderMenuItems(item.childrens)}
-                    </Menu.SubMenu>
-                }
-                return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
-            })
+            }
+            if (Array.isArray(item.childrens)) {
+                return <Menu.SubMenu
+                    
+                    key={item.id}
+                    icon={handleRenderIcon(item.icon)}
+                    title={<span>{item.title}</span>}
+                >
+                    {this.renderMenuItems(item.childrens)}
+                </Menu.SubMenu>
+            }
+            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
+        })
+    }
+
+    proccessMenus(data, scope) {
+        let menus = {}
+
+        objectToArrayMap(data).forEach((item) => {
+            const position = item.value.position ?? "top"
+            if (!menus[position]) {
+                menus[position] = []
+            }
+
+            menus[position].push(item.value)
+        })
+
+
+        if (typeof(scope) !== "undefined") {
+            return menus[scope]
         }
 
+        return menus
+    }
+    
+    renderMenus(menus) {
         return objectToArrayMap(menus).map((item) => {
             return <div key={item.key} className={window.classToStyle(`sidebarMenu_${item.key}`)}>
                 <Menu
                     mode="inline"
-                    onClick={(e) => this.handleClick(e)}
                     theme={this.state.theme}
+                    onClick={(e) => this.handleClick(e)}
                 >
-                    {renderMenuItems(item.value)}
+                    {this.renderMenuItems(item.value)}
                 </Menu>
             </div>
         })
     }
 
     render() {
-        if (!this.state.done) {
-            return null
-        }
+        if (!this.state.done) return null
+
         return (
             <Sider
                 theme={this.state.theme}
                 collapsible
                 collapsed={this.props.collapsed}
                 onCollapse={() => this.props.onCollapse()}
-                className={window.classToStyle('sidebar_sider')}
+                className={window.classToStyle(this.state.editMode ? 'sidebar_sider_edit' : 'sidebar_sider')}
             >
-                <div className={window.classToStyle('sidebar_header')}>
-                    <div className={window.classToStyle('sidebar_header_logo')}>
-                        <img src={logo?.alt ?? null} />
+                <antd.Drawer
+                    closeIcon={<Icons.Save />}
+                    placement="left"
+                    visible={this.state.editMode}
+                    onClose={() => this.toogleEditMode(false)}
+                    style={{ display: "flex" }}
+                >
+                    <div className={window.classToStyle('sidebar_menu_wrapper_edit')}>
+                        {this.renderMenuItems(this.proccessMenus(this.state.menus, "top"))}
                     </div>
-                    <div>
-                        <ConnectionStatus />
+                </antd.Drawer>
+                {this.state.editMode ? null :
+                    <div className={window.classToStyle('sidebar_header')}>
+                        <div className={window.classToStyle('sidebar_header_logo')}>
+                            <img src={logo?.alt ?? null} />
+                        </div>
                     </div>
-                </div>
+                }
                 <div className={window.classToStyle('sidebar_menu_wrapper')}>
-                    {this.renderMenus(objectToArrayMap(this.state.menus))}
+                    {this.renderMenus(this.proccessMenus(this.state.menus))}
                 </div>
             </Sider>
         )
