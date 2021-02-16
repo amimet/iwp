@@ -73,7 +73,7 @@ export class Controller {
     add(key, method, options) {
         window.controllers[this.id][key] = method
 
-        if (options.lock) {
+        if (options?.lock) {
             this.freeze.lock(key)
         }
     }
