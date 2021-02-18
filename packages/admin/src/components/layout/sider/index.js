@@ -68,11 +68,14 @@ export default class Sidebar extends React.Component {
         if (Items) {
             const custom = this.props.app.sidebar
 
+            let menus = {}     
             let scope = []
-            let menus = this.state.menus ?? {}
-            const itemsmix = [...BottomItems, ...Items]
-
+            
             let objs = {}
+
+            Items.concat(BottomItems).forEach((entry) => {
+                objs[entry.id] = entry
+            })
 
             if (Array.isArray(custom)) {
                 custom.forEach((key) => {
@@ -81,16 +84,14 @@ export default class Sidebar extends React.Component {
             } else {
                 scope = DefaultItemsKeys
             }
-
+            
+            // avoid excluding bottom items
             BottomItems.forEach((entry) => {
-                scope.push(entry.id) // avoid excluding bottom items
+                scope.push(entry.id) 
             })
 
-            itemsmix.forEach((entry) => {
-                objs[entry.id] = entry
-            })
-
-            scope.forEach(async (key) => {
+            console.log(objs)
+            scope.forEach((key) => {
                 const item = objs[key]
 
                 try {
@@ -143,7 +144,8 @@ export default class Sidebar extends React.Component {
         }
 
         return items.map((item) => {
-            if (item.component != null) {
+            if (typeof(item.component) !== "undefined") {
+                console.log(item.component)
                 if (this.SidebarItemComponentMap[item.component]) {
                     return this.SidebarItemComponentMap[item.component]
                 }
@@ -166,6 +168,7 @@ export default class Sidebar extends React.Component {
         let menus = {}
 
         objectToArrayMap(data).forEach((item) => {
+            console.log(item)
             const position = item.value.position ?? "top"
             if (!menus[position]) {
                 menus[position] = []
