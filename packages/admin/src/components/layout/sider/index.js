@@ -44,7 +44,20 @@ export default class Sidebar extends React.Component {
     }
 
     toogleEditMode(to) {
-        return this.setState({ editMode: to ?? !this.state.editMode })
+        if (typeof (to) == "undefined") {
+            to = !this.state.editMode
+        }
+
+        const drawerFragment = <div className={window.classToStyle('sidebar_menu_wrapper_edit')}>
+            {this.renderMenuItems(this.proccessMenus(this.state.menus, "top"))}
+        </div>
+
+        if (to) {
+            return window.controllers.drawer.open(drawerFragment, { props: { closeIcon: <Icons.Save />, placement: "left", onClose: () => this.toogleEditMode(false) } })
+        } else {
+            return window.controllers.drawer.close()
+        }
+
     }
 
     componentDidMount() {
@@ -121,14 +134,14 @@ export default class Sidebar extends React.Component {
         }
     }
 
-    renderMenuItems(items) {        
+    renderMenuItems(items) {
         const handleRenderIcon = (icon) => {
             if (typeof (icon) !== "object") {
                 return null
             }
             return icon
         }
-        
+
         return items.map((item) => {
             if (item.component != null) {
                 if (this.SidebarItemComponentMap[item.component]) {
@@ -137,7 +150,7 @@ export default class Sidebar extends React.Component {
             }
             if (Array.isArray(item.childrens)) {
                 return <Menu.SubMenu
-                    
+
                     key={item.id}
                     icon={handleRenderIcon(item.icon)}
                     title={<span>{item.title}</span>}
@@ -162,13 +175,13 @@ export default class Sidebar extends React.Component {
         })
 
 
-        if (typeof(scope) !== "undefined") {
+        if (typeof (scope) !== "undefined") {
             return menus[scope]
         }
 
         return menus
     }
-    
+
     renderMenus(menus) {
         return objectToArrayMap(menus).map((item) => {
             return <div key={item.key} className={window.classToStyle(`sidebarMenu_${item.key}`)}>
