@@ -1,18 +1,16 @@
 import store from 'store'
-import { verbosity } from 'core/libs'
 import { history } from 'umi'
-import { objectToArrayMap } from '@nodecorejs/utils'
-import { queryIndexer, config, setLocale } from 'core'
+import { objectToArrayMap, verbosity } from '@nodecorejs/utils'
+import { queryIndexer, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
-import { defaults } from 'config'
-import * as ui from 'core/libs/ui'
+import config from 'config'
+import { settings } from 'core/libs'
 
 export default {
   namespace: 'app',
   state: {
     language: config.i18n.defaultLanguage,
     style_prefix: config.app.defaultStyleClass ?? "app_",
-    queryDone: false,
     env_proccess: process.env,
     dispatcher: null,
 
@@ -22,12 +20,15 @@ export default {
 
     account_data: [],
 
+    sidebar: null,
+
     notifications: [],
     activeTheme: "light"
   },
   subscriptions: {
     setup({ dispatch }) {
       dispatch({ type: 'updateState', payload: { dispatcher: dispatch } })
+      dispatch({ type: 'earlyInit' })
       dispatch({ type: 'initFrames' })
       dispatch({ type: 'query' })
     },
@@ -54,50 +55,14 @@ export default {
     },
   },
   effects: {
-    *query({ payload }, { call, put, select }) {
+    *earlyInit({ payload }, { call, put, select }) {
       const state = yield select(state => state.app)
 
+      window.controllers = {}
       window.changeLocale = setLocale
       window.dispatcher = state.dispatcher
-      window.Externals = []
 
-      if (state.session) {
-        let updated = {}
-
-        const tryDefault = (key) => {
-          if (typeof (defaults[key]) !== "undefined") {
-            return defaults[key]
-          }
-          return null
-        }
-        const fromSessionFrame = ["username", "sub", "iat", "fullName", "avatar", "email"]
-
-        fromSessionFrame.forEach((e) => {
-          try {
-            if (state.session[e] != null) { // if false try to catch from defaults in config
-              return updated[e] = state.session[e]
-            }
-            return updated[e] = tryDefault(e)
-          } catch (error) {
-            return console.log(error)
-          }
-        })
-
-        state.dispatcher({ type: "updateState", payload: { account_data: updated } })
-      }
-
-      queryIndexer([
-        {
-          match: '/s;:id',
-          to: `/settings?key=:id`,
-        },
-        {
-          match: '/@:id',
-          to: `/@/:id`,
-        }
-      ], (callback) => {
-        window.location = callback
-      })
+      window.controllers.settings = settings
 
       window.classToStyle = (key) => {
         if (typeof (key) !== "string") {
@@ -135,6 +100,38 @@ export default {
         }
         return requirePass
       }
+    },
+    *query({ payload }, { call, put, select }) {
+      const state = yield select(state => state.app)
+
+      if (state.session) {
+        let updated = {}
+
+        const tryDefault = (key) => {
+          if (typeof (config.defaults[key]) !== "undefined") {
+            return config.defaults[key]
+          }
+          return null
+        }
+        const fromSessionFrame = ["username", "sub", "iat", "fullName", "avatar", "email"]
+
+        fromSessionFrame.forEach((e) => {
+          try {
+            if (state.session[e] != null) { // if false try to catch from defaults in config
+              return updated[e] = state.session[e]
+            }
+            return updated[e] = tryDefault(e)
+          } catch (error) {
+            return console.log(error)
+          }
+        })
+
+        state.dispatcher({ type: "updateState", payload: { account_data: updated } })
+      }
+
+      queryIndexer(config.indexer ?? [], (callback) => {
+        window.location = callback
+      })
 
       if (!state.session_valid) {
         history.push(`/login`)
@@ -149,6 +146,19 @@ export default {
         history.push(config.app.mainPath)
       }
 
+      try {
+        const sidebarCustom = settings.getValue("sidebarItems")
+
+        if (sidebarCustom) {
+          state.dispatcher({
+            type: "updateState",
+            payload: { sidebar: JSON.parse(sidebarCustom) }
+          })
+        }
+      } catch (error) {
+        verbosity.error(`Failed to proccess sidebar items >`, error.message)
+      }
+
     },
     *login({ payload, callback }, { call, put, select }) {
       const state = yield select(state => state.app)
@@ -158,19 +168,16 @@ export default {
           endpoint: "login",
           body: payload
         },
-        callback: (error, response) => {
+        callback: (error, response, status) => {
           if (error) {
             return callback(true, response)
           }
+
           store.set(config.app.storage.signkey, response.originKey)
           store.set(config.app.storage.session_frame, response.token)
           location.reload()
-          if (typeof (callback) !== "undefined") {
-            if (error) {
-              return callback(true, response)
-            }
-            return callback(false, null)
-          }
+
+          return callback(false, status)
         }
       })
     },
@@ -186,7 +193,7 @@ export default {
             if (error) {
               return callback(true)
             }
-            callback(false, response)
+            return callback(false, response)
           }
         }
       })
@@ -201,7 +208,7 @@ export default {
           if (config.app.certified_signkeys.includes(signkey)) {
             jwt.verify(session, signkey, (err, decoded) => {
               if (err) {
-                verbosity([`Invalid token > `, err])
+                verbosity.log([`Invalid token > `, err])
                 state.dispatcher({ type: "logout" })
               }
               if (decoded) {
@@ -215,7 +222,7 @@ export default {
               }
             })
           } else {
-            verbosity(`signed key is not an certifed signkey`)
+            verbosity.log(`signed key is not an certifed signkey`)
           }
         } catch (error) {
           console.log(error)

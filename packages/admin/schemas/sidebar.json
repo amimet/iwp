@@ -11,9 +11,16 @@
         "icon": "Users"
     },
     {
-        "id": "users",
-        "title": "Employers",
+        "id": "accounts",
+        "path": "users",
+        "title": "Accounts",
         "icon": "User",
+        "parent": "users"
+    },
+    {
+        "id": "users/contracts",
+        "title": "Contracts",
+        "icon": "Briefcase",
         "parent": "users"
     },
     {
@@ -29,6 +36,12 @@
         "parent": "users"
     },
     {
+        "id": "users/workshifts",
+        "title": "Workshifts",
+        "icon": "Clock",
+        "parent": "users"
+    },
+    {
         "sub": true,
         "id": "geo",
         "title": "Geo",
@@ -37,7 +50,7 @@
     {
         "id": "regions",
         "title": "Regions",
-        "icon": "Target",
+        "icon": "Map",
         "parent": "geo"
     },
     {
@@ -59,19 +72,5 @@
         "id": "server_manager",
         "title": "Server",
         "icon": "Database"
-    },
-    {
-        "id": "settings",
-        "position": "bottom",
-        "title": "Settings",
-        "icon": "Settings"
-    },
-    {
-        "id": "account",
-        "position": "bottom",
-        "component": "account",
-        "requireState": {
-            "session_valid": true
-        }
     }
 ]

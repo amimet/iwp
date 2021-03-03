@@ -1,12 +1,7 @@
-import { clientInfo } from 'core'
-var { verbosity } = require("@nodecorejs/utils")
+import * as ui from './ui'
+import { DSO } from './dsoc'
+import { Controller } from './controller'
+export { default as withConnector } from './withConnector'
+export { default as settings } from './settings'
 
-if (clientInfo.os.family) {
-    if (clientInfo.os.family !== ("Windows" || "Linux")) {
-        verbosity = () =>{ return false } // disable verbosity for non-v8stackframe-compatible
-    }
-}
-
-export {
-    verbosity
-}
+export { ui, DSO, Controller }
