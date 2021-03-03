@@ -105,5 +105,12 @@
         "method": "POST",
         "controller": "Devcon",
         "middleware": "ensureAuthenticated"
+    },
+    {
+        "path": "/printer",
+        "method": "POST",
+        "controller": "Devcon",
+        "middleware": "ensureAuthenticated",
+        "exec": "sendPrinter"
     }
 ]

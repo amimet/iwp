@@ -14,6 +14,7 @@
         "start:server": "cd packages/server && npm start"
     },
     "dependencies": {
-        "@ragestudio/nodecorejs": "0.16.23"
+        "@ragestudio/nodecorejs": "0.16.23",
+        "printer": "^0.4.0"
     }
 }
