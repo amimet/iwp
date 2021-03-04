@@ -5,8 +5,8 @@ function sendPrint(payload) {
     return new Promise((resolve, reject) => {
         const { data, type } = payload
         printer.printDirect({
-            data: String("YEAE"),
-            type: "RAW",
+            data: data,
+            type: "TEXT",
             success: (jobID) => {
                 return resolve(`SUCCESS WITH ID [${jobID}]`)
             },
