@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import { withConnector } from 'core/libs'
-import { ButtonMenu } from 'components'
+import { ButtonMenu, Settings } from 'components'
 
 let settingList = [
     {
@@ -20,10 +20,11 @@ let settingList = [
         icon: "Package"
     }
 ]
-export default class Settings extends React.Component {
+export default class SettingMenu extends React.Component {
     setting = {
         open: (id) => {
             this.setState({ openSetting: id })
+            Settings.open(id)
         },
         close: () => {
             this.setState({ openSetting: null })

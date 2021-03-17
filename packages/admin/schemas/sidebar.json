@@ -72,5 +72,10 @@
         "id": "server_manager",
         "title": "Server",
         "icon": "Database"
+    },
+    {
+        "id": "launchpad",
+        "title": "Launchpad",
+        "icon": "Command"
     }
 ]

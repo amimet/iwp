@@ -32,7 +32,7 @@ export default class BaseLayout extends React.Component {
     }
 
     handleUpdateDrawerInstance(mutation) {
-        if (typeof(mutation) !== "object") {
+        if (typeof (mutation) !== "object") {
             console.warn(`handling drawer instance updates is only allowed with objects`)
             return false
         }
@@ -89,7 +89,7 @@ export default class BaseLayout extends React.Component {
 
     componentDidMount() {
         this.drawerController.add("open", (fragment, options) => {
-            return this.handleDrawerEvent({ eventInstance: "open" }, { options, fragment })
+            return this.handleDrawerEvent({ eventInstance: "open" }, { fragment, options })
         }, { lock: true })
 
         this.drawerController.add("close", (to) => {
@@ -132,7 +132,7 @@ export default class BaseLayout extends React.Component {
 
         return <antd.Layout style={{ minHeight: '100vh' }}>
             <antd.Drawer {...this.state.drawerInstance.options?.props} visible={this.state.drawerInstance.render} >
-                <React.Fragment>{this.state.drawerInstance.render}</React.Fragment>
+                <React.Fragment>{this.state.drawerInstance.render && React.createElement(this.state.drawerInstance.render)}</React.Fragment>
             </antd.Drawer>
             <Layout.Sider onCollapse={() => this.toggleCollapseSider()} collapsed={this.state.collapsedSider} />
             <antd.Layout className={window.classToStyle("layout")}>
