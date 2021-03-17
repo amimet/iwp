@@ -4,35 +4,23 @@ import * as antd from 'antd'
 
 import styles from './index.less'
 
-const ItemTypes = { Button: antd.Button, Switch: antd.Switch }
-
-// Index Order sensitive !!!
-let settingList = [
-    {
-        id: "test1",
-        icon: "Box",
-        title: "Testing 1",
-        group: "general",
-        type: "Switch"
-    },
-    {
-        id: "test2",
-        title: "Testing 2",
-        group: "general",
-        type: "Button"
-    },
-]
-
-let groupsDecorator = {
-    general: {
-        title: "General",
-        icon: "Settings"
-    }
+const ItemTypes = {
+    Button: antd.Button,
+    Switch: antd.Switch,
+    Slider: antd.Slider,
+    Checkbox: antd.Checkbox,
+    Input: antd.Input,
+    InputNumber: antd.InputNumber,
+    Select: antd.Select
 }
+
+let settingList = require("schemas/settingsList.json") // Index Order sensitive !!!
+let groupsDecorator = require("schemas/settingsGroupsDecorator.json")
+let handlers = require("core/handlers").default.settings ?? {}
 
 const controller = {
     open: (key) => {
-        console.log(key)
+        // TODO: Scroll to content
         window.controllers.drawer.open(SettingsController, {
             props: {
                 onClose: controller.close,
@@ -46,20 +34,6 @@ const controller = {
     }
 }
 
-const handlers = {
-    test1: {
-        enable: () => {
-            console.log("test1 fn() => enabling")
-        },
-        disable: () => {
-            console.log("test1 fn() => DISABLED")
-        },
-        click: () => {
-            console.log("test1 fn() => CLICKED, UNIQUE FN")
-        }
-    }
-}
-
 export class SettingsController extends React.Component {
 
     handleEvent(event, id, type) {
@@ -68,7 +42,7 @@ export class SettingsController extends React.Component {
             return false
         }
 
-        if (typeof(handlers[id]) == "undefined") {
+        if (typeof (handlers[id]) == "undefined") {
             console.warn(`No handler for ${id}`)
             return false
         }
@@ -102,7 +76,11 @@ export class SettingsController extends React.Component {
         const _event = this.handleEvent
         function renderGroupItems(group) {
             return items[group].map((item) => {
-                return <div>
+                if (!item.type) {
+                    console.error(`Item [${item.id}] has no an type!`)
+                    return null
+                }
+                return <div key={item.id}>
                     <h5> {item.icon ? React.createElement(Icons[item.icon]) : null}{item.title ?? item.id} </h5>
                     {React.createElement(ItemTypes[item.type], {
                         onClick: (e) => _event(e, item.id ?? "anon", item.type),
@@ -117,8 +95,8 @@ export class SettingsController extends React.Component {
             if (group === "none") {
                 return null
             }
-            const fromDecoratorIcon = groupsDecorator[group].icon
-            const fromDecoratorTitle = groupsDecorator[group].title
+            const fromDecoratorIcon = groupsDecorator[group]?.icon
+            const fromDecoratorTitle = groupsDecorator[group]?.title
 
             return <div>
                 <h1>{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null} {fromDecoratorTitle ?? group}</h1>
@@ -142,7 +120,7 @@ export class SettingsController extends React.Component {
         return Object.keys(items).map((group) => {
             return <div style={{ marginBottom: "30px" }}>
                 {renderGroupDecorator(group)}
-                <div className={styles.groupItems} >
+                <div key={group} className={styles.groupItems} >
                     {renderGroupItems(group)}
                 </div>
             </div>
