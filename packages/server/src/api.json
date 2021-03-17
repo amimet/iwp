@@ -99,5 +99,18 @@
         "controller": "UserController",
         "middleware": "ensureAuthenticated",
         "exec": "isAuth"
+    },
+    {
+        "path": "/devcon",
+        "method": "POST",
+        "controller": "Devcon",
+        "middleware": "ensureAuthenticated"
+    },
+    {
+        "path": "/printer",
+        "method": "POST",
+        "controller": "Devcon",
+        "middleware": "ensureAuthenticated",
+        "exec": "sendPrinter"
     }
 ]
