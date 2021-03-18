@@ -82,7 +82,7 @@ export class SettingsController extends React.Component {
                 }
                 return <div key={item.id}>
                     <h5> {item.icon ? React.createElement(Icons[item.icon]) : null}{item.title ?? item.id} </h5>
-                    {React.createElement(ItemTypes[item.type], {
+                    {item.render ?? React.createElement(ItemTypes[item.type], {
                         onClick: (e) => _event(e, item.id ?? "anon", item.type),
                         children: item.title ?? item.id,
                         ...item.props
