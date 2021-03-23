@@ -61,6 +61,29 @@ const ContractSchema = Schema({
     monetary_value: String,
 })
 
+const StreamingSchema = Schema({
+    session_id: String,
+    stream_key: String,
+    stream_id: String,
+    user_id: String,
+})
+
+const StreamKeysSchema = Schema({
+    user_id: String,
+    username: String,
+    key: String,
+})
+
+const StreamingResolverSchema = Schema({
+    stream_key: String,
+    stream_id: String,
+    user_id: String,
+})
+
+export const StreamingResolver = mongoose.model('StreamingResolver', StreamingResolverSchema, "streaming_resolvers")
+export const StreamKey = mongoose.model('StreamKey', StreamKeysSchema, "stream_keys")
+export const Streaming = mongoose.model('Streaming', StreamingSchema, "streamings")
+
 export const Fabric = mongoose.model('Fabric', FabricSchema, "fabric")
 export const Workload = mongoose.model('Workload', WorkloadSchema, "workload")
 export const Role = mongoose.model('Role', RoleSchema, 'roles')

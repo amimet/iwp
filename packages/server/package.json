@@ -23,6 +23,8 @@
   },
   "license": "ISC",
   "dependencies": {
+    "unique-names-generator": "^4.4.0",
+    "node-media-server": "^2.2.4",
     "@babel/runtime": "^7.12.1",
     "@nodecorejs/utils": "^0.16.23",
     "@ragestudio/nodecorejs": "0.16.23",

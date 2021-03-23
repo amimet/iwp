@@ -1,5 +1,37 @@
 [
     {
+        "path": "/stream",
+        "method": "GET",
+        "controller": "StreamingController"
+    },
+    {
+        "path": "/streams",
+        "method": "GET",
+        "controller": "StreamingController",
+        "exec": "getAll"
+    },
+    {
+        "path": "/streamKey",
+        "method": "GET",
+        "controller": "StreamingController",
+        "middleware": "ensureAuthenticated",
+        "exec": "getStreamKey"
+    },
+    {
+        "path": "/generateStreamKey",
+        "method": "GET",
+        "controller": "StreamingController",
+        "middleware": "ensureAuthenticated",
+        "exec": "generateStreamKey"
+    },
+    {
+        "path": "/createStream",
+        "method": "POST",
+        "controller": "StreamingController",
+        "exec": "create",
+        "middleware": "ensureAuthenticated"
+    },
+    {
         "path": "/itemVault",
         "method": "GET",
         "controller": "VaultController",
@@ -47,7 +79,10 @@
         "path": "/hasPermissions",
         "method": "POST",
         "controller": "RolesController",
-        "middleware": ["ensureAuthenticated", "hasPermissions"],
+        "middleware": [
+            "ensureAuthenticated",
+            "hasPermissions"
+        ],
         "exec": "hasPermissions"
     },
     {

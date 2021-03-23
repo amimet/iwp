@@ -11,6 +11,7 @@ import { User } from './models'
 
 import { errorHandler, notFoundHandler } from './middlewares'
 import generateAPI from './lib/generateAPI'
+import nodeMediaServer from './lib/mediaServer'
 
 const JwtStrategy = require('passport-jwt').Strategy
 const LocalStrategy = require('passport-local').Strategy
@@ -144,6 +145,8 @@ function createServer() {
     connectDB()
     initExpress()
     initPassaport()
+
+    nodeMediaServer.newNMS().run()
 
     httpServer.listen(listenPort, () => {
         verbosity.log(`🌐 Server listening on port (${listenPort})`)
