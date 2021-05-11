@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import * as Icons from 'feather-reactjs'
 
 import styles from './index.less'
-import { __proto__filterSchematizedArray } from '@nodecorejs/utils'
+import { __proto__filterSchematizedArray } from '@corenode/utils'
 
 export default class ListedMenu extends React.Component {
   state = {

@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import { objectToArrayMap } from '@nodecorejs/utils'
+import { objectToArrayMap } from '@corenode/utils'
 import { FormGenerator } from 'components'
 
 import { Drawer, Button, Select } from 'antd'

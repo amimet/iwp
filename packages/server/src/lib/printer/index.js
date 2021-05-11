@@ -1,4 +1,4 @@
-//import modules from '@nodecorejs/modules'
+//import modules from '@corenode/modules'
 var printer = require('printer')
 
 function sendPrint(payload) {

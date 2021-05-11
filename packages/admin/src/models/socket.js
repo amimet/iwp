@@ -1,7 +1,7 @@
 import { app } from 'config'
 import axios from 'axios'
 import * as ui from 'core/libs/ui'
-import { objectToArrayMap, verbosity } from '@nodecorejs/utils'
+import { objectToArrayMap, verbosity } from '@corenode/utils'
 
 export default {
     namespace: 'socket',

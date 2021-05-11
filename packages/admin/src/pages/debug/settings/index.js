@@ -1,5 +1,5 @@
 import React from 'react'
-import { objectToArrayMap } from '@nodecorejs/utils'
+import { objectToArrayMap } from '@corenode/utils'
 import { withConnector, settings } from 'core/libs'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'

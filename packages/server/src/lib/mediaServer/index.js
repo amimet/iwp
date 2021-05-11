@@ -1,9 +1,9 @@
 import NodeMediaServer from 'node-media-server'
-import { getRuntimeEnv } from '@nodecorejs/dot-runtime'
+import { getRuntimeEnv } from '@corenode/dot-runtime'
 import { Streaming, StreamKey, User, StreamingResolver } from '../../models'
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 
-let { verbosity } = require('@nodecorejs/utils')
+let { verbosity } = require('@corenode/utils')
 verbosity = verbosity.options({ method: `[NodeMediaServer]` })
 
 const config = getRuntimeEnv().rtmp_server

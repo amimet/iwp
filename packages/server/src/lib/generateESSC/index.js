@@ -1,4 +1,4 @@
-import { verbosity, objectToArrayMap } from '@nodecorejs/utils'
+import { verbosity, objectToArrayMap } from '@corenode/utils'
 import { User, Session, GeoRegion, Vault } from '../../models'
 
 function getRandomInt(min, max) {

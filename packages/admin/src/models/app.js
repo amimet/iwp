@@ -1,6 +1,6 @@
 import store from 'store'
 import { history } from 'umi'
-import { objectToArrayMap, verbosity } from '@nodecorejs/utils'
+import { objectToArrayMap, verbosity } from '@corenode/utils'
 import { queryIndexer, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
 import config from 'config'

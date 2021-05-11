@@ -1,4 +1,4 @@
-import runtime from '@nodecorejs/dot-runtime'
+import runtime from '@corenode/dot-runtime'
 import localforage from 'localforage'
 
 console.log(runtime)

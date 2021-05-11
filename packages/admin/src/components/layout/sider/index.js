@@ -6,7 +6,7 @@ import { history } from 'umi'
 
 import { Controller, withConnector } from 'core/libs'
 
-import { objectToArrayMap } from '@nodecorejs/utils'
+import { objectToArrayMap } from '@corenode/utils'
 import { logo } from 'config'
 
 import DefaultItemsKeys from 'schemas/defaultSidebar.json'

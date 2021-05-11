@@ -1,7 +1,7 @@
 import config from 'config'
 import axios from 'axios'
 import { ui } from 'core/libs'
-import { objectToArrayMap, verbosity } from '@nodecorejs/utils'
+import { objectToArrayMap, verbosity } from '@corenode/utils'
 
 const ignoreErrorCodes = [404, 403]
 

@@ -1,5 +1,5 @@
 // Prototype for nodecore module
-import { verbosity } from '@nodecorejs/utils'
+import { verbosity } from '@corenode/utils'
 import store from 'store'
 
 export class DSO {

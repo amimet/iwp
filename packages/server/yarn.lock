@@ -863,9 +863,9 @@
   dependencies:
     "chokidar" "2.1.8"
 
-"@nodecorejs/utils@^0.16.20":
+"@corenode/utils@^0.16.20":
   "integrity" "sha512-YZiU+D5dtKUVYc5150SEVJ8u+vMYgIrYXc18kG8lXkjoEak4oTYprqZx4Q+h1MP2PcBUbqj2D6uB8Ps3YEHq5A=="
-  "resolved" "https://registry.npmjs.org/@nodecorejs/utils/-/utils-0.16.20.tgz"
+  "resolved" "https://registry.npmjs.org/@corenode/utils/-/utils-0.16.20.tgz"
   "version" "0.16.20"
   dependencies:
     "@babel/core" "^7.12.9"

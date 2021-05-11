@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { verbosity } from '@nodecorejs/utils'
+import { verbosity } from '@corenode/utils'
 
 /**
  * 
@@ -35,4 +35,4 @@ export function genPassword(password) {
     };
 }
 
-export * from '@nodecorejs/utils'
+export * from '@corenode/utils'

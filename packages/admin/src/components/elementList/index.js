@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import { RefreshCw } from 'feather-reactjs'
-import { objectToArrayMap, getCircularReplacer, decycle } from '@nodecorejs/utils'
+import { objectToArrayMap, getCircularReplacer, decycle } from '@corenode/utils'
 
 const serializeFlags = {
     __cycle_flag: true // with id 0

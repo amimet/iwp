@@ -9,6 +9,10 @@ export default defineConfig({
   ignoreMomentLocale: true,
   nodeModulesTransform: {
     type: 'none',
+   // exclude: ["execa", "human-signals"]
+  },
+  chainWebpack(webpack) {
+    webpack.plugin("IgnorePlugin").use("IgnorePlugin")
   },
   alias: {
     schemas: path.resolve(__dirname, './schemas'),

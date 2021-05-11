@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-import { verbosity, objectToArrayMap } from '@nodecorejs/utils'
+import { verbosity, objectToArrayMap } from '@corenode/utils'
 import express from 'express'
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'

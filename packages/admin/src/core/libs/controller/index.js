@@ -1,4 +1,4 @@
-import { verbosity } from '@nodecorejs/utils'
+import { verbosity } from '@corenode/utils'
 const inmutableKey = ["_params"]
 
 export class Controller {
