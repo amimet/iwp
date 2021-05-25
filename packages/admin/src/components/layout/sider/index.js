@@ -4,6 +4,7 @@ import { Layout, Menu } from 'antd'
 import * as antd from 'antd'
 import { history } from 'umi'
 
+import { Settings } from 'components'
 import { Controller, withConnector } from 'core/libs'
 
 import { objectToArrayMap } from '@corenode/utils'
@@ -14,6 +15,12 @@ import Items from 'schemas/sidebar.json'
 import BottomItems from 'schemas/bottomSidebar.json'
 
 const { Sider } = Layout
+
+const onClickHandlers = {
+    "settings": (event) => {
+        Settings.open()
+    }
+}
 
 @withConnector
 export default class Sidebar extends React.Component {
@@ -37,6 +44,9 @@ export default class Sidebar extends React.Component {
     }
 
     handleClick(e) {
+        if (typeof onClickHandlers[e.key] === "function") {
+            return onClickHandlers[e.key](e)
+        }
         if (typeof (this.state.pathResolve[e.key]) !== "undefined") {
             return history.push(`/${this.state.pathResolve[e.key]}`)
         }
@@ -150,7 +160,6 @@ export default class Sidebar extends React.Component {
             }
             if (Array.isArray(item.childrens)) {
                 return <Menu.SubMenu
-
                     key={item.id}
                     icon={handleRenderIcon(item.icon)}
                     title={<span>{item.title}</span>}

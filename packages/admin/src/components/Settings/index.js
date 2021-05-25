@@ -17,44 +17,41 @@ const ItemTypes = {
 let settingList = require("schemas/settingsList.json") // Index Order sensitive !!!
 let groupsDecorator = require("schemas/settingsGroupsDecorator.json")
 
-const controller = {
-    open: (key) => {
-        // TODO: Scroll to content
-        window.controllers.drawer.open(SettingsController, {
-            props: {
-                onClose: controller.close,
-                width: "45%"
-            }
-        })
-    },
-
-    close: () => {
-        window.controllers.drawer.close()
-    }
-}
-
 export class SettingsController extends React.Component {
     controller = window.controllers["settings"]
 
+    state = {
+        settings: this.controller.get() ?? {}
+    }
+
+    _set(key, value) {
+        let settings = {...this.state.settings}
+        settings[key] = value
+
+        this.setState({ settings }, () => {
+            this.controller.set(key, value)
+        })
+    }
+
     handleEvent(event, id, type) {
-        if (typeof id === "undefined"){
+        if (typeof id === "undefined") {
             console.error(`No setting id provided!`)
             return false
         }
         if (typeof type !== "string") {
             console.error(`Invalid eventType data-type, expecting string!`)
             return false
-        }             
+        }
 
-        const val = this.controller.getValue(id) ?? false
+        const value = this.controller.getValue(id) ?? false
 
         switch (type.toLowerCase()) {
             case "button": {
-                window.controllers.events.emit("changeSetting", { event, id, value: val })
+                window.controllers.events.emit("changeSetting", { event, id, value })
                 break
             }
             default: {
-                this.controller.set(id, !val)
+                this._set(id, !value)
                 break
             }
         }
@@ -69,19 +66,34 @@ export class SettingsController extends React.Component {
                     console.error(`Item [${item.id}] has no an type!`)
                     return null
                 }
+
+                if (typeof item.props === "undefined") {
+                    item.props = {}
+                }
+
+                switch (item.type.toLowerCase()) {
+                    case "switch":{
+                        item.props.checked = this.state.settings[item.id]
+                        break
+                    }
+                
+                    default:{
+                        item.props.value = this.state.settings[item.id]
+                        break
+                    }
+                }
                 return <div key={item.id}>
                     <h5> {item.icon ? React.createElement(Icons[item.icon]) : null}{item.title ?? item.id} </h5>
                     {item.render ?? React.createElement(ItemTypes[item.type], {
                         onClick: (e) => this.handleEvent(e, item.id ?? "anon", item.type),
-                        children: item.title ?? item.id,
-                        value: this.controller.getValue(item.id),
+                        children: item.title ?? item.id,                        
                         ...item.props
                     })}
                 </div>
             })
         }
 
-        const renderGroupDecorator = (group)  => {
+        const renderGroupDecorator = (group) => {
             if (group === "none") {
                 return null
             }
@@ -121,6 +133,22 @@ export class SettingsController extends React.Component {
         return <div>
             {this.generateMenu(settingList)}
         </div>
+    }
+}
+
+const controller = {
+    open: (key) => {
+        // TODO: Scroll to content
+        window.controllers.drawer.open(SettingsController, {
+            props: {
+                onClose: controller.close,
+                width: "45%"
+            }
+        })
+    },
+
+    close: () => {
+        window.controllers.drawer.close()
     }
 }
 
