@@ -7,8 +7,9 @@ import { objectToArrayMap, verbosity } from '@corenode/utils'
 
 import config from 'config'
 import { queryIndexer, setLocale } from 'core'
-import coreEvents from 'core/events'
+import builtInEvents from 'core/events'
 import { settings } from 'core/libs'
+import SettingsController from 'core/models/settings'
 
 export default {
   namespace: 'app',
@@ -63,16 +64,16 @@ export default {
     *earlyInit({ payload }, { call, put, select }) {
       const state = yield select(state => state.app)
 
+      global.settingsController = new SettingsController()
+      global.applicationEvents = new EventEmitter()
+
+      objectToArrayMap(builtInEvents).forEach((event) => {
+        global.applicationEvents.on(event.key, event.value)
+      })
+
       window.controllers = {}
       window.changeLocale = setLocale
       window.dispatcher = state.dispatcher
-
-      window.controllers.settings = settings
-      window.controllers.events = new EventEmitter()
-
-      objectToArrayMap(coreEvents).forEach((event) => {
-        window.controllers.events.on(event.key, event.value)
-      })
 
       window.classToStyle = (key) => {
         if (typeof (key) !== "string") {

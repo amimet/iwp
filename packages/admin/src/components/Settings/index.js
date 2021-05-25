@@ -18,19 +18,14 @@ let settingList = require("schemas/settingsList.json") // Index Order sensitive 
 let groupsDecorator = require("schemas/settingsGroupsDecorator.json")
 
 export class SettingsController extends React.Component {
-    controller = window.controllers["settings"]
+    settingController = global.settingsController
 
     state = {
-        settings: this.controller.get() ?? {}
+        settings: this.settingController.get() ?? {}
     }
 
     _set(key, value) {
-        let settings = {...this.state.settings}
-        settings[key] = value
-
-        this.setState({ settings }, () => {
-            this.controller.set(key, value)
-        })
+        this.setState({ settings: this.settingController.change(key, value) })
     }
 
     handleEvent(event, id, type) {
@@ -43,18 +38,20 @@ export class SettingsController extends React.Component {
             return false
         }
 
-        const value = this.controller.getValue(id) ?? false
+        const value = this.settingController.get(id) ?? false
+        let to = !value
 
         switch (type.toLowerCase()) {
             case "button": {
-                window.controllers.events.emit("changeSetting", { event, id, value })
+                to = value
                 break
             }
             default: {
-                this._set(id, !value)
                 break
             }
         }
+
+        this._set(id, to)
     }
 
     generateMenu(data) {

@@ -14,15 +14,12 @@ import "./index.less"
 @connect(({ loading }) => ({ loading }))
 export default class BaseLayout extends React.Component {
     drawerController = new Controller({ id: "drawer", locked: true })
+
     originPath = window.location.pathname
     state = {
         drawerInstance: {},
-        collapsedSider: false,
+        collapsedSidebar: false,
         isMobile: null
-    }
-
-    toggleCollapseSider = (to) => {
-        this.setState({ collapsedSider: (to ?? !this.state.collapsedSider) })
     }
 
     handleClickBack() {
@@ -94,8 +91,6 @@ export default class BaseLayout extends React.Component {
             return this.handleDrawerEvent({ eventInstance: "onClose" })
         }, { lock: true })
 
-        window.toggleCollapseSider = this.toggleCollapseSider
-
         this.enquireHandler = enquireScreen(mobile => {
             const { isMobile } = this.state
             if (isMobile !== mobile) {
@@ -132,7 +127,7 @@ export default class BaseLayout extends React.Component {
             <antd.Drawer {...this.state.drawerInstance.options?.props} visible={this.state.drawerInstance.render} >
                 <React.Fragment>{this.state.drawerInstance.render && React.createElement(this.state.drawerInstance.render)}</React.Fragment>
             </antd.Drawer>
-            <Layout.Sider onCollapse={() => this.toggleCollapseSider()} collapsed={this.state.collapsedSider} />
+            <Layout.Sider onCollapse={() => this.toggleCollapseSider()} collapsed={this.state.collapsedSidebar} />
             <antd.Layout className={window.classToStyle("layout")}>
                 <Layout.Header handleBack={() => this.handleClickBack()} originPath={this.originPath} siteName={config.app.title} />
 

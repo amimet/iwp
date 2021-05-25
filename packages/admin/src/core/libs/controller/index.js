@@ -71,6 +71,8 @@ export class Controller {
     }
 
     add(key, method, options, events) {
+        this[key] = method
+        
         window.controllers[this.id][key] = method
 
         if (options?.lock) {

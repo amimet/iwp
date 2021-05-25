@@ -36,8 +36,10 @@ export default class Sidebar extends React.Component {
     }
 
     state = {
+        isHover: false,
+        collapsed: this.props.collapsed ?? settingsController.get("collapseOnLooseFocus") ?? false,
         editMode: false,
-        done: false,
+        loading: true,
         pathResolve: {},
         menus: {},
         theme: this.props.app.activeTheme ?? "light"
@@ -67,20 +69,31 @@ export default class Sidebar extends React.Component {
         } else {
             return window.controllers.drawer.close()
         }
+    }
 
+    onMouseEnter = (event) => {
+        this.setState({ isHover: true })
+    }
+
+    handleMouseLeave = (event) => {
+        this.setState({ isHover: false })
     }
 
     componentDidMount() {
         this.sidebarController.add("toogleEdit", (to) => {
-            return this.toogleEditMode(to)
+            this.toogleEditMode(to)
+        }, { lock: true })
+
+        this.sidebarController.add("toogleCollapse", (to) => {
+            this.setState({ collapsed: (to ?? !this.state.collapsed) })
         }, { lock: true })
 
         if (Items) {
             const custom = this.props.app.sidebar
 
-            let menus = {}     
+            let menus = {}
             let scope = []
-            
+
             let objs = {}
 
             Items.concat(BottomItems).forEach((entry) => {
@@ -94,10 +107,10 @@ export default class Sidebar extends React.Component {
             } else {
                 scope = DefaultItemsKeys
             }
-            
+
             // avoid excluding bottom items
             BottomItems.forEach((entry) => {
-                scope.push(entry.id) 
+                scope.push(entry.id)
             })
 
             scope.forEach((key) => {
@@ -140,7 +153,7 @@ export default class Sidebar extends React.Component {
                     return console.log(error)
                 }
             })
-            this.setState({ menus, done: true })
+            this.setState({ menus, loading: false })
         }
     }
 
@@ -153,7 +166,7 @@ export default class Sidebar extends React.Component {
         }
 
         return items.map((item) => {
-            if (typeof(item.component) !== "undefined") {
+            if (typeof (item.component) !== "undefined") {
                 if (this.SidebarItemComponentMap[item.component]) {
                     return this.SidebarItemComponentMap[item.component]
                 }
@@ -206,13 +219,34 @@ export default class Sidebar extends React.Component {
     }
 
     render() {
-        if (!this.state.done) return null
+        if(settingsController.is("collapseOnLooseFocus", true)){
+            while (this.state.isHover && this.state.collapsed){
+                window.controllers.sidebar.toogleCollapse(false)
+                break
+            }
+            while (!this.state.isHover && !this.state.collapsed) {
+                const delay = 500
+                setTimeout(() => {
+                    window.controllers.sidebar.toogleCollapse(true)
+                }, delay)
+    
+                break
+            }
+        }else {
+            if (this.state.collapsed) {
+                window.controllers.sidebar.toogleCollapse(false)
+            }
+        }
+
+        if (this.state.loading) return null
 
         return (
             <Sider
+                onMouseEnter={this.onMouseEnter}
+                onMouseLeave={this.handleMouseLeave}
                 theme={this.state.theme}
                 collapsible
-                collapsed={this.props.collapsed}
+                collapsed={this.state.collapsed}
                 onCollapse={() => this.props.onCollapse()}
                 className={window.classToStyle(this.state.editMode ? 'sidebar_sider_edit' : 'sidebar_sider')}
             >

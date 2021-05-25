@@ -1,16 +1,10 @@
 [
     {
-        "id": "test1",
-        "icon": "Box",
-        "title": "Testing 1",
+        "id": "expire_session",
+        "icon": "Key",
+        "title": "Expire Session",
         "group": "general",
         "type": "Switch"
-    },
-    {
-        "id": "test2",
-        "title": "Testing 2",
-        "group": "general",
-        "type": "Button"
     },
     {
         "group": "sidebar",

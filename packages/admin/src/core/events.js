@@ -1,9 +1,7 @@
-import { verbosity } from '@corenode/utils'
+import handlers from './handlers'
 
-export default {
-    changeSetting: (payload) => {
-        verbosity.log(`emitted event [${payload.id}]`, payload)
-        
-    },
+const events = {
     
 }
+
+export default events
