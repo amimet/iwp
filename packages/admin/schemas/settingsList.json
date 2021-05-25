@@ -7,6 +7,13 @@
         "type": "Switch"
     },
     {
+        "id": "edit_sidebar",
+        "icon": "Edit",
+        "title": "Edit Sidebar",
+        "group": "general",
+        "type": "Button"
+    },
+    {
         "group": "sidebar",
         "id": "collapseOnLooseFocus",
         "title": "Collapse when loose focus",

@@ -5,20 +5,98 @@ import * as antd from 'antd'
 import { history } from 'umi'
 
 import { Settings } from 'components'
-import { Controller, withConnector } from 'core/libs'
+import { Controller, withConnector, DJail } from 'core/libs'
 
 import { objectToArrayMap } from '@corenode/utils'
 import { logo } from 'config'
 
-import DefaultItemsKeys from 'schemas/defaultSidebar.json'
-import Items from 'schemas/sidebar.json'
-import BottomItems from 'schemas/bottomSidebar.json'
+import defaultSidebarKeys from 'schemas/defaultSidebar.json'
+import sidebarItems from 'schemas/sidebar.json'
+import bottomSidebarItems from 'schemas/bottomSidebar.json'
 
 const { Sider } = Layout
 
 const onClickHandlers = {
     "settings": (event) => {
         Settings.open()
+    }
+}
+
+const SidebarStorageControllerKey = "app_sidebar"
+const SidebarStorageController = new DJail({ name: SidebarStorageControllerKey, voidMutation: true, type: "array" })
+
+@withConnector
+class SidebarEdit extends React.Component {
+    allItems = [...sidebarItems, ...bottomSidebarItems]
+        .map((item, index) => {
+            if (item.locked) {
+                item.disabled = true
+            }
+
+            item.key = index.toString()
+            return item
+        })
+        .filter((item) => !item.disabled)
+
+    state = {
+        targetKeys: [],
+        selectedKeys: [],
+    }
+
+    handleUpdate = () => {
+        const targetKeys = this.state.targetKeys
+
+        targetKeys.forEach((key) => {
+            const item = this.allItems[key]
+            if (typeof item !== "undefined") {
+                SidebarStorageController.set(item.id, item.id)
+            }
+        })
+    }
+
+    handleChange = (nextTargetKeys, direction, moveKeys) => {
+        this.setState({ targetKeys: nextTargetKeys })
+        this.handleUpdate()
+    }
+
+    handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
+        this.setState({ selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys] })
+    }
+
+    componentDidMount() {
+        let targetKeys = [...this.state.targetKeys]
+        const storagedKeys = SidebarStorageController.get()
+
+        this.allItems.forEach((item) => {
+            const key = storagedKeys[item.id]
+
+            if (typeof key === "undefined") {
+                if (defaultSidebarKeys.includes(item.id)) {
+                    targetKeys.push(item.key)
+                }
+            }
+
+        })
+
+        this.setState({ targetKeys })
+    }
+
+    render() {
+        const { targetKeys, selectedKeys } = this.state
+        return (
+            <>
+                <antd.Transfer
+                    dataSource={this.allItems}
+                    titles={['Disabled', 'Enabled']}
+                    targetKeys={targetKeys}
+                    selectedKeys={selectedKeys}
+                    onChange={this.handleChange}
+                    onSelectChange={this.handleSelectChange}
+                    render={item => item.title}
+                    oneWay
+                />
+            </>
+        )
     }
 }
 
@@ -49,23 +127,19 @@ export default class Sidebar extends React.Component {
         if (typeof onClickHandlers[e.key] === "function") {
             return onClickHandlers[e.key](e)
         }
-        if (typeof (this.state.pathResolve[e.key]) !== "undefined") {
+        if (typeof this.state.pathResolve[e.key] !== "undefined") {
             return history.push(`/${this.state.pathResolve[e.key]}`)
         }
         return history.push(`/${e.key}`)
     }
 
     toogleEditMode(to) {
-        if (typeof (to) == "undefined") {
+        if (typeof to === "undefined") {
             to = !this.state.editMode
         }
 
-        const drawerFragment = <div className={window.classToStyle('sidebar_menu_wrapper_edit')}>
-            {this.renderMenuItems(this.proccessMenus(this.state.menus, "top"))}
-        </div>
-
         if (to) {
-            return window.controllers.drawer.open(drawerFragment, { props: { closeIcon: <Icons.Save />, placement: "left", onClose: () => this.toogleEditMode(false) } })
+            return window.controllers.drawer.open(SidebarEdit, { props: { closeIcon: <Icons.Save />, placement: "left", onClose: () => this.toogleEditMode(false), width: "50%" } })
         } else {
             return window.controllers.drawer.close()
         }
@@ -79,7 +153,7 @@ export default class Sidebar extends React.Component {
         this.setState({ isHover: false })
     }
 
-    componentDidMount() {
+    setController() {
         this.sidebarController.add("toogleEdit", (to) => {
             this.toogleEditMode(to)
         }, { lock: true })
@@ -88,73 +162,91 @@ export default class Sidebar extends React.Component {
             this.setState({ collapsed: (to ?? !this.state.collapsed) })
         }, { lock: true })
 
-        if (Items) {
-            const custom = this.props.app.sidebar
+    }
 
-            let menus = {}
-            let scope = []
+    componentDidMount() {
+        this.setController()
 
-            let objs = {}
-
-            Items.concat(BottomItems).forEach((entry) => {
-                objs[entry.id] = entry
+        let objects = {}
+        let items = [
+            ...sidebarItems.map((obj) => {
+                obj.position = "top"
+                return obj
+            }),
+            ...bottomSidebarItems.map((obj) => {
+                obj.position = "bottom"
+                return obj
             })
+        ]
 
-            if (Array.isArray(custom)) {
-                custom.forEach((key) => {
-                    scope.push(key)
-                })
-            } else {
-                scope = DefaultItemsKeys
+        let menus = {}
+        let scopeKeys = [...defaultSidebarKeys]
+
+        items.forEach((item) => {
+            objects[item.id] = item
+
+            try {
+                let valid = true
+                let obj = {
+                    id: item.id,
+                    title: item.title ?? item.id,
+                    position: item.position ?? "top",
+                    component: item.component
+                }
+
+                // object validation
+                if (!scopeKeys.includes(item.id) && !item.locked) {
+                    valid = false
+                }
+
+                if (typeof (item.requireState) === "object") {
+                    const { key, value } = item.requireState
+                    window.dispatcher({
+                        type: "isStateKey",
+                        payload: { key, value },
+                        callback: (result) => {
+                            if (!result) {
+                                valid = false
+                            }
+                        }
+                    })
+                }
+
+                // end validation
+                if (!valid) {
+                    return false
+                }
+
+                // handle props
+                if (typeof (item.icon) !== "undefined" && typeof (Icons[item.icon]) !== "undefined") {
+                    obj.icon = React.createElement(Icons[item.icon])
+                }
+
+                if (typeof (item.path) !== "undefined") {
+                    let resolvers = this.state.pathResolve ?? {}
+                    resolvers[item.id] = item.path
+                    this.setState({ pathResolve: resolvers })
+                }
+
+                if (typeof (item.sub) !== "undefined" && item.sub) {
+                    return menus[item.id] = {
+                        childrens: [],
+                        ...obj
+                    }
+                }
+
+                if (typeof (item.parent) !== "undefined" && menus[item.parent]) {
+                    return menus[item.parent].childrens.push(obj)
+                }
+
+                return menus[item.id] = obj
+            } catch (error) {
+                return console.log(error)
             }
 
-            // avoid excluding bottom items
-            BottomItems.forEach((entry) => {
-                scope.push(entry.id)
-            })
+        })
 
-            scope.forEach((key) => {
-                const item = objs[key]
-
-                try {
-                    let obj = {
-                        id: item.id,
-                        title: item.title ?? item.id,
-                        position: item.position ?? "top",
-                        component: item.component
-                    }
-                    if (typeof (item.requireState) !== "undefined") {
-                        if (!window.requiresState(item.requireState)) {
-                            return false
-                        }
-                    }
-
-                    if (typeof (item.icon) !== "undefined" && typeof (Icons[item.icon]) !== "undefined") {
-                        obj.icon = React.createElement(Icons[item.icon])
-                    }
-                    if (typeof (item.path) !== "undefined") {
-                        let resolvers = this.state.pathResolve ?? {}
-                        resolvers[item.id] = item.path
-                        this.setState({ pathResolve: resolvers })
-                    }
-
-                    if (typeof (item.sub) !== "undefined" && item.sub) {
-                        return menus[item.id] = {
-                            childrens: [],
-                            ...obj
-                        }
-                    }
-                    if (typeof (item.parent) !== "undefined" && menus[item.parent]) {
-                        return menus[item.parent].childrens.push(obj)
-                    }
-
-                    return menus[item.id] = obj
-                } catch (error) {
-                    return console.log(error)
-                }
-            })
-            this.setState({ menus, loading: false })
-        }
+        this.setState({ menus: menus, loading: false })
     }
 
     renderMenuItems(items) {
@@ -176,11 +268,12 @@ export default class Sidebar extends React.Component {
                     key={item.id}
                     icon={handleRenderIcon(item.icon)}
                     title={<span>{item.title}</span>}
+                    {...item.props}
                 >
                     {this.renderMenuItems(item.childrens)}
                 </Menu.SubMenu>
             }
-            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} >{item.title ?? item.id}</Menu.Item>
+            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>{item.title ?? item.id}</Menu.Item>
         })
     }
 
@@ -208,6 +301,7 @@ export default class Sidebar extends React.Component {
         return objectToArrayMap(menus).map((item) => {
             return <div key={item.key} className={window.classToStyle(`sidebarMenu_${item.key}`)}>
                 <Menu
+                    selectable={item.key === "bottom" ? false : true}
                     mode="inline"
                     theme={this.state.theme}
                     onClick={(e) => this.handleClick(e)}
@@ -219,8 +313,8 @@ export default class Sidebar extends React.Component {
     }
 
     render() {
-        if(settingsController.is("collapseOnLooseFocus", true)){
-            while (this.state.isHover && this.state.collapsed){
+        if (settingsController.is("collapseOnLooseFocus", true)) {
+            while (this.state.isHover && this.state.collapsed) {
                 window.controllers.sidebar.toogleCollapse(false)
                 break
             }
@@ -229,10 +323,10 @@ export default class Sidebar extends React.Component {
                 setTimeout(() => {
                     window.controllers.sidebar.toogleCollapse(true)
                 }, delay)
-    
+
                 break
             }
-        }else {
+        } else {
             if (this.state.collapsed) {
                 window.controllers.sidebar.toogleCollapse(false)
             }
@@ -245,22 +339,10 @@ export default class Sidebar extends React.Component {
                 onMouseEnter={this.onMouseEnter}
                 onMouseLeave={this.handleMouseLeave}
                 theme={this.state.theme}
-                collapsible
                 collapsed={this.state.collapsed}
                 onCollapse={() => this.props.onCollapse()}
                 className={window.classToStyle(this.state.editMode ? 'sidebar_sider_edit' : 'sidebar_sider')}
             >
-                <antd.Drawer
-                    closeIcon={<Icons.Save />}
-                    placement="left"
-                    visible={this.state.editMode}
-                    onClose={() => this.toogleEditMode(false)}
-                    style={{ display: "flex" }}
-                >
-                    <div className={window.classToStyle('sidebar_menu_wrapper_edit')}>
-                        {this.renderMenuItems(this.proccessMenus(this.state.menus, "top"))}
-                    </div>
-                </antd.Drawer>
                 {this.state.editMode ? null :
                     <div className={window.classToStyle('sidebar_header')}>
                         <div className={window.classToStyle('sidebar_header_logo')}>
@@ -268,6 +350,7 @@ export default class Sidebar extends React.Component {
                         </div>
                     </div>
                 }
+
                 <div className={window.classToStyle('sidebar_menu_wrapper')}>
                     {this.renderMenus(this.proccessMenus(this.state.menus))}
                 </div>

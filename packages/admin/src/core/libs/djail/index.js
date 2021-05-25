@@ -6,27 +6,62 @@ export class DJail {
     constructor(params) {
         this.storeKey = params.name
         this.voidMutation = params.voidMutation ?? false
-        this.data = {}
+        this.objectType = params.type ?? "object"
+        this.data = null
 
         if (!this.storeKey) {
             throw new Error(`Invalid or missing store name`)
         }
+
+        switch (this.objectType) {
+            case "object": {
+                this.data = new Object()
+                break
+            }
+            case "array": {
+                this.data = new Array()
+                this.data[0] = {}
+                break
+            }
+
+            default: {
+                this.data = new Object()
+                break
+            }
+        }
     }
 
     _pull() {
-        this.data = store.get(this.storeKey)   
+        const storaged = store.get(this.storeKey) 
+
+        if (storaged) {
+            this.data = store.get(this.storeKey)
+        }
+
+        return this.data
     }
 
-    _push(update) { 
+    _push(update) {
         if (typeof update !== "undefined") {
-            this.data = { ...this.data, ...update}
+            switch (this.objectType) {
+                case "object": {
+                    this.data = { ...this.data, ...update }
+                }
+                case "array": {
+                    this.data = [...this.data, ...update]
+                }
+                default: {
+                    break
+                }
+            }
         }
-        store.set(this.storeKey, this.data)   
+
+        store.set(this.storeKey, this.data)
     }
 
     getValue(key) {
         try {
-            return this.get()[key]
+            return this.get(key)[key]
         } catch (error) {
             verbosity.error(error)
             return false
@@ -34,67 +69,88 @@ export class DJail {
     }
 
     get(query) {
-        try {
-            this._pull()
-            let scope = []
-            let parsed = {}
-            
-            if (Array.isArray(query)) {
-                scope = query
-            } else {
-                scope.push(query)
-            }
-
-            scope.forEach((key) => {
-                if (typeof this.data[key] !== "undefined") {
-                    parsed[key] = this.data[key]
-                }
-            })
-
-            if (query) {
-                return parsed
-            }
-
+        this._pull()
+        if (!query) {
             return this.data
-        } catch (error) {
-            verbosity.error(error)
-            return false
         }
+
+        let scope = []
+        let matched = {}
+
+        if (Array.isArray(query)) {
+            scope = query
+        } else {
+            scope.push(query)
+        }
+
+        scope.forEach((key) => {
+            switch (this.objectType) {
+                case "object": {
+                    matched[key] = this.data[key]
+                    break
+                }
+                case "array": {
+                    const adresses = this.data[0]
+                    matched[key] = this.data[adresses[key]]
+                    break
+                }
+                default: {
+                    break
+                }
+            }
+
+        })
+
+        return matched
     }
 
     set(key, value) {
         this._pull()
-        let settings = this.get() ?? {}
 
-        try {
-            if (typeof (value) == "undefined") {
-                if (!this.voidMutation) {
-                    verbosity.warn(`voidMutation is enabled, no changes on key [${key}]`)
-                    return settings
+        switch (this.objectType) {
+            case "object": {
+                if (typeof (value) == "undefined") {
+                    if (!this.voidMutation) {
+                        verbosity.warn(`voidMutation is enabled, no changes on key [${key}]`)
+                        return settings
+                    }
+                    verbosity.warn(`voidMutation is not enabled, undefined values causes key removal`)
                 }
-                verbosity.warn(`voidMutation is not enabled, undefined values causes key removal`)
+
+                this.data[key] = value
+                break
             }
-
-            settings[key] = value
-            this._push(settings)
-        } catch (error) {
-            verbosity.error(error)
+            case "array": {
+                this.data.push(value)
+                this.data[0][key] = (this.data.length - 1)
+                break
+            }
+            default: {
+                break
+            }
         }
-
-        return settings
+        
+        this._push()
+        return this.data
     }
 
     remove(key) {
-        let settings = this.get() ?? {}
-
-        try {
-            delete settings[key]
-            this._push(settings)
-        } catch (error) {
-            verbosity.error(error)
+        switch (this.objectType) {
+            case "object": {
+                delete this.data[key]
+                this._push()
+                break
+            }
+            case "array": {
+                this.data.filter(item => item.key !== key)
+                break
+            }
+            default: {
+                break
+            }
         }
 
-        return settings
+        return this.data
     }
 }
 

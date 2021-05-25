@@ -44,14 +44,8 @@ export default class BaseLayout extends React.Component {
             console.warn(`eventInstance is not defined / valid, handling with default event`)
         }
 
-        if (typeof (instance) == "object") {
-            if (instance.options) {
-                drawerInstance.options = { ...drawerInstance.options, ...instance.options }
-            }
-        }
-
-        const isOpenDrawer = Boolean(drawerInstance.render ? true : false)
-        const isLocked = Boolean(drawerInstance.options?.lock ?? false)
+        const isOpenDrawer = () => Boolean(drawerInstance.render ? true : false)
+        const isLocked = () => Boolean(drawerInstance.options?.lock ?? false)
 
         switch (eventInstance) {
             case "lock": {
@@ -61,7 +55,7 @@ export default class BaseLayout extends React.Component {
                 return this.handleUpdateDrawerInstance({ options: { lock: false } })
             }
             case "onClose": {
-                if (isLocked) {
+                if (isLocked()) {
                     console.warn(`Drawer is locked, render update is not allowed`)
                     return false
                 }
@@ -69,13 +63,25 @@ export default class BaseLayout extends React.Component {
                 return this.handleUpdateDrawerInstance(drawerInstance)
             }
             case "open": {
-                if (isOpenDrawer && isLocked) {
+                let timeout = 0
+                if (isOpenDrawer() && isLocked()) {
                     console.warn(`Drawer is locked, render update is not allowed`)
                     return false
                 }
 
-                drawerInstance.render = instance?.fragment
-                return this.handleUpdateDrawerInstance(drawerInstance)
+                if (drawerInstance.render) {
+                    timeout = 250
+                    this.handleDrawerEvent({ eventInstance: "onClose" })
+                }
+
+                setTimeout(() => {
+                    if (typeof instance.options !== "undefined") {
+                        drawerInstance.options = { ...drawerInstance.options, ...instance.options }
+                    }
+
+                    drawerInstance.render = instance?.fragment
+                    this.handleUpdateDrawerInstance(drawerInstance)
+                }, timeout)
             }
             default:
                 break;

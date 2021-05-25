@@ -27,7 +27,7 @@ export default {
 
     account_data: [],
 
-    sidebar: null,
+    enabledSidebarItems: [],
     notifications: [],
     activeTheme: "light"
   },
@@ -93,23 +93,12 @@ export default {
         }
         return key
       }
-
-      window.requiresState = (conditions) => {
-        let requirePass = false
-        if (typeof (conditions) !== "undefined") {
-          objectToArrayMap(conditions).forEach((condition) => {
-            if (typeof (state[condition.key]) !== "undefined") {
-              if (state[condition.key] == condition.value) {
-                requirePass = true
-              } else {
-                requirePass = false
-              }
-            } else {
-              requirePass = false
-            }
-          })
-        }
-        return requirePass
+    },
+    *isStateKey({ payload, callback }, { select }) {
+      const state = yield select(state => state.app)
+      const result = state[payload.key] === payload.value ? true : false
+      if (typeof callback === "function") {
+        callback(result)
       }
     },
     *query({ payload }, { call, put, select }) {
@@ -174,7 +163,7 @@ export default {
         type: "updateState",
         payload: { loadDone: true }
       })
-      
+
     },
     *login({ payload, callback }, { call, put, select }) {
       const state = yield select(state => state.app)

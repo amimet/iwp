@@ -1,16 +1,17 @@
 [
     {
         "id": "settings",
-        "position": "bottom",
         "title": "Settings",
-        "icon": "Settings"
+        "icon": "Settings",
+        "locked": true
     },
     {
         "id": "account",
-        "position": "bottom",
         "component": "account",
+        "locked": true,
         "requireState": {
-            "session_valid": true
+            "key": "session_valid",
+            "value": true
         }
     }
 ]

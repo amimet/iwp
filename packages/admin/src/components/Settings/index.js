@@ -17,7 +17,7 @@ const ItemTypes = {
 let settingList = require("schemas/settingsList.json") // Index Order sensitive !!!
 let groupsDecorator = require("schemas/settingsGroupsDecorator.json")
 
-export class SettingsController extends React.Component {
+export class SettingsMenu extends React.Component {
     settingController = global.settingsController
 
     state = {
@@ -43,15 +43,15 @@ export class SettingsController extends React.Component {
 
         switch (type.toLowerCase()) {
             case "button": {
-                to = value
+                this.settingController.events.emit("changeSetting", { event, id, value, to })
                 break
             }
             default: {
+                this._set(id, to)
                 break
             }
         }
 
-        this._set(id, to)
     }
 
     generateMenu(data) {
@@ -69,12 +69,12 @@ export class SettingsController extends React.Component {
                 }
 
                 switch (item.type.toLowerCase()) {
-                    case "switch":{
+                    case "switch": {
                         item.props.checked = this.state.settings[item.id]
                         break
                     }
-                
-                    default:{
+
+                    default: {
                         item.props.value = this.state.settings[item.id]
                         break
                     }
@@ -83,7 +83,7 @@ export class SettingsController extends React.Component {
                     <h5> {item.icon ? React.createElement(Icons[item.icon]) : null}{item.title ?? item.id} </h5>
                     {item.render ?? React.createElement(ItemTypes[item.type], {
                         onClick: (e) => this.handleEvent(e, item.id ?? "anon", item.type),
-                        children: item.title ?? item.id,                        
+                        children: item.title ?? item.id,
                         ...item.props
                     })}
                 </div>
@@ -117,7 +117,7 @@ export class SettingsController extends React.Component {
         }
 
         return Object.keys(items).map((group) => {
-            return <div style={{ marginBottom: "30px" }}>
+            return <div key={group} style={{ marginBottom: "30px" }}>
                 {renderGroupDecorator(group)}
                 <div key={group} className={styles.groupItems} >
                     {renderGroupItems(group)}
@@ -136,7 +136,7 @@ export class SettingsController extends React.Component {
 const controller = {
     open: (key) => {
         // TODO: Scroll to content
-        window.controllers.drawer.open(SettingsController, {
+        window.controllers.drawer.open(SettingsMenu, {
             props: {
                 onClose: controller.close,
                 width: "45%"
