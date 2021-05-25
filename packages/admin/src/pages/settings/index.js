@@ -1,6 +1,4 @@
 import React from 'react'
-import * as antd from 'antd'
-import { withConnector } from 'core/libs'
 import { ButtonMenu, Settings } from 'components'
 
 let settingList = [

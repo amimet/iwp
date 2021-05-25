@@ -1,14 +1,20 @@
 import store from 'store'
 import { history } from 'umi'
-import { objectToArrayMap, verbosity } from '@corenode/utils'
-import { queryIndexer, setLocale } from 'core'
 import jwt from 'jsonwebtoken'
+import { EventEmitter } from 'events'
+
+import { objectToArrayMap, verbosity } from '@corenode/utils'
+
 import config from 'config'
+import { queryIndexer, setLocale } from 'core'
+import coreEvents from 'core/events'
 import { settings } from 'core/libs'
 
 export default {
   namespace: 'app',
   state: {
+    loadDone: false,
+
     language: config.i18n.defaultLanguage,
     style_prefix: config.app.defaultStyleClass ?? "app_",
     env_proccess: process.env,
@@ -21,7 +27,6 @@ export default {
     account_data: [],
 
     sidebar: null,
-
     notifications: [],
     activeTheme: "light"
   },
@@ -63,6 +68,11 @@ export default {
       window.dispatcher = state.dispatcher
 
       window.controllers.settings = settings
+      window.controllers.events = new EventEmitter()
+
+      objectToArrayMap(coreEvents).forEach((event) => {
+        window.controllers.events.on(event.key, event.value)
+      })
 
       window.classToStyle = (key) => {
         if (typeof (key) !== "string") {
@@ -159,6 +169,11 @@ export default {
         verbosity.error(`Failed to proccess sidebar items >`, error.message)
       }
 
+      state.dispatcher({
+        type: "updateState",
+        payload: { loadDone: true }
+      })
+      
     },
     *login({ payload, callback }, { call, put, select }) {
       const state = yield select(state => state.app)

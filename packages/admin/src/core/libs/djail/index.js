@@ -2,14 +2,26 @@
 import { verbosity } from '@corenode/utils'
 import store from 'store'
 
-export class DSO {
+export class DJail {
     constructor(params) {
         this.storeKey = params.name
         this.voidMutation = params.voidMutation ?? false
+        this.data = {}
 
         if (!this.storeKey) {
             throw new Error(`Invalid or missing store name`)
         }
+    }
+
+    _pull() {
+        this.data = store.get(this.storeKey)   
+    }
+
+    _push(update) { 
+        if (typeof update !== "undefined") {
+            this.data = { ...this.data, ...update}
+        }
+        store.set(this.storeKey, this.data)   
     }
 
     getValue(key) {
@@ -23,10 +35,10 @@ export class DSO {
 
     get(query) {
         try {
+            this._pull()
             let scope = []
             let parsed = {}
-            const data = store.get(this.storeKey)
-
+            
             if (Array.isArray(query)) {
                 scope = query
             } else {
@@ -34,14 +46,16 @@ export class DSO {
             }
 
             scope.forEach((key) => {
-                parsed[key] = data[key]
+                if (typeof this.data[key] !== "undefined") {
+                    parsed[key] = this.data[key]
+                }
             })
 
             if (query) {
                 return parsed
             }
 
-            return data
+            return this.data
         } catch (error) {
             verbosity.error(error)
             return false
@@ -49,38 +63,39 @@ export class DSO {
     }
 
     set(key, value) {
-        let _settings = this.get() ?? {}
+        this._pull()
+        let settings = this.get() ?? {}
 
         try {
             if (typeof (value) == "undefined") {
                 if (!this.voidMutation) {
                     verbosity.warn(`voidMutation is enabled, no changes on key [${key}]`)
-                    return _settings
+                    return settings
                 }
                 verbosity.warn(`voidMutation is not enabled, undefined values causes key removal`)
             }
 
-            _settings[key] = value
-            store.set(this.storeKey, _settings)
+            settings[key] = value
+            this._push(settings)
         } catch (error) {
             verbosity.error(error)
         }
 
-        return _settings
+        return settings
     }
 
     remove(key) {
-        let _settings = this.get() ?? {}
+        let settings = this.get() ?? {}
 
         try {
-            delete _settings[key]
-            store.set(this.storeKey, _settings)
+            delete settings[key]
+            this._push(settings)
         } catch (error) {
             verbosity.error(error)
         }
 
-        return _settings
+        return settings
     }
 }
 
-export default DSO
+export default DJail

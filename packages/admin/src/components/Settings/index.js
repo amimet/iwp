@@ -16,7 +16,6 @@ const ItemTypes = {
 
 let settingList = require("schemas/settingsList.json") // Index Order sensitive !!!
 let groupsDecorator = require("schemas/settingsGroupsDecorator.json")
-let handlers = require("core/handlers").default.settings ?? {}
 
 const controller = {
     open: (key) => {
@@ -35,46 +34,36 @@ const controller = {
 }
 
 export class SettingsController extends React.Component {
+    controller = window.controllers["settings"]
 
     handleEvent(event, id, type) {
-        if (typeof (type) !== "string") {
+        if (typeof id === "undefined"){
+            console.error(`No setting id provided!`)
+            return false
+        }
+        if (typeof type !== "string") {
             console.error(`Invalid eventType data-type, expecting string!`)
             return false
-        }
+        }             
 
-        if (typeof (handlers[id]) == "undefined") {
-            console.warn(`No handler for ${id}`)
-            return false
-        }
-
-        let dispatch = "click"
+        const val = this.controller.getValue(id) ?? false
 
         switch (type.toLowerCase()) {
             case "button": {
-                dispatch = "click"
-                break
-            }
-            case "switch": {
-                dispatch = event ? "enable" : "disable"
+                window.controllers.events.emit("changeSetting", { event, id, value: val })
                 break
             }
             default: {
-                // like button (onClick)
-                dispatch = "click"
+                this.controller.set(id, !val)
                 break
             }
-        }
-
-        if (typeof (handlers[id][dispatch]) == "function") {
-            handlers[id][dispatch]()
         }
     }
 
     generateMenu(data) {
         let items = {}
 
-        const _event = this.handleEvent
-        function renderGroupItems(group) {
+        const renderGroupItems = (group) => {
             return items[group].map((item) => {
                 if (!item.type) {
                     console.error(`Item [${item.id}] has no an type!`)
@@ -83,15 +72,16 @@ export class SettingsController extends React.Component {
                 return <div key={item.id}>
                     <h5> {item.icon ? React.createElement(Icons[item.icon]) : null}{item.title ?? item.id} </h5>
                     {item.render ?? React.createElement(ItemTypes[item.type], {
-                        onClick: (e) => _event(e, item.id ?? "anon", item.type),
+                        onClick: (e) => this.handleEvent(e, item.id ?? "anon", item.type),
                         children: item.title ?? item.id,
+                        value: this.controller.getValue(item.id),
                         ...item.props
                     })}
                 </div>
             })
         }
 
-        function renderGroupDecorator(group) {
+        const renderGroupDecorator = (group)  => {
             if (group === "none") {
                 return null
             }

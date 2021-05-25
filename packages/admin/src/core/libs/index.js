@@ -1,6 +1,8 @@
 import * as ui from './ui'
-import { DSO } from './dsoc'
 import { Controller } from './controller'
-export { default as withConnector } from './withConnector'
+import DJail from './djail'
 
-export { ui, DSO, Controller }
+export { default as withConnector } from './withConnector'
+export { default as settings } from './settings'
+
+export { ui, Controller, DJail }

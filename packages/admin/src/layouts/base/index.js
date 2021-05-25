@@ -1,6 +1,5 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
 import config from 'config'
 import { PageTransition, Layout } from 'components'
 import { withRouter, connect, history } from 'umi'
@@ -18,7 +17,6 @@ export default class BaseLayout extends React.Component {
     originPath = window.location.pathname
     state = {
         drawerInstance: {},
-
         collapsedSider: false,
         isMobile: null
     }

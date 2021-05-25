@@ -11,9 +11,6 @@ export default defineConfig({
     type: 'none',
    // exclude: ["execa", "human-signals"]
   },
-  chainWebpack(webpack) {
-    webpack.plugin("IgnorePlugin").use("IgnorePlugin")
-  },
   alias: {
     schemas: path.resolve(__dirname, './schemas'),
     interface: path.resolve(__dirname, './interface'),

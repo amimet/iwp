@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import * as Icons from 'feather-reactjs'
 
 import styles from './index.less'
-import { __proto__filterSchematizedArray } from '@corenode/utils'
+import { objectToArrayMap } from '@corenode/utils'
 
 export default class ListedMenu extends React.Component {
   state = {
@@ -17,7 +17,7 @@ export default class ListedMenu extends React.Component {
 
   async queryMenu() {
     this.setState({ loading: true })
-    this.setState({ menus: await __proto__filterSchematizedArray(this.props.menuArray), loading: false })
+    this.setState({ menus: objectToArrayMap(this.props.menuArray), loading: false })
   }
 
   getMenu() {
@@ -28,14 +28,14 @@ export default class ListedMenu extends React.Component {
     ))
   }
 
-  selectKey = (key: any) => {
+  selectKey = (key) => {
     this.setState({
       selectKey: key,
     })
   }
 
   renderChildren = () => {
-    let titlesArray: never[] = []
+    let titlesArray = []
     this.state.menus.forEach(e => { titlesArray[e.key] = e })
 
     const OptionTitle = () => {
@@ -80,7 +80,7 @@ export default class ListedMenu extends React.Component {
 
   render() {
     const { selectKey, loading } = this.state
-    const isMode = (e: string) => {
+    const isMode = (e) => {
       return this.state.mode === `${e}`
     }
 

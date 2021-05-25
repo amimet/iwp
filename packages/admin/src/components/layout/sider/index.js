@@ -90,7 +90,6 @@ export default class Sidebar extends React.Component {
                 scope.push(entry.id) 
             })
 
-            console.log(objs)
             scope.forEach((key) => {
                 const item = objs[key]
 
@@ -145,7 +144,6 @@ export default class Sidebar extends React.Component {
 
         return items.map((item) => {
             if (typeof(item.component) !== "undefined") {
-                console.log(item.component)
                 if (this.SidebarItemComponentMap[item.component]) {
                     return this.SidebarItemComponentMap[item.component]
                 }
@@ -168,7 +166,6 @@ export default class Sidebar extends React.Component {
         let menus = {}
 
         objectToArrayMap(data).forEach((item) => {
-            console.log(item)
             const position = item.value.position ?? "top"
             if (!menus[position]) {
                 menus[position] = []
