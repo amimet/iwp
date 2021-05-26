@@ -97,6 +97,10 @@ export default class BaseLayout extends React.Component {
             return this.handleDrawerEvent({ eventInstance: "onClose" })
         }, { lock: true })
 
+        global.applicationEvents.on("cleanAll", () => {
+            this.handleDrawerEvent({ eventInstance: "onClose" })
+        })
+
         this.enquireHandler = enquireScreen(mobile => {
             const { isMobile } = this.state
             if (isMobile !== mobile) {

@@ -10,32 +10,50 @@
 @app_menuItemIconSize: 30px;
 @app_menuItemTextSize: 12px;
 
+.ant-layout {
+    position: fixed;
+    -webkit-overflow-scrolling: touch;
+
+    width: 100vw;
+    height: 100vh;
+    
+    overflow: hidden;
+}
+
 .ant-layout-sider-children{
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+
     margin-top: @app_header_height!important;
 }
 
 // app_
-
 .app_layout{
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+    
+    display: flex;
+
     background-color: @app_wrapper_background;
-    max-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .app_header {
-    background-color: @app_header_background!important;
-    height: @app_header_height;
-    border-bottom: 1px @app_wrapper_backgroundAccent solid;
-
-    transition: all ease-in-out 150ms;
+    position: relative;
 
     display: flex;
     flex-direction: row;
-
     align-items: center;
     z-index: 100;
 
     height: @app_header_height;
     padding: 0 16px;
+
+    transition: all ease-in-out 150ms;
+
+    background-color: @app_header_background!important;
+    border-bottom: 1px @app_wrapper_backgroundAccent solid;
 
     > div {
         margin: 0 16px;
@@ -54,8 +72,11 @@
 // }
 
 .app_wrapper {
-    margin: 0 16px;
+    position: relative;
+
     height: 100%;
+
+    margin: 0 16px;
 
     overflow-x: hidden;
     overflow-y: auto;
@@ -67,12 +88,12 @@
     bottom: 0;
     left: 0;
 
-    background-color: #fff;
-    padding: 5px 25px;
-    font-size: 10px;
-
     height: fit-content;
     width: 100%;
+    padding: 5px 25px;
+
+    background-color: #fff;
+    font-size: 10px;
 }
 
 .app_searchBar {
@@ -168,55 +189,27 @@
 .app_sidebar_sider .ant-layout-sider-children{
     margin-top: 15px!important;
     transition: all 150ms ease-in-out;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .app_sidebar_sider_edit .ant-layout-sider-children{
     margin-top: 15px!important;
-    transition: all 150ms ease-in-out;
-    //transform: translate(35px, 120px);
 
     .app_sidebar_menu_wrapper {
-        .ant-menu {
-            border-radius: 0 12px 12px 0;
-            background-color: #45454531;
-        }
-        
-        .app_sidebarMenu_top ul{
-            > .ant-menu-item li {
-                user-select: none;
-                span {
-                    user-select: none;
-                }
-                margin: 15px 0;
-            }
-            > .ant-menu-submenu {
-                user-select: none;
-                margin: 15px 0;
-            }
-        }
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
     }
 } 
 
-.app_sidebar_menu_wrapper_edit {
-    align-items: center;
-    align-content: center;
-
-    .ant-menu {
-        width: 100%!important;
-        border-radius: 0 12px 12px 0;
-        background-color: #45454531;
-    }
-    
-    .app_sidebarMenu_top ul{
-        > .ant-menu-item {
-            user-select: none;
-            margin: 15px 0;
-        }
-        > .ant-menu-submenu {
-            user-select: none;
-            margin: 15px 0;
-        }
-    }
+.app_sidebar_menu_wrapper {
+    transition: all 450ms ease-in-out;
+  
+    height: 100%;
+    width: 100%;
 }
 
 .app_sidebar_header {
@@ -236,15 +229,23 @@
     }
 }
 
-.app_sidebar_menu_wrapper {
+.app_sidebarMenu_top {
     
 }
 
 .app_sidebarMenu_bottom {
     position: absolute;
+    width: 100%;
     bottom: 0;
     margin-bottom: 48px;
 }
+
+.app_usernameSidebarComponent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0!important;
+} 
 
 // User Card
 @userCard_borderColor_active: rgba(51,51,51,1);

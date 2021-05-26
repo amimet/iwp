@@ -31,6 +31,7 @@ export default class Layout extends React.Component {
 
     componentDidMount() {
         this.loadLanguage(this.state.language)
+        document.addEventListener('touchmove', (e) => { e.preventDefault() }, false)
     }
 
     loadLanguage = async (language) => {

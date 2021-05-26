@@ -2,7 +2,8 @@
     {
         "id": "main",
         "title": "Dashboard",
-        "icon": "Home"
+        "icon": "Home",
+        "locked": true
     },
     {
         "sub": true,

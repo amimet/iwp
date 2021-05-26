@@ -9,7 +9,9 @@ import config from 'config'
 import { queryIndexer, setLocale } from 'core'
 import builtInEvents from 'core/events'
 import { settings } from 'core/libs'
+
 import SettingsController from 'core/models/settings'
+import SidebarController from 'core/models/sidebar'
 
 export default {
   namespace: 'app',
@@ -65,6 +67,7 @@ export default {
       const state = yield select(state => state.app)
 
       global.settingsController = new SettingsController()
+      global.sidebarController = new SidebarController()
       global.applicationEvents = new EventEmitter()
 
       objectToArrayMap(builtInEvents).forEach((event) => {
