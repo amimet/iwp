@@ -6,53 +6,49 @@
         "locked": true
     },
     {
-        "sub": true,
         "id": "users",
         "title": "Users",
-        "icon": "Users"
+        "icon": "Users",
+        "children": [
+            {
+                "id": "users/contracts",
+                "title": "Contracts",
+                "icon": "Briefcase"
+            },
+            {
+                "id": "users/roles",
+                "title": "Roles",
+                "icon": "Link"
+            },
+            {
+                "id": "users/workload",
+                "title": "Workload",
+                "icon": "GitCommit"
+            },
+            {
+                "id": "users/workshifts",
+                "title": "Workshifts",
+                "icon": "Clock"
+            },
+            {
+                "id": "accounts",
+                "path": "users",
+                "title": "Accounts",
+                "icon": "User"          
+            }
+        ]
     },
     {
-        "id": "accounts",
-        "path": "users",
-        "title": "Accounts",
-        "icon": "User",
-        "parent": "users"
-    },
-    {
-        "id": "users/contracts",
-        "title": "Contracts",
-        "icon": "Briefcase",
-        "parent": "users"
-    },
-    {
-        "id": "users/roles",
-        "title": "Roles",
-        "icon": "Link",
-        "parent": "users"
-    },
-    {
-        "id": "users/workload",
-        "title": "Workload",
-        "icon": "GitCommit",
-        "parent": "users"
-    },
-    {
-        "id": "users/workshifts",
-        "title": "Workshifts",
-        "icon": "Clock",
-        "parent": "users"
-    },
-    {
-        "sub": true,
         "id": "geo",
         "title": "Geo",
-        "icon": "MapPin"
-    },
-    {
-        "id": "regions",
-        "title": "Regions",
-        "icon": "Map",
-        "parent": "geo"
+        "icon": "MapPin",
+        "children": [
+            {
+                "id": "regions",
+                "title": "Regions",
+                "icon": "Map"
+            }
+        ]
     },
     {
         "id": "fabric",

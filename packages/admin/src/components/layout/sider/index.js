@@ -62,6 +62,17 @@ class SidebarEdit extends React.Component {
         disabledObjects: [],
     }
 
+    update = () => {
+        const items = this.state.items
+        let obj = []
+
+        items.forEach((item, index) => {
+            obj[index] = item.id
+        })
+
+        global.sidebarController._push(obj)
+    }
+
     reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list)
         const [removed] = result.splice(startIndex, 1)
@@ -71,12 +82,6 @@ class SidebarEdit extends React.Component {
     }
 
     onDragEnd = (result) => {
-        const item = allItems[result.draggableId] ?? {}
-
-        if (item.locked) {
-            return
-        }
-
         if (!result.destination) {
             return
         }
@@ -87,7 +92,9 @@ class SidebarEdit extends React.Component {
             result.destination.index,
         )
 
-        this.setState({ items })
+        this.setState({ items }, () => {
+            this.update()
+        })
     }
 
     componentDidMount() {
@@ -98,13 +105,9 @@ class SidebarEdit extends React.Component {
 
         storagedKeys.forEach((key) => {
             let item = allItems[key]
-
-            if (item.parent)
-                return
-            if (item.locked)
-                return
-
-            active.push(item)
+            if (typeof item !=="undefined") {
+                active.push(item)
+            }
         })
 
         allItemsMap.forEach((item) => {
@@ -180,7 +183,7 @@ export default class Sidebar extends React.Component {
     sidebarHelpers = new Controller({ id: "sidebar", locked: true })
 
     sidebarComponentsMap = {
-        account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar})
+        account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar })
     }
 
     state = {
@@ -243,7 +246,6 @@ export default class Sidebar extends React.Component {
         const sidebarController = global.sidebarController
         this.setHelpers()
 
-        let objects = {}
         let items = [
             ...sidebarItems.map((obj) => {
                 obj.position = "top"
@@ -255,21 +257,15 @@ export default class Sidebar extends React.Component {
             })
         ]
 
-        let menus = {}
+        let itemsMap = {
+            bottom: [],
+            top: []
+        }
         let scopeKeys = [...sidebarController.get()]
 
-        items.forEach((item) => {
-            objects[item.id] = item
-
+        items.forEach((item, index) => {
             try {
                 let valid = true
-                let obj = {
-                    ...item,
-                    id: item.id,
-                    title: item.title ?? item.id,
-                    position: item.position ?? "top",
-                    component: item.component
-                }
 
                 // object validation
                 if (!scopeKeys.includes(item.id) && !item.locked) {
@@ -295,8 +291,10 @@ export default class Sidebar extends React.Component {
                 }
 
                 // handle props
+                item.order = index
+
                 if (typeof (item.icon) !== "undefined" && typeof (Icons[item.icon]) !== "undefined") {
-                    obj.icon = React.createElement(Icons[item.icon])
+                    item.icon = React.createElement(Icons[item.icon])
                 }
 
                 if (typeof (item.path) !== "undefined") {
@@ -305,25 +303,22 @@ export default class Sidebar extends React.Component {
                     this.setState({ pathResolve: resolvers })
                 }
 
-                if (typeof (item.sub) !== "undefined" && item.sub) {
-                    return menus[item.id] = {
-                        childrens: [],
-                        ...obj
-                    }
-                }
-
-                if (typeof (item.parent) !== "undefined" && menus[item.parent]) {
-                    return menus[item.parent].childrens.push(obj)
-                }
-
-                return menus[item.id] = obj
+                itemsMap[item.position].push(item)
             } catch (error) {
                 return console.log(error)
             }
-
         })
 
-        this.setState({ menus: menus, loading: false })
+        // short addresses
+        let topItems = itemsMap["top"]
+        console.log(topItems)
+        topItems.forEach((item, index) => {
+            
+
+            topItems[item.order] = item
+        })
+
+        this.setState({ menus: itemsMap, loading: false })
     }
 
     renderMenuItems(items) {
@@ -340,39 +335,20 @@ export default class Sidebar extends React.Component {
                     item.content = this.sidebarComponentsMap[item.component]
                 }
             }
-            
-            if (Array.isArray(item.childrens)) {
+
+            if (Array.isArray(item.children)) {
                 return <Menu.SubMenu
                     key={item.id}
                     icon={handleRenderIcon(item.icon)}
                     title={<span>{item.title}</span>}
                     {...item.props}
                 >
-                    {this.renderMenuItems(item.childrens)}
+                    {this.renderMenuItems(item.children)}
                 </Menu.SubMenu>
             }
 
             return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}> {item.content ?? (item.title ?? item.id)}</Menu.Item>
         })
-    }
-
-    proccessMenus(data, scope) {
-        let menus = {}
-
-        objectToArrayMap(data).forEach((item) => {
-            const position = item.value.position ?? "top"
-            if (!menus[position]) {
-                menus[position] = []
-            }
-            menus[position].push(item.value)
-        })
-
-
-        if (typeof (scope) !== "undefined") {
-            return menus[scope]
-        }
-
-        return menus
     }
 
     renderMenus(menus) {
@@ -392,6 +368,8 @@ export default class Sidebar extends React.Component {
     }
 
     render() {
+        if (this.state.loading) return null
+
         if (settingsController.is("collapseOnLooseFocus", true) && !this.state.editMode) {
             while (this.state.isHover && this.state.collapsed) {
                 window.controllers.sidebar.toogleCollapse(false)
@@ -410,8 +388,6 @@ export default class Sidebar extends React.Component {
                 window.controllers.sidebar.toogleCollapse(false)
             }
         }
-
-        if (this.state.loading) return null
 
         return (
             <Sider
@@ -441,7 +417,7 @@ export default class Sidebar extends React.Component {
                 }
 
                 <div className={window.classToStyle('sidebar_menu_wrapper')}>
-                    {this.renderMenus(this.proccessMenus(this.state.menus))}
+                    {this.renderMenus(this.state.menus)}
                 </div>
             </Sider>
         )
