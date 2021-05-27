@@ -8,6 +8,9 @@
     {
         "id": "account",
         "component": "account",
+        "props": {
+            "className": "accountSidebarComponent"
+        },
         "locked": true,
         "requireState": {
             "key": "session_valid",

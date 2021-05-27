@@ -1,7 +1,7 @@
 import { Menu, Avatar } from 'antd'
 
 export default (props) => {
-    return <Menu.Item id={props.username} className={window.classToStyle("usernameSidebarComponent")} key={props.username}>
+    return <div className="accountSidebarComponent">
         <Avatar src={props.avatar} />
-    </Menu.Item>
+    </div>
 }

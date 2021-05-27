@@ -180,7 +180,7 @@ export default class Sidebar extends React.Component {
     sidebarHelpers = new Controller({ id: "sidebar", locked: true })
 
     sidebarComponentsMap = {
-        account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar })
+        account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar})
     }
 
     state = {
@@ -194,7 +194,6 @@ export default class Sidebar extends React.Component {
     }
 
     handleClick = (e) => {
-        console.log(e)
         if (typeof e.key === "undefined") {
             global.applicationEvents.emit("invalidSidebarKey", e)
             return false
@@ -206,7 +205,7 @@ export default class Sidebar extends React.Component {
         if (typeof this.state.pathResolve[e.key] !== "undefined") {
             return history.push(`/${this.state.pathResolve[e.key]}`)
         }
-       
+
         return history.push(`/${e.key}`)
     }
 
@@ -265,6 +264,7 @@ export default class Sidebar extends React.Component {
             try {
                 let valid = true
                 let obj = {
+                    ...item,
                     id: item.id,
                     title: item.title ?? item.id,
                     position: item.position ?? "top",
@@ -337,9 +337,10 @@ export default class Sidebar extends React.Component {
         return items.map((item) => {
             if (typeof (item.component) !== "undefined") {
                 if (this.sidebarComponentsMap[item.component]) {
-                    return this.sidebarComponentsMap[item.component]
+                    item.content = this.sidebarComponentsMap[item.component]
                 }
             }
+            
             if (Array.isArray(item.childrens)) {
                 return <Menu.SubMenu
                     key={item.id}
@@ -350,7 +351,8 @@ export default class Sidebar extends React.Component {
                     {this.renderMenuItems(item.childrens)}
                 </Menu.SubMenu>
             }
-            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>{item.title ?? item.id}</Menu.Item>
+
+            return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}> {item.content ?? (item.title ?? item.id)}</Menu.Item>
         })
     }
 
@@ -362,7 +364,6 @@ export default class Sidebar extends React.Component {
             if (!menus[position]) {
                 menus[position] = []
             }
-
             menus[position].push(item.value)
         })
 
@@ -378,6 +379,7 @@ export default class Sidebar extends React.Component {
         return objectToArrayMap(menus).map((item) => {
             return <div key={item.key} className={window.classToStyle(`sidebarMenu_${item.key}`)}>
                 <Menu
+                    key={item.key}
                     selectable={item.key === "bottom" ? false : true}
                     mode="inline"
                     theme={this.state.theme}
