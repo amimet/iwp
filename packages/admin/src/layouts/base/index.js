@@ -142,7 +142,6 @@ export default class BaseLayout extends React.Component {
                 <Layout.Header handleBack={() => this.handleClickBack()} originPath={this.originPath} siteName={config.app.title} />
 
                 <antd.Layout.Content className={window.classToStyle("wrapper")}>
-                    <Layout.Breadcrumb />
 
                     <PageTransition
                         preset={config.app.defaultTransitionPreset ?? "moveToLeftFromRight"}
