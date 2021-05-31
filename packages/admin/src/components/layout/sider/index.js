@@ -1,5 +1,5 @@
 import React from 'react'
-import * as Icons from 'components/Icons'
+import { Icons, createIconRender } from 'components/Icons'
 import { Layout, Menu } from 'antd'
 import { history } from 'umi'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -22,14 +22,6 @@ const onClickHandlers = {
     "settings": (event) => {
         Settings.open()
     }
-}
-
-const createIconRender = (icon, props) => {
-    if (typeof Icons[icon] !== "undefined") {
-        return React.createElement(Icons[icon], props)
-    }
-
-    return null
 }
 
 const allItemsMap = [...sidebarItems, ...bottomSidebarItems]
@@ -105,7 +97,7 @@ class SidebarEdit extends React.Component {
 
         storagedKeys.forEach((key) => {
             let item = allItems[key]
-            if (typeof item !=="undefined") {
+            if (typeof item !== "undefined") {
                 active.push(item)
             }
         })
@@ -196,52 +188,6 @@ export default class Sidebar extends React.Component {
         theme: this.props.app.activeTheme ?? "light"
     }
 
-    handleClick = (e) => {
-        if (typeof e.key === "undefined") {
-            global.applicationEvents.emit("invalidSidebarKey", e)
-            return false
-        }
-
-        if (typeof onClickHandlers[e.key] === "function") {
-            return onClickHandlers[e.key](e)
-        }
-        if (typeof this.state.pathResolve[e.key] !== "undefined") {
-            return history.push(`/${this.state.pathResolve[e.key]}`)
-        }
-
-        return history.push(`/${e.key}`)
-    }
-
-    toogleEditMode(to) {
-        if (typeof to === "undefined") {
-            to = !this.state.editMode
-        }
-
-        if (to) {
-            global.applicationEvents.emit("cleanAll")
-        }
-
-        this.setState({ editMode: to })
-    }
-
-    onMouseEnter = (event) => {
-        this.setState({ isHover: true })
-    }
-
-    handleMouseLeave = (event) => {
-        this.setState({ isHover: false })
-    }
-
-    setHelpers() {
-        this.sidebarHelpers.add("toogleEdit", (to) => {
-            this.toogleEditMode(to)
-        }, { lock: true })
-
-        this.sidebarHelpers.add("toogleCollapse", (to) => {
-            this.setState({ collapsed: (to ?? !this.state.collapsed) })
-        }, { lock: true })
-    }
-
     componentDidMount() {
         const sidebarController = global.sidebarController
         this.setHelpers()
@@ -311,10 +257,7 @@ export default class Sidebar extends React.Component {
 
         // short addresses
         let topItems = itemsMap["top"]
-        console.log(topItems)
         topItems.forEach((item, index) => {
-            
-
             topItems[item.order] = item
         })
 
@@ -365,6 +308,52 @@ export default class Sidebar extends React.Component {
                 </Menu>
             </div>
         })
+    }
+
+    handleClick = (e) => {
+        if (typeof e.key === "undefined") {
+            global.applicationEvents.emit("invalidSidebarKey", e)
+            return false
+        }
+
+        if (typeof onClickHandlers[e.key] === "function") {
+            return onClickHandlers[e.key](e)
+        }
+        if (typeof this.state.pathResolve[e.key] !== "undefined") {
+            return history.push(`/${this.state.pathResolve[e.key]}`)
+        }
+
+        return history.push(`/${e.key}`)
+    }
+
+    toogleEditMode(to) {
+        if (typeof to === "undefined") {
+            to = !this.state.editMode
+        }
+
+        if (to) {
+            global.applicationEvents.emit("cleanAll")
+        }
+
+        this.setState({ editMode: to })
+    }
+
+    onMouseEnter = (event) => {
+        this.setState({ isHover: true })
+    }
+
+    handleMouseLeave = (event) => {
+        this.setState({ isHover: false })
+    }
+
+    setHelpers() {
+        this.sidebarHelpers.add("toogleEdit", (to) => {
+            this.toogleEditMode(to)
+        }, { lock: true })
+
+        this.sidebarHelpers.add("toogleCollapse", (to) => {
+            this.setState({ collapsed: (to ?? !this.state.collapsed) })
+        }, { lock: true })
     }
 
     render() {

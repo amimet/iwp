@@ -1,7 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
 import classnames from 'classnames'
-import { ConnectionStatus } from 'components'
 
 export default class Header extends React.Component {
     state = {
@@ -21,7 +20,6 @@ export default class Header extends React.Component {
 
         return (
             <antd.Layout.Header className={classnames(window.classToStyle("header"), { ["hidden"]: this.state.hidden })} >
-                <ConnectionStatus />
                 <antd.Input.Search className={window.classToStyle("searchBar")} placeholder="Search on app..." loading={this.state.loadingSearch} />
             </antd.Layout.Header>
         )

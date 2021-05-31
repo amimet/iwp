@@ -1,11 +1,10 @@
-import PageTransition from './PageTransition'
-import FormGenerator from './FormGenerator'
+import PageTransition from './pageTransition'
+import FormGenerator from './formGenerator'
 import ButtonMenu from './buttonMenu'
 import * as Layout from './layout'
 
 export { default as LoadingSpinner } from './loadingSpinner'
-export { default as ConnectionStatus } from './connectionStatus'
-export { default as Settings } from './Settings'
+export { default as Settings } from './settings'
 
 export {
     Layout,

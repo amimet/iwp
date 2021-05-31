@@ -1,13 +1,11 @@
 import React from 'react'
 import * as antd from 'antd'
-import { objectToArrayMap } from '@corenode/utils'
 import * as ui from 'core/libs/ui'
-import * as Icons from 'components/Icons'
+import { Icons } from 'components/Icons'
 
 import { LoadingSpinner, FormGenerator } from 'components'
 
 import { Drawer, Button, Select } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
 
 class ModifyRole extends React.Component {
     state = {
@@ -37,7 +35,7 @@ class ModifyRole extends React.Component {
         if (this.state.loading) return <div> Loading </div>
 
         return <>
-            <Button type="primary" onClick={this.toogleDrawer}> <PlusOutlined /> Create new </Button>
+            <Button type="primary" onClick={this.toogleDrawer}> <Icons.PlusOutlined /> Create new </Button>
             <Drawer
                 title="Add new role"
                 width={"40%"}
@@ -185,7 +183,7 @@ export default class Roles extends React.Component {
 
         return <div className={window.classToStyle("users_list_wrapper")} >
             <antd.Card style={{ marginBottom: "18px" }}>
-                <antd.Button onClick={() => { this.createNewRole() }} icon={<PlusOutlined />} type="primary">Create new</antd.Button>
+                <antd.Button onClick={() => { this.createNewRole() }} icon={<Icons.PlusOutlined />} type="primary">Create new</antd.Button>
             </antd.Card>
             <antd.List
                 dataSource={this.state.data}

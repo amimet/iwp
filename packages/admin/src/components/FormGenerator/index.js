@@ -2,13 +2,12 @@ import React from 'react'
 import { connect } from 'umi'
 import { verbosity } from '@corenode/utils'
 
+import { Icons } from 'components/Icons'
 import { Form, Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider, Switch } from 'antd';
-import HeadShake from 'react-reveal/HeadShake';
-import * as antd from 'antd'
+import HeadShake from 'react-reveal/HeadShake'
 
 const formItems = { Input, Button, Checkbox, Select, Dropdown, Slider, InputNumber, DatePicker, AutoComplete, Divider, Switch }
 
-import * as Icons from 'components/Icons'
 @connect(({ app }) => ({ app }))
 export default class FormGenerator extends React.Component {
     discardValuesFromID = []
