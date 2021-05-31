@@ -1,5 +1,5 @@
 import React from 'react'
-import * as Icons from 'components/Icons'
+import { Icons }from 'components/icons'
 import * as antd from 'antd'
 
 import styles from './index.less'

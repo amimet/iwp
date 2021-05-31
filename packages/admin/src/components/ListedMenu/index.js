@@ -1,7 +1,7 @@
 import React from 'react'
 import { Menu, Result } from 'antd'
 import classnames from 'classnames'
-import * as Icons from 'feather-reactjs'
+import { Icons } from 'components/icons'
 
 import styles from './index.less'
 import { objectToArrayMap } from '@corenode/utils'

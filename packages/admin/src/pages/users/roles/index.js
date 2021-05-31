@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import * as ui from 'core/libs/ui'
-import { Icons } from 'components/Icons'
+import { Icons } from 'components/icons'
 
 import { LoadingSpinner, FormGenerator } from 'components'
 

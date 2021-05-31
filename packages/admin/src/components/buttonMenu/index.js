@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
+import { Icons } from 'components/icons'
 import { FormattedMessage } from 'react-intl'
 
 export default class ButtonMenu extends React.Component {

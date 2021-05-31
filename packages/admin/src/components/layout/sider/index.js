@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icons, createIconRender } from 'components/Icons'
+import { Icons, createIconRender } from 'components/icons'
 import { Layout, Menu } from 'antd'
 import { history } from 'umi'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
@@ -239,10 +239,6 @@ export default class Sidebar extends React.Component {
                 // handle props
                 item.order = index
 
-                if (typeof (item.icon) !== "undefined" && typeof (Icons[item.icon]) !== "undefined") {
-                    item.icon = React.createElement(Icons[item.icon])
-                }
-
                 if (typeof (item.path) !== "undefined") {
                     let resolvers = this.state.pathResolve ?? {}
                     resolvers[item.id] = item.path
@@ -255,21 +251,21 @@ export default class Sidebar extends React.Component {
             }
         })
 
-        // short addresses
-        let topItems = itemsMap["top"]
-        topItems.forEach((item, index) => {
-            topItems[item.order] = item
-        })
+        // * ples do an method for short items order
+        // let topItems = itemsMap["top"]
+        // topItems.forEach((item, index) => {
+        //     topItems[item.order] = item
+        // })
 
         this.setState({ menus: itemsMap, loading: false })
     }
 
     renderMenuItems(items) {
         const handleRenderIcon = (icon) => {
-            if (typeof (icon) !== "object") {
+            if (typeof (icon) === "undefined") {
                 return null
             }
-            return icon
+            return createIconRender(icon)
         }
 
         return items.map((item) => {
