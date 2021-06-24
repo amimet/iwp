@@ -31,3 +31,19 @@ package-lock.json
 
 */.umi
 */**/.umi
+
+dumps.log
+origin.server
+server.registry
+server.manifest
+package-lock.json
+yarn.lock
+
+*/**/node_modules
+*/**/dist
+*/**/dumps.log
+*/**/origin.server
+*/**/server.registry
+*/**/server.manifest
+*/**/package-lock.json
+*/**/yarn.lock

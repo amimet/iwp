@@ -1,28 +1,29 @@
-require('dotenv').config()
+import path from 'path'
+import fs from 'fs'
 
+import cloudlink from '@ragestudio/cloudlink'
 import { verbosity, objectToArrayMap } from '@corenode/utils'
-import express from 'express'
+
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
-import path from 'path'
 
 import { User } from './models'
-
-import { errorHandler, notFoundHandler } from './middlewares'
-import generateAPI from './lib/generateAPI'
-import nodeMediaServer from './lib/mediaServer'
 
 const JwtStrategy = require('passport-jwt').Strategy
 const LocalStrategy = require('passport-local').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
-const listenPort = process.env.globalPort
 
-let app = express()
-let httpServer = require('http').createServer(app)
+const { listenPort } = _env
+console.log(_env)
+const instance = new cloudlink.Server({
+    port: listenPort
+})
+const server = instance.httpServer
+
 let opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.server_key,
+    secretOrKey: undefined,
     algorithms: ['sha1', 'RS256', 'HS256']
 }
 
@@ -83,25 +84,15 @@ function initPassaport() {
             .catch(err => done(err, null))
     }))
 
-    app.use(passport.initialize())
+    instance.use(passport.initialize())
 }
 
 function initExpress() {
-    app.use(express.json())
-    app.use(express.urlencoded({ extended: true }))
-
-    app.use((req, res, next) => {
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-        res.setHeader('Access-Control-Allow-Credentials', "true")
-        next()
-    })
-
     let notAllowedReponseData = ["password"]
     let allowedResponseData = ["_id", "username", "fullName", "avatar", "email", "roles"]
 
-    app.use((req, res, next) => {
+    //* filter allowed keys
+    server.use((req, res, next) => {
         const _send = res.send
 
         res.send = function (data, code) {
@@ -127,31 +118,20 @@ function initExpress() {
                 arguments[0] = responseData
             }
 
-            _send.apply(res, arguments)
+            _send.serverly(res, arguments)
         }
         next()
     })
 
-    app.use('/', generateAPI({
-        ControllersPath: path.resolve(__dirname, `./controllers`),
-        MiddlewaresPath: path.resolve(__dirname, `./middlewares`)
-    }))
-
-    app.use(errorHandler)
-    app.use(notFoundHandler)
+    //* start instance
+    instance.init()
 }
 
 function createServer() {
-    connectDB()
     initExpress()
+
+    //connectDB()
     initPassaport()
-
-    nodeMediaServer.newNMS().run()
-
-    httpServer.listen(listenPort, () => {
-        verbosity.log(`🌐 Server listening on port (${listenPort})`)
-    })
 }
 
-// start the server
 createServer()
