@@ -1,8 +1,4 @@
-import path from 'path'
-import fs from 'fs'
-
 import cloudlink from '@ragestudio/cloudlink'
-import { verbosity, objectToArrayMap } from '@corenode/utils'
 
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
@@ -15,15 +11,17 @@ const LocalStrategy = require('passport-local').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 
 const { listenPort } = _env
-console.log(_env)
-const instance = new cloudlink.Server({
+
+console.log(runtime)
+
+const serverInstance = new cloudlink.Server({
     port: listenPort
 })
-const server = instance.httpServer
+const server = serverInstance.httpServer
 
 let opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: undefined,
+    secretOrKey: serverInstance.oskid,
     algorithms: ['sha1', 'RS256', 'HS256']
 }
 
@@ -84,7 +82,7 @@ function initPassaport() {
             .catch(err => done(err, null))
     }))
 
-    instance.use(passport.initialize())
+    server.use(passport.initialize())
 }
 
 function initExpress() {
@@ -94,8 +92,7 @@ function initExpress() {
     //* filter allowed keys
     server.use((req, res, next) => {
         const _send = res.send
-
-        res.send = function (data, code) {
+        res.send = (data, code) => {
             let responseData = arguments[0]
 
             const responseType = typeof (responseData)
@@ -118,13 +115,13 @@ function initExpress() {
                 arguments[0] = responseData
             }
 
-            _send.serverly(res, arguments)
+            _send(res, arguments)
         }
         next()
     })
 
     //* start instance
-    instance.init()
+    serverInstance.init()
 }
 
 function createServer() {
