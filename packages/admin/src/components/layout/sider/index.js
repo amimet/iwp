@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import { Settings } from 'components'
 import { Controller, withConnector, DJail } from 'core/libs'
+import { setLocation } from 'core'
 
 import { objectToArrayMap } from '@corenode/utils'
 import { logo } from 'config'
@@ -251,7 +252,7 @@ export default class Sidebar extends React.Component {
             }
         })
 
-        // * ples do an method for short items order
+        // * ples this needs an method for short items order
         // let topItems = itemsMap["top"]
         // topItems.forEach((item, index) => {
         //     topItems[item.order] = item
@@ -316,10 +317,10 @@ export default class Sidebar extends React.Component {
             return onClickHandlers[e.key](e)
         }
         if (typeof this.state.pathResolve[e.key] !== "undefined") {
-            return history.push(`/${this.state.pathResolve[e.key]}`)
+            return setLocation(`/${this.state.pathResolve[e.key]}`, 150)
         }
 
-        return history.push(`/${e.key}`)
+        return setLocation(`/${e.key}`, 150)
     }
 
     toogleEditMode(to) {

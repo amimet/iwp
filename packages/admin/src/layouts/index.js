@@ -1,6 +1,7 @@
 import React from 'react'
 import Base from './base'
 import { withRouter, connect } from 'umi'
+import { EventEmitter } from 'events'
 
 import { Helmet } from 'react-helmet'
 import { queryLayout, getLocale, defaultLanguage } from 'core'
@@ -30,6 +31,7 @@ export default class Layout extends React.Component {
     }
 
     componentDidMount() {
+        window.busEvent = new EventEmitter()
         this.loadLanguage(this.state.language)
         document.addEventListener('touchmove', (e) => { e.preventDefault() }, false)
     }

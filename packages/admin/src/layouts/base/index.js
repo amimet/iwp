@@ -7,13 +7,16 @@ import ngProgress from 'nprogress'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 
 import { Controller } from 'core/libs'
+import { setLocation } from 'core'
 
+import "theme/index.less"
 import "./index.less"
 
 @withRouter
 @connect(({ loading }) => ({ loading }))
 export default class BaseLayout extends React.Component {
     drawerController = new Controller({ id: "drawer", locked: true })
+    layoutContentRef = React.createRef()
 
     originPath = window.location.pathname
     state = {
@@ -23,7 +26,7 @@ export default class BaseLayout extends React.Component {
     }
 
     handleClickBack() {
-        history.push(this.originPath)
+        setLocation(this.originPath)
     }
 
     handleUpdateDrawerInstance(mutation) {
@@ -88,7 +91,29 @@ export default class BaseLayout extends React.Component {
         }
     }
 
+    handleTransition = (state, delay) => {
+        const { current } = this.layoutContentRef
+        const oldClass = current.className
+
+        if(state === "leave"){
+            current.className = `fade-transverse-active fade-transverse-leave-to`
+        }else {
+            current.className = `fade-transverse-active fade-transverse-enter-to`
+        }
+    }
+
     componentDidMount() {
+        if (typeof window.busEvent === "undefined") {
+            throw new Error(`BusEvent is not available`)
+        }
+
+        window.busEvent.on("setLocation", (to, delay) => {
+            this.handleTransition("leave")
+        })
+        window.busEvent.on("setLocationReady", (to, delay) => {
+            this.handleTransition("enter")
+        })
+
         this.drawerController.add("open", (fragment, options) => {
             return this.handleDrawerEvent({ eventInstance: "open" }, { fragment, options })
         }, { lock: true })
@@ -142,14 +167,9 @@ export default class BaseLayout extends React.Component {
                 <Layout.Header handleBack={() => this.handleClickBack()} originPath={this.originPath} siteName={config.app.title} />
 
                 <antd.Layout.Content className={window.classToStyle("wrapper")}>
-
-                    <PageTransition
-                        preset={config.app.defaultTransitionPreset ?? "moveToLeftFromRight"}
-                        transitionKey={window.location.pathname}
-                    >
+                    <div ref={this.layoutContentRef}>
                         {children}
-                    </PageTransition>
-
+                    </div>
                 </antd.Layout.Content>
             </antd.Layout>
         </antd.Layout>
