@@ -1,5 +1,5 @@
 import cloudlink from '@ragestudio/cloudlink'
-
+import { objectToArrayMap } from "@corenode/utils"
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
@@ -7,128 +7,103 @@ import passport from 'passport'
 import { User } from './models'
 
 const JwtStrategy = require('passport-jwt').Strategy
-const LocalStrategy = require('passport-local').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
+const LocalStrategy = require('passport-local').Strategy
 
-const { listenPort } = _env
+class Server {
+    constructor() {
+        this.env = _env
+        this.listenPort = this.env.listenPort ?? 3000
 
-console.log(runtime)
+        this.middlewares = objectToArrayMap(require("./middlewares")).map((entry) => {
+            return entry.value
+        })
+        this.controllers = require("./controllers")
+        this.endpoints = require("./endpoints.json")
 
-const serverInstance = new cloudlink.Server({
-    port: listenPort
-})
-const server = serverInstance.httpServer
+        this.instance = new cloudlink.Server({
+            middlewares: this.middlewares,
+            controllers: this.controllers,
+            endpoints: this.endpoints,
+            port: this.listenPort
+        })
+        this.server = this.instance.httpServer
 
-let opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: serverInstance.oskid,
-    algorithms: ['sha1', 'RS256', 'HS256']
-}
-
-function getDBConnectionString() {
-    const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = process.env
-    return `${db_driver}://${db_user}:${db_pwd}@${db_hostname}:${db_port}/${db_name}`
-}
-
-function connectDB() {
-    return new Promise((resolve, reject) => {
-        try {
-            console.log("🌐 Trying to connect to DB...")
-            mongoose.connect(getDBConnectionString(), { useNewUrlParser: true })
-                .then((res) => { return resolve(true) })
-                .catch((err) => { return reject(err) })
-        } catch (err) {
-            return reject(err)
-        }
-    }).then(done => {
-        console.log(`✅ Connected to DB`)
-    }).catch((error) => {
-        console.log(`❌ Failed to connect to DB, retrying...\n`)
-        console.log(error)
-        setTimeout(() => {
-            connectDB()
-        }, 1000)
-    })
-}
-
-function initPassaport() {
-    passport.use(new LocalStrategy({
-        usernameField: "username",
-        passwordField: "password",
-        session: false
-    }, (username, password, done) => {
-        User.findOne({ username: username })
-            .then(data => {
-                if (data === null) {
-                    return done(null, false)
-                } else if (!bcrypt.compareSync(password, data.password)) {
-                    return done(null, false)
-                }
-                return done(null, data)
-            })
-            .catch(err => done(err, null))
-    }))
-
-    passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
-        User.findOne({ _id: jwt_payload.sub })
-            .then(data => {
-                if (data === null) {
-                    return done(null, false);
-                }
-                else {
-                    return done(null, data);
-                }
-            })
-            .catch(err => done(err, null))
-    }))
-
-    server.use(passport.initialize())
-}
-
-function initExpress() {
-    let notAllowedReponseData = ["password"]
-    let allowedResponseData = ["_id", "username", "fullName", "avatar", "email", "roles"]
-
-    //* filter allowed keys
-    server.use((req, res, next) => {
-        const _send = res.send
-        res.send = (data, code) => {
-            let responseData = arguments[0]
-
-            const responseType = typeof (responseData)
-            const isArray = Array.isArray(responseData)
-
-            if (responseType == "object") {
-                let temp = []
-                const source = isArray ? responseData : [responseData]
-
-                source.forEach((item) => {
-                    temp.push(JSON.parse(JSON.stringify(item, allowedResponseData)))
-                })
-
-                if (isArray) {
-                    responseData = temp
-                } else {
-                    responseData = temp[0]
-                }
-
-                arguments[0] = responseData
+        this.options = {
+            jwtStrategy: {
+                jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+                secretOrKey: this.instance.oskid,
+                algorithms: ['sha1', 'RS256', 'HS256']
             }
-
-            _send(res, arguments)
         }
-        next()
-    })
+    }
 
-    //* start instance
-    serverInstance.init()
+    getDBConnectionString() {
+        const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = _env
+        return `${db_driver}://${db_user}:${db_pwd}@${db_hostname}:${db_port}/${db_name}`
+    }
+
+    connectToDB = () => {
+        return new Promise((resolve, reject) => {
+            try {
+                console.log("🌐 Trying to connect to DB...")
+                mongoose.connect(this.getDBConnectionString(), { useNewUrlParser: true })
+                    .then((res) => { return resolve(true) })
+                    .catch((err) => { return reject(err) })
+            } catch (err) {
+                return reject(err)
+            }
+        }).then(done => {
+            console.log(`✅ Connected to DB`)
+        }).catch((error) => {
+            console.log(`❌ Failed to connect to DB, retrying...\n`)
+            console.log(error)
+            setTimeout(() => {
+                connectDB()
+            }, 1000)
+        })
+    }
+
+    initialize = () => {
+        this.connectToDB()
+        this.initPassport()
+
+        this.instance.init()
+    }
+
+    initPassport() {
+        passport.use(new LocalStrategy({
+            usernameField: "username",
+            passwordField: "password",
+            session: false
+        }, (username, password, done) => {
+            User.findOne({ username: username })
+                .then(data => {
+                    if (data === null) {
+                        return done(null, false)
+                    } else if (!bcrypt.compareSync(password, data.password)) {
+                        return done(null, false)
+                    }
+                    return done(null, data)
+                })
+                .catch(err => done(err, null))
+        }))
+
+        passport.use(new JwtStrategy(this.options.jwtStrategy, (jwt_payload, done) => {
+            User.findOne({ _id: jwt_payload.sub })
+                .then(data => {
+                    if (data === null) {
+                        return done(null, false);
+                    }
+                    else {
+                        return done(null, data);
+                    }
+                })
+                .catch(err => done(err, null))
+        }))
+
+        this.server.use(passport.initialize())
+    }
 }
 
-function createServer() {
-    initExpress()
-
-    //connectDB()
-    initPassaport()
-}
-
-createServer()
+new Server().initialize()

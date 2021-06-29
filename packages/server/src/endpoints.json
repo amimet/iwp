@@ -1,151 +1,119 @@
 [
     {
-        "path": "/stream",
-        "method": "GET",
-        "controller": "StreamingController"
-    },
-    {
-        "path": "/streams",
-        "method": "GET",
-        "controller": "StreamingController",
-        "exec": "getAll"
-    },
-    {
-        "path": "/streamKey",
-        "method": "GET",
-        "controller": "StreamingController",
-        "middleware": "ensureAuthenticated",
-        "exec": "getStreamKey"
-    },
-    {
-        "path": "/generateStreamKey",
-        "method": "GET",
-        "controller": "StreamingController",
-        "middleware": "ensureAuthenticated",
-        "exec": "generateStreamKey"
-    },
-    {
-        "path": "/createStream",
-        "method": "POST",
-        "controller": "StreamingController",
-        "exec": "create",
-        "middleware": "ensureAuthenticated"
-    },
-    {
-        "path": "/itemVault",
+        "route": "/itemVault",
         "method": "GET",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated"
     },
     {
-        "path": "/itemVault",
+        "route": "/itemVault",
         "method": "PUT",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated",
-        "exec": "set"
+        "dn": "set"
     },
     {
-        "path": "/workload",
+        "route": "/workload",
         "method": "GET",
         "controller": "WorkloadController",
         "middleware": "ensureAuthenticated"
     },
     {
-        "path": "/workload",
+        "route": "/workload",
         "method": "POST",
         "controller": "WorkloadController",
         "middleware": "ensureAuthenticated",
-        "exec": "set"
+        "fn": "set"
     },
     {
-        "path": "/vault",
+        "route": "/vault",
         "method": "GET",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated",
-        "exec": "getAll"
+        "fn": "getAll"
     },
     {
-        "path": "/region",
+        "route": "/region",
         "method": "GET",
         "controller": "RegionController"
     },
     {
-        "path": "/regions",
+        "route": "/regions",
         "method": "GET",
         "controller": "RegionController",
-        "exec": "getAll"
+        "fn": "getAll"
     },
     {
-        "path": "/hasPermissions",
+        "route": "/hasPermissions",
         "method": "POST",
         "controller": "RolesController",
         "middleware": [
             "ensureAuthenticated",
             "hasPermissions"
         ],
-        "exec": "hasPermissions"
+        "fn": "hasPermissions"
     },
     {
-        "path": "/role",
+        "route": "/role",
         "method": "POST",
         "controller": "RolesController",
-        "exec": "set"
+        "fn": "set"
     },
     {
-        "path": "/roles",
+        "route": "/roles",
         "method": "GET",
         "controller": "RolesController"
     },
     {
-        "path": "/users",
+        "route": "/users",
         "method": "GET",
         "controller": "UserController",
         "middleware": "ensureAuthenticated"
     },
     {
-        "path": "/user",
+        "route": "/user",
         "method": "GET",
         "controller": "UserController",
         "middleware": "ensureAuthenticated",
-        "exec": "getOne"
+        "fn": "getOne"
     },
     {
-        "path": "/login",
+        "route": "/login",
         "method": "POST",
         "controller": "UserController",
-        "exec": "login"
+        "fn": "login"
     },
     {
-        "path": "/logout",
-        "method": "POST",
-        "controller": "UserController",
-        "middleware": "ensureAuthenticated",
-        "exec": "logout"
-    },
-    {
-        "path": "/register",
-        "method": "POST",
-        "controller": "UserController",
-        "exec": "register"
-    },
-    {
-        "path": "/isAuth",
+        "route": "/logout",
         "method": "POST",
         "controller": "UserController",
         "middleware": "ensureAuthenticated",
-        "exec": "isAuth"
+        "fn": "logout"
     },
     {
-        "path": "/devcon",
+        "route": "/register",
+        "method": "POST",
+        "controller": "UserController",
+        "fn": "register"
+    },
+    {
+        "route": "/isAuth",
+        "method": "POST",
+        "controller": "UserController",
+        "middleware": "ensureAuthenticated",
+        "fn": "isAuth"
+    },
+    {
+        "route": "/devcon",
         "method": "POST",
         "controller": "Devcon",
         "middleware": "ensureAuthenticated"
     },
     {
-        "path": "/printer",
+        "route": "/printer",
         "method": "POST",
         "controller": "Devcon",
         "middleware": "ensureAuthenticated",
-        "exec": "sendPrinter"
+        "fn": "sendPrinter"
     }
 ]
