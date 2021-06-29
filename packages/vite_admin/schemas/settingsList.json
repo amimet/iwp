@@ -1,0 +1,22 @@
+[
+    {
+        "id": "expire_session",
+        "icon": "Key",
+        "title": "Expire Session",
+        "group": "general",
+        "type": "Switch"
+    },
+    {
+        "id": "edit_sidebar",
+        "icon": "Edit",
+        "title": "Edit Sidebar",
+        "group": "general",
+        "type": "Button"
+    },
+    {
+        "group": "sidebar",
+        "id": "collapseOnLooseFocus",
+        "title": "Collapse when loose focus",
+        "type": "Switch"
+    }
+]

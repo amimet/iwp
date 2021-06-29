@@ -5,11 +5,10 @@ export default defineConfig({
   hash: true,
   //devtool: 'eval',
   dva: { immer: true },
-  targets: { ie: 11 },
+  targets: { ie: 11, node: 6 },
   ignoreMomentLocale: true,
   nodeModulesTransform: {
-    type: 'none',
-   // exclude: ["execa", "human-signals"]
+    type: 'all',
   },
   alias: {
     schemas: path.resolve(__dirname, './schemas'),

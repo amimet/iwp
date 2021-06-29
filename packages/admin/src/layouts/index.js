@@ -31,6 +31,7 @@ export default class Layout extends React.Component {
     }
 
     componentDidMount() {
+        console.log(require('@ragestudio/cloudlink'))
         window.busEvent = new EventEmitter()
         this.loadLanguage(this.state.language)
         document.addEventListener('touchmove', (e) => { e.preventDefault() }, false)

@@ -13,6 +13,6 @@
         "start:server": "cd packages/server && npm start"
     },
     "dependencies": {
-        "corenode": "^0.25.22"
+        "corenode": "^0.25.23"
     }
 }

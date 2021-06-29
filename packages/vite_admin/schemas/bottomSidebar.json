@@ -1,0 +1,20 @@
+[
+    {
+        "id": "settings",
+        "title": "Settings",
+        "icon": "Settings",
+        "locked": true
+    },
+    {
+        "id": "account",
+        "component": "account",
+        "props": {
+            "className": "accountSidebarComponent"
+        },
+        "locked": true,
+        "requireState": {
+            "key": "session_valid",
+            "value": true
+        }
+    }
+]

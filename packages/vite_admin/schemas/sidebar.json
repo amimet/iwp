@@ -1,0 +1,78 @@
+[
+    {
+        "id": "main",
+        "title": "Dashboard",
+        "icon": "Home",
+        "locked": true
+    },
+    {
+        "id": "users",
+        "title": "Users",
+        "icon": "Users",
+        "children": [
+            {
+                "id": "users/contracts",
+                "title": "Contracts",
+                "icon": "Briefcase"
+            },
+            {
+                "id": "users/roles",
+                "title": "Roles",
+                "icon": "Link"
+            },
+            {
+                "id": "users/workload",
+                "title": "Workload",
+                "icon": "GitCommit"
+            },
+            {
+                "id": "users/workshifts",
+                "title": "Workshifts",
+                "icon": "Clock"
+            },
+            {
+                "id": "accounts",
+                "path": "users",
+                "title": "Accounts",
+                "icon": "User"          
+            }
+        ]
+    },
+    {
+        "id": "geo",
+        "title": "Geo",
+        "icon": "MapPin",
+        "children": [
+            {
+                "id": "regions",
+                "title": "Regions",
+                "icon": "Map"
+            }
+        ]
+    },
+    {
+        "id": "fabric",
+        "title": "Fabric",
+        "icon": "Box"
+    },
+    {
+        "id": "vault",
+        "title": "Vault",
+        "icon": "Archive"
+    },
+    {
+        "id": "reports",
+        "title": "Reports",
+        "icon": "Umbrella"
+    },
+    {
+        "id": "server_manager",
+        "title": "Server",
+        "icon": "Database"
+    },
+    {
+        "id": "launchpad",
+        "title": "Launchpad",
+        "icon": "Command"
+    }
+]

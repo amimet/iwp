@@ -1,0 +1,10 @@
+{
+    "general": {
+        "title": "General",
+        "icon": "Settings"
+    },
+    "sidebar": {
+        "title": "Sidebar",
+        "icon": "Layout"
+    }
+}
