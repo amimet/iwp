@@ -1,0 +1,6 @@
+{
+  "appId": "com.amimet.app",
+  "appName": "amimet-iwp",
+  "webDir": "build",
+  "bundledWebRuntime": true
+}
