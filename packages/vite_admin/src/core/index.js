@@ -1,18 +1,8 @@
 import { cloneDeep } from 'lodash'
 import store from 'store'
-import platform from 'platform'
-const { pathToRegexp } = require('path-to-regexp')
+import { pathToRegexp } from 'path-to-regexp'
+import config from 'config'
 
-const config = require("config")
-const packageJson = require("../../package.json")
-
-const clientInfo = {
-    packageName: packageJson.name,
-    siteName: config.app.siteName,
-    version: packageJson.version,
-    os: platform.os,
-    layout: platform.layout
-}
 
 const languages = config.i18n ? config.i18n.languages.map(item => item.key) : []
 const defaultLanguage = config.i18n ? config.i18n.defaultLanguage : 'en'
@@ -211,4 +201,4 @@ export function setLocation(to, delay) {
     }, delay ?? 0)
 }
 
-export { config, packageJson, languages, defaultLanguage, clientInfo }
+export { config, languages, defaultLanguage }

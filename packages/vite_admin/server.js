@@ -3,11 +3,11 @@ const fs = require('fs')
 const { createServer } = require('vite')
 
 import reactRefresh from "@vitejs/plugin-react-refresh"
-import commonjsExternals from 'vite-plugin-commonjs-externals'
 import vitePluginImp from "vite-plugin-imp"
 import lessToJS from "less-vars-to-js"
 import builtins from "rollup-plugin-node-builtins"
 import globals from "rollup-plugin-node-globals"
+import commonjs from '@rollup/plugin-commonjs'
 
 const themeVariables = lessToJS(
     fs.readFileSync(path.resolve(__dirname, "./config/variables.less"), "utf8")
@@ -26,6 +26,11 @@ createServer({
         _env: _env
     },
     plugins: [
+        commonjs({
+            exclude: ["node_modules/vite/**", "src/**", "config/**"],
+            transformMixedEsModules: false,
+            defaultIsModuleExports: false
+        }),
         reactRefresh(),
         { ...builtins({ crypto: true }), name: "rollup-plugin-node-builtins" },
         { ...globals(), name: 'rollup-plugin-node-globals' },

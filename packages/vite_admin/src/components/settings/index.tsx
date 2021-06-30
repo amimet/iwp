@@ -14,8 +14,8 @@ const ItemTypes = {
     Select: antd.Select
 }
 
-let settingList = require("schemas/settingsList.json") // Index Order sensitive !!!
-let groupsDecorator = require("schemas/settingsGroupsDecorator.json")
+import settingList from "schemas/settingsList.json"
+import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
 export class SettingsMenu extends React.Component {
     settingController = global.settingsController
