@@ -1,5 +1,5 @@
 .splash-wrapper {
-	background-color: rgb(6, 6, 6);
+	background-color: #252525;
 	position: absolute;
 	z-index: 0;
 
@@ -27,7 +27,6 @@
 	backface-visibility: hidden;
 	transform: translate3d(0, 0, 0);
 	will-change: contents;
-
 	background: conic-gradient(
 		from 230.29deg at 51.63% 52.16%,
 		#2400ff 0deg,
@@ -37,6 +36,44 @@
 		#ff5335 301.88deg,
 		#691eff 360deg
 	);
+}
+
+.bouncy-logo {
+	will-change: transition, opacity, z-index;
+	position: absolute;
+	z-index: 3;
+
+	width: 100vw;
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	align-items: center;
+
+	justify-content: center;
+}
+
+.bouncy-logo .ball {
+	animation: logo-bounce 0.5s alternate infinite forwards;
+}
+
+.bouncy-logo .ball svg {
+	opacity: 1;
+	width: 200px;
+	height: 200px;
+	margin: auto;
+
+	stroke-width: 1.5;
+	stroke-opacity: 1;
+
+	stroke-dasharray: 1000;
+	stroke-dashoffset: 1000;
+
+	fill: transparent;
+
+	animation: logo-reveal 5.1s ease-out 0.5s forwards, logo-stroke 2.1s ease-out 0s forwards,
+		logo-transform 5.1s ease-out 0s forwards;
 }
 
 @keyframes glow-splash {
@@ -51,8 +88,11 @@
 		-webkit-animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
 		animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
 	}
-
+	97% {
+		z-index: 4;
+	}
 	100% {
+		z-index: 4;
 		opacity: 0.28;
 	}
 }
@@ -77,114 +117,63 @@
 	}
 }
 
-.bouncy-logo {
-    will-change: transition, opacity,z-index;
-    position: absolute;
-    z-index: 3;
-
-    width: 100vw;
-    height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    align-items: center;
-
-    justify-content: center;
-    animation: logo-zindex 5.1s ease-out 0.5s forwards;
-}
-
-.bouncy-logo .ball {
-	transform: translate(0, 0);
-	animation: logo-bounce 1s alternate infinite forwards;
-}
-
-.bouncy-logo .ball svg {
-	opacity: 1;
-	width: 200px;
-	height: 200px;
-	margin: auto;
-
-	stroke-width: 1;
-	stroke-opacity: 1;
-
-	stroke-dasharray: 1000;
-	stroke-dashoffset: 1000;
-
-	fill: transparent;
-
-	animation: logo-reveal 5.1s ease-out 0.5s forwards, logo-stroke 5s linear 0s forwards, logo-zindex-out 2s ease-in-out 5.1s forwards;
-}
-
-#backdroped{
-    z-index: 1;
-    opacity: 0;
-    animation: logo-zindex-in 2s ease-in-out 5.1s forwards;
-}
-
-.shadow {
-	width: 100%;
-	height: auto;
-	opacity: 0.5;
-}
-
-
 @keyframes logo-bounce {
 	from {
-		top: 0;
+		transform: translate(0, -10px);
 	}
 	to {
-		top: 10%;
+		transform: translate(0, 10px);
+	}
+}
+
+@keyframes logo-transform {
+	0% {
+		animation-timing-function: cubic-bezier(0, 0, 0.3rem, 1);
+		transform: scale(5) rotate(65deg);
+		filter: blur(10px);
+	}
+	17% {
+		filter: unset;
+	}
+	18% {
+		filter: drop-shadow(0 0 80px rgba(255, 255, 255, 1));
+	}
+	19% {
+		transform: rotate(5deg);
+	}
+	100% {
+		transform: scale(0.8) rotate(0deg);
 	}
 }
 
 @keyframes logo-reveal {
 	0% {
+		-webkit-animation-timing-function: cubic-bezier(0, 0, 0.3rem, 1);
 		animation-timing-function: cubic-bezier(0, 0, 0.3rem, 1);
 	}
 	7% {
 		fill: transparent;
 	}
 	10% {
-		filter: drop-shadow(0 0 100px rgba(255, 255, 255, 0.8));
-		fill: rgba(255, 255, 255, 7);
+		fill: rgba(225, 225, 225, 0.8);
 	}
-
 	40% {
-		fill: rgba(255, 255, 255, 7);
+		fill: rgba(225, 225, 225, 0.8);
 	}
-
 	100% {
-        z-index: 0;
 		fill: rgba(51, 51, 51, 0.8);
 	}
 }
 
 @keyframes logo-stroke {
-	50% {
+	0% {
+		stroke-opacity: 0;
+	}
+	10% {
+		stroke-opacity: 1;
+	}
+	100% {
 		stroke-dashoffset: 0;
 		stroke-opacity: 0;
 	}
-
-	100% {
-		stroke-opacity: 0;
-	}
-}
-
-@keyframes logo-zindex-in {
-    0%{
-        opacity: 0;
-    }
-    100%{
-        opacity: 1;
-    }
-}
-
-@keyframes logo-zindex-on {
-    0%{
-        opacity: 1;
-    }
-    100%{
-        opacity: 0;
-    }
 }
