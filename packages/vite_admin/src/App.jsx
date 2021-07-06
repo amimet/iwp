@@ -6,37 +6,43 @@ import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
 import { BrowserRouter } from "react-router-dom"
 
+import { NotFound } from "components"
+import Routes from "@pages"
+
 import BaseLayout from "./layout"
 import builtInEvents from "core/events"
 import config from "config"
 
 import SettingsController from "core/models/settings"
 import SidebarController from "core/models/sidebar"
+import { createBrowserHistory } from "history"
 
-const defaultGlobalState = {
-	num: 0,
-	text: "foo",
-	bool: false,
-}
+const RenderPage = (props = {}) => {
+	const [state, dispatch] = React.useReducer(props.reducer, props.initialState ?? {})
+	const useGlobalState = () => [state, dispatch]
 
-const globalStateContext = React.createContext(defaultGlobalState)
-const dispatchStateContext = React.createContext(undefined)
+	const context = {
+		...props.context,
+		useGlobalState,
+	}
 
-const GlobalStateProvider = ({ children }) => {
-	const [state, dispatch] = React.useReducer((state, newValue) => ({ ...state, ...newValue }), defaultGlobalState)
+	if (!props.component) {
+		props.component = <div>EMPTY PAGE</div>
+	}
 
-	return (
-		<globalStateContext.Provider value={state}>
-			<dispatchStateContext.Provider value={dispatch}>{children}</dispatchStateContext.Provider>
-		</globalStateContext.Provider>
-	)
+	return React.createElement(props.component, { ...context })
 }
 
 export default class App extends React.Component {
 	constructor(props) {
 		super(props)
 
+		this.history = createBrowserHistory()
 		this.busEvent = window.busEvent = new EventEmitter()
+
+		this.globalStateContext = React.createContext()
+		this.globalDispatchContext = React.createContext()
+		this.globalState = {}
 
 		this.busEvent.on("app_init", () => {
 			this.toogleLoading(true)
@@ -109,44 +115,68 @@ export default class App extends React.Component {
 		unenquireScreen(this.enquireHandler)
 	}
 
+	validateLocationSlash = (location) => {
+		let key = location ?? window.location.pathname
+
+		while (key[0] === "/") {
+			key = key.slice(1, key.length)
+		}
+
+		return key
+	}
+
 	loadPage = (key) => {
 		if (typeof key !== "string") {
 			return false
 		}
 
-		if (key[0] === "/") {
-			key = key.slice(1, key.length)
+		if (key === "/") {
+			key = config.app?.mainPath ?? "index"
 		}
 
-		import(`./pages/${key}/index.jsx`)
-			.then((content) => {
-				this.setState({ contentComponent: content.default })
-			})
-			.catch((error) => {
-				console.error(error)
-			})
+		const validatedKey = this.validateLocationSlash(key)
+
+		if (validatedKey !== key) {
+			key = validatedKey
+		}
+
+		if (window.location.pathname !== key) {
+			this.history.push(`/${validatedKey}`)
+		}
+
+		if (typeof Routes[key] !== "undefined") {
+			this.setState({ contentComponent: Routes[key] })
+		} else {
+			this.setState({ contentComponent: NotFound })
+		}
 	}
 
-    renderPage() {
-        if (this.state.contentComponent) {
-            return React.createElement(this.state.contentComponent, this)
-        }
-        return <div></div>
-    }
+	reducer = (state, action) => {
+		const { type, payload } = action
+		switch (type) {
+			case "SET_CART_ITEMS": {
+				return {
+					...state,
+					cart: payload,
+				}
+			}
+			// Add more here!
+			default:
+				return state
+		}
+	}
 
 	render() {
 		if (this.state.loading) {
 			return <div>Loading</div>
 		}
 
-        return (
+		return (
 			<React.Fragment>
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
-				<GlobalStateProvider>
-                    {this.renderPage()}
-				</GlobalStateProvider>
+				<RenderPage component={this.state.contentComponent} reducer={this.reducer} />
 			</React.Fragment>
 		)
 	}

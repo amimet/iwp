@@ -8,7 +8,7 @@ export default {
         title: packagejson.name,
         siteName: "AmimetApp",
         defaultStyleClass: "app_",
-        mainPath: '/main',
+        mainPath: 'main',
         api_hostname: "https://api.amimet.es",
 
         storage: { // specify where data is storaged

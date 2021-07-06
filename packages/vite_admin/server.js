@@ -8,6 +8,8 @@ import lessToJS from "less-vars-to-js"
 import builtins from "rollup-plugin-node-builtins"
 import globals from "rollup-plugin-node-globals"
 import commonjs from '@rollup/plugin-commonjs'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 const themeVariables = lessToJS(
     fs.readFileSync(path.resolve(__dirname, "./config/variables.less"), "utf8")
@@ -25,15 +27,19 @@ createServer({
         "process.env": _env,
         _env: _env
     },
+    output: {
+        dir: 'output',
+        format: 'cjs'
+    },
     plugins: [
+        nodePolyfills(),
+        nodeResolve({ preferBuiltins: false }),
         commonjs({
             exclude: ["node_modules/vite/**", "src/**", "config/**"],
             transformMixedEsModules: false,
             defaultIsModuleExports: false
         }),
         reactRefresh(),
-        { ...builtins({ crypto: true }), name: "rollup-plugin-node-builtins" },
-        { ...globals(), name: 'rollup-plugin-node-globals' },
     ],
     css: {
         preprocessorOptions: {
@@ -51,7 +57,7 @@ createServer({
             locales: path.resolve(__dirname, './src/locales'),
             core: path.resolve(__dirname, './src/core'),
             config: path.resolve(__dirname, './config'),
-            pages: path.resolve(__dirname, './src/pages'),
+            "@pages": path.resolve(__dirname, './src/pages'),
             components: path.resolve(__dirname, './src/components'),
             models: path.resolve(__dirname, './src/models'),
         },
