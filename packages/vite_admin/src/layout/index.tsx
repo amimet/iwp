@@ -111,7 +111,8 @@ export default class BaseLayout extends React.Component {
     }
 
     render() {
-        const Children =  this.props.children
+        const Children = this.props.children
+
         return (
             <React.Fragment>
                 <antd.Layout style={{ minHeight: '100vh' }}>

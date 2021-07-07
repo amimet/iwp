@@ -46,18 +46,25 @@ const aggregation = (baseClass, ...mixins) => {
 	return base
 }
 
-class EviteApp {
-	constructor(params) {
-		this.params = { ...params }
-
+class EviteApp{
+	constructor() {
 		window.app = Object()
 
 		// states
 		this.loading = Boolean(false)
+		this.loadedRoute = null
+		this._renderContent = null
+
 
 		// controllers
 		this.history = window.app.history = createBrowserHistory()
 		this.busEvent = window.app.busEvent = new EventEmitter()
+
+		this.history._push = this.history.push
+		this.history.push = (key) => {
+			this.history._push(key)
+			this.loadPage(key)
+		}
 
 		// global state
 		this.globalStateContext = React.createContext()
@@ -66,16 +73,16 @@ class EviteApp {
 
 		// set events
 		this.busEvent.on("app_init", () => {
-			if (typeof this._onInitialization === "function") {
-				this._onInitialization()
+			if (typeof this.onInitialization === "function") {
+				this.onInitialization()
 			}
 
 			this.toogleLoading(true)
 		})
 
 		this.busEvent.on("app_load_done", () => {
-			if (typeof this._onDone === "function") {
-				this._onDone()
+			if (typeof this.onDone === "function") {
+				this.onDone()
 			}
 			
 			this.toogleLoading(false)
@@ -87,7 +94,7 @@ class EviteApp {
 
 	toogleLoading = (to) => {
 		if (typeof to !== "boolean") {
-			to = !this.state.loading
+			to = !this.loading
 		}
 
 		if (typeof this.onToogleLoading === "function") {
@@ -105,13 +112,6 @@ class EviteApp {
 		})
 
 		this.busEvent.emit("app_load_done")
-	}
-}
-
-class EvitePageRender {
-	constructor(params) {
-		this.params = {...params}
-
 	}
 
 	validateLocationSlash = (location) => {
@@ -140,25 +140,17 @@ class EvitePageRender {
 		}
 
 		if (typeof Routes[key] !== "undefined") {
-			this.setState({ contentComponent: Routes[key], loadedRoute: `/${key}` })
+			this._renderContent = Routes[key]
+			this.loadedRoute =  `/${key}`
 		} else {
-			this.setState({ contentComponent: NotFound })
+			this._renderContent = NotFound
 		}
 	}
 }
 
-
-const EviteExtensions = {
-	RenderExtension: EvitePageRender
-}
-
-function createEviteApp(extensions) {
-	if (typeof extensions) {
-		
-	}
+function createEviteApp() {
 	return class extends aggregation(React.Component, EviteApp){}
 }
-
 
 //* APP
 export const GlobalStateProvider = (props = {}) => {
@@ -188,9 +180,6 @@ export default class App extends createEviteApp() {
 
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
 	state = {
-		contentComponent: null,
-		page: window.location.pathname,
-		loading: true,
 		isMobile: false,
 	}
 
@@ -215,12 +204,6 @@ export default class App extends createEviteApp() {
 	componentDidMount() {
 		this.loadPage(window.location.pathname)
 
-		this.history._push = this.history.push
-		this.history.push = (key) => {
-			this.history._push(key)
-			this.loadPage(key)
-		}
-
 		document.addEventListener(
 			"touchmove",
 			(e) => {
@@ -233,8 +216,6 @@ export default class App extends createEviteApp() {
 	componentWillUnmount() {
 		unenquireScreen(this.enquireHandler)
 	}
-
-	
 
 	reducer = (state, action) => {
 		const { type, payload } = action
@@ -255,15 +236,15 @@ export default class App extends createEviteApp() {
 	}
 
 	renderPageComponent() {
-		if (this.state.contentComponent) {
-			return this.state.contentComponent
+		console.log(this._renderContent)
+		if (this._renderContent) {
+			return () => {return this._renderContent}
 		}
 
 		return () => {
 			return <div></div>
 		}
 	}
-
 	render() {
 		return (
 			<React.Fragment>
@@ -271,7 +252,7 @@ export default class App extends createEviteApp() {
 					<title>{config.app.siteName}</title>
 				</Helmet>
 				<GlobalStateProvider reducer={this.reducer}>
-					<BaseLayout>{this.renderPageComponent()}</BaseLayout>
+					<BaseLayout children={this.renderPageComponent()} />
 				</GlobalStateProvider>
 			</React.Fragment>
 		)
