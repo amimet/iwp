@@ -4,7 +4,6 @@ import { enquireScreen, unenquireScreen } from "enquire-js"
 import ngProgress from "nprogress"
 import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
-import { BrowserRouter } from "react-router-dom"
 
 import { NotFound } from "components"
 import Routes from "@pages"
@@ -17,79 +16,89 @@ import SettingsController from "core/models/settings"
 import SidebarController from "core/models/sidebar"
 import { createBrowserHistory } from "history"
 
-const RenderPage = (props = {}) => {
-	const [state, dispatch] = React.useReducer(props.reducer, props.initialState ?? {})
-	const useGlobalState = () => [state, dispatch]
-
-	const context = {
-		...props.context,
-		useGlobalState,
+// *EVITE
+const aggregation = (baseClass, ...mixins) => {
+	class base extends baseClass {
+		constructor(...args) {
+			super(...args)
+			mixins.forEach((mixin) => {
+				copyProps(this, new mixin())
+			})
+		}
 	}
 
-	if (!props.component) {
-		props.component = <div>EMPTY PAGE</div>
+	let copyProps = (target, source) => {
+		// this function copies all properties and symbols, filtering out some special ones
+		Object.getOwnPropertyNames(source)
+			.concat(Object.getOwnPropertySymbols(source))
+			.forEach((prop) => {
+				if (!prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/))
+					Object.defineProperty(target, prop, Object.getOwnPropertyDescriptor(source, prop))
+			})
 	}
 
-	return React.createElement(props.component, { ...context })
+	mixins.forEach((mixin) => {
+		// outside contructor() to allow aggregation(A,B,C).staticFunction() to be called etc.
+		copyProps(base.prototype, mixin.prototype)
+		copyProps(base, mixin)
+	})
+
+	return base
 }
 
-export default class App extends React.Component {
-	constructor(props) {
-		super(props)
+class EviteApp {
+	constructor(params) {
+		this.params = { ...params }
 
-		this.history = createBrowserHistory()
-		this.busEvent = window.busEvent = new EventEmitter()
+		window.app = Object()
 
+		// states
+		this.loading = Boolean(false)
+
+		// controllers
+		this.history = window.app.history = createBrowserHistory()
+		this.busEvent = window.app.busEvent = new EventEmitter()
+
+		// global state
 		this.globalStateContext = React.createContext()
 		this.globalDispatchContext = React.createContext()
 		this.globalState = {}
 
+		// set events
 		this.busEvent.on("app_init", () => {
+			if (typeof this._onInitialization === "function") {
+				this._onInitialization()
+			}
+
 			this.toogleLoading(true)
 		})
 
 		this.busEvent.on("app_load_done", () => {
+			if (typeof this._onDone === "function") {
+				this._onDone()
+			}
+			
 			this.toogleLoading(false)
 		})
+
+		//initalization
+		this.initialize()
 	}
-
-	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
-	state = {
-		contentComponent: null,
-		page: window.location.pathname,
-		loading: true,
-		isMobile: false,
-	}
-
-	enquireHandler = enquireScreen((mobile) => {
-		const { isMobile } = this.state
-
-		if (isMobile !== mobile) {
-			window.isMobile = mobile
-			this.setState({ isMobile: mobile })
-		}
-	})
 
 	toogleLoading = (to) => {
 		if (typeof to !== "boolean") {
 			to = !this.state.loading
 		}
 
-		if (to === true) {
-			this.loadBar.start()
-		} else {
-			this.loadBar.done()
+		if (typeof this.onToogleLoading === "function") {
+			this.onToogleLoading(to)
 		}
-
-		this.setState({ loading: to })
+		this.loading = to
 	}
 
-	async initialize() {
+	initialize() {
 		this.busEvent.emit("app_init")
 		//* preload tasks
-
-		global.settingsController = new SettingsController()
-		global.sidebarController = new SidebarController()
 
 		objectToArrayMap(builtInEvents).forEach((event) => {
 			this.busEvent.on(event.key, event.value)
@@ -97,22 +106,12 @@ export default class App extends React.Component {
 
 		this.busEvent.emit("app_load_done")
 	}
+}
 
-	componentDidMount() {
-		this.initialize()
-		this.loadPage(window.location.pathname)
+class EvitePageRender {
+	constructor(params) {
+		this.params = {...params}
 
-		document.addEventListener(
-			"touchmove",
-			(e) => {
-				e.preventDefault()
-			},
-			false,
-		)
-	}
-
-	componentWillUnmount() {
-		unenquireScreen(this.enquireHandler)
 	}
 
 	validateLocationSlash = (location) => {
@@ -140,43 +139,140 @@ export default class App extends React.Component {
 			key = validatedKey
 		}
 
-		if (window.location.pathname !== key) {
-			this.history.push(`/${validatedKey}`)
-		}
-
 		if (typeof Routes[key] !== "undefined") {
-			this.setState({ contentComponent: Routes[key] })
+			this.setState({ contentComponent: Routes[key], loadedRoute: `/${key}` })
 		} else {
 			this.setState({ contentComponent: NotFound })
 		}
 	}
+}
+
+
+const EviteExtensions = {
+	RenderExtension: EvitePageRender
+}
+
+function createEviteApp(extensions) {
+	if (typeof extensions) {
+		
+	}
+	return class extends aggregation(React.Component, EviteApp){}
+}
+
+
+//* APP
+export const GlobalStateProvider = (props = {}) => {
+	const [state, dispatch] = React.useReducer(props.reducer, props.initialState ?? {})
+	const useGlobalState = () => [state, dispatch]
+
+	const context = {
+		...props.context,
+		useGlobalState,
+	}
+
+	return React.cloneElement(props.children, { ...context })
+}
+
+export default class App extends createEviteApp() {
+	constructor(props) {
+		super(props)
+
+		// set controllers
+		this.controllers = window.app.controllers = {}
+
+		// set params controllers
+		this.paramsController = window.app.params = {}
+		this.paramsController.settings = new SettingsController()
+		this.paramsController.sidebar = new SidebarController()
+	}
+
+	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+	state = {
+		contentComponent: null,
+		page: window.location.pathname,
+		loading: true,
+		isMobile: false,
+	}
+
+	enquireHandler = enquireScreen((mobile) => {
+		const { isMobile } = this.state
+
+		if (isMobile !== mobile) {
+			window.isMobile = mobile
+			this.setState({ isMobile: mobile })
+		}
+	})
+
+	onToogleLoading(to) {
+		if (to === true) {
+			this.loadBar.start()
+		}
+		else {
+			this.loadBar.done()
+		}
+	}
+
+	componentDidMount() {
+		this.loadPage(window.location.pathname)
+
+		this.history._push = this.history.push
+		this.history.push = (key) => {
+			this.history._push(key)
+			this.loadPage(key)
+		}
+
+		document.addEventListener(
+			"touchmove",
+			(e) => {
+				e.preventDefault()
+			},
+			false,
+		)
+	}
+
+	componentWillUnmount() {
+		unenquireScreen(this.enquireHandler)
+	}
+
+	
 
 	reducer = (state, action) => {
 		const { type, payload } = action
 		switch (type) {
-			case "SET_CART_ITEMS": {
+			case "UPDATE_CART": {
 				return {
 					...state,
-					cart: payload,
+					cart: {
+						...state.cart,
+						...payload,
+					},
 				}
 			}
-			// Add more here!
+
 			default:
 				return state
 		}
 	}
 
-	render() {
-		if (this.state.loading) {
-			return <div>Loading</div>
+	renderPageComponent() {
+		if (this.state.contentComponent) {
+			return this.state.contentComponent
 		}
 
+		return () => {
+			return <div></div>
+		}
+	}
+
+	render() {
 		return (
 			<React.Fragment>
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
-				<RenderPage component={this.state.contentComponent} reducer={this.reducer} />
+				<GlobalStateProvider reducer={this.reducer}>
+					<BaseLayout>{this.renderPageComponent()}</BaseLayout>
+				</GlobalStateProvider>
 			</React.Fragment>
 		)
 	}

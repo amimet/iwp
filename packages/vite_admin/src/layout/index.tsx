@@ -90,11 +90,15 @@ export default class BaseLayout extends React.Component {
     }
 
     componentDidMount() {
-        window.busEvent.on("setLocation", (to, delay) => {
+        window.app.busEvent.on("setLocation", (to, delay) => {
             this.handleTransition("leave")
         })
-        window.busEvent.on("setLocationReady", (to, delay) => {
+        window.app.busEvent.on("setLocationReady", (to, delay) => {
             this.handleTransition("enter")
+        })
+
+        window.app.busEvent.on("cleanAll", () => {
+            this.handleDrawerEvent({ eventInstance: "onClose" })
         })
 
         this.drawerController.add("open", (fragment, options) => {
@@ -104,13 +108,10 @@ export default class BaseLayout extends React.Component {
         this.drawerController.add("close", (to) => {
             return this.handleDrawerEvent({ eventInstance: "onClose" })
         }, { lock: true })
-
-        global.applicationEvents.on("cleanAll", () => {
-            this.handleDrawerEvent({ eventInstance: "onClose" })
-        })
     }
 
     render() {
+        const Children =  this.props.children
         return (
             <React.Fragment>
                 <antd.Layout style={{ minHeight: '100vh' }}>
@@ -119,14 +120,14 @@ export default class BaseLayout extends React.Component {
                         <React.Fragment>{this.state.drawerInstance.render && React.createElement(this.state.drawerInstance.render)}</React.Fragment>
                     </antd.Drawer>
 
-                    <Sidebar onCollapse={() => this.toggleCollapseSider()} collapsed={this.state.collapsedSidebar} />
+                    <Sidebar {...this.props} onCollapse={() => this.toggleCollapseSider()} collapsed={this.state.collapsedSidebar} />
 
                     <antd.Layout className="app_layout">
-                        <Header siteName={config.app.title} />
+                        <Header {...this.props} siteName={config.app.title} />
 
-                        <antd.Layout.Content className="app_wrapper">
+                        <antd.Layout.Content {...this.props} className="app_wrapper">
                             <div ref={this.layoutContentRef}>
-                                {this.props.children}
+                                <Children {...this.props} />
                             </div>
                         </antd.Layout.Content>
 

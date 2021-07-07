@@ -179,8 +179,8 @@ export function generateRandomId(length = 15) {
 //
 
 export function getBusEvent() {
-    if (typeof window.busEvent !== "undefined") {
-        return window.busEvent
+    if (typeof window.app.busEvent !== "undefined") {
+        return window.app.busEvent
     }
     return null
 }
@@ -190,14 +190,14 @@ export function setLocation(to, delay) {
         console.warn(`Invalid location`)
         return false
     }
-    if (typeof window.busEvent === "undefined") {
+    if (typeof window.app.busEvent === "undefined") {
         throw new Error(`BusEvent is not available`)
     }
 
-    window.busEvent.emit("setLocation", to, delay)
+    window.app.busEvent.emit("setLocation", to, delay)
     setTimeout(() => {
-        //history.push(to)
-        window.busEvent.emit("setLocationReady")
+        window.app.history.push(to)
+        window.app.busEvent.emit("setLocationReady")
     }, delay ?? 0)
 }
 

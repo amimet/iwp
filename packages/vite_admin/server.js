@@ -57,6 +57,7 @@ createServer({
             locales: path.resolve(__dirname, './src/locales'),
             core: path.resolve(__dirname, './src/core'),
             config: path.resolve(__dirname, './config'),
+            "@": path.resolve(__dirname, './src'),
             "@pages": path.resolve(__dirname, './src/pages'),
             components: path.resolve(__dirname, './src/components'),
             models: path.resolve(__dirname, './src/models'),

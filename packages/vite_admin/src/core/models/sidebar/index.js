@@ -1,6 +1,5 @@
 import store from 'store'
-
-const defaultKeys = import('schemas/defaultSidebar.json')
+import defaultKeys from 'schemas/defaultSidebar.json'
 
 class SidebarController {
     constructor() {

@@ -62,7 +62,7 @@ class SidebarEdit extends React.Component {
             obj[index] = item.id
         })
 
-        global.sidebarController._push(obj)
+        window.app.controllers.sidebar._push(obj)
     }
 
     reorder = (list, startIndex, endIndex) => {
@@ -93,7 +93,7 @@ class SidebarEdit extends React.Component {
         let active = []
         let disabled = []
 
-        const storagedKeys = global.sidebarController.get()
+        const storagedKeys = window.app.params.sidebar.get()
 
         storagedKeys.forEach((key) => {
             let item = allItems[key]
@@ -169,26 +169,35 @@ class SidebarEdit extends React.Component {
 }
 
 export default class Sidebar extends React.Component {
-    userData = this.props.app.account_data
+    constructor(props){
+        super(props)
+        const [state, dispatch] = this.props.useGlobalState()
+        
+        this.globalState = state ?? {}
+        this.dispatcher = dispatch
 
-    sidebarHelpers = new Controller({ id: "sidebar", locked: true })
+        this.userData = state.account_data ?? {
+            username: "",
+            avatar: ""
+        }
 
-    sidebarComponentsMap = {
-        account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar })
-    }
+        this.controller = new Controller({ id: "sidebar", locked: true })
+        this.sidebarComponentsMap = {
+            account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar })
+        }
 
-    state = {
-        isHover: false,
-        collapsed: this.props.collapsed ?? settingsController.get("collapseOnLooseFocus") ?? false,
-        editMode: false,
-        loading: true,
-        pathResolve: {},
-        menus: {},
-        theme: this.props.app.activeTheme ?? "light"
+        this.state = {
+            isHover: false,
+            collapsed: this.props.collapsed ?? window.app.params.settings.get("collapseOnLooseFocus") ?? false,
+            editMode: false,
+            loading: true,
+            pathResolve: {},
+            menus: {},
+            theme: this.globalState.theme?.activeTheme ?? "light"
+        }
     }
 
     componentDidMount() {
-        const sidebarController = global.sidebarController
         this.setHelpers()
 
         let items = [
@@ -206,7 +215,7 @@ export default class Sidebar extends React.Component {
             bottom: [],
             top: []
         }
-        let scopeKeys = [...sidebarController.get()]
+        let scopeKeys = [...window.app.params.sidebar.get()]
 
         items.forEach((item, index) => {
             try {
@@ -219,15 +228,7 @@ export default class Sidebar extends React.Component {
 
                 if (typeof (item.requireState) === "object") {
                     const { key, value } = item.requireState
-                    window.dispatcher({
-                        type: "isStateKey",
-                        payload: { key, value },
-                        callback: (result) => {
-                            if (!result) {
-                                valid = false
-                            }
-                        }
-                    })
+                    //* TODO: check global state
                 }
 
                 // end validation
@@ -307,7 +308,7 @@ export default class Sidebar extends React.Component {
 
     handleClick = (e) => {
         if (typeof e.key === "undefined") {
-            window.busEvent.emit("invalidSidebarKey", e)
+            window.app.busEvent.emit("invalidSidebarKey", e)
             return false
         }
 
@@ -327,7 +328,7 @@ export default class Sidebar extends React.Component {
         }
 
         if (to) {
-            window.busEvent.emit("cleanAll")
+            window.app.busEvent.emit("cleanAll")
         }
 
         this.setState({ editMode: to })
@@ -342,11 +343,11 @@ export default class Sidebar extends React.Component {
     }
 
     setHelpers() {
-        this.sidebarHelpers.add("toogleEdit", (to) => {
+        this.controller.add("toogleEdit", (to) => {
             this.toogleEditMode(to)
         }, { lock: true })
 
-        this.sidebarHelpers.add("toogleCollapse", (to) => {
+        this.controller.add("toogleCollapse", (to) => {
             this.setState({ collapsed: (to ?? !this.state.collapsed) })
         }, { lock: true })
     }
@@ -354,22 +355,22 @@ export default class Sidebar extends React.Component {
     render() {
         if (this.state.loading) return null
 
-        if (settingsController.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+        if (window.app.params.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
             while (this.state.isHover && this.state.collapsed) {
-                window.controllers.sidebar.toogleCollapse(false)
+                this.controller.toogleCollapse(false)
                 break
             }
             while (!this.state.isHover && !this.state.collapsed) {
                 const delay = 500
                 setTimeout(() => {
-                    window.controllers.sidebar.toogleCollapse(true)
+                    this.controller.toogleCollapse(true)
                 }, delay)
 
                 break
             }
         } else {
             if (this.state.collapsed) {
-                window.controllers.sidebar.toogleCollapse(false)
+                this.controller.toogleCollapse(false)
             }
         }
 

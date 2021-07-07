@@ -18,14 +18,12 @@ import settingList from "schemas/settingsList.json"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
 export class SettingsMenu extends React.Component {
-    settingController = global.settingsController
-
     state = {
-        settings: this.settingController.get() ?? {}
+        settings: window.app.params.settings.get() ?? {}
     }
 
     _set(key, value) {
-        this.setState({ settings: this.settingController.change(key, value) })
+        this.setState({ settings: window.app.params.settings.change(key, value) })
     }
 
     handleEvent(event, id, type) {
@@ -38,12 +36,12 @@ export class SettingsMenu extends React.Component {
             return false
         }
 
-        const value = this.settingController.get(id) ?? false
+        const value = window.app.params.settings.get(id) ?? false
         let to = !value
 
         switch (type.toLowerCase()) {
             case "button": {
-                this.settingController.events.emit("changeSetting", { event, id, value, to })
+                window.app.params.settings.events.emit("changeSetting", { event, id, value, to })
                 break
             }
             default: {

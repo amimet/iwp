@@ -3,7 +3,14 @@ import React from "react"
 export default class MainTest extends React.Component {
 	setCartState = (payload) => {
 		const [state, dispatch] = this.props.useGlobalState()
-		dispatch({ type: "SET_CART_ITEMS", payload })
+		dispatch({ type: "UPDATE_CART", payload })
+	}
+
+	sumItems = () => {
+		const [state, dispatch] = this.props.useGlobalState()
+		dispatch({ type: "UPDATE_CART", payload: {
+			items: (state.cart?.items ?? 0) + 1
+		}})
 	}
 
 	render() {
@@ -18,6 +25,9 @@ export default class MainTest extends React.Component {
 			<div>
 				<button onClick={() => this.setCartState({ mayonese: 30 })}>
 					set cart
+				</button>
+				<button onClick={() => this.sumItems()}>
+					sum
 				</button>
 			</div>
 		</div>

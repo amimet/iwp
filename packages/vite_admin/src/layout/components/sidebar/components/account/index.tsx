@@ -1,3 +1,4 @@
+import React from 'react'
 import { Menu, Avatar } from 'antd'
 
 export default (props) => {
