@@ -171,7 +171,7 @@ class SidebarEdit extends React.Component {
 export default class Sidebar extends React.Component {
     constructor(props){
         super(props)
-        const [state, dispatch] = this.props.useGlobalState()
+        const [state, dispatch] = this.props.withGlobalState()
         
         this.globalState = state ?? {}
         this.dispatcher = dispatch

@@ -1,8 +1,8 @@
 import Main from './main'
-import Test from './test'
+import Account from './account'
 
 //* ROUTES
 export default {
     "main": Main,
-    "test": Test
+    "account": Account,
 }

@@ -74,28 +74,29 @@ export const UserController = {
             })
     },
     login: (req, res, next) => {
-        passport.authenticate("local", { session: false }, (error, user) => {
+        passport.authenticate("local", { session: false }, (error, user, options) => {
             if (error) {
-                return res.status(401).json("Invalid credentials")
+                return res.status(500).json("Error validating user")
             }
+
             if (!user) {
-                return res.status(404).json("User not exist")
+                return res.status(401).json("Invalid credentials")
             }
 
             const payload = {
                 sub: user._id,
-                exp: Date.now() + parseInt(process.env.signLifetime),
+                exp: Date.now() + parseInt(options.signLifetime ?? 300),
                 username: user.username,
                 fullName: user.fullName,
                 avatar: user.avatar,
                 email: user.email
             }
 
-            const token = jwt.sign(JSON.stringify(payload), process.env.server_key)
+            const token = jwt.sign(JSON.stringify(payload), options.secretOrKey)
             SessionController.set(user._id, token)
 
             res.cookie('st', token, { maxAge: 900000, httpOnly: true })
-            res.json({ token: token, originKey: process.env.server_key })
+            res.json({ token: token, originKey: options.secretOrKey })
         })(req, res)
     },
     logout: (req, res, next) => {

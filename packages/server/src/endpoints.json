@@ -68,7 +68,8 @@
         "route": "/users",
         "method": "GET",
         "controller": "UserController",
-        "middleware": "ensureAuthenticated"
+        "middleware": "ensureAuthenticated",
+        "fn": "get"
     },
     {
         "route": "/user",

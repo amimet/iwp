@@ -8,9 +8,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@corenode/utils": "^0.25.22",
-    "corenode": "^0.25.22",
-    "@ragestudio/cloudlink": "^0.5.13",
+    "@corenode/utils": "^0.25.24",
+    "corenode": "^0.25.24",
+    "@ragestudio/cloudlink": "^0.5.23",
     "bcrypt": "^5.0.1",
     "connect-mongo": "^4.4.1",
     "jsonwebtoken": "^8.5.1",

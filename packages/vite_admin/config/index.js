@@ -11,7 +11,8 @@ export default {
         mainPath: 'main',
         api_hostname: "https://api.amimet.es",
 
-        storage: { // specify where data is storaged
+        storage: {
+            token: "token",
             session_frame: "session",
             signkey: "certified",
             settings: "app_settings"

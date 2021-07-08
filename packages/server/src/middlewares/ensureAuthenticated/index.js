@@ -1,6 +1,6 @@
 import passport from 'passport'
 
-export const ensureAuthenticated = (req, res, next) => {
+export default (req, res, next ) => {
     passport.authenticate('jwt', { session: false }, (err, user, info) => {
         if (err) {
             return res.status(403).json(`An error occurred while trying to authenticate`)
@@ -15,5 +15,3 @@ export const ensureAuthenticated = (req, res, next) => {
         next()
     })(req, res, next)
 }
-
-export default ensureAuthenticated

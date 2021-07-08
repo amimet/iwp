@@ -22,20 +22,26 @@ class Server {
         this.endpoints = require("./endpoints.json")
 
         this.instance = new cloudlink.Server({
-            middlewares: this.middlewares,
+            middlewares: require("./middlewares"),
             controllers: this.controllers,
             endpoints: this.endpoints,
             port: this.listenPort
         })
         this.server = this.instance.httpServer
 
+        this.instance.init()
+
         this.options = {
-            jwtStrategy: {
+            jwtStrategy:  {
                 jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
                 secretOrKey: this.instance.oskid,
-                algorithms: ['sha1', 'RS256', 'HS256']
+                algorithms: ['sha1', 'RS256', 'HS256'],
+                signLifetime: _env.signLifetime ?? 300
             }
         }
+
+        this.connectToDB()
+        this.initPassport()
     }
 
     getDBConnectionString() {
@@ -64,13 +70,6 @@ class Server {
         })
     }
 
-    initialize = () => {
-        this.connectToDB()
-        this.initPassport()
-
-        this.instance.init()
-    }
-
     initPassport() {
         passport.use(new LocalStrategy({
             usernameField: "username",
@@ -78,17 +77,18 @@ class Server {
             session: false
         }, (username, password, done) => {
             User.findOne({ username: username })
-                .then(data => {
+                .then((data) => {
                     if (data === null) {
-                        return done(null, false)
+                        return done(null, false, this.options.jwtStrategy)
                     } else if (!bcrypt.compareSync(password, data.password)) {
-                        return done(null, false)
+                        return done(null, false, this.options.jwtStrategy)
                     }
-                    return done(null, data)
-                })
-                .catch(err => done(err, null))
-        }))
 
+                    return done(null, data, this.options.jwtStrategy)
+                })
+                .catch(err => done(err, null, this.options.jwtStrategy))
+        }))
+        
         passport.use(new JwtStrategy(this.options.jwtStrategy, (jwt_payload, done) => {
             User.findOne({ _id: jwt_payload.sub })
                 .then(data => {
@@ -106,4 +106,4 @@ class Server {
     }
 }
 
-new Server().initialize()
+new Server()

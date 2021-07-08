@@ -211,6 +211,7 @@ export default {
 
       const signkey = store.get(config.app.storage.signkey)
       const session = store.get(config.app.storage.session_frame)
+      
       if (session) {
         try {
           if (config.app.certified_signkeys.includes(signkey)) {

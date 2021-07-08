@@ -4,6 +4,7 @@ import { enquireScreen, unenquireScreen } from "enquire-js"
 import ngProgress from "nprogress"
 import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
+import cloudlinkClient from "@ragestudio/cloudlink/dist/client"
 
 import { NotFound } from "components"
 import Routes from "@pages"
@@ -14,10 +15,12 @@ import config from "config"
 
 import SettingsController from "core/models/settings"
 import SidebarController from "core/models/sidebar"
+
 import { createBrowserHistory } from "history"
 
-// *EVITE
-const aggregation = (baseClass, ...mixins) => {
+import * as session from "core/session"
+
+const classAggregation = (baseClass, ...mixins) => {
 	class base extends baseClass {
 		constructor(...args) {
 			super(...args)
@@ -46,25 +49,16 @@ const aggregation = (baseClass, ...mixins) => {
 	return base
 }
 
-class EviteApp{
+class EviteApp {
 	constructor() {
 		window.app = Object()
 
 		// states
 		this.loading = Boolean(false)
-		this.loadedRoute = null
-		this._renderContent = null
-
 
 		// controllers
 		this.history = window.app.history = createBrowserHistory()
 		this.busEvent = window.app.busEvent = new EventEmitter()
-
-		this.history._push = this.history.push
-		this.history.push = (key) => {
-			this.history._push(key)
-			this.loadPage(key)
-		}
 
 		// global state
 		this.globalStateContext = React.createContext()
@@ -84,7 +78,7 @@ class EviteApp{
 			if (typeof this.onDone === "function") {
 				this.onDone()
 			}
-			
+
 			this.toogleLoading(false)
 		})
 
@@ -113,6 +107,68 @@ class EviteApp{
 
 		this.busEvent.emit("app_load_done")
 	}
+}
+
+function createEviteApp() {
+	return class extends classAggregation(React.Component, EviteApp) {}
+}
+
+//* APP
+export const GlobalBindingProvider = (props) => {
+	const context = {}
+
+	objectToArrayMap(props).forEach((prop) => {
+		if (prop.key === "children") {
+			return false
+		}
+
+		if (typeof prop.value === "function") {
+			prop.value = prop.value()
+		}
+
+		context[prop.key] = prop.value
+	})
+
+	return React.cloneElement(props.children, { ...context })
+}
+
+export default class App extends createEviteApp() {
+	constructor(props) {
+		super(props)
+
+		// overwrite history
+		this.history._push = this.history.push
+		this.history.push = (key) => {
+			this.history._push(key)
+			this.loadPage(key)
+		}
+
+		// set controllers
+		this.controllers = window.app.controllers = {}
+
+		// set params controllers
+		this.paramsController = window.app.params = {}
+		this.paramsController.settings = new SettingsController()
+		this.paramsController.sidebar = new SidebarController()
+
+		// init
+		this.apiBridge = null
+		this.setApiBridge()
+	}
+
+	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+	state = {
+		isMobile: false,
+	}
+
+	enquireHandler = enquireScreen((mobile) => {
+		const { isMobile } = this.state
+
+		if (isMobile !== mobile) {
+			window.isMobile = mobile
+			this.setState({ isMobile: mobile })
+		}
+	})
 
 	validateLocationSlash = (location) => {
 		let key = location ?? window.location.pathname
@@ -140,65 +196,40 @@ class EviteApp{
 		}
 
 		if (typeof Routes[key] !== "undefined") {
-			this._renderContent = Routes[key]
-			this.loadedRoute =  `/${key}`
+			this.setState({ contentComponent: Routes[key], loadedRoute: `/${key}` })
 		} else {
-			this._renderContent = NotFound
+			this.setState({ contentComponent: NotFound })
 		}
 	}
-}
 
-function createEviteApp() {
-	return class extends aggregation(React.Component, EviteApp){}
-}
-
-//* APP
-export const GlobalStateProvider = (props = {}) => {
-	const [state, dispatch] = React.useReducer(props.reducer, props.initialState ?? {})
-	const useGlobalState = () => [state, dispatch]
-
-	const context = {
-		...props.context,
-		useGlobalState,
-	}
-
-	return React.cloneElement(props.children, { ...context })
-}
-
-export default class App extends createEviteApp() {
-	constructor(props) {
-		super(props)
-
-		// set controllers
-		this.controllers = window.app.controllers = {}
-
-		// set params controllers
-		this.paramsController = window.app.params = {}
-		this.paramsController.settings = new SettingsController()
-		this.paramsController.sidebar = new SidebarController()
-	}
-
-	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
-	state = {
-		isMobile: false,
-	}
-
-	enquireHandler = enquireScreen((mobile) => {
-		const { isMobile } = this.state
-
-		if (isMobile !== mobile) {
-			window.isMobile = mobile
-			this.setState({ isMobile: mobile })
-		}
-	})
-
-	onToogleLoading(to) {
+	onToogleLoading(to) {
 		if (to === true) {
 			this.loadBar.start()
-		}
-		else {
+		} else {
 			this.loadBar.done()
 		}
+	}
+
+	setApiBridge() {
+		cloudlinkClient
+			.createInterface("http://localhost:3000", () => {
+				const obj = {}
+				const sessionData = session.getSession()
+
+				if (typeof sessionData.token !== "undefined") {
+					obj.headers = {
+						Authorization: `Bearer ${sessionData.token ?? null}`,
+					}
+				}
+
+				return obj
+			})
+			.then((api) => {
+				this.apiBridge = api
+			})
+			.catch((err) => {
+				console.error(`CANNOT BRIDGE API > ${err}`)
+			})
 	}
 
 	componentDidMount() {
@@ -236,24 +267,29 @@ export default class App extends createEviteApp() {
 	}
 
 	renderPageComponent() {
-		console.log(this._renderContent)
-		if (this._renderContent) {
-			return () => {return this._renderContent}
+		if (this.state.contentComponent) {
+			return this.state.contentComponent
 		}
 
 		return () => {
 			return <div></div>
 		}
 	}
+
 	render() {
 		return (
 			<React.Fragment>
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
-				<GlobalStateProvider reducer={this.reducer}>
-					<BaseLayout children={this.renderPageComponent()} />
-				</GlobalStateProvider>
+				<GlobalBindingProvider
+					withGlobalState={() => {
+						const [state, dispatch] = React.useReducer(this.reducer, {})
+						return () => [state, dispatch]
+					}}
+				>
+						<BaseLayout children={this.renderPageComponent()} />
+				</GlobalBindingProvider>
 			</React.Fragment>
 		)
 	}

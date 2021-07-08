@@ -7,8 +7,14 @@ export default defineConfig({
   dva: { immer: true },
   targets: { ie: 11, node: 6 },
   ignoreMomentLocale: true,
+  mfsu: {
+    development : {
+      output : "./.mfsu-dev",
+    },
+
+  },
   nodeModulesTransform: {
-    type: 'all',
+    type: 'none',
   },
   alias: {
     schemas: path.resolve(__dirname, './schemas'),
