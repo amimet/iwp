@@ -6,20 +6,20 @@ import Breadcrumb from '../breadcrumb'
 export default class Header extends React.Component {
     state = {
         loadingSearch: false,
-        hidden: false
+        visible: false
     }
 
     componentDidMount() {
-        window.hideHeader = () => {
-            this.setState({ hidden: !this.state.hidden })
+        window.toogleHeader = (to) => {
+            this.setState({ visible: to ?? !this.state.visible })
         }
     }
 
     render() {
-        window.headerVisible = !this.state.hidden
+        window.headerVisible = this.state.visible
 
         return (
-            <antd.Layout.Header className={classnames(`app_header`, { ["hidden"]: this.state.hidden })} >
+            <antd.Layout.Header className={classnames(`app_header`, { ["hidden"]: !this.state.visible })} >
                 <Breadcrumb />
                 <antd.Input.Search className="app_searchBar" placeholder="Search on app..." loading={this.state.loadingSearch} />
             </antd.Layout.Header>

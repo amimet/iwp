@@ -20,13 +20,15 @@ export const UserController = {
             selector = { username }
         }
 
-        User.find(selector).then((response) => {
-            if (response) {
-                return res.send(response)
-            } else {
-                return res.status(404).json("No user finded")
-            }
-        })
+        User.find(selector)
+            .then((response) => {
+                if (response) {
+                    return res.json(response)
+                } else {
+                    res.status(404)
+                    return res.json("User not exists")
+                }
+            })
     },
     getOne: (req, res, next) => {
         const { id, username } = req.query
@@ -39,13 +41,15 @@ export const UserController = {
             selector = { username }
         }
 
-        User.findOne(selector).then((response) => {
-            if (response) {
-                return res.send(response)
-            } else {
-                return res.status(404).json("No user finded")
-            }
-        })
+        User.findOne(selector)
+            .then((response) => {
+                if (response) {
+                    return res.json(response)
+                } else {
+                    res.status(404)
+                    return res.json("User not exists")
+                }
+            })
     },
     register: (req, res, next) => {
         User.findOne({ username: req.body.username })
@@ -76,7 +80,7 @@ export const UserController = {
     login: (req, res, next) => {
         passport.authenticate("local", { session: false }, (error, user, options) => {
             if (error) {
-                return res.status(500).json("Error validating user")
+                return res.status(500).json(`Error validating user > ${error.message}`)
             }
 
             if (!user) {

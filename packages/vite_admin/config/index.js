@@ -12,6 +12,7 @@ export default {
         api_hostname: "https://api.amimet.es",
 
         storage: {
+            basics: "user",
             token: "token",
             session_frame: "session",
             signkey: "certified",

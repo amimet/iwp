@@ -8,10 +8,9 @@ export default (req, res, next ) => {
 
         if (!user) {
             return res.status(403).json(`This request needs authentication that you do not have`)
+        }else{
+            req.userData = user
+            next()
         }
-
-        req.userData = user
-
-        next()
     })(req, res, next)
 }

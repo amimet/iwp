@@ -7,6 +7,7 @@ import { objectToArrayMap } from "@corenode/utils"
 import cloudlinkClient from "@ragestudio/cloudlink/dist/client"
 
 import { NotFound, AppLoading } from "components"
+import { notification } from "antd"
 import Routes from "@pages"
 
 import BaseLayout from "./layout"
@@ -17,8 +18,10 @@ import SettingsController from "core/models/settings"
 import SidebarController from "core/models/sidebar"
 
 import { createBrowserHistory } from "history"
+import {setLocation} from "core"
 
-import * as session from "core/session"
+import * as session from "core/models/session"
+import * as user from "core/models/user"
 
 const classAggregation = (baseClass, ...mixins) => {
 	class base extends baseClass {
@@ -51,7 +54,7 @@ const classAggregation = (baseClass, ...mixins) => {
 
 class EviteApp {
 	constructor() {
-		window.app = Object()
+		this.app = window.app = Object()
 
 		// states
 		this.loading = true
@@ -74,18 +77,10 @@ function createEviteApp() {
 
 			// set events
 			this.busEvent.on("app_init", async () => {
-				if (typeof this.onInitialization === "function") {
-					await this.onInitialization()
-				}
-
 				this.toogleLoading(true)
 			})
 
 			this.busEvent.on("app_load_done", async () => {
-				if (typeof this.onDone === "function") {
-					await this.onDone()
-				}
-
 				this.toogleLoading(false)
 			})
 		}
@@ -110,7 +105,7 @@ function createEviteApp() {
 				this.busEvent.on(event.key, event.value)
 			})
 
-			await this.onInitialization()
+			await this.initialization()
 
 			this.busEvent.emit("app_load_done")
 		}
@@ -146,16 +141,28 @@ export default class App extends createEviteApp() {
 			this.history._push(key)
 			this.loadPage(key)
 		}
+		this.app.setLocation = setLocation
 
 		// set controllers
-		this.controllers = window.app.controllers = {}
+		this.controllers = this.app.controllers = {}
 
 		// set params controllers
-		this.paramsController = window.app.params = {}
+		this.paramsController = this.app.params = {}
 		this.paramsController.settings = new SettingsController()
 		this.paramsController.sidebar = new SidebarController()
+
+		// app statement
+		this.user = null
+
+		//
+		this.app.reloadAppState = this.reloadAppState
 	}
 
+	initialization = async () => {
+		await this.setApiBridge()
+		this.user = this.getCurrentUser()
+	}
+	
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
 
 	state = {
@@ -172,9 +179,42 @@ export default class App extends createEviteApp() {
 		}
 	})
 
-	onInitialization = async () => {
-		await this.setApiBridge()
+	reloadAppState = async () => {
+		this.app.setLocation("/")
+
+		if (!window.headerVisible) {
+            window.toogleHeader(true)
+        }
+
+		await this.initialization()
 	}
+
+	getCurrentUser = () => {
+		let currentUser = Object()
+
+		const sessionData = session.decryptSession()
+		const basicsData = user.getLocalBasics()
+
+		if (sessionData) {
+			currentUser = { ...currentUser, ...sessionData }
+			currentUser["_id"] = currentUser.sub
+			delete currentUser.sub
+		}
+		if (basicsData) {
+			currentUser = { ...currentUser, ...basicsData }
+		}
+
+		if (!currentUser.avatar) {
+			currentUser.avatar = config.defaults.avatar
+		}
+		if (!currentUser.username) {
+			currentUser.username = "Guest"
+		}
+
+		return currentUser
+	}
+
+	
 
 	onToogleLoading = (to) => {
 		this.setState({ loading: to })
@@ -219,28 +259,34 @@ export default class App extends createEviteApp() {
 	}
 
 	setApiBridge() {
+		console.log(`Trying to connect to API Bridge`)
 		return new Promise((resolve, reject) => {
 			cloudlinkClient
-			.createInterface("http://localhost:3000", () => {
-				const obj = {}
-				const sessionData = session.getSession()
+				.createInterface("http://localhost:3000", () => {
+					const obj = {}
+					const thisSession = session.getSession()
 
-				if (typeof sessionData.token !== "undefined") {
-					obj.headers = {
-						Authorization: `Bearer ${sessionData.token ?? null}`,
+					if (typeof thisSession !== "undefined") {
+						obj.headers = {
+							Authorization: `Bearer ${thisSession ?? null}`,
+						}
 					}
-				}
 
-				return obj
-			})
-			.then((api) => {
-				this.apiBridge = api
-				return resolve()
-			})
-			.catch((err) => {
-				console.error(`CANNOT BRIDGE API > ${err}`)
-				return reject()
-			})
+					return obj
+				})
+				.then((api) => {
+					this.apiBridge = api
+					return resolve()
+				})
+				.catch((err) => {
+					notification.error({
+						message: `Cannot connect with the API`,
+						description: err.toString(),
+					})
+					console.error(`CANNOT BRIDGE API > ${err}`)
+
+					return reject()
+				})
 		})
 	}
 
@@ -291,9 +337,11 @@ export default class App extends createEviteApp() {
 
 	render() {
 		if (this.state.loading) {
-			return <React.Fragment>
-				<AppLoading />
-			</React.Fragment>
+			return (
+				<React.Fragment>
+					<AppLoading />
+				</React.Fragment>
+			)
 		}
 
 		return (
@@ -302,6 +350,9 @@ export default class App extends createEviteApp() {
 					<title>{config.app.siteName}</title>
 				</Helmet>
 				<GlobalBindingProvider
+					user={() => {
+						return this.user
+					}}
 					withGlobalState={() => {
 						const [state, dispatch] = React.useReducer(this.reducer, {})
 						return () => [state, dispatch]

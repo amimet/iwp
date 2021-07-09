@@ -5,18 +5,30 @@ const { createServer } = require('vite')
 import reactRefresh from "@vitejs/plugin-react-refresh"
 import vitePluginImp from "vite-plugin-imp"
 import lessToJS from "less-vars-to-js"
-import builtins from "rollup-plugin-node-builtins"
-import globals from "rollup-plugin-node-globals"
+
 import commonjs from '@rollup/plugin-commonjs'
-import { nodeResolve } from '@rollup/plugin-node-resolve'
-import nodePolyfills from 'rollup-plugin-node-polyfills'
+import resolve from "@rollup/plugin-node-resolve";
 
 const themeVariables = lessToJS(
     fs.readFileSync(path.resolve(__dirname, "./config/variables.less"), "utf8")
 )
 
+const plugins = [
+    reactRefresh(),
+    resolve({
+        browser: true,
+    }),
+    commonjs({
+        requireReturnsDefault: "preferred",
+        exclude: ["node_modules/vite/**", "src/**", "config/**"],
+        transformMixedEsModules: false,
+        defaultIsModuleExports: false
+    }),
+]
+
 createServer({
     configFile: false,
+    plugins,
     server: {
         port: 8000
     },
@@ -31,16 +43,6 @@ createServer({
         dir: 'output',
         format: 'cjs'
     },
-    plugins: [
-        nodePolyfills(),
-        nodeResolve({ preferBuiltins: false }),
-        commonjs({
-            exclude: ["node_modules/vite/**", "src/**", "config/**"],
-            transformMixedEsModules: false,
-            defaultIsModuleExports: false
-        }),
-        reactRefresh(),
-    ],
     css: {
         preprocessorOptions: {
             less: {

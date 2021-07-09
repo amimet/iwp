@@ -176,14 +176,9 @@ export default class Sidebar extends React.Component {
         this.globalState = state ?? {}
         this.dispatcher = dispatch
 
-        this.userData = state.account_data ?? {
-            username: "",
-            avatar: ""
-        }
-
         this.controller = new Controller({ id: "sidebar", locked: true })
         this.sidebarComponentsMap = {
-            account: React.createElement(AccountComponent, { username: this.userData.username, avatar: this.userData.avatar })
+            account: React.createElement(AccountComponent, { username: this.props.user.username?? "Guest", avatar: this.props.user.avatar })
         }
 
         this.state = {

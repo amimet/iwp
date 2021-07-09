@@ -9,6 +9,15 @@ import { User } from './models'
 const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
+const { Buffer } = require("buffer")
+
+function b64Decode(data) {
+    return Buffer.from(data, 'base64').toString('utf-8')
+}
+
+function b64Encode(data) {
+    return Buffer.from(data, 'utf-8').toString('base64')
+}
 
 class Server {
     constructor() {
@@ -29,10 +38,8 @@ class Server {
         })
         this.server = this.instance.httpServer
 
-        this.instance.init()
-
         this.options = {
-            jwtStrategy:  {
+            jwtStrategy: {
                 jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
                 secretOrKey: this.instance.oskid,
                 algorithms: ['sha1', 'RS256', 'HS256'],
@@ -40,8 +47,14 @@ class Server {
             }
         }
 
-        this.connectToDB()
-        this.initPassport()
+        this.initialize()
+    }
+
+    async initialize() {
+        await this.connectToDB()
+        await this.initPassport()
+
+        this.instance.init()
     }
 
     getDBConnectionString() {
@@ -76,11 +89,11 @@ class Server {
             passwordField: "password",
             session: false
         }, (username, password, done) => {
-            User.findOne({ username: username })
+            User.findOne({ username: b64Decode(username) })
                 .then((data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
-                    } else if (!bcrypt.compareSync(password, data.password)) {
+                    } else if (!bcrypt.compareSync(b64Decode(password), data.password)) {
                         return done(null, false, this.options.jwtStrategy)
                     }
 
@@ -88,7 +101,7 @@ class Server {
                 })
                 .catch(err => done(err, null, this.options.jwtStrategy))
         }))
-        
+
         passport.use(new JwtStrategy(this.options.jwtStrategy, (jwt_payload, done) => {
             User.findOne({ _id: jwt_payload.sub })
                 .then(data => {

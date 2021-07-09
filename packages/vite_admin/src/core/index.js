@@ -177,7 +177,6 @@ export function generateRandomId(length = 15) {
 }
 
 //
-
 export function getBusEvent() {
     if (typeof window.app.busEvent !== "undefined") {
         return window.app.busEvent
@@ -198,7 +197,7 @@ export function setLocation(to, delay) {
     setTimeout(() => {
         window.app.history.push(to)
         window.app.busEvent.emit("setLocationReady")
-    }, delay ?? 0)
+    }, delay ?? 100)
 }
 
 export { config, languages, defaultLanguage }
