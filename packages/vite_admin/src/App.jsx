@@ -6,7 +6,7 @@ import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
 import cloudlinkClient from "@ragestudio/cloudlink/dist/client"
 
-import { NotFound } from "components"
+import { NotFound, AppLoading } from "components"
 import Routes from "@pages"
 
 import BaseLayout from "./layout"
@@ -54,7 +54,7 @@ class EviteApp {
 		window.app = Object()
 
 		// states
-		this.loading = Boolean(false)
+		this.loading = true
 
 		// controllers
 		this.history = window.app.history = createBrowserHistory()
@@ -64,53 +64,57 @@ class EviteApp {
 		this.globalStateContext = React.createContext()
 		this.globalDispatchContext = React.createContext()
 		this.globalState = {}
-
-		// set events
-		this.busEvent.on("app_init", () => {
-			if (typeof this.onInitialization === "function") {
-				this.onInitialization()
-			}
-
-			this.toogleLoading(true)
-		})
-
-		this.busEvent.on("app_load_done", () => {
-			if (typeof this.onDone === "function") {
-				this.onDone()
-			}
-
-			this.toogleLoading(false)
-		})
-
-		//initalization
-		this.initialize()
-	}
-
-	toogleLoading = (to) => {
-		if (typeof to !== "boolean") {
-			to = !this.loading
-		}
-
-		if (typeof this.onToogleLoading === "function") {
-			this.onToogleLoading(to)
-		}
-		this.loading = to
-	}
-
-	initialize() {
-		this.busEvent.emit("app_init")
-		//* preload tasks
-
-		objectToArrayMap(builtInEvents).forEach((event) => {
-			this.busEvent.on(event.key, event.value)
-		})
-
-		this.busEvent.emit("app_load_done")
 	}
 }
 
 function createEviteApp() {
-	return class extends classAggregation(React.Component, EviteApp) {}
+	return class extends classAggregation(React.Component, EviteApp) {
+		constructor(props) {
+			super(props)
+
+			// set events
+			this.busEvent.on("app_init", async () => {
+				if (typeof this.onInitialization === "function") {
+					await this.onInitialization()
+				}
+
+				this.toogleLoading(true)
+			})
+
+			this.busEvent.on("app_load_done", async () => {
+				if (typeof this.onDone === "function") {
+					await this.onDone()
+				}
+
+				this.toogleLoading(false)
+			})
+		}
+
+		toogleLoading = (to) => {
+			if (typeof to !== "boolean") {
+				to = !this.loading
+			}
+
+			if (typeof this.onToogleLoading === "function") {
+				this.onToogleLoading(to)
+			}
+
+			this.loading = to
+		}
+
+		_init = async () => {
+			this.busEvent.emit("app_init")
+
+			//* preload tasks
+			objectToArrayMap(builtInEvents).forEach((event) => {
+				this.busEvent.on(event.key, event.value)
+			})
+
+			await this.onInitialization()
+
+			this.busEvent.emit("app_load_done")
+		}
+	}
 }
 
 //* APP
@@ -150,14 +154,12 @@ export default class App extends createEviteApp() {
 		this.paramsController = window.app.params = {}
 		this.paramsController.settings = new SettingsController()
 		this.paramsController.sidebar = new SidebarController()
-
-		// init
-		this.apiBridge = null
-		this.setApiBridge()
 	}
 
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+
 	state = {
+		loading: true,
 		isMobile: false,
 	}
 
@@ -169,6 +171,20 @@ export default class App extends createEviteApp() {
 			this.setState({ isMobile: mobile })
 		}
 	})
+
+	onInitialization = async () => {
+		await this.setApiBridge()
+	}
+
+	onToogleLoading = (to) => {
+		this.setState({ loading: to })
+
+		if (to === true) {
+			this.loadBar.start()
+		} else {
+			this.loadBar.done()
+		}
+	}
 
 	validateLocationSlash = (location) => {
 		let key = location ?? window.location.pathname
@@ -202,16 +218,9 @@ export default class App extends createEviteApp() {
 		}
 	}
 
-	onToogleLoading(to) {
-		if (to === true) {
-			this.loadBar.start()
-		} else {
-			this.loadBar.done()
-		}
-	}
-
 	setApiBridge() {
-		cloudlinkClient
+		return new Promise((resolve, reject) => {
+			cloudlinkClient
 			.createInterface("http://localhost:3000", () => {
 				const obj = {}
 				const sessionData = session.getSession()
@@ -226,13 +235,17 @@ export default class App extends createEviteApp() {
 			})
 			.then((api) => {
 				this.apiBridge = api
+				return resolve()
 			})
 			.catch((err) => {
 				console.error(`CANNOT BRIDGE API > ${err}`)
+				return reject()
 			})
+		})
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+		await this._init()
 		this.loadPage(window.location.pathname)
 
 		document.addEventListener(
@@ -277,6 +290,12 @@ export default class App extends createEviteApp() {
 	}
 
 	render() {
+		if (this.state.loading) {
+			return <React.Fragment>
+				<AppLoading />
+			</React.Fragment>
+		}
+
 		return (
 			<React.Fragment>
 				<Helmet>
@@ -287,8 +306,11 @@ export default class App extends createEviteApp() {
 						const [state, dispatch] = React.useReducer(this.reducer, {})
 						return () => [state, dispatch]
 					}}
+					apiBridge={() => {
+						return this.apiBridge
+					}}
 				>
-						<BaseLayout children={this.renderPageComponent()} />
+					<BaseLayout children={this.renderPageComponent()} />
 				</GlobalBindingProvider>
 			</React.Fragment>
 		)

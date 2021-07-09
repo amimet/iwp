@@ -2,6 +2,7 @@ import React from 'react'
 
 export default class Account extends React.Component {
     render() {
+        console.log(this.props)
         const username = "bruh"
         const avatar = ""
         const sub = ""
