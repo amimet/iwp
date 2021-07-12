@@ -6,7 +6,7 @@ import Breadcrumb from '../breadcrumb'
 export default class Header extends React.Component {
     state = {
         loadingSearch: false,
-        visible: false
+        visible: true
     }
 
     componentDidMount() {
