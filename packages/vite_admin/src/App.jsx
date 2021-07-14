@@ -1,27 +1,28 @@
 import React from "react"
 import { Helmet } from "react-helmet"
-import { enquireScreen, unenquireScreen } from "enquire-js"
 import ngProgress from "nprogress"
 import { EventEmitter } from "events"
+
+import { notification } from "antd"
+import { createBrowserHistory } from "history"
+
 import { objectToArrayMap } from "@corenode/utils"
 import cloudlinkClient from "@ragestudio/cloudlink/dist/client"
+import Jail from "corenode/dist/classes/Jail"
 
 import { NotFound, AppLoading } from "components"
-import { notification } from "antd"
+import BaseLayout from "./layout"
+import config from "config"
 import Routes from "@pages"
 
-import BaseLayout from "./layout"
+import { setLocation } from "core"
 import builtInEvents from "core/events"
-import config from "config"
-
-import SettingsController from "core/models/settings"
-import SidebarController from "core/models/sidebar"
-
-import { createBrowserHistory } from "history"
-import {setLocation} from "core"
 
 import * as session from "core/models/session"
 import * as user from "core/models/user"
+
+import SidebarController from "core/models/sidebar"
+import SettingsController from "core/models/settings"
 
 const classAggregation = (baseClass, ...mixins) => {
 	class base extends baseClass {
@@ -54,6 +55,7 @@ const classAggregation = (baseClass, ...mixins) => {
 
 class EviteApp {
 	constructor() {
+		this.appJail = new Jail()
 		this.app = window.app = Object()
 
 		// states
@@ -67,6 +69,12 @@ class EviteApp {
 		this.globalStateContext = React.createContext()
 		this.globalDispatchContext = React.createContext()
 		this.globalState = {}
+	}
+
+	registerAppMethod = (key, method) => {
+		if (typeof method === "function") {
+			this.app[key] = method
+		}
 	}
 }
 
@@ -139,8 +147,9 @@ export default class App extends createEviteApp() {
 		this.history._push = this.history.push
 		this.history.push = (key) => {
 			this.history._push(key)
-			this.loadPage(key)
+			this.renderPagePath(key)
 		}
+
 		this.app.setLocation = setLocation
 
 		// set controllers
@@ -153,47 +162,59 @@ export default class App extends createEviteApp() {
 
 		// app statement
 		this.user = null
+		this.state = {
+			loading: true,
+			isMobile: false,
+		}
 
 		//
-		this.app.reloadAppState = this.reloadAppState
+		this.registerAppMethod("reloadAppState", this.reloadAppState)
+	}
+
+	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+	
+	componentDidMount() {
+		this._init()	
+		
+		document.addEventListener(
+			"touchmove",
+			(e) => {
+				e.preventDefault()
+			},
+			false,
+		)
+	}
+
+	reloadAppState = async () => {
+		await this.initialization()
 	}
 
 	initialization = async () => {
-		await this.setApiBridge()
-		this.user = this.getCurrentUser()
-	}
-	
-	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+		await this.connectBridge()
+		
 
-	state = {
-		loading: true,
-		isMobile: false,
-	}
+		this.session = session.getSession()
 
-	enquireHandler = enquireScreen((mobile) => {
-		const { isMobile } = this.state
-
-		if (isMobile !== mobile) {
-			window.isMobile = mobile
-			this.setState({ isMobile: mobile })
+		if (typeof this.session === "undefined") {
+			this.busEvent.emit("not_session")
+		}else {
+			this.validSession = await session.validateCurrentSession(this.apiBridge)
+			console.log(this.validSession)
 		}
-	})
 
-	reloadAppState = async () => {
-		this.app.setLocation("/")
-
-		if (!window.headerVisible) {
-            window.toogleHeader(true)
-        }
-
-		await this.initialization()
+		
+		this.user = await this.getCurrentUser()
+		this.renderPagePath(window.location.pathname)
+		if (typeof window.headerVisible !== "undefined" && !window.headerVisible) {
+			window.toogleHeader(true)
+		}	
 	}
 
 	getCurrentUser = () => {
 		let currentUser = Object()
 
 		const sessionData = session.decryptSession()
-		const basicsData = user.getLocalBasics()
+		const basicsData = user.getLocalBasics(this.apiBridge)
 
 		if (sessionData) {
 			currentUser = { ...currentUser, ...sessionData }
@@ -213,8 +234,6 @@ export default class App extends createEviteApp() {
 
 		return currentUser
 	}
-
-	
 
 	onToogleLoading = (to) => {
 		this.setState({ loading: to })
@@ -236,7 +255,7 @@ export default class App extends createEviteApp() {
 		return key
 	}
 
-	loadPage = (key) => {
+	renderPagePath = (key) => {
 		if (typeof key !== "string") {
 			return false
 		}
@@ -258,7 +277,7 @@ export default class App extends createEviteApp() {
 		}
 	}
 
-	setApiBridge() {
+	connectBridge() {
 		console.log(`Trying to connect to API Bridge`)
 		return new Promise((resolve, reject) => {
 			cloudlinkClient
@@ -288,23 +307,6 @@ export default class App extends createEviteApp() {
 					return reject()
 				})
 		})
-	}
-
-	async componentDidMount() {
-		await this._init()
-		this.loadPage(window.location.pathname)
-
-		document.addEventListener(
-			"touchmove",
-			(e) => {
-				e.preventDefault()
-			},
-			false,
-		)
-	}
-
-	componentWillUnmount() {
-		unenquireScreen(this.enquireHandler)
 	}
 
 	reducer = (state, action) => {

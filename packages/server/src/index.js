@@ -47,6 +47,11 @@ class Server {
             }
         }
 
+        this.instance.middlewares["useJwtStrategy"] = (req, res,next) => {
+            req.jwtStrategy = this.options.jwtStrategy
+            next()
+        }
+
         this.initialize()
     }
 
@@ -78,7 +83,7 @@ class Server {
             console.log(`❌ Failed to connect to DB, retrying...\n`)
             console.log(error)
             setTimeout(() => {
-                connectDB()
+                this.connectToDB()
             }, 1000)
         })
     }

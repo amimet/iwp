@@ -51,3 +51,9 @@ export function decryptSession(){
 
     return data
 }
+
+export function validateCurrentSession(bridge, callback) {
+    const session = getSession()
+
+    return new request(bridge.post.validatesession, [{ session: session }], callback).send()
+}

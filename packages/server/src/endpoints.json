@@ -1,5 +1,12 @@
 [
     {
+        "route": "/validateSession",
+        "method": "POST",
+        "controller": "SessionController",
+        "middleware": "useJwtStrategy",
+        "fn": "validate"
+    },
+    {
         "route": "/itemVault",
         "method": "GET",
         "controller": "VaultController",
@@ -10,7 +17,7 @@
         "method": "PUT",
         "controller": "VaultController",
         "middleware": "ensureAuthenticated",
-        "dn": "set"
+        "fn": "set"
     },
     {
         "route": "/workload",
