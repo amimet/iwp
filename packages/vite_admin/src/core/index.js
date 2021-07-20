@@ -3,7 +3,6 @@ import store from 'store'
 import { pathToRegexp } from 'path-to-regexp'
 import config from 'config'
 
-
 const languages = config.i18n ? config.i18n.languages.map(item => item.key) : []
 const defaultLanguage = config.i18n ? config.i18n.defaultLanguage : 'en'
 
