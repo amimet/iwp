@@ -10,6 +10,7 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
+const _ = require('lodash')
 
 function b64Decode(data) {
     return Buffer.from(data, 'base64').toString('utf-8')
@@ -18,6 +19,8 @@ function b64Decode(data) {
 function b64Encode(data) {
     return Buffer.from(data, 'utf-8').toString('base64')
 }
+
+const invalidKeys = ["password"]
 
 class Server {
     constructor() {
@@ -29,13 +32,16 @@ class Server {
         })
         this.controllers = require("./controllers")
         this.endpoints = require("./endpoints.json")
+        this.internalsMiddlewares = [this.safeSend]
 
         this.instance = new cloudlink.Server({
+            serverMiddlewares: this.internalsMiddlewares,
             middlewares: require("./middlewares"),
             controllers: this.controllers,
             endpoints: this.endpoints,
             port: this.listenPort
         })
+
         this.server = this.instance.httpServer
 
         this.options = {
@@ -47,11 +53,6 @@ class Server {
             }
         }
 
-        this.instance.middlewares["useJwtStrategy"] = (req, res,next) => {
-            req.jwtStrategy = this.options.jwtStrategy
-            next()
-        }
-
         this.initialize()
     }
 
@@ -59,7 +60,38 @@ class Server {
         await this.connectToDB()
         await this.initPassport()
 
+        // register middlewares
+        this.instance.middlewares["useJwtStrategy"] = (req, res,next) => {
+            req.jwtStrategy = this.options.jwtStrategy
+            next()
+        }
+
+        this.server.use((req,res,next) => {
+            res.safeSend = (data,...context) => {
+                res.send(this.securizeData(data),...context)
+            }
+
+            res.safeJson = (data,...context) => {
+                res.json(this.securizeData(data),...context)
+            }
+    
+            next() 
+        })
+
         this.instance.init()
+    }
+
+    securizeData(data) {
+        if(typeof data === "object") {
+            const values = Object.values(data)
+            data = values[values.length - 2]
+
+            invalidKeys.forEach((key) => {
+                delete data[key]
+            })
+        }
+
+        return data
     }
 
     getDBConnectionString() {

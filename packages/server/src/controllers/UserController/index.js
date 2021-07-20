@@ -23,7 +23,7 @@ export const UserController = {
         User.find(selector)
             .then((response) => {
                 if (response) {
-                    return res.json(response)
+                    return res.safeJson(response)
                 } else {
                     res.status(404)
                     return res.json("User not exists")
@@ -44,7 +44,7 @@ export const UserController = {
         User.findOne(selector)
             .then((response) => {
                 if (response) {
-                    return res.json(response)
+                    return res.safeJson(response)
                 } else {
                     res.status(404)
                     return res.json("User not exists")
