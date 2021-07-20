@@ -71,10 +71,8 @@ class EviteApp {
 		this.globalState = {}
 	}
 
-	registerAppMethod = (key, method) => {
-		if (typeof method === "function") {
-			this.app[key] = method
-		}
+	appendToApp = (key, method) => {
+		this.app[key] = method
 	}
 }
 
@@ -168,7 +166,14 @@ export default class App extends createEviteApp() {
 		}
 
 		//
-		this.registerAppMethod("reloadAppState", this.reloadAppState)
+		this.appendToApp("reloadAppState", this.reloadAppState)
+
+		this.appendToApp("about", {
+			siteName: config.app.siteName,
+			title: config.app.title,
+			version: global.project.version,
+			environment: process.env.NODE_ENV
+		})
 	}
 
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
