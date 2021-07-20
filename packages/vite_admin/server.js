@@ -4,6 +4,7 @@ const { createServer } = require('vite')
 
 import reactRefresh from "@vitejs/plugin-react-refresh"
 import lessToJS from "less-vars-to-js"
+import vitePluginImp from "vite-plugin-imp"
 
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from "@rollup/plugin-node-resolve"

@@ -196,19 +196,24 @@ export default class App extends createEviteApp() {
 
 	initialization = async () => {
 		await this.connectBridge()
-		
 
-		this.session = session.getSession()
+		this.session = await session.getSession()
 
 		if (typeof this.session === "undefined") {
 			this.busEvent.emit("not_session")
 		}else {
-			this.validSession = await session.validateCurrentSession(this.apiBridge)
-			console.log(this.validSession)
-		}
+			const validation = await session.getCurrentTokenValidation(this.apiBridge)
+			this.validSession = validation.valid
 
+			if (!this.validSession){
+				this.busEvent.emit("not_valid_session", validation.error)
+				await session.logout(this.apiBridge)
+			}else {
+				await user.setLocalBasics(this.apiBridge)
+				this.user = await this.getCurrentUser()
+			}
+		}
 		
-		this.user = await this.getCurrentUser()
 		this.renderPagePath(window.location.pathname)
 		if (typeof window.headerVisible !== "undefined" && !window.headerVisible) {
 			window.toogleHeader(true)
@@ -333,24 +338,22 @@ export default class App extends createEviteApp() {
 	}
 
 	renderPageComponent() {
+		if (this.state.loading) {
+			return () => {
+				return <AppLoading />
+			}
+		}
+
 		if (this.state.contentComponent) {
 			return this.state.contentComponent
 		}
-
+		
 		return () => {
 			return <div></div>
 		}
 	}
 
 	render() {
-		if (this.state.loading) {
-			return (
-				<React.Fragment>
-					<AppLoading />
-				</React.Fragment>
-			)
-		}
-
 		return (
 			<React.Fragment>
 				<Helmet>
@@ -358,7 +361,7 @@ export default class App extends createEviteApp() {
 				</Helmet>
 				<GlobalBindingProvider
 					user={() => {
-						return this.user
+						return this.user ?? {}
 					}}
 					withGlobalState={() => {
 						const [state, dispatch] = React.useReducer(this.reducer, {})

@@ -37,6 +37,7 @@ export function getLocalBasics(bridge, callback) {
 
 export function setLocalBasics(bridge, callback) {
     const sessionData = session.decryptSession()
+    
     if (sessionData) {
         fetchBasics(bridge, { username: sessionData.username }, (err, res) => {
             if (typeof callback === 'function') {

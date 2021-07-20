@@ -13,7 +13,6 @@ export async function handleLogin(bridge, payload, callback) {
         }
         if (!err) {
             setSession(res.data)
-            user.setLocalBasics(bridge)
             window.app.reloadAppState()
         }
     })
@@ -24,21 +23,20 @@ export async function getAuth(bridge, payload, callback) {
 }
 
 export function setSession(payload = {}) {
-    const { token, originKey, } = payload
-
-    if (typeof token === "undefined") {
+    if (typeof payload.token === "undefined") {
         throw new Error(`Cannot set an new session without a token! (missing token)`)
     }
 
-    if (typeof originKey !== "undefined") {
-        cookies.set("originKey", originKey)
-    }
-
-    cookies.set(tokenKey, token)
+    cookies.set(tokenKey, payload.token)
 }
 
 export function getSession() {
     return cookies.get(tokenKey)
+}
+
+// gets all sessions from current user id
+export function getAll(bridge, callback) {
+    return new request(bridge.get.sessions, [], callback).send()
 }
 
 export function decryptSession(){
@@ -52,8 +50,20 @@ export function decryptSession(){
     return data
 }
 
-export function validateCurrentSession(bridge, callback) {
+export function getCurrentTokenValidation(bridge, callback) {
     const session = getSession()
 
     return new request(bridge.post.validatesession, [{ session: session }], callback).send()
+}
+
+export async function validateCurrentSession(bridge) {
+    const validation = await getCurrentTokenValidation(bridge)
+    return validation.valid
+}
+
+export async function logout(bridge) {
+    const session = getSession()
+
+    cookies.remove(tokenKey)
+    return new request(bridge.post.logout, [{ session: session }]).send()
 }

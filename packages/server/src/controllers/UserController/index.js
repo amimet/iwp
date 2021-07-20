@@ -2,7 +2,7 @@ import passport from 'passport'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
-import { User } from '../../models'
+import { User, Session } from '../../models'
 import SessionController from '../SessionController'
 
 export const UserController = {
@@ -88,28 +88,31 @@ export const UserController = {
             }
 
             const payload = {
-                sub: user._id,
-                exp: Date.now() + parseInt(options.signLifetime ?? 300),
+                id: user._id,
                 username: user.username,
-                fullName: user.fullName,
-                avatar: user.avatar,
                 email: user.email
             }
 
-            const token = jwt.sign(JSON.stringify(payload), options.secretOrKey)
-            SessionController.set(user._id, token)
+            // generate token
+            const token = jwt.sign(payload, options.secretOrKey, {expiresIn: options.expiresIn ?? "1h", algorithm: options.algorithm ?? "HS256"})
 
-            res.cookie('st', token, { maxAge: 900000, httpOnly: true })
-            res.json({ token: token, originKey: options.secretOrKey })
+            // add the new session
+            let newSession = new Session({
+                user_id: user.id,
+                token
+            })
+
+            newSession.save()
+
+            // send result
+            res.json({ token: token })
         })(req, res)
     },
-    logout: (req, res, next) => {
-        try {
-            SessionController.destroy(req, res, next)
-        } catch (err) {
+    logout: async (req, res, next) => {
+        const { token } = req.body
 
-        }
-    }
+        Session.findOneAndDelete({ token: token })
+    },
 }
 
 export default UserController

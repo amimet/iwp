@@ -72,8 +72,18 @@ export default class Login extends React.Component {
                 } catch (error) {
                     window.currentForms["normal_login"].handleFormError("result", `${error}`)
                 }
+            }else {
+                if (res.status === 200) {
+                    this.onDone()
+                }
             }
         })
+    }
+
+    onDone = () => {
+        if (typeof this.props.onDone === "function") {
+            this.props.onDone()
+        }
     }
 
     componentDidMount() {

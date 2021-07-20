@@ -10,7 +10,6 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
-const _ = require('lodash')
 
 function b64Decode(data) {
     return Buffer.from(data, 'base64').toString('utf-8')
@@ -27,16 +26,12 @@ class Server {
         this.env = _env
         this.listenPort = this.env.listenPort ?? 3000
 
-        this.middlewares = objectToArrayMap(require("./middlewares")).map((entry) => {
-            return entry.value
-        })
+        this.middlewares = require("./middlewares")
         this.controllers = require("./controllers")
-        this.endpoints = require("./endpoints.json")
-        this.internalsMiddlewares = [this.safeSend]
+        this.endpoints = require("./endpoints")
 
         this.instance = new cloudlink.Server({
-            serverMiddlewares: this.internalsMiddlewares,
-            middlewares: require("./middlewares"),
+            middlewares: this.middlewares,
             controllers: this.controllers,
             endpoints: this.endpoints,
             port: this.listenPort
@@ -49,7 +44,7 @@ class Server {
                 jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
                 secretOrKey: this.instance.oskid,
                 algorithms: ['sha1', 'RS256', 'HS256'],
-                signLifetime: _env.signLifetime ?? 300
+                expiresIn: "1h"
             }
         }
 
@@ -139,14 +134,13 @@ class Server {
                 .catch(err => done(err, null, this.options.jwtStrategy))
         }))
 
-        passport.use(new JwtStrategy(this.options.jwtStrategy, (jwt_payload, done) => {
-            User.findOne({ _id: jwt_payload.sub })
+        passport.use(new JwtStrategy(this.options.jwtStrategy, (token, done) => {
+            User.findOne({ _id: token.id })
                 .then(data => {
                     if (data === null) {
-                        return done(null, false);
-                    }
-                    else {
-                        return done(null, data);
+                        return done(null, false)
+                    } else {
+                        return done(null, data, token)
                     }
                 })
                 .catch(err => done(err, null))
