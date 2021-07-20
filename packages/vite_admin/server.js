@@ -3,11 +3,10 @@ const fs = require('fs')
 const { createServer } = require('vite')
 
 import reactRefresh from "@vitejs/plugin-react-refresh"
-import vitePluginImp from "vite-plugin-imp"
 import lessToJS from "less-vars-to-js"
 
 import commonjs from '@rollup/plugin-commonjs'
-import resolve from "@rollup/plugin-node-resolve";
+import resolve from "@rollup/plugin-node-resolve"
 
 const themeVariables = lessToJS(
     fs.readFileSync(path.resolve(__dirname, "./config/variables.less"), "utf8")
