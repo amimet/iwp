@@ -11,8 +11,5 @@
         "start:admin": "cd packages/admin && npm start",
         "start:client": "cd packages/client && npm start",
         "start:server": "cd packages/server && npm start"
-    },
-    "dependencies": {
-        "corenode": "^0.25.26"
     }
 }
