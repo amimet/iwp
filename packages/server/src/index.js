@@ -31,6 +31,7 @@ class Server {
         this.endpoints = require("./endpoints")
 
         this.instance = new cloudlink.Server({
+            listen: "0.0.0.0",
             middlewares: this.middlewares,
             controllers: this.controllers,
             endpoints: this.endpoints,

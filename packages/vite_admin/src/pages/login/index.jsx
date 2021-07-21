@@ -59,7 +59,7 @@ const formInstance = [
 
 export default class Login extends React.Component {
     async handleSend(values) {
-        session.handleLogin(this.props.apiBridge, values, (err, res) => {
+        session.handleLogin(this.props.api, values, (err, res) => {
             window.currentForms["normal_login"].toogleValidation(false)
             window.currentForms["normal_login"].clearErrors()
 

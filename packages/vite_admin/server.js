@@ -20,7 +20,7 @@ const plugins = [
     }),
     commonjs({
         requireReturnsDefault: "preferred",
-        exclude: ["node_modules/vite/**", "src/**", "config/**"],
+        exclude: ["node_modules/vite/**", "src/**", "config/**", "evite/**"],
         transformMixedEsModules: false,
         defaultIsModuleExports: false
     }),
@@ -30,7 +30,11 @@ createServer({
     configFile: false,
     plugins,
     server: {
-        port: 8000
+        port: 8000,
+        host: "0.0.0.0",
+        fs: {
+            allow: ['..']
+        }
     },
     define: {
         global: {
@@ -53,6 +57,7 @@ createServer({
     },
     resolve: {
         alias: {
+            evite: path.resolve(__dirname, "./evite/src"),
             schemas: path.resolve(__dirname, './schemas'),
             interface: path.resolve(__dirname, './interface'),
             theme: path.resolve(__dirname, './src/theme'),

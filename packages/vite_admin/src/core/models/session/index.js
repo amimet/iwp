@@ -1,5 +1,4 @@
 import { request } from '../apiBridge'
-import * as user from 'core/models/user'
 import cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
 import config from 'config'

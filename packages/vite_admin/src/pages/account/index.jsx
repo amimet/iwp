@@ -1,7 +1,10 @@
 import React from "react"
 import * as antd from 'antd'
+import { Icons } from 'components/icons'
 import * as user from "core/models/user"
 import * as session from "core/models/session"
+
+import "./index.less"
 
 export default class Account extends React.Component {
 	state = {
@@ -13,16 +16,13 @@ export default class Account extends React.Component {
 		const query = new URLSearchParams(window.location.search)
 		const requestedUser = query.get("username")
 		
-		const sessions = await session.getAll(this.props.apiBridge)
-		console.log(sessions, Array.isArray(sessions))
-		sessions.forEach(session =>{
-			console.log(session)
-		})
+		const sessions = await session.getAll(this.props.api)
+		const ss = JSON.parse(JSON.stringify(sessions))
 
-		this.setState({ sessions: sessions })
+		this.setState({ sessions: ss })
 
 		if (requestedUser != null) {
-			const userBasics = await user.fetchBasics(this.props.apiBridge, { username: requestedUser })
+			const userBasics = await user.fetchBasics(this.props.api, { username: requestedUser })
 			.catch((err) => {
 				console.log(err)
 			})
@@ -35,8 +35,9 @@ export default class Account extends React.Component {
 		
 		if (Array.isArray(data)) {
 			return data.map((session) => {
-				return <div>
-					session: {session.id}
+				return <div key={session._id} className="session_entry">
+					<Icons.Key />
+					{session._id}
 				</div>
 			}) 
 		}
@@ -60,8 +61,9 @@ export default class Account extends React.Component {
 						<span>#{this.props.user._id}</span>
 					</div>
 				</div>
-
-				{this.renderSessions()}
+				<div className="session_wrapper">
+					{this.renderSessions()}
+				</div>
 			</div>
 		)
 	}

@@ -1,17 +1,10 @@
-import React from "react"
+import React from 'react'
+import Jail from "corenode/dist/classes/Jail"
+import { createBrowserHistory } from "history"
 import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
 
-import { NotFound } from "components"
-import Routes from "@pages"
-
-import builtInEvents from "core/events"
-import config from "config"
-
-import { createBrowserHistory } from "history"
-
-// *EVITE
-const aggregation = (baseClass, ...mixins) => {
+const classAggregation = (baseClass, ...mixins) => {
 	class base extends baseClass {
 		constructor(...args) {
 			super(...args)
@@ -40,108 +33,175 @@ const aggregation = (baseClass, ...mixins) => {
 	return base
 }
 
-class EviteApp{
-	constructor() {
-		window.app = Object()
+function getEviteConstructor(context) {
+	return class EviteApp {
+		constructor() {
+			this.constructorContext = context
+			this.jail = new Jail()
 
-		// states
-		this.loading = Boolean(false)
-		this.loadedRoute = null
-		this._renderContent = null
+			// set window app controllers
+			this.app = window.app = Object()
+			this.controllers = this.app.controllers = {}
 
+			// states
+			this.loading = true
+			this.beforeInit = []
 
-		// controllers
-		this.history = window.app.history = createBrowserHistory()
-		this.busEvent = window.app.busEvent = new EventEmitter()
+			// controllers
+			this.history = window.app.history = createBrowserHistory()
+			this.busEvent = window.app.busEvent = new EventEmitter()
+			this.builtInEvents = null
 
-		this.history._push = this.history.push
-		this.history.push = (key) => {
-			this.history._push(key)
-			this.loadPage(key)
+			// global state
+			this.globalStateContext = React.createContext()
+			this.globalDispatchContext = React.createContext()
+			this.globalState = {}
+
+			// extends class
+			if (Array.isArray(this.constructorContext.extensions)) {
+				this.constructorContext.extensions.forEach((extension) => {
+					this.attachExtension(extension)
+				})
+			}
+	
 		}
 
-		// global state
-		this.globalStateContext = React.createContext()
-		this.globalDispatchContext = React.createContext()
-		this.globalState = {}
-
-		// set events
-		this.busEvent.on("app_init", () => {
-			if (typeof this.onInitialization === "function") {
-				this.onInitialization()
+		attachExtension = (extension) => {
+			if (typeof extension.key !== "string") {
+				return false
 			}
 
-			this.toogleLoading(true)
-		})
-
-		this.busEvent.on("app_load_done", () => {
-			if (typeof this.onDone === "function") {
-				this.onDone()
+			// autoexecute the exec function
+			if (typeof extension.exec === "function") {
+				extension.exec(this)
 			}
-			
-			this.toogleLoading(false)
-		})
 
-		//initalization
-		this.initialize()
-	}
+			// this overwritte `this` property
+			if (typeof extension.self !== "undefined") {
+				this.bindSelf(extension.self)
+			}
 
-	toogleLoading = (to) => {
-		if (typeof to !== "boolean") {
-			to = !this.loading
+			if (typeof extension.expose !== "undefined") {
+				let exposeArray = []
+				if (Array.isArray(extension.expose)) {
+					exposeArray = extension.expose
+				}else {
+					exposeArray.push(extension.expose)
+				}
+
+				exposeArray.forEach((expose) => {
+					if(typeof expose.self !== "undefined") {
+						this.bindSelf(expose.self)
+					}
+					if (typeof expose.attachToInitializer !== "undefined") {
+						this.attachToInitializer(expose.attachToInitializer)
+					}
+					
+				})
+			}
 		}
 
-		if (typeof this.onToogleLoading === "function") {
-			this.onToogleLoading(to)
-		}
-		this.loading = to
-	}
+		attachToInitializer(task){
+			let tasks = []
+			if (Array.isArray(task)) {
+				tasks = task
+			}else{
+				tasks.push(task)
+			}
 
-	initialize() {
-		this.busEvent.emit("app_init")
-		//* preload tasks
-
-		objectToArrayMap(builtInEvents).forEach((event) => {
-			this.busEvent.on(event.key, event.value)
-		})
-
-		this.busEvent.emit("app_load_done")
-	}
-
-	validateLocationSlash = (location) => {
-		let key = location ?? window.location.pathname
-
-		while (key[0] === "/") {
-			key = key.slice(1, key.length)
+			tasks.forEach((task) => {
+				if(typeof task === "function") {
+					this.beforeInit.push(task)
+				}
+			})
 		}
 
-		return key
-	}
+		bindSelf(self){
+			const keys = Object.keys(self)
 
-	loadPage = (key) => {
-		if (typeof key !== "string") {
+			keys.forEach((key) => {
+				this[key] = self[key]
+			})
+		}
+
+		appendToApp = (key, method) => {
+			this.app[key] = method
+		}
+	}
+}
+
+function createEviteApp(context) {
+	return class extends classAggregation(React.Component, getEviteConstructor(context)) {
+		constructor(props) {
+			super(props)
+
+			// set events
+			this.busEvent.on("app_init", async () => {
+				this.toogleLoading(true)
+			})
+
+			this.busEvent.on("app_load_done", async () => {
+				this.toogleLoading(false)
+			})
+		}
+
+		toogleLoading = (to) => {
+			if (typeof to !== "boolean") {
+				to = !this.loading
+			}
+
+			if (typeof this.onToogleLoading === "function") {
+				this.onToogleLoading(to)
+			}
+
+			this.loading = to
+		}
+
+		_init = async () => {
+			this.busEvent.emit("app_init")
+
+			//* preload tasks
+			if (this.builtInEvents !== null) {
+				objectToArrayMap(this.builtInEvents).forEach((event) => {
+					this.busEvent.on(event.key, event.value)
+				})
+			}
+
+			if (Array.isArray(this.beforeInit)) {
+				this.beforeInit.forEach(async(task) => {
+					await task(this)
+				})
+			}
+
+			await this.initialization()
+
+			this.busEvent.emit("app_load_done")
+		}
+	}
+}
+
+const GlobalBindingProvider = (props) => {
+	const context = {}
+
+	objectToArrayMap(props).forEach((prop) => {
+		if (prop.key === "children") {
 			return false
 		}
 
-		if (key === "/") {
-			key = config.app?.mainPath ?? "index"
+		if (typeof prop.value === "function") {
+			prop.value = prop.value()
 		}
 
-		const validatedKey = this.validateLocationSlash(key)
+		context[prop.key] = prop.value
+	})
 
-		if (validatedKey !== key) {
-			key = validatedKey
-		}
-
-		if (typeof Routes[key] !== "undefined") {
-			this._renderContent = Routes[key]
-			this.loadedRoute =  `/${key}`
-		} else {
-			this._renderContent = NotFound
-		}
-	}
+	return React.cloneElement(props.children, { ...context })
 }
 
-function createEviteApp() {
-	return class extends aggregation(React.Component, EviteApp){}
+export {
+	classAggregation,
+	createEviteApp,
+	GlobalBindingProvider,
 }
+
+export default createEviteApp
