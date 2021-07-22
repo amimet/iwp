@@ -63,7 +63,6 @@ function getEviteConstructor(context) {
 					this.attachExtension(extension)
 				})
 			}
-	
 		}
 
 		attachExtension = (extension) => {
@@ -88,7 +87,7 @@ function getEviteConstructor(context) {
 				}else {
 					exposeArray.push(extension.expose)
 				}
-
+			
 				exposeArray.forEach((expose) => {
 					if(typeof expose.self !== "undefined") {
 						this.bindSelf(expose.self)
@@ -96,7 +95,6 @@ function getEviteConstructor(context) {
 					if (typeof expose.attachToInitializer !== "undefined") {
 						this.attachToInitializer(expose.attachToInitializer)
 					}
-					
 				})
 			}
 		}
@@ -109,9 +107,9 @@ function getEviteConstructor(context) {
 				tasks.push(task)
 			}
 
-			tasks.forEach((task) => {
-				if(typeof task === "function") {
-					this.beforeInit.push(task)
+			tasks.forEach((_task) => {
+				if(typeof _task === "function") {
+					this.beforeInit.push(_task)
 				}
 			})
 		}
@@ -120,6 +118,10 @@ function getEviteConstructor(context) {
 			const keys = Object.keys(self)
 
 			keys.forEach((key) => {
+				if (typeof self[key] === "function") {
+					self[key] = self[key]
+				}
+
 				this[key] = self[key]
 			})
 		}
@@ -150,8 +152,8 @@ function createEviteApp(context) {
 				to = !this.loading
 			}
 
-			if (typeof this.onToogleLoading === "function") {
-				this.onToogleLoading(to)
+			if (typeof this.handleLoading === "function") {
+				this.handleLoading(to)
 			}
 
 			this.loading = to
@@ -168,9 +170,11 @@ function createEviteApp(context) {
 			}
 
 			if (Array.isArray(this.beforeInit)) {
-				this.beforeInit.forEach(async(task) => {
-					await task(this)
-				})
+				for await(let task of this.beforeInit){
+					if (typeof task === "function") {
+						await task(this)
+					}
+				}
 			}
 
 			await this.initialization()

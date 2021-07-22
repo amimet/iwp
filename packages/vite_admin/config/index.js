@@ -4,13 +4,13 @@ export default {
     logo: {
         alt: "https://dl.amimet.es/branding/amimet_alt/SVG/index.svg"
     },
+    api: {
+        address: process.env.NODE_ENV !== 'production'? "http://localhost:3000" : "https://api.amimet.es",
+    },
     app: {
         title: packagejson.name,
         siteName: "AmimetApp",
-        defaultStyleClass: "app_",
         mainPath: 'main',
-        api_hostname: "https://api.amimet.es",
-
         storage: {
             basics: "user",
             token: "token",
@@ -18,10 +18,6 @@ export default {
             signkey: "certified",
             settings: "app_settings"
         },
-
-        certified_signkeys: [
-            "f706b0a535b6c2d36545c4137a0a3a26853ea8b5-1223c9ba7923152cae28e5a2e7501b2b-50600768"
-        ] // get from external resolver
     },
     indexer: [
         {

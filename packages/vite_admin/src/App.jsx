@@ -2,17 +2,9 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import ngProgress from "nprogress"
 
-import { notification } from "antd"
-
-import { objectToArrayMap } from "@corenode/utils"
-import cloudlinkClient from "@ragestudio/cloudlink/dist/client"
-
-import { NotFound, AppLoading } from "components"
+import { AppLoading } from "components"
 import BaseLayout from "./layout"
 import config from "config"
-import Routes from "@pages"
-
-import { setLocation } from "core"
 
 import * as session from "core/models/session"
 import * as user from "core/models/user"
@@ -21,65 +13,12 @@ import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { createEviteApp, GlobalBindingProvider } from "evite"
-
-const bruhExtension = {
-	key: "bruhExtension",
-	expose: [
-		{
-			name: "createBridge",
-
-			self: {
-				createBridge: () => {
-					return new Promise((resolve, reject) => {
-						cloudlinkClient
-							.createInterface("http://192.168.1.36:3000", () => {
-								const obj = {}
-								const thisSession = session.getSession()
-			
-								if (typeof thisSession !== "undefined") {
-									obj.headers = {
-										Authorization: `Bearer ${thisSession ?? null}`,
-									}
-								}
-			
-								return obj
-							})
-							.then((api) => {
-								return resolve()
-							})
-							.catch((err) => {
-								notification.error({
-									message: `Cannot connect with the API`,
-									description: err.toString(),
-								})
-								console.error(`CANNOT BRIDGE API > ${err}`)
-			
-								return reject()
-							})
-					})
-				}
-			}
-		}
-	],
-	self: {
-		
-	}
-}
-
-const extensions = [bruhExtension]
-
-export default class App extends createEviteApp(extensions) {
+import { API, Render } from "extensions"
+export default class App extends createEviteApp({
+	extensions: [API, Render],
+}) {
 	constructor(props) {
 		super(props)
-
-		// overwrite history
-		this.history._push = this.history.push
-		this.history.push = (key) => {
-			this.history._push(key)
-			this.renderPagePath(key)
-		}
-	
-		this.app.setLocation = setLocation
 
 		// set params controllers
 		this.paramsController = this.app.params = {}
@@ -100,22 +39,14 @@ export default class App extends createEviteApp(extensions) {
 			siteName: config.app.siteName,
 			title: config.app.title,
 			version: global.project.version,
-			environment: process.env.NODE_ENV
+			environment: process.env.NODE_ENV,
 		})
 	}
 
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
-	
+
 	componentDidMount() {
-		this._init()	
-		
-		document.addEventListener(
-			"touchmove",
-			(e) => {
-				e.preventDefault()
-			},
-			false,
-		)
+		this._init()
 	}
 
 	reloadAppState = async () => {
@@ -123,29 +54,28 @@ export default class App extends createEviteApp(extensions) {
 	}
 
 	initialization = async () => {
-		await this.connectBridge()
+		this.sessionToken = await session.getSession()
 
-		this.session = await session.getSession()
-
-		if (typeof this.session === "undefined") {
+		if (typeof this.sessionToken === "undefined") {
 			this.busEvent.emit("not_session")
-		}else {
+		} else {
 			const validation = await session.getCurrentTokenValidation(this.apiBridge)
+			this.session = validation
 			this.validSession = validation.valid
 
-			if (!this.validSession){
+			if (!this.validSession) {
 				this.busEvent.emit("not_valid_session", validation.error)
 				await session.logout(this.apiBridge)
-			}else {
+			} else {
 				await user.setLocalBasics(this.apiBridge)
 				this.user = await this.getCurrentUser()
 			}
 		}
-		
-		this.renderPagePath(window.location.pathname)
+
+		this._render(window.location.pathname)
 		if (typeof window.headerVisible !== "undefined" && !window.headerVisible) {
 			window.toogleHeader(true)
-		}	
+		}
 	}
 
 	getCurrentUser = () => {
@@ -173,45 +103,13 @@ export default class App extends createEviteApp(extensions) {
 		return currentUser
 	}
 
-	onToogleLoading = (to) => {
+	handleLoading = (to) => {
 		this.setState({ loading: to })
 
 		if (to === true) {
 			this.loadBar.start()
 		} else {
 			this.loadBar.done()
-		}
-	}
-
-	validateLocationSlash = (location) => {
-		let key = location ?? window.location.pathname
-
-		while (key[0] === "/") {
-			key = key.slice(1, key.length)
-		}
-
-		return key
-	}
-
-	renderPagePath = (key) => {
-		if (typeof key !== "string") {
-			return false
-		}
-
-		if (key === "/") {
-			key = config.app?.mainPath ?? "index"
-		}
-
-		const validatedKey = this.validateLocationSlash(key)
-
-		if (validatedKey !== key) {
-			key = validatedKey
-		}
-
-		if (typeof Routes[key] !== "undefined") {
-			this.setState({ contentComponent: Routes[key], loadedRoute: `/${key}` })
-		} else {
-			this.setState({ contentComponent: NotFound })
 		}
 	}
 
@@ -243,7 +141,7 @@ export default class App extends createEviteApp(extensions) {
 		if (this.state.contentComponent) {
 			return this.state.contentComponent
 		}
-		
+
 		return () => {
 			return <div></div>
 		}
@@ -265,6 +163,9 @@ export default class App extends createEviteApp(extensions) {
 					}}
 					api={() => {
 						return this.apiBridge
+					}}
+					session={() => {
+						return this.session
 					}}
 				>
 					<BaseLayout children={this.renderPageComponent()} />

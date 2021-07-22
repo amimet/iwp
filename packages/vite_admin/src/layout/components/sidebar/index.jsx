@@ -178,7 +178,9 @@ export default class Sidebar extends React.Component {
 
         this.controller = new Controller({ id: "sidebar", locked: true })
         this.sidebarComponentsMap = {
-            account: React.createElement(AccountComponent, { username: this.props.user.username?? "Guest", avatar: this.props.user.avatar })
+            account: () => {
+                return <AccountComponent username={this.props.user.username ?? "Guest"} avatar={this.props.user.avatar} />
+            }
         }
 
         this.state = {
@@ -266,7 +268,7 @@ export default class Sidebar extends React.Component {
         return items.map((item) => {
             if (typeof (item.component) !== "undefined") {
                 if (this.sidebarComponentsMap[item.component]) {
-                    item.content = this.sidebarComponentsMap[item.component]
+                    item.content = this.sidebarComponentsMap[item.component]()
                 }
             }
 

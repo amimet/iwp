@@ -16,6 +16,7 @@ const ItemTypes = {
 
 import settingList from "schemas/settingsList.json"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
+import * as session from 'core/models/session'
 
 export class SettingsMenu extends React.Component {
 	state = {
@@ -159,11 +160,26 @@ export class SettingsMenu extends React.Component {
 		)
 	}
 
+	renderLogout() {
+		if (this.props.session?.valid) {
+			return (
+				<div>
+					<antd.Button onClick={() => {session.logout(this.props.api)}} type="danger">Logout</antd.Button>
+				</div>
+			)
+		}
+
+		return <div></div>
+	}
+
 	render() {
 		return (
 			<div>
 				{this.generateMenu(settingList)}
-				{this.renderAboutApp()}
+				<div className="settings_bottom_items">
+					{this.renderLogout()}
+					{this.renderAboutApp()}
+				</div>
 			</div>
 		)
 	}

@@ -32,9 +32,6 @@ createServer({
     server: {
         port: 8000,
         host: "0.0.0.0",
-        fs: {
-            allow: ['..']
-        }
     },
     define: {
         global: {
@@ -59,6 +56,7 @@ createServer({
         alias: {
             evite: path.resolve(__dirname, "./evite/src"),
             schemas: path.resolve(__dirname, './schemas'),
+            extensions: path.resolve(__dirname, './src/extensions'),
             interface: path.resolve(__dirname, './interface'),
             theme: path.resolve(__dirname, './src/theme'),
             locales: path.resolve(__dirname, './src/locales'),

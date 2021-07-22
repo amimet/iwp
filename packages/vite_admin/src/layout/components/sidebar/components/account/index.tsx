@@ -1,5 +1,5 @@
 import React from 'react'
-import { Menu, Avatar } from 'antd'
+import { Avatar } from 'antd'
 
 export default (props) => {
     return <div className="accountSidebarComponent">
