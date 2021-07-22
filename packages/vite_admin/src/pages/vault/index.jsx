@@ -340,8 +340,9 @@ export default class Vault extends React.Component {
     componentDidMount = async () => {
         //TODO: get vault from api
         const vault = await this.props.api.get.vault()
-        console.log(vault)
-      
+        vault.forEach(item => {
+            
+        })
         //this.setState({ data: res })
     }
 

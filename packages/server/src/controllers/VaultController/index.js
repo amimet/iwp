@@ -5,7 +5,7 @@ export const VaultController = {
     get: (req, res, next) => {
         Vault.findOne({ id: req.body.id }).then((response) => {
             if (response) {
-                return res.json(response)
+                return res.send(response)
             } else {
                 return res.status(404).send("No data found")
             }

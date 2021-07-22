@@ -35,7 +35,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.5",
     "@corenode/utils": "^0.25.24",
-    "@ragestudio/cloudlink": "^0.5.31",
+    "@ragestudio/cloudlink": "^0.5.33",
     "antd": "^4.16.8",
     "classnames": "^2.3.1",
     "cookie_js": "^1.4.2",
