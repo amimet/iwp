@@ -39,7 +39,7 @@ export default class Users extends React.Component {
 	}
 
 	openUser(user) {
-        window.app.setLocation(`account?username=${user}`)
+        window.app.setLocation(`/account?username=${user}`)
 	}
 
 	render() {

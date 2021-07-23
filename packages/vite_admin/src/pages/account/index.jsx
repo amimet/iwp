@@ -8,25 +8,36 @@ import "./index.less"
 
 export default class Account extends React.Component {
 	state = {
-		user: null,
+		user: {},
 		sessions: null,
 	}
 
 	componentDidMount = async () => {
+		// TODO: CHECK with API & session token
+		let isSelf = true
+
 		const query = new URLSearchParams(window.location.search)
 		const requestedUser = query.get("username")
-		
-		const sessions = await session.getAll(this.props.api)
-		const ss = JSON.parse(JSON.stringify(sessions))
-
-		this.setState({ sessions: ss })
-
+	
 		if (requestedUser != null) {
-			const userBasics = await user.fetchBasics(this.props.api, { username: requestedUser })
+			isSelf = false
+
+		 	await user.fetchBasics(this.props.api, { username: requestedUser })
+			.then((data) => {
+				this.setState({ user: data })
+			})
 			.catch((err) => {
 				console.log(err)
 			})
-			console.log(userBasics)
+		}else {
+			this.setState({
+				user: this.props.user
+			})
+		}
+
+		if (isSelf) {
+			const sessions = await session.getAll(this.props.api)
+			this.setState({ sessions })
 		}
 	}
 
@@ -48,17 +59,15 @@ export default class Account extends React.Component {
 	}
 
 	render() {
-		if (!this.props.user) {
-			return <div></div>
-		}
+		const { user } = this.state ?? {}
 
 		return (
 			<div>
 				<div className="app_account_header">
-					<img src={this.props.user.avatar} />
+					<img src={user.avatar} />
 					<div style={{ margin: "0 15px" }}>
-						<h1>@{this.props.user.username}</h1>
-						<span>#{this.props.user._id}</span>
+						<h1>@{user.username}</h1>
+						<span>#{user._id}</span>
 					</div>
 				</div>
 				<div className="session_wrapper">
