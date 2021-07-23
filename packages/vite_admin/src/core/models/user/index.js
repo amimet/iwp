@@ -9,7 +9,7 @@ export function updateData() {
     // update to api
 }
 
-export async function fetchBasics(bridge, payload = {}, callback) {
+export async function fetchData(bridge, payload = {}, callback) {
     return new request(bridge.get.user, [undefined, { username: payload.username, id: payload.id }], callback).send()
 }
 
@@ -39,7 +39,7 @@ export function setLocalBasics(bridge, callback) {
     const sessionData = session.decryptSession()
     
     if (sessionData) {
-        fetchBasics(bridge, { username: sessionData.username }, (err, res) => {
+        fetchData(bridge, { username: sessionData.username }, (err, res) => {
             if (typeof callback === 'function') {
                 console.error(err)
                 callback(err, res)

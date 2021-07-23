@@ -22,7 +22,7 @@ export default class Account extends React.Component {
 		if (requestedUser != null) {
 			isSelf = false
 
-		 	await user.fetchBasics(this.props.api, { username: requestedUser })
+		 	await user.fetchData(this.props.api, { username: requestedUser })
 			.then((data) => {
 				this.setState({ user: data })
 			})
