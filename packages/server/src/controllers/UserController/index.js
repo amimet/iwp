@@ -3,27 +3,16 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
 import { User, Session } from '../../models'
-import SessionController from '../SessionController'
 
 export const UserController = {
     isAuth: (req, res, next) => {
         return res.json(`You look nice today 😎`)
     },
     get: (req, res, next) => {
-        const { id, username } = req.query
-
-        let selector = {}
-
-        if (typeof (id) !== "undefined") {
-            selector = { id }
-        } else if (typeof (username) !== "undefined") {
-            selector = { username }
-        }
-
-        User.find(selector)
+        User.find({}, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
             .then((response) => {
                 if (response) {
-                    return res.safeJson(response)
+                    return res.json(response)
                 } else {
                     res.status(404)
                     return res.json("User not exists")
@@ -44,7 +33,7 @@ export const UserController = {
         User.findOne(selector)
             .then((response) => {
                 if (response) {
-                    return res.safeJson(response)
+                    return res.json(response)
                 } else {
                     res.status(404)
                     return res.json("User not exists")
@@ -94,7 +83,7 @@ export const UserController = {
             }
 
             // generate token
-            const token = jwt.sign(payload, options.secretOrKey, {expiresIn: options.expiresIn ?? "1h", algorithm: options.algorithm ?? "HS256"})
+            const token = jwt.sign(payload, options.secretOrKey, { expiresIn: options.expiresIn ?? "1h", algorithm: options.algorithm ?? "HS256" })
 
             // add the new session
             let newSession = new Session({

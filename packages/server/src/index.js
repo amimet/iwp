@@ -122,7 +122,7 @@ class Server {
             passwordField: "password",
             session: false
         }, (username, password, done) => {
-            User.findOne({ username: b64Decode(username) })
+            User.findOne({ username: b64Decode(username) }).select('+password')
                 .then((data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
