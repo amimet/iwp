@@ -2,7 +2,7 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import ngProgress from "nprogress"
 
-import { AppLoading } from "components"
+import { AppLoading, NotFound } from "components"
 import BaseLayout from "./layout"
 import config from "config"
 
@@ -14,6 +14,7 @@ import SettingsController from "core/models/settings"
 
 import { createEviteApp, GlobalBindingProvider } from "evite"
 import { API, Render } from "extensions"
+
 export default class App extends createEviteApp({
 	extensions: [API, Render],
 }) {
@@ -54,6 +55,13 @@ export default class App extends createEviteApp({
 	}
 
 	initialization = async () => {
+		await this.sessionInitialization()
+		if (typeof window.headerVisible !== "undefined" && !window.headerVisible) {
+			window.toogleHeader(true)
+		}
+	}
+
+	sessionInitialization = async () => {
 		this.sessionToken = await session.getSession()
 
 		if (typeof this.sessionToken === "undefined") {
@@ -70,11 +78,6 @@ export default class App extends createEviteApp({
 				await user.setLocalBasics(this.apiBridge)
 				this.user = await this.getCurrentUser()
 			}
-		}
-
-		this._render(window.location.pathname)
-		if (typeof window.headerVisible !== "undefined" && !window.headerVisible) {
-			window.toogleHeader(true)
 		}
 	}
 
@@ -131,28 +134,21 @@ export default class App extends createEviteApp({
 		}
 	}
 
-	renderPageComponent() {
-		if (this.state.loading) {
-			return () => {
-				return <AppLoading />
-			}
-		}
-
-		if (this.state.contentComponent) {
-			return this.state.contentComponent
-		}
-
-		return () => {
-			return <div></div>
-		}
-	}
-
 	render() {
+		const loading = this.state.loading
+
+		const Page = this.createPageRender({
+			on404: (props) => {
+				return <NotFound />
+			},
+		})
+
 		return (
 			<React.Fragment>
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
+
 				<GlobalBindingProvider
 					user={() => {
 						return this.user ?? {}
@@ -168,7 +164,7 @@ export default class App extends createEviteApp({
 						return this.session
 					}}
 				>
-					<BaseLayout children={this.renderPageComponent()} />
+					<BaseLayout>{loading ? <AppLoading /> : <Page/>}</BaseLayout>
 				</GlobalBindingProvider>
 			</React.Fragment>
 		)

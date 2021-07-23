@@ -50,12 +50,10 @@ export default class BaseLayout extends React.Component {
 		window.app.busEvent.on("cleanAll", () => {
 			window.controllers["drawer"].close()
 		})
-
 	}
 
 	render() {
-		const Children = this.props.children
-
+		const Children = (props) => React.cloneElement(this.props.children,props)
 		return (
 			<React.Fragment>
 				<antd.Layout style={{ minHeight: "100vh" }}>
@@ -72,7 +70,7 @@ export default class BaseLayout extends React.Component {
 
 						<antd.Layout.Content {...this.props} className="app_wrapper">
 							<div ref={this.layoutContentRef}>
-								<Children {...this.props} />
+							<Children {...this.props} />
 							</div>
 						</antd.Layout.Content>
 					</antd.Layout>

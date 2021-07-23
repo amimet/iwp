@@ -1,3 +1,5 @@
+import React from 'react'
+
 const Marker = ({ text }) => <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", width: "auto", height: "auto", fontSize: "17px", color: "#333333" }}>
     <div style={{ backgroundColor: "rgba(66, 117, 245, 0.4)", height: '35px', width: "35px", borderRadius: "24px" }} />
 </div>

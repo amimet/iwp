@@ -1,5 +1,4 @@
 import React from 'react'
-import Jail from "corenode/dist/classes/Jail"
 import { createBrowserHistory } from "history"
 import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
@@ -37,7 +36,6 @@ function getEviteConstructor(context) {
 	return class EviteApp {
 		constructor() {
 			this.constructorContext = context
-			this.jail = new Jail()
 
 			// set window app controllers
 			this.app = window.app = Object()
@@ -84,12 +82,12 @@ function getEviteConstructor(context) {
 				let exposeArray = []
 				if (Array.isArray(extension.expose)) {
 					exposeArray = extension.expose
-				}else {
+				} else {
 					exposeArray.push(extension.expose)
 				}
-			
+
 				exposeArray.forEach((expose) => {
-					if(typeof expose.self !== "undefined") {
+					if (typeof expose.self !== "undefined") {
 						this.bindSelf(expose.self)
 					}
 					if (typeof expose.attachToInitializer !== "undefined") {
@@ -99,27 +97,31 @@ function getEviteConstructor(context) {
 			}
 		}
 
-		attachToInitializer(task){
+		attachToInitializer(task) {
 			let tasks = []
 			if (Array.isArray(task)) {
 				tasks = task
-			}else{
+			} else {
 				tasks.push(task)
 			}
 
 			tasks.forEach((_task) => {
-				if(typeof _task === "function") {
+				if (typeof _task === "function") {
 					this.beforeInit.push(_task)
 				}
 			})
 		}
 
-		bindSelf(self){
+		getThisContext(){
+			return this
+		}
+		
+		bindSelf(self) {
 			const keys = Object.keys(self)
 
 			keys.forEach((key) => {
 				if (typeof self[key] === "function") {
-					self[key] = self[key]
+					self[key] = self[key].bind(this)
 				}
 
 				this[key] = self[key]
@@ -170,7 +172,7 @@ function createEviteApp(context) {
 			}
 
 			if (Array.isArray(this.beforeInit)) {
-				for await(let task of this.beforeInit){
+				for await (let task of this.beforeInit) {
 					if (typeof task === "function") {
 						await task(this)
 					}

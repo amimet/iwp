@@ -183,20 +183,4 @@ export function getBusEvent() {
     return null
 }
 
-export function setLocation(to, delay) {
-    if (typeof to !== "string") {
-        console.warn(`Invalid location`)
-        return false
-    }
-    if (typeof window.app.busEvent === "undefined") {
-        throw new Error(`BusEvent is not available`)
-    }
-
-    window.app.busEvent.emit("setLocation", to, delay)
-    setTimeout(() => {
-        window.app.history.push(to)
-        window.app.busEvent.emit("setLocationReady")
-    }, delay ?? 100)
-}
-
 export { config, languages, defaultLanguage }

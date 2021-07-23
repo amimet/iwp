@@ -338,18 +338,14 @@ export default class Vault extends React.Component {
     }
 
     componentDidMount = async () => {
-        //TODO: get vault from api
         const vault = await this.props.api.get.vault()
-        vault.forEach(item => {
-            
-        })
-        //this.setState({ data: res })
+        this.setState({ data: vault })
     }
 
     render() {
         if (!this.state.data) return <LoadingSpinner />
         return (
-            <div className={window.classToStyle('vault_wrapper')}>
+            <div className="app_vault_wrapper">
                 <antd.Card style={{ marginBottom: "18px" }}>
                     <AddVaultDevice />
                 </antd.Card>

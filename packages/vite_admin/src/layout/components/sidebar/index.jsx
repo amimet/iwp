@@ -5,7 +5,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import { Settings } from 'components'
 import { Controller } from 'core/libs'
-import { setLocation } from 'core'
 
 import { objectToArrayMap } from '@corenode/utils'
 import config from 'config'
@@ -313,10 +312,10 @@ export default class Sidebar extends React.Component {
             return onClickHandlers[e.key](e)
         }
         if (typeof this.state.pathResolve[e.key] !== "undefined") {
-            return setLocation(`/${this.state.pathResolve[e.key]}`, 150)
+            return window.app.setLocation(`/${this.state.pathResolve[e.key]}`, 150)
         }
 
-        return setLocation(`/${e.key}`, 150)
+        return window.app.setLocation(`/${e.key}`, 150)
     }
 
     toogleEditMode(to) {

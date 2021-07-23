@@ -12,13 +12,10 @@ export class request {
         }
     }
 
-    send = async () => {
+    send = async (params = {}) => {
         let payloads = {
             body: undefined,
             query: undefined,
-            options: {
-                parseData: false
-            }
         }
 
         if (Array.isArray(this.payload)) {
@@ -28,9 +25,6 @@ export class request {
             if (typeof this.payload[1] === "object") {
                 payloads.query = this.payload[1]
             }
-            if (typeof this.payload[2] === "object") {
-                payloads.options = this.payload[2]
-            }
         }else if (typeof this.payload === "object"){
             payloads = {
                 ...payloads,
@@ -38,17 +32,14 @@ export class request {
             }
         }
 
-        await this.req(payloads.body, payloads.query, payloads.options)
+        return await this.req(payloads.body, payloads.query, { parseData: false })
             .then((res) => {
-                console.log(res)
-
                 this.cb(false, res)
-                return res
+                return res.data
             })
             .catch((err) => {
                 console.log(err)
-
-                this.cb(err.response, err.response)
+                this.cb(err.response.data, err.response)
                 return err
             })
     }
