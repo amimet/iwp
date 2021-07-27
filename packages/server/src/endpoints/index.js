@@ -1,5 +1,19 @@
 module.exports = [
     {
+        route: "/session",
+        method: 'DELETE',
+        controller : "SessionController",
+        middleware: "ensureAuthenticated",
+        fn: "delete"
+    },
+    {
+        route: "/sessions",
+        method: 'DELETE',
+        controller : "SessionController",
+        middleware: "ensureAuthenticated",
+        fn: "deleteAll"
+    },
+    {
         route: "/validateSession",
         method: "POST",
         controller: "SessionController",
@@ -102,6 +116,7 @@ module.exports = [
         route: "/logout",
         method: "POST",
         controller: "UserController",
+        middleware: ["ensureAuthenticated"],
         fn: "logout"
     },
     {
