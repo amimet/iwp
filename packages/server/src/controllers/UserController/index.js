@@ -173,9 +173,21 @@ export const UserController = {
                 username: user.username,
                 email: user.email
             }
+            
+            let signLifetime = "1h"
+
+            if (options.expiresIn !== undefined) {
+                signLifetime = options.expiresIn 
+            }
+            if (req.body.not_expire) {
+                signLifetime = undefined            
+            }
 
             // generate token
-            const token = jwt.sign(payload, options.secretOrKey, { expiresIn: options.expiresIn ?? "1h", algorithm: options.algorithm ?? "HS256" })
+            const token = jwt.sign(payload, options.secretOrKey, { 
+                expiresIn: signLifetime, 
+                algorithm: options.algorithm ?? "HS256" 
+            })
 
             // add the new session
             let newSession = new Session({
