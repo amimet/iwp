@@ -2,7 +2,7 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import ngProgress from "nprogress"
 
-import { AppLoading, NotFound } from "components"
+import { AppLoading, NotFound, RenderError } from "components"
 import BaseLayout from "./layout"
 import config from "config"
 
@@ -141,6 +141,9 @@ export default class App extends createEviteApp({
 			on404: (props) => {
 				return <NotFound />
 			},
+			onRenderError: (props) => {
+				return <RenderError {...props} />
+			}
 		})
 
 		return (

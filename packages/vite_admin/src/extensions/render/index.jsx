@@ -1,6 +1,5 @@
 import React from "react"
 import config from "config"
-import { NotFound } from "components"
 import loadable from "@loadable/component"
 
 export default {
@@ -11,7 +10,7 @@ export default {
 				async (self) => {
 					self.history._push = self.history.push
 					self.history.push = (key) => {
-                        self.history._push(key)
+						self.history._push(key)
 						self.forceUpdate()
 					}
 
@@ -41,16 +40,26 @@ export default {
 			],
 			self: {
 				createPageRender: function (params) {
-					return loadable((props) => {       
-						return import(`${global.aliases["pages"]}${window.location.pathname}`).catch(
-							() => {
+					return loadable((props) => {
+						const pagePath = `${global.aliases["pages"]}${window.location.pathname}`
+
+						return import(`${pagePath}`).catch((err) => {
+							const isNotFound = err.message.includes("Failed to fetch dynamically imported module")
+
+							if (isNotFound) {
 								if (typeof params.on404 === "function") {
-									return params.on404
+									return () => React.createElement(params.on404, { path: pagePath })
 								}
 
-								return () => <div> NOT FOUND</div>
-							},
-						)
+								return () => <div>NOT FOUND</div>
+							} else {
+								if (typeof params.onRenderError === "function") {
+									return () => React.createElement(params.onRenderError, { error: err })
+								}
+
+								return () => <div>{err.toString()}</div>
+							}
+						})
 					})
 				},
 				validateLocationSlash: (location) => {
