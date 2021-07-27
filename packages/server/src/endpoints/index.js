@@ -1,5 +1,19 @@
 module.exports = [
     {
+        route: "/role",
+        method: 'PUT',
+        controller: "UserController",
+        middleware: ["ensureAuthenticated", "roles"],
+        fn: "grantRole"
+    },
+    {
+        route: "/role",
+        method: 'DELETE',
+        controller: "UserController",
+        middleware: ["ensureAuthenticated", "roles"],
+        fn: "denyRole"
+    },
+    {
         route: "/session",
         method: 'DELETE',
         controller : "SessionController",

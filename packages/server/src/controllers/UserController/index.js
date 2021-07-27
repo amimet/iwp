@@ -51,9 +51,9 @@ export const UserController = {
                     var hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
                     let document = new User({
                         username: req.body.username,
-                        fullName: req.body.fullName || null,
-                        avatar: req.body.avatar || "https://www.flaticon.com/svg/static/icons/svg/149/149071.svg",
-                        email: req.body.email || null,
+                        fullName: req.body.fullName,
+                        avatar: req.body.avatar,
+                        email: req.body.email,
                         roles: ["registered"],
                         password: hash
                     })
@@ -66,6 +66,97 @@ export const UserController = {
             .catch(err => {
                 return next(err)
             })
+    },
+    denyRole: async (req, res) => {
+        // check if issuer user is admin
+        if (!req.isAdmin()) {
+            return res.status(403).send("You do not have administrator permission")
+        }
+
+        let { user_id, username, roles } = req.body
+        const userQuery = {
+            username: username,
+            user_id: user_id,
+        }
+
+        // parse requested roles
+        if (typeof roles === "string") {
+            roles = roles.split(",").map(role => role.trim())
+        }else {
+            return res.send("No effect")
+        }
+
+        // get current user roles
+        const user = await User.findOne({ ...userQuery })
+        if (typeof user === "undefined") {
+            return res.status(404).send(`[${username}] User not found`)
+        }
+
+        // query all roles mutation
+        let queryRoles = []
+        if (Array.isArray(roles)) {
+            queryRoles = roles
+        } else if (typeof roles === 'string') {
+            queryRoles.push(roles)
+        }
+        
+        // mutate all roles
+        if (queryRoles.length > 0 && Array.isArray(user.roles)) {
+            queryRoles.forEach(role => {
+                user.roles = user.roles.filter(_role => _role !== role)
+            })
+        }
+
+        // update user roles
+        await user.save()
+        return res.send("done")
+    },
+    grantRole: async (req, res) => {
+        // check if issuer user is admin
+        if (!req.isAdmin()) {
+            return res.status(403).send("You do not have administrator permission")
+        }
+
+        let { user_id, username, roles } = req.body
+        const userQuery = {
+            username: username,
+            user_id: user_id,
+        }
+
+        // parse requested roles
+        if (typeof roles === "string") {
+            roles = roles.split(",").map(role => role.trim())
+        }else {
+            return res.send("No effect")
+        }
+
+        // get current user roles
+        const user = await User.findOne({ ...userQuery })
+        if (typeof user === "undefined") {
+            return res.status(404).send(`[${username}] User not found`)
+        }
+
+        // query all roles mutation
+        let queryRoles = []
+        if (Array.isArray(roles)) {
+            queryRoles = roles
+        } else if (typeof roles === 'string') {
+            queryRoles.push(roles)
+        }
+
+        
+        // mutate all roles
+        if (queryRoles.length > 0 && Array.isArray(user.roles)) {
+            queryRoles.forEach(role => {
+                if (!user.roles.includes(role)) {
+                    user.roles.push(role)
+                }
+            })
+        }
+
+        // update user roles
+        await user.save()
+        return res.send("done")
     },
     login: (req, res, next) => {
         passport.authenticate("local", { session: false }, (error, user, options) => {
