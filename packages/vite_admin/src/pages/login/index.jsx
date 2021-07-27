@@ -1,17 +1,18 @@
 import React from 'react'
+import * as antd from 'antd'
 import { FormGenerator } from 'components'
 import * as session from 'core/models/session'
 
 const formInstance = [
     {
         id: "username",
-        formElement: {
-            element: "Input",
+        element: {
+            component: "Input",
             icon: "User",
             placeholder: "Username",
             props: null
         },
-        formItem: {
+        item: {
             hasFeedback: true,
             rules: [
                 {
@@ -24,15 +25,15 @@ const formInstance = [
     },
     {
         id: "password",
-        formElement: {
-            element: "Input",
+        element: {
+            component: "Input",
             icon: "Lock",
             placeholder: "Password",
             props: {
                 type: "password"
             }
         },
-        formItem: {
+        item: {
             hasFeedback: true,
             rules: [
                 {
@@ -45,8 +46,8 @@ const formInstance = [
     {
         id: "login_btn",
         withValidation: true,
-        formElement: {
-            element: "Button",
+        element: {
+            component: "Button",
             props: {
                 icon: "User",
                 children: "Login",
@@ -54,11 +55,24 @@ const formInstance = [
                 htmlType: "submit"
             }
         }
+    },
+    {
+        id: "not_expire",
+        withValidation: false,
+        element: {
+            component: "Checkbox",
+            props: {
+                children: "Not expire",
+                defaultChecked: false,
+            }
+        }
     }
 ]
 
 export default class Login extends React.Component {
     async handleSend(values) {
+        console.log(values)
+        return
         session.handleLogin(this.props.api, values, (err, res) => {
             window.currentForms["normal_login"].toogleValidation(false)
             window.currentForms["normal_login"].clearErrors()
