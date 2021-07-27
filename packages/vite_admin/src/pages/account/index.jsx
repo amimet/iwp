@@ -8,19 +8,19 @@ import "./index.less"
 
 export default class Account extends React.Component {
 	state = {
+		isSelf: true,
 		user: {},
 		sessions: null,
 	}
 
 	componentDidMount = async () => {
 		// TODO: CHECK with API & session token
-		let isSelf = true
 
 		const query = new URLSearchParams(window.location.search)
 		const requestedUser = query.get("username")
 
 		if (requestedUser != null) {
-			isSelf = false
+			this.setState({ isSelf: false })
 
 			await user
 				.fetchData(this.props.api, { username: requestedUser })
@@ -36,7 +36,7 @@ export default class Account extends React.Component {
 			})
 		}
 
-		if (isSelf) {
+		if (this.state.isSelf) {
 			const sessions = await session.getAll(this.props.api)
 			this.setState({ sessions })
 		}
@@ -45,6 +45,7 @@ export default class Account extends React.Component {
 	render() {
 		const { user } = this.state ?? {}
 		console.log(user)
+
 		return (
 			<div className="account_wrapper">
 				<div className="app_account_header">
@@ -54,9 +55,11 @@ export default class Account extends React.Component {
 						<span>#{user._id}</span>
 					</div>
 				</div>
-				<div className="session_wrapper">
+				
+				{this.state.isSelf && <div className="session_wrapper">
 					<Sessions sessions={this.state.sessions} />
-				</div>
+				</div>}
+				
 			</div>
 		)
 	}
