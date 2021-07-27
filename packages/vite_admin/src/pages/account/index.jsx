@@ -1,8 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-import * as user from "core/models/user"
-import * as session from "core/models/session"
+
 import { Sessions, Roles } from "components"
+
+import * as session from "core/models/session"
+import * as user from "core/models/user"
 
 import "./index.less"
 
@@ -41,6 +43,16 @@ export default class Account extends React.Component {
 			this.setState({ sessions })
 		}
 	}
+	signOutAll = () => {
+		antd.Modal.warning({
+			title: 'Caution',
+			content: 'This action will cause all sessions to be closed, you will have to log in again.',
+			onOk: () => {
+				session.destroyAll(this.props.api)
+			},
+			okCancel: true,
+		})
+	}
 
 	render() {
 		const { user } = this.state ?? {}
@@ -59,6 +71,9 @@ export default class Account extends React.Component {
 
 				{this.state.isSelf && <div className="session_wrapper">
 					<Sessions sessions={this.state.sessions} />
+					<antd.Button onClick={() => this.signOutAll()} type="danger">
+						Destroy all sessions
+					</antd.Button>
 				</div>}
 				
 			</div>

@@ -66,3 +66,9 @@ export async function logout(bridge) {
     cookies.remove(tokenKey)
     return new request(bridge.post.logout, [{ session: session }]).send()
 }
+
+export async function destroyAll(bridge) {
+    console.log(bridge)
+    //return new request(bridge.post.logout, [{ session: session }]).send()
+
+}

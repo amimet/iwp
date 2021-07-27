@@ -51,6 +51,7 @@ export default class Sessions extends React.Component {
 		if (Array.isArray(this.props.sessions)) {
 			return (
 				<div className="sessions_wrapper">
+					<h1><Icons.Key />Sessions</h1>
 					<antd.Collapse bordered={false} accordion>
 						{this.renderSessions()}
 					</antd.Collapse>
