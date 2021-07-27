@@ -2,6 +2,37 @@ import { Session } from '../../models'
 import jwt from 'jsonwebtoken'
 
 export const SessionController = {
+    deleteAll: async (req, res) => {
+        const { user_id } = req.body
+
+        if (typeof user_id === "undefined") {
+            return res.status(400).send("No user_id provided")
+        }
+        
+        const allSessions = await Session.deleteMany({user_id})
+        if (allSessions) {
+            return res.send("done")
+        }
+
+        return res.status(404).send("not found")
+    },
+    delete: async (req, res) => {
+        const { token, user_id } = req.body
+
+        if (typeof user_id === "undefined") {
+            return res.status(400).send("No user_id provided")
+        }
+        if (typeof token === "undefined") {
+            return res.status(400).send("No token provided")
+        }
+        
+        const session = await Session.findOneAndDelete({user_id, token})
+        if (session) {
+            return res.send("done")
+        }
+
+        return res.status(404).send("not found")
+    },
     validate: async (req, res) => {
         const token = req.body.session
         let result = {
