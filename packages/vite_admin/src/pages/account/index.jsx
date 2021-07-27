@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import * as user from "core/models/user"
 import * as session from "core/models/session"
-import { Sessions } from "components"
+import { Sessions, Roles } from "components"
 
 import "./index.less"
 
@@ -54,8 +54,9 @@ export default class Account extends React.Component {
 						<h1>@{user.username}</h1>
 						<span>#{user._id}</span>
 					</div>
+					<Roles roles={user.roles}/>
 				</div>
-				
+
 				{this.state.isSelf && <div className="session_wrapper">
 					<Sessions sessions={this.state.sessions} />
 				</div>}
