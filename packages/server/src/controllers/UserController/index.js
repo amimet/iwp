@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
 import { User, Session } from '../../models'
+import SessionController from '../SessionController'
 
 export const UserController = {
     isAuth: (req, res, next) => {
@@ -88,7 +89,9 @@ export const UserController = {
             // add the new session
             let newSession = new Session({
                 user_id: user.id,
-                token
+                token: token,
+                date: new Date().getTime(),
+                location: req.server_instance.id
             })
 
             newSession.save()
@@ -98,9 +101,12 @@ export const UserController = {
         })(req, res)
     },
     logout: async (req, res, next) => {
-        const { token } = req.body
+        req.body = {
+            user_id: req.decodedToken.id,
+            token: req.jwtToken
+        }
 
-        Session.findOneAndDelete({ token: token })
+        return SessionController.delete(req, res, next)
     },
 }
 

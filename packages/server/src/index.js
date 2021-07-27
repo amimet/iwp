@@ -57,28 +57,34 @@ class Server {
         await this.initPassport()
 
         // register middlewares
-        this.instance.middlewares["useJwtStrategy"] = (req, res,next) => {
+        this.instance.middlewares["useJwtStrategy"] = (req, res, next) => {
             req.jwtStrategy = this.options.jwtStrategy
             next()
         }
 
-        this.server.use((req,res,next) => {
-            res.safeSend = (data,...context) => {
-                res.send(this.securizeData(data),...context)
+        this.server.use((req, res, next) => {
+            res.safeSend = (data, ...context) => {
+                res.send(this.securizeData(data), ...context)
             }
 
-            res.safeJson = (data,...context) => {
-                res.json(this.securizeData(data),...context)
+            res.safeJson = (data, ...context) => {
+                res.json(this.securizeData(data), ...context)
             }
-    
-            next() 
+
+            next()
+        })
+
+        this.server.use((req, res, next) => {
+            req.server_instance = this.instance
+
+            next()
         })
 
         this.instance.init()
     }
 
     securizeData(data) {
-        if(typeof data === "object") {
+        if (typeof data === "object") {
             const values = Object.values(data)
             data = values[values.length - 2]
 
