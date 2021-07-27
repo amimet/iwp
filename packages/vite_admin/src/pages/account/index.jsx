@@ -1,13 +1,13 @@
 import React from "react"
-import * as antd from 'antd'
-import { Icons } from 'components/icons'
+import * as antd from "antd"
 import * as user from "core/models/user"
 import * as session from "core/models/session"
+import { Sessions } from "components"
 
 import "./index.less"
 
 export default class Account extends React.Component {
-	state = {
+	state = {
 		user: {},
 		sessions: null,
 	}
@@ -18,20 +18,21 @@ export default class Account extends React.Component {
 
 		const query = new URLSearchParams(window.location.search)
 		const requestedUser = query.get("username")
-	
+
 		if (requestedUser != null) {
 			isSelf = false
 
-		 	await user.fetchData(this.props.api, { username: requestedUser })
-			.then((data) => {
-				this.setState({ user: data })
-			})
-			.catch((err) => {
-				console.log(err)
-			})
-		}else {
+			await user
+				.fetchData(this.props.api, { username: requestedUser })
+				.then((data) => {
+					this.setState({ user: data })
+				})
+				.catch((err) => {
+					console.log(err)
+				})
+		} else {
 			this.setState({
-				user: this.props.user
+				user: this.props.user,
 			})
 		}
 
@@ -41,28 +42,11 @@ export default class Account extends React.Component {
 		}
 	}
 
-	renderSessions() {
-		const data = this.state.sessions
-		
-		if (Array.isArray(data)) {
-			return data.map((session) => {
-				return <div key={session._id} className="session_entry">
-					<Icons.Key />
-					{session._id}
-				</div>
-			}) 
-		}
-
-		return <div>
-
-		</div>
-	}
-
 	render() {
 		const { user } = this.state ?? {}
-
+		console.log(user)
 		return (
-			<div>
+			<div className="account_wrapper">
 				<div className="app_account_header">
 					<img src={user.avatar} />
 					<div style={{ margin: "0 15px" }}>
@@ -71,7 +55,7 @@ export default class Account extends React.Component {
 					</div>
 				</div>
 				<div className="session_wrapper">
-					{this.renderSessions()}
+					<Sessions sessions={this.state.sessions} />
 				</div>
 			</div>
 		)
