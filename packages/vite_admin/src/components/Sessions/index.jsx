@@ -9,10 +9,13 @@ export default class Sessions extends React.Component {
 		const data = this.props.sessions
 		return data.map((session) => {
 			const header = (
-				<>
-					<Icons.Key />
-					{session._id}
-				</>
+				<div className="session_header">
+					<div>
+						<Icons.Key />
+					</div>
+					<div>{session._id}</div>
+					<div>{this.props.current === session.uuid ? <antd.Tag>Current</antd.Tag> : ""}</div>
+				</div>
 			)
 
 			const renderDate = () => {
@@ -23,7 +26,7 @@ export default class Sessions extends React.Component {
 				}
 				return session.date
 			}
-			
+
 			return (
 				<antd.Collapse.Panel header={header} key={session._id} className="session_entry">
 					<div className="session_entry_info">
@@ -46,12 +49,13 @@ export default class Sessions extends React.Component {
 	}
 
 	render() {
-		console.log(this.props.sessions)
-
 		if (Array.isArray(this.props.sessions)) {
 			return (
 				<div className="sessions_wrapper">
-					<h1><Icons.Key />Sessions</h1>
+					<h1>
+						<Icons.Key />
+						Sessions
+					</h1>
 					<antd.Collapse bordered={false} accordion>
 						{this.renderSessions()}
 					</antd.Collapse>

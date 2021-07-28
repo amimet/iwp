@@ -56,7 +56,7 @@ export default class Account extends React.Component {
 
 	render() {
 		const { user } = this.state ?? {}
-		console.log(user)
+		const currentSession = this.props.user?.session?.uuid
 
 		return (
 			<div className="account_wrapper">
@@ -70,7 +70,7 @@ export default class Account extends React.Component {
 				</div>
 
 				{this.state.isSelf && <div className="session_wrapper">
-					<Sessions sessions={this.state.sessions} />
+					<Sessions current={currentSession} sessions={this.state.sessions} />
 					<antd.Button onClick={() => this.signOutAll()} type="danger">
 						Destroy all sessions
 					</antd.Button>
