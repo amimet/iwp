@@ -1,12 +1,16 @@
 import FormGenerator from './formGenerator'
 import ButtonMenu from './buttonMenu'
-import * as Layout from './layout'
 
-export { default as LoadingSpinner } from './loadingSpinner'
+export { default as LoadingSpinner } from './LoadingSpinner'
 export { default as Settings } from './settings'
+export { default as NotFound } from './notFound'
+export { default as AppLoading } from './AppLoading'
+export { default as RenderError } from './RenderError'
+
+export { default as Sessions } from './Sessions'
+export { default as Roles } from './Roles'
 
 export {
-    Layout,
     ButtonMenu,
     FormGenerator
 }

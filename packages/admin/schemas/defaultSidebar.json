@@ -1,7 +1,7 @@
 [
     "main",
     "users",
-    "accounts",
+    "users/accounts",
     "users/contracts",
     "users/roles",
     "users/workload",

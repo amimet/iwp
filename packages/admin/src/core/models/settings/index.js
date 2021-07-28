@@ -3,10 +3,12 @@ import { EventEmitter } from 'events'
 import { objectToArrayMap } from '@corenode/utils'
 import handlers from 'core/handlers'
 
+const defaultKeys = import('schemas/defaultSettings.json')
+
 class SettingsController {
     constructor() {
         this.storeKey = "app_settings"
-        this.defaultSettings = require('schemas/defaultSettings.json')
+        this.defaultSettings = defaultKeys
 
         this.events = new EventEmitter()
         this.settings = store.get(this.storeKey) ?? {}

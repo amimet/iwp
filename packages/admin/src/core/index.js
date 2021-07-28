@@ -1,24 +1,10 @@
 import { cloneDeep } from 'lodash'
 import store from 'store'
-import { i18n, app } from 'config'
-import platform from 'platform'
-import { history } from 'umi'
+import { pathToRegexp } from 'path-to-regexp'
+import config from 'config'
 
-export const package_json = require('../../package.json')
-export const clientInfo = {
-    packageName: package_json.name,
-    siteName: app.siteName,
-    version: package_json.version,
-    os: platform.os,
-    layout: platform.layout
-};
-
-const { pathToRegexp } = require('path-to-regexp')
-
-export const config = require("config")
-export const packagejson = require("../../package.json")
-export const languages = i18n ? i18n.languages.map(item => item.key) : []
-export const defaultLanguage = i18n ? i18n.defaultLanguage : 'en'
+const languages = config.i18n ? config.i18n.languages.map(item => item.key) : []
+const defaultLanguage = config.i18n ? config.i18n.defaultLanguage : 'en'
 
 /**
  * Query objects that specify keys and values in an array where all values are objects.
@@ -190,26 +176,11 @@ export function generateRandomId(length = 15) {
 }
 
 //
-
 export function getBusEvent() {
-    if (typeof window.busEvent !== "undefined") {
-        return window.busEvent
+    if (typeof window.app.busEvent !== "undefined") {
+        return window.app.busEvent
     }
     return null
 }
 
-export function setLocation(to, delay) {
-    if (typeof to !== "string") {
-        console.warn(`Invalid location`)
-        return false
-    }
-    if (typeof window.busEvent === "undefined") {
-        throw new Error(`BusEvent is not available`)
-    }
-
-    window.busEvent.emit("setLocation", to, delay)
-    setTimeout(() => {
-        history.push(to)
-        window.busEvent.emit("setLocationReady")
-    }, delay ?? 0)
-}
+export { config, languages, defaultLanguage }

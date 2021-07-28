@@ -1,9 +1,10 @@
 import store from 'store'
+import defaultKeys from 'schemas/defaultSidebar.json'
 
 class SidebarController {
     constructor() {
         this.storeKey = "app_sidebar"
-        this.defaults = require('schemas/defaultSidebar.json')
+        this.defaults = defaultKeys
 
         this.data = store.get(this.storeKey) ?? this.defaults
         return this

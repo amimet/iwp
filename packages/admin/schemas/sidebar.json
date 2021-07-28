@@ -31,8 +31,7 @@
                 "icon": "Clock"
             },
             {
-                "id": "accounts",
-                "path": "users",
+                "id": "users/accounts",
                 "title": "Accounts",
                 "icon": "User"          
             }

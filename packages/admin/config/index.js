@@ -1,26 +1,23 @@
-const packagejson = require("../package.json")
+import packagejson from '../package.json'
 
-module.exports = {
+export default {
     logo: {
         alt: "https://dl.amimet.es/branding/amimet_alt/SVG/index.svg"
     },
+    api: {
+        address: process.env.NODE_ENV !== 'production'? "http://localhost:3000" : "https://api.amimet.es",
+    },
     app: {
         title: packagejson.name,
-        app_model: "app",
-        defaultStyleClass: "app_",
-        defaultTransitionPreset: "moveToLeftFromRight",
-        mainPath: '/main',
-        api_hostname: "https://api.amimet.es",
-
-        storage: { // specify where data is storaged
+        siteName: "AmimetApp",
+        mainPath: 'main',
+        storage: {
+            basics: "user",
+            token: "token",
             session_frame: "session",
             signkey: "certified",
             settings: "app_settings"
         },
-
-        certified_signkeys: [
-            "f706b0a535b6c2d36545c4137a0a3a26853ea8b5-1223c9ba7923152cae28e5a2e7501b2b-50600768"
-        ] // get from external resolver
     },
     indexer: [
         {
@@ -47,11 +44,5 @@ module.exports = {
             }
         ],
         defaultLanguage: 'en',
-    },
-    layouts: [
-        {
-            name: 'base',
-            include: [/.*/]
-        },
-    ],
+    }
 }
