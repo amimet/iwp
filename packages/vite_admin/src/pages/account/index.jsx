@@ -43,10 +43,11 @@ export default class Account extends React.Component {
 			this.setState({ sessions })
 		}
 	}
+
 	signOutAll = () => {
 		antd.Modal.warning({
-			title: 'Caution',
-			content: 'This action will cause all sessions to be closed, you will have to log in again.',
+			title: "Caution",
+			content: "This action will cause all sessions to be closed, you will have to log in again.",
 			onOk: () => {
 				session.destroyAll(this.props.api)
 			},
@@ -66,16 +67,19 @@ export default class Account extends React.Component {
 						<h1>@{user.username}</h1>
 						<span>#{user._id}</span>
 					</div>
-					<Roles roles={user.roles}/>
+					<Roles roles={user.roles} />
 				</div>
 
-				{this.state.isSelf && <div className="session_wrapper">
-					<Sessions current={currentSession} sessions={this.state.sessions} />
-					<antd.Button onClick={() => this.signOutAll()} type="danger">
-						Destroy all sessions
-					</antd.Button>
-				</div>}
-				
+				{this.state.isSelf && (
+					<div className="session_wrapper">
+						<Sessions current={currentSession} sessions={this.state.sessions} />
+						{this.state.sessions && (
+							<antd.Button onClick={() => this.signOutAll()} type="danger">
+								Destroy all sessions
+							</antd.Button>
+						)}
+					</div>
+				)}
 			</div>
 		)
 	}
