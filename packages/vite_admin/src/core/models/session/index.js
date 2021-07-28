@@ -65,9 +65,8 @@ export async function validateCurrentSession(bridge) {
     return validation.valid
 }
 
-
 export async function logout(bridge) {
-    await destroySession()
+    await destroySession(bridge)
     clean()
 }
 
@@ -77,7 +76,7 @@ export async function destroySession(bridge) {
 
     if (session) {
         const token = get()
-        return new RequestAdaptor(bridge.delete.session, [{ user_id: session.id, token: token }]).send()
+        return new RequestAdaptor(bridge.delete.session, [{ user_id: session.user_id, token: token }]).send()
     }
 
     return false
@@ -86,6 +85,11 @@ export async function destroySession(bridge) {
 // [API] Destroy all session for current user
 export async function destroyAll(bridge) {
     const session = decodeSession()
-    new RequestAdaptor(bridge.delete.sessions, [{ user_id: session.id }]).send()
-    await clean()
+
+    if (session) {
+        new RequestAdaptor(bridge.delete.sessions, [{ user_id: session.user_id }]).send()
+        await clean()
+    }
+
+    return false
 }

@@ -10,7 +10,7 @@ export function updateData() {
 }
 
 export async function fetchData(bridge, payload = {}, callback) {
-    return new RequestAdaptor(bridge.get.user, [undefined, { username: payload.username, id: payload.id }], callback).send()
+    return new RequestAdaptor(bridge.get.user, [undefined, { username: payload.username, user_id: payload.user_id }], callback).send()
 }
 
 export function getLocalBasics(bridge, callback) {

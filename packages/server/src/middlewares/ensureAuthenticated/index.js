@@ -18,7 +18,7 @@ export default async (req, res, next) => {
                 return fail()
             }
 
-            const sessions = await Session.find({ user_id: decoded.id })
+            const sessions = await Session.find({ user_id: decoded.user_id })
             const sessionsTokens = sessions.map(session => session.token)
             if (!sessionsTokens.includes(token)) {
                 return fail()

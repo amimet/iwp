@@ -142,7 +142,7 @@ class Server {
         }))
 
         passport.use(new JwtStrategy(this.options.jwtStrategy, (token, done) => {
-            User.findOne({ _id: token.id })
+            User.findOne({ _id: token.user_id })
                 .then(data => {
                     if (data === null) {
                         return done(null, false)

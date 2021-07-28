@@ -88,9 +88,7 @@ export default class App extends createEviteApp({
 		const basicsData = user.getLocalBasics(this.apiBridge)
 
 		if (sessionData) {
-			currentUser = { ...currentUser, ...sessionData }
-			currentUser["_id"] = currentUser.sub
-			delete currentUser.sub
+			currentUser = { ...currentUser, session: sessionData }
 		}
 		if (basicsData) {
 			currentUser = { ...currentUser, ...basicsData }

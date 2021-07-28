@@ -1,6 +1,7 @@
 import passport from 'passport'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import { nanoid } from 'nanoid'
 
 import { User, Session } from '../../models'
 import SessionController from '../SessionController'
@@ -10,7 +11,17 @@ export const UserController = {
         return res.json(`You look nice today 😎`)
     },
     get: (req, res, next) => {
-        User.find({}, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
+        const { id, username } = req.query
+
+        let selector = {}
+
+        if (typeof (id) !== "undefined") {
+            selector = { id }
+        } else if (typeof (username) !== "undefined") {
+            selector = { username }
+        }
+
+        User.find(selector, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
             .then((response) => {
                 if (response) {
                     return res.json(response)
@@ -82,7 +93,7 @@ export const UserController = {
         // parse requested roles
         if (typeof roles === "string") {
             roles = roles.split(",").map(role => role.trim())
-        }else {
+        } else {
             return res.send("No effect")
         }
 
@@ -99,7 +110,7 @@ export const UserController = {
         } else if (typeof roles === 'string') {
             queryRoles.push(roles)
         }
-        
+
         // mutate all roles
         if (queryRoles.length > 0 && Array.isArray(user.roles)) {
             queryRoles.forEach(role => {
@@ -126,7 +137,7 @@ export const UserController = {
         // parse requested roles
         if (typeof roles === "string") {
             roles = roles.split(",").map(role => role.trim())
-        }else {
+        } else {
             return res.send("No effect")
         }
 
@@ -144,7 +155,7 @@ export const UserController = {
             queryRoles.push(roles)
         }
 
-        
+
         // mutate all roles
         if (queryRoles.length > 0 && Array.isArray(user.roles)) {
             queryRoles.forEach(role => {
@@ -169,29 +180,31 @@ export const UserController = {
             }
 
             const payload = {
-                id: user._id,
+                user_id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                uuid: nanoid()
             }
-            
+
             let signLifetime = "1h"
 
             if (options.expiresIn !== undefined) {
-                signLifetime = options.expiresIn 
+                signLifetime = options.expiresIn
             }
             if (req.body.not_expire) {
-                signLifetime = undefined            
+                signLifetime = undefined
             }
 
             // generate token
-            const token = jwt.sign(payload, options.secretOrKey, { 
-                expiresIn: signLifetime, 
-                algorithm: options.algorithm ?? "HS256" 
+            const token = jwt.sign(payload, options.secretOrKey, {
+                expiresIn: signLifetime,
+                algorithm: options.algorithm ?? "HS256"
             })
 
             // add the new session
             let newSession = new Session({
-                user_id: user.id,
+                uuid: payload.uuid,
+                user_id: user._id,
                 token: token,
                 date: new Date().getTime(),
                 location: req.server_instance.id
@@ -205,7 +218,7 @@ export const UserController = {
     },
     logout: async (req, res, next) => {
         req.body = {
-            user_id: req.decodedToken.id,
+            user_id: req.decodedToken.user_id,
             token: req.jwtToken
         }
 

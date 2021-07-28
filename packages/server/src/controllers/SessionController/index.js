@@ -53,9 +53,9 @@ export const SessionController = {
 
             result = { ...result, ...decoded }
 
-            const sessions = await Session.find({ user_id: result.id })
+            const sessions = await Session.find({ user_id: result.user_id })
             const sessionsTokens = sessions.map((session) => {
-                if (session.user_id === result.id) {
+                if (session.user_id === result.user_id) {
                     return session.token
                 }
             })
@@ -71,9 +71,9 @@ export const SessionController = {
         res.json(result)
     },
     get: async (req, res) => {
-        // get current session user_id
-        const { id } = req.user
-        const sessions = await Session.find({ user_id: id }, { token: 0 })
+        // get current session _id
+        const { _id } = req.user
+        const sessions = await Session.find({ user_id: _id }, { token: 0 })
 
         res.json(sessions)
     },
