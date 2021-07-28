@@ -5,7 +5,7 @@ import { CloseCircleOutlined } from "@ant-design/icons"
 const { Paragraph, Text } = Typography
 
 export default (props) => {
-	const errors = []
+	let errors = []
 	const getErrors = () => {
 		return errors.map((err) => {
 			if (err instanceof Error) {

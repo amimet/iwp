@@ -17,7 +17,7 @@ export default {
                 createBridge: async () => {
                     const getSessionContext = () => {
                         const obj = {}
-                        const thisSession = session.getSession()
+                        const thisSession = session.get()
 
                         if (typeof thisSession !== "undefined") {
                             obj.headers = {

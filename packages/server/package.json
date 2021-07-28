@@ -1,6 +1,6 @@
 {
   "name": "amimet-server",
-  "version": "0.5.5",
+  "version": "0.6.2",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "dependencies": {
     "@corenode/utils": "^0.25.26",
     "corenode": "^0.25.26",
-    "@ragestudio/cloudlink": "^0.5.31",
+    "@ragestudio/cloudlink": "^0.5.35",
     "bcrypt": "^5.0.1",
     "connect-mongo": "^4.4.1",
     "jsonwebtoken": "^8.5.1",

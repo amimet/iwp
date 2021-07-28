@@ -62,7 +62,7 @@ export default class App extends createEviteApp({
 	}
 
 	sessionInitialization = async () => {
-		this.sessionToken = await session.getSession()
+		this.sessionToken = await session.get()
 
 		if (typeof this.sessionToken === "undefined") {
 			this.busEvent.emit("not_session")
@@ -84,7 +84,7 @@ export default class App extends createEviteApp({
 	getCurrentUser = () => {
 		let currentUser = Object()
 
-		const sessionData = session.decryptSession()
+		const sessionData = session.decodeSession()
 		const basicsData = user.getLocalBasics(this.apiBridge)
 
 		if (sessionData) {

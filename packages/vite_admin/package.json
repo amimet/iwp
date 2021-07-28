@@ -37,7 +37,7 @@
     "@ant-design/icons": "^4.5",
     "@corenode/utils": "^0.25.24",
     "@loadable/component": "^5.15.0",
-    "@ragestudio/cloudlink": "^0.5.33",
+    "@ragestudio/cloudlink": "^0.5.35",
     "antd": "^4.16.8",
     "classnames": "^2.3.1",
     "cookie_js": "^1.4.2",

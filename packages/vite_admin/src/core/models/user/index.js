@@ -1,4 +1,4 @@
-import { request } from '../apiBridge'
+import { RequestAdaptor } from '@ragestudio/cloudlink/dist/client'
 import * as session from '../session'
 import store from 'store'
 import config from 'config'
@@ -10,7 +10,7 @@ export function updateData() {
 }
 
 export async function fetchData(bridge, payload = {}, callback) {
-    return new request(bridge.get.user, [undefined, { username: payload.username, id: payload.id }], callback).send()
+    return new RequestAdaptor(bridge.get.user, [undefined, { username: payload.username, id: payload.id }], callback).send()
 }
 
 export function getLocalBasics(bridge, callback) {
@@ -36,7 +36,7 @@ export function getLocalBasics(bridge, callback) {
 }
 
 export function setLocalBasics(bridge, callback) {
-    const sessionData = session.decryptSession()
+    const sessionData = session.decodeSession()
     
     if (sessionData) {
         fetchData(bridge, { username: sessionData.username }, (err, res) => {

@@ -1,4 +1,4 @@
-import { request } from '../apiBridge'
+import { RequestAdaptor } from '@ragestudio/cloudlink/dist/client'
 import cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
 import config from 'config'
@@ -6,22 +6,27 @@ import config from 'config'
 const tokenKey = config.app.storage?.token ?? "token"
 
 export async function handleLogin(bridge, payload, callback) {
-    getAuth(bridge, payload, (err, res) => {
+    genToken(bridge, payload, (err, res) => {
         if (typeof callback === 'function') {
             callback(err, res)
         }
         if (!err) {
-            setSession(res.data)
+            storage(res.data)
             window.app.reloadAppState()
         }
     })
 }
 
-export async function getAuth(bridge, payload, callback) {
-    return new request(bridge.post.login, [{ username: window.btoa(payload.username), password: window.btoa(payload.password) }], callback).send()
+export async function genToken(bridge, payload, callback) {
+    return new RequestAdaptor(bridge.post.login, [{ username: window.btoa(payload.username), password: window.btoa(payload.password) }], callback).send()
 }
 
-export function setSession(payload = {}) {
+// Gets the current session storaged
+export function get() {
+    return cookies.get(tokenKey)
+}
+
+export function storage(payload = {}) {
     if (typeof payload.token === "undefined") {
         throw new Error(`Cannot set an new session without a token! (missing token)`)
     }
@@ -29,18 +34,18 @@ export function setSession(payload = {}) {
     cookies.set(tokenKey, payload.token)
 }
 
-export function getSession() {
-    return cookies.get(tokenKey)
+export async function clean() {
+    cookies.remove(tokenKey)
 }
 
-// gets all sessions from current user id
+// [API] Get all sessions for current user
 export function getAll(bridge, callback) {
-    return new request(bridge.get.sessions, [], callback).send()
+    return new RequestAdaptor(bridge.get.sessions, [], callback).send()
 }
 
-export function decryptSession(){
+export function decodeSession() {
     let data = null
-    const session = getSession()
+    const session = get()
 
     if (typeof session !== "undefined") {
         data = jwt_decode(session)
@@ -50,9 +55,9 @@ export function decryptSession(){
 }
 
 export function getCurrentTokenValidation(bridge, callback) {
-    const session = getSession()
+    const session = get()
 
-    return new request(bridge.post.validatesession, [{ session: session }], callback).send()
+    return new RequestAdaptor(bridge.post.validatesession, [{ session: session }], callback).send()
 }
 
 export async function validateCurrentSession(bridge) {
@@ -60,15 +65,27 @@ export async function validateCurrentSession(bridge) {
     return validation.valid
 }
 
-export async function logout(bridge) {
-    const session = getSession()
 
-    cookies.remove(tokenKey)
-    return new request(bridge.post.logout, [{ session: session }]).send()
+export async function logout(bridge) {
+    await destroySession()
+    clean()
 }
 
-export async function destroyAll(bridge) {
-    console.log(bridge)
-    //return new request(bridge.post.logout, [{ session: session }]).send()
+// [API] Destroy session for current storaged session
+export async function destroySession(bridge) {
+    const session = decodeSession()
 
+    if (session) {
+        const token = get()
+        return new RequestAdaptor(bridge.delete.session, [{ user_id: session.id, token: token }]).send()
+    }
+
+    return false
+}
+
+// [API] Destroy all session for current user
+export async function destroyAll(bridge) {
+    const session = decodeSession()
+    new RequestAdaptor(bridge.delete.sessions, [{ user_id: session.id }]).send()
+    await clean()
 }
