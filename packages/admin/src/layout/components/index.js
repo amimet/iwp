@@ -1,10 +1,10 @@
 import Sidebar from './sidebar'
 import Header from './header'
 import Breadcrumb from './breadcrumb'
-import Drawer from './drawer'
+import DrawerController from './drawer'
 
 export {
-    Drawer,
+    DrawerController as Drawer,
     Breadcrumb,
     Sidebar,
     Header

@@ -21,6 +21,12 @@ module.exports = [
         fn: "denyRole"
     },
     {
+        route: "/roles",
+        method: "GET",
+        controller: "RolesController",
+        fn: "getAll",
+    },
+    {
         route: "/session",
         method: 'DELETE',
         controller : "SessionController",
@@ -101,17 +107,6 @@ module.exports = [
             "hasPermissions"
         ],
         fn: "hasPermissions"
-    },
-    {
-        route: "/role",
-        method: "POST",
-        controller: "RolesController",
-        fn: "set"
-    },
-    {
-        route: "/roles",
-        method: "GET",
-        controller: "RolesController"
     },
     {
         route: "/users",

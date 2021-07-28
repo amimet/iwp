@@ -1,8 +1,10 @@
 import { Role } from '../../models'
 
 export const RolesController = {
-    hasPermissions: (req, res, next) => {
-        return res.json(`You are lucky today 🥳 > ${req.userPermissions}`)
+    getAll: async (req, res, next) => {
+        const roles = await Role.find()
+        
+        return res.json(roles)
     },
     get: (req, res, next) => {
         Role.find().then((data) => {

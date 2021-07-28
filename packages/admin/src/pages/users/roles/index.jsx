@@ -7,48 +7,14 @@ import { LoadingSpinner, FormGenerator } from 'components'
 import { Drawer, Button, Select } from 'antd'
 
 class ModifyRole extends React.Component {
-    state = {
-        visible: false,
-        regions: []
-    }
-
-    toogleDrawer = (to) => {
-        this.setState({
-            visible: (to ?? !this.state.visible),
-        })
-    }
-
-    componentDidMount() {
-        this.toogleDrawer(true)
-    }
-
     handleSubmit(context) {
-        try {
-            console.log(context)
-        } catch (error) {
-            console.log(error)
-        }
+        console.log(context)
     }
 
     render() {
         if (this.state.loading) return <div> Loading </div>
 
-        return <>
-            <Button type="primary" onClick={this.toogleDrawer}> <Icons.PlusOutlined /> Create new </Button>
-            <Drawer
-                title="Add new role"
-                width={"40%"}
-                onClose={this.toogleDrawer}
-                visible={this.state.visible}
-                bodyStyle={{ paddingBottom: 80 }}
-                footer={
-                    <div style={{ textAlign: 'right' }}>
-                        <Button onClick={this.toogleDrawer} style={{ marginRight: 8 }}>Cancel</Button>
-                        <Button onClick={() => window.currentForms["roles_createnew"].handleFinish()} type="primary">Submit</Button>
-                    </div>
-                }
-            >
-                <FormGenerator
+        return <FormGenerator
                     name="roles_createnew"
                     renderLoadingIcon
                     onFinish={(context) => this.handleSubmit(context)}
@@ -77,7 +43,6 @@ class ModifyRole extends React.Component {
                                 props: {
                                     mode: "multiple",
                                     allowClear: true,
-                                    children: this.renderPermissionsOptions()
                                 }
                             },
                             formItem: {
@@ -92,9 +57,6 @@ class ModifyRole extends React.Component {
                         },
                     ]}
                 />
-
-            </Drawer>
-        </>
     }
 }
 
@@ -104,15 +66,20 @@ export default class Roles extends React.Component {
     }
 
     componentDidMount = async() => {
-       // TODO: fetch roles
-
-       //this.setState({ data: res })
+        await this.props.api.get
+        .roles()
+        .then((data) => {
+            this.setState({ data })
+        })
+        .catch((err) => {
+            this.setState({ error: err.message })
+        })
     }
 
-    modifyRole() {
-    
-    }
 
+    openRoleCreator = () => {
+        window.controllers["drawer"].open(<ModifyRole />)
+    }
 
     createNewRole() {
         let inputRoleRef = React.createRef()
@@ -120,12 +87,15 @@ export default class Roles extends React.Component {
 
         antd.Modal.confirm({
             title: "Create a new role",
-            content: <div className={window.classToStyle("new_role_form")}>
+            content: <div className="new_role_form">
                 <div>
                     <antd.Input ref={inputRoleRef} placeholder="Role name" />
                 </div>
                 <div>
                     <antd.Input ref={inputDescriptionRef} placeholder="Description" />
+                </div>
+                <div>
+
                 </div>
             </div>,
             onOk: () => {
@@ -145,9 +115,9 @@ export default class Roles extends React.Component {
     render() {
         if (!this.state.data) return <LoadingSpinner />
 
-        return <div className={window.classToStyle("users_list_wrapper")} >
+        return <div className="users_list_wrapper" >
             <antd.Card style={{ marginBottom: "18px" }}>
-                <antd.Button onClick={() => { this.createNewRole() }} icon={<Icons.PlusOutlined />} type="primary">Create new</antd.Button>
+                <antd.Button onClick={() => { this.openRoleCreator() }} icon={<Icons.PlusOutlined />} type="primary">Create new</antd.Button>
             </antd.Card>
             <antd.List
                 dataSource={this.state.data}
