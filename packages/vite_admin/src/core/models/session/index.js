@@ -5,6 +5,15 @@ import config from 'config'
 
 const tokenKey = config.app.storage?.token ?? "token"
 
+export async function regenerate(bridge) {
+    return new RequestAdaptor(bridge.post.regenerate, []).send()
+        .then((err, data) => {
+            if (!err) {
+                return storage(data)
+            }
+        })
+}
+
 export async function handleLogin(bridge, payload, callback) {
     genToken(bridge, payload, (err, res) => {
         if (typeof callback === 'function') {
@@ -12,13 +21,12 @@ export async function handleLogin(bridge, payload, callback) {
         }
         if (!err) {
             storage(res.data)
-            window.app.reloadAppState()
         }
     })
 }
 
 export async function genToken(bridge, payload, callback) {
-    return new RequestAdaptor(bridge.post.login, [{ username: window.btoa(payload.username), password: window.btoa(payload.password) }], callback).send()
+    return new RequestAdaptor(bridge.post.login, [{ username: window.btoa(payload.username), password: window.btoa(payload.password), allowRegenerate: payload.allowRegenerate }], callback).send()
 }
 
 // Gets the current session storaged
@@ -32,10 +40,12 @@ export function storage(payload = {}) {
     }
 
     cookies.set(tokenKey, payload.token)
+    window.app.reloadAppState()
 }
 
-export async function clean() {
+export async function clear() {
     cookies.remove(tokenKey)
+    window.app.reloadAppState()
 }
 
 // [API] Get all sessions for current user
@@ -67,7 +77,7 @@ export async function validateCurrentSession(bridge) {
 
 export async function logout(bridge) {
     await destroySession(bridge)
-    clean()
+    clear()
 }
 
 // [API] Destroy session for current storaged session
@@ -88,7 +98,7 @@ export async function destroyAll(bridge) {
 
     if (session) {
         new RequestAdaptor(bridge.delete.sessions, [{ user_id: session.user_id }]).send()
-        await clean()
+        await clear()
     }
 
     return false

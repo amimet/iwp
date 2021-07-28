@@ -7,6 +7,7 @@ import "./index.less"
 export default class Sessions extends React.Component {
 	renderSessions = () => {
 		const data = this.props.sessions
+
 		return data.map((session) => {
 			const header = (
 				<div className="session_header">
@@ -30,6 +31,12 @@ export default class Sessions extends React.Component {
 			return (
 				<antd.Collapse.Panel header={header} key={session._id} className="session_entry">
 					<div className="session_entry_info">
+						{session.allowRegenerate && (
+							<div style={{ color: "orange" }}>
+								<Icons.AlertTriangle />
+								This token can be regenerated
+							</div>
+						)}
 						<div>
 							<Icons.Clock />
 							{renderDate()}

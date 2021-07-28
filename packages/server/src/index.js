@@ -42,6 +42,7 @@ class Server {
 
         this.options = {
             jwtStrategy: {
+                sessionLocationSign: this.instance.id,
                 jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
                 secretOrKey: this.instance.oskid,
                 algorithms: ['sha1', 'RS256', 'HS256'],

@@ -72,8 +72,17 @@ export default class App extends createEviteApp({
 			this.validSession = validation.valid
 
 			if (!this.validSession) {
-				this.busEvent.emit("not_valid_session", validation.error)
-				await session.logout(this.apiBridge)
+				// try to regenerate
+				try {
+					if (this.session.allowRegenerate) {
+						await session.regenerate(this.apiBridge)
+					}else {
+						throw new Error(`Session cant be regenerated`)
+					}
+				} catch (error) {
+					this.busEvent.emit("not_valid_session", validation.error)
+					await session.clear()
+				}
 			} else {
 				await user.setLocalBasics(this.apiBridge)
 				this.user = await this.getCurrentUser()

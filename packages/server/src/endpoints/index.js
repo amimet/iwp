@@ -1,5 +1,12 @@
 module.exports = [
     {
+        route: "/regenerate",
+        method: "POST",
+        controller: "SessionController",
+        middleware: ["ensureAuthenticated", "useJwtStrategy"],
+        fn: "regenerate"
+    },
+    {
         route: "/role",
         method: 'PUT',
         controller: "UserController",

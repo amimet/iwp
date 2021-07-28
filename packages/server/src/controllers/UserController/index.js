@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid'
 
 import { User, Session } from '../../models'
 import SessionController from '../SessionController'
+import { Token } from '../../lib'
 
 export const UserController = {
     isAuth: (req, res, next) => {
@@ -182,35 +183,15 @@ export const UserController = {
             const payload = {
                 user_id: user._id,
                 username: user.username,
-                email: user.email,
-                uuid: nanoid()
+                email: user.email
             }
 
-            let signLifetime = "1h"
-
-            if (options.expiresIn !== undefined) {
-                signLifetime = options.expiresIn
-            }
-            if (req.body.not_expire) {
-                signLifetime = undefined
+            if (req.body.allowRegenerate) {
+                payload.allowRegenerate = true
             }
 
             // generate token
-            const token = jwt.sign(payload, options.secretOrKey, {
-                expiresIn: signLifetime,
-                algorithm: options.algorithm ?? "HS256"
-            })
-
-            // add the new session
-            let newSession = new Session({
-                uuid: payload.uuid,
-                user_id: user._id,
-                token: token,
-                date: new Date().getTime(),
-                location: req.server_instance.id
-            })
-
-            newSession.save()
+            const token = Token.signNew(payload, options)
 
             // send result
             res.json({ token: token })

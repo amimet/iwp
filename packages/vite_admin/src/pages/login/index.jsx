@@ -57,7 +57,7 @@ const formInstance = [
         }
     },
     {
-        id: "not_expire",
+        id: "allowRegenerate",
         withValidation: false,
         element: {
             component: "Checkbox",
@@ -74,7 +74,7 @@ export default class Login extends React.Component {
         const payload = {
             username: values.username,
             password: values.password,
-            not_expire: values.not_expire,
+            allowRegenerate: values.allowRegenerate,
         }
         
         session.handleLogin(this.props.api, payload, (err, res) => {
