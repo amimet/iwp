@@ -3,6 +3,7 @@ import { createBrowserHistory } from "history"
 import { EventEmitter } from "events"
 import { objectToArrayMap } from "@corenode/utils"
 
+
 const classAggregation = (baseClass, ...mixins) => {
 	class base extends baseClass {
 		constructor(...args) {
