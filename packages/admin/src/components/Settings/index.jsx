@@ -188,16 +188,15 @@ export class SettingsMenu extends React.Component {
 const controller = {
 	open: (key) => {
 		// TODO: Scroll to content
-		window.controllers.drawer.open(SettingsMenu, {
+		window.controllers.drawer.open("settings", SettingsMenu, {
 			props: {
-				onClose: controller.close,
 				width: "45%",
 			},
 		})
 	},
 
 	close: () => {
-		window.controllers.drawer.close()
+		window.controllers.drawer.close("settings")
 	},
 }
 
