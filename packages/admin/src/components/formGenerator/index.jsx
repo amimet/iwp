@@ -33,9 +33,9 @@ const allComponents = {
 export default class FormGenerator extends React.Component {
 	FormRef = React.createRef()
 
-    fieldsReferences = {}
-    unsetValues = {}
-    discardedValues = []
+	fieldsReferences = {}
+	unsetValues = {}
+	discardedValues = []
 
 	state = {
 		validating: false,
@@ -45,16 +45,16 @@ export default class FormGenerator extends React.Component {
 
 	handleFinish(payload) {
 		if (typeof this.props.onFinish === "function") {
-            // try to read unset values
-            Object.keys(this.fieldsReferences).forEach((key) => {
-                const ref = this.fieldsReferences[key].current
+			// try to read unset values
+			Object.keys(this.fieldsReferences).forEach((key) => {
+				const ref = this.fieldsReferences[key].current
 
-                if (typeof ref.state !== "undefined") {
-                    this.unsetValues[key] = ref.state?.value || ref.state?.checked
-                }
-            })
+				if (typeof ref.state !== "undefined") {
+					this.unsetValues[key] = ref.state?.value || ref.state?.checked
+				}
+			})
 
-            // filter discarded values
+			// filter discarded values
 			try {
 				const keys = Object.keys(payload)
 				this.discardedValues.forEach((id) => {
@@ -66,8 +66,8 @@ export default class FormGenerator extends React.Component {
 				// terrible
 			}
 
-            // fulfil unset values
-            payload = {...payload, ...this.unsetValues}
+			// fulfil unset values
+			payload = { ...payload, ...this.unsetValues }
 
 			return this.props.onFinish(payload)
 		}
@@ -135,7 +135,7 @@ export default class FormGenerator extends React.Component {
 		ids.forEach((_id) => {
 			const value = this.discardedValues ?? []
 			value.push(_id)
-            this.discardedValues = value
+			this.discardedValues = value
 		})
 	}
 
@@ -174,7 +174,7 @@ export default class FormGenerator extends React.Component {
 				return React.cloneElement(renderIcon, element.iconProps ? { ...element.iconProps } : null)
 			}
 		} else {
-			return formItem.prefix ?? null
+			return element.prefix ?? null
 		}
 	}
 
@@ -184,20 +184,11 @@ export default class FormGenerator extends React.Component {
 				return elements.map((field) => {
 					let { item, element } = field
 
-					//* VALIDATE
 					// check if has an id
 					if (typeof field.id === "undefined") {
 						console.error("An component does not have an ID provided")
 						return null
 					}
-
-					// check if component is available on library
-					if (typeof allComponents[element.component] === "undefined") {
-						console.warn(`[${element.component}] is not an valid component`)
-						return null
-					}
-
-					//* PARSE
 
 					// fulfill
 					if (typeof item === "undefined") {
@@ -205,6 +196,12 @@ export default class FormGenerator extends React.Component {
 					}
 					if (typeof element === "undefined") {
 						element = {}
+					}
+
+					// check if component is available on library
+					if (typeof allComponents[element.component] === "undefined") {
+						console.warn(`[${element.component}] is not an valid component`)
+						return null
 					}
 
 					// handle groups
@@ -233,18 +230,18 @@ export default class FormGenerator extends React.Component {
 					switch (element.component) {
 						case "Checkbox": {
 							elementProps.onChange = (e) => {
-                                this.unsetValues[field.id] = e.target.checked
+								this.unsetValues[field.id] = e.target.checked
 								elementProps.checked = e.target.checked
 								elementProps.value = e.target.checked
 							}
 							break
 						}
-                        case "Divider": {
-                            this.discardValueFromId(field.id)
-                            break
-                        }
+						case "Divider": {
+							this.discardValueFromId(field.id)
+							break
+						}
 						case "Button": {
-                            this.discardValueFromId(field.id)
+							this.discardValueFromId(field.id)
 							if (field.withValidation) {
 								elementProps.icon = this.state.validating ? (
 									<Icons.LoadingOutlined spin style={{ marginRight: "7px" }} />
@@ -309,11 +306,11 @@ export default class FormGenerator extends React.Component {
 							break
 						}
 					}
-                    
-                    // set reference
-                    this.fieldsReferences[field.id] = elementProps.ref = React.createRef()
 
-                    // return field
+					// set reference
+					this.fieldsReferences[field.id] = elementProps.ref = React.createRef()
+
+					// return field
 					return (
 						<div className={field.className} style={field.style} key={field.id}>
 							{field.title ?? null}
