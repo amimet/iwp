@@ -13,11 +13,14 @@ export class Drawer extends React.Component {
 	unlock = () => this.setState({ locked: false })
 	lock = () => this.setState({ locked: true })
 
-	close = () => {
+	onClose = () => {
 		if (typeof this.options.props?.closable !== "undefined" && !this.options.props?.closable) {
 			return false
 		}
+		this.close()
+	}
 
+	close = () => {
 		if (typeof this.options.onClose === "function") {
 			this.options.onClose(...context)
 		}
@@ -30,17 +33,24 @@ export class Drawer extends React.Component {
 		}, 400)
 	}
 
-	componentDidMount = () => {
+	componentDidMount = async () => {
 		if (typeof this.props.controller === "undefined") {
 			throw new Error(`Cannot mount an drawer without an controller`)
 		}
+		if (typeof this.props.component === "undefined") {
+			throw new Error(`Empty component`)
+		}
+	}
 
-		if (Array.isArray(this.options.extends)) {
-			this.options.extends.forEach((extend) => {
-				if (typeof extend === "function") {
-					extend(this)
-				}
-			})
+	onDone = () => {
+		if (typeof this.options.onDone === "function") {
+			this.options.onDone(this)
+		}
+	}
+
+	onFail = () => {
+		if (typeof this.options.onFail === "function") {
+			this.options.onFail(this)
 		}
 	}
 
@@ -57,7 +67,7 @@ export class Drawer extends React.Component {
 			onFail: this.onFail,
 		}
 
-		return <antd.Drawer {...drawerProps}>{React.createElement(this.props.children, componentProps)}</antd.Drawer>
+		return <antd.Drawer key={this.props.id} {...drawerProps}>{React.createElement(this.props.children, componentProps)}</antd.Drawer>
 	}
 }
 

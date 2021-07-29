@@ -12,8 +12,6 @@ class ModifyRole extends React.Component {
     }
 
     render() {
-        if (this.state.loading) return <div> Loading </div>
-
         return <FormGenerator
                     name="roles_createnew"
                     renderLoadingIcon
@@ -22,10 +20,10 @@ class ModifyRole extends React.Component {
                         {
                             id: "title",
                             title: "Role name",
-                            formElement: {
-                                element: "Input"
+                            element: {
+                                component: "Input"
                             },
-                            formItem: {
+                            item: {
                                 hasFeedback: true,
                                 rules: [
                                     {
@@ -38,14 +36,14 @@ class ModifyRole extends React.Component {
                         {
                             id: "permissions",
                             title: "Permissions",
-                            formElement: {
-                                element: "Select",
+                            element: {
+                                component: "Select",
                                 props: {
                                     mode: "multiple",
                                     allowClear: true,
                                 }
                             },
-                            formItem: {
+                            item: {
                                 hasFeedback: true,
                                 rules: [
                                     {
@@ -76,9 +74,8 @@ export default class Roles extends React.Component {
         })
     }
 
-
     openRoleCreator = () => {
-        window.controllers["drawer"].open(<ModifyRole />)
+        window.controllers["drawer"].open("roleCreator", ModifyRole)
     }
 
     createNewRole() {
