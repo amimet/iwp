@@ -7,13 +7,10 @@ const { createPageRender } = require("vite-plugin-ssr")
 const reactRefresh = require("@vitejs/plugin-react-refresh")
 const lessToJS = require("less-vars-to-js")
 
-const commonjs = require('@rollup/plugin-commonjs')
 const nodeResolve = require("@rollup/plugin-node-resolve").default
 const ssr = require("vite-plugin-ssr/plugin")
 
 const isProduction = process.env.NODE_ENV === "production"
-
-
 
 function getEviteServerConfig(overrides = {}) {
     const defaultAliases = {
@@ -45,10 +42,6 @@ function getEviteServerConfig(overrides = {}) {
             fs: {
                 allow: [".."]
             },
-        },
-        output: {
-            dir: 'output',
-            format: 'cjs'
         },
         css: {
             preprocessorOptions: {

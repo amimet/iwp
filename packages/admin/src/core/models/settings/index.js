@@ -1,5 +1,5 @@
 import store from 'store'
-import { EventEmitter } from 'events'
+import EventEmitter from "@foxify/events"
 import { objectToArrayMap } from '@corenode/utils'
 import handlers from 'core/handlers'
 
