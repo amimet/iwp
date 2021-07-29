@@ -76,7 +76,7 @@ export default class App extends createEviteApp({
 				try {
 					if (this.session.allowRegenerate) {
 						await session.regenerate(this.apiBridge)
-					}else {
+					} else {
 						throw new Error(`Session cant be regenerated`)
 					}
 				} catch (error) {
@@ -150,7 +150,7 @@ export default class App extends createEviteApp({
 			},
 			onRenderError: (props) => {
 				return <RenderError {...props} />
-			}
+			},
 		})
 
 		return (
@@ -174,7 +174,7 @@ export default class App extends createEviteApp({
 						return this.session
 					}}
 				>
-					<BaseLayout>{loading ? <AppLoading /> : <Page/>}</BaseLayout>
+					<BaseLayout>{loading ? <AppLoading /> : <Page />}</BaseLayout>
 				</GlobalBindingProvider>
 			</React.Fragment>
 		)
