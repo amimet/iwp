@@ -7,7 +7,7 @@ export class Drawer extends React.Component {
 
 	state = {
 		locked: this.options.locked ?? false,
-		visible: this.props.children ? true : false,
+		visible: false,
 	}
 
 	unlock = () => this.setState({ locked: false })
@@ -37,8 +37,12 @@ export class Drawer extends React.Component {
 		if (typeof this.props.controller === "undefined") {
 			throw new Error(`Cannot mount an drawer without an controller`)
 		}
-		if (typeof this.props.component === "undefined") {
+		if (typeof this.props.children === "undefined") {
 			throw new Error(`Empty component`)
+		}
+
+		if (this.props.children) {
+			this.setState({ visible: true })
 		}
 	}
 
