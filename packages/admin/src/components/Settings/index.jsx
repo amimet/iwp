@@ -1,7 +1,7 @@
 import React from "react"
 import { Icons } from "components/icons"
 import * as antd from "antd"
-
+import { SketchPicker } from "react-color"
 import "./index.less"
 
 const ItemTypes = {
@@ -12,11 +12,12 @@ const ItemTypes = {
 	Input: antd.Input,
 	InputNumber: antd.InputNumber,
 	Select: antd.Select,
+	ColorPicker: SketchPicker,
 }
 
 import settingList from "schemas/settingsList.json"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
-import * as session from 'core/models/session'
+import * as session from "core/models/session"
 
 export class SettingsMenu extends React.Component {
 	state = {
@@ -61,33 +62,50 @@ export class SettingsMenu extends React.Component {
 					console.error(`Item [${item.id}] has no an type!`)
 					return null
 				}
+				if (typeof ItemTypes[item.type] === "undefined") {
+					console.error(`Item [${item.id}] has an invalid type: ${item.type}`)
+					return null
+				}
 
 				if (typeof item.props === "undefined") {
 					item.props = {}
 				}
 
+				// fix handlers
 				switch (item.type.toLowerCase()) {
+					case "colorpicker":{
+						item.props.onChange = (value) => {
+							item.props.color = value.hex
+						}
+						item.props.onChangeComplete = (color, event) => {
+							window.app.params.settings.events.emit("changeSetting", { id: item.id, event, value: color })
+							this._set(item.id, color.hex)
+						}
+						break
+					}
 					case "switch": {
+						item.props.children = item.title ?? item.id
 						item.props.checked = this.state.settings[item.id]
+						item.props.onClick = (e) => this.handleEvent(e, item.id ?? "anon", item.type)
 						break
 					}
 
 					default: {
+						item.props.children = item.title ?? item.id
 						item.props.value = this.state.settings[item.id]
+						item.props.onClick = (e) => this.handleEvent(e, item.id ?? "anon", item.type)
 						break
 					}
 				}
+
 				return (
 					<div key={item.id}>
 						<h5>
-							{" "}
 							{item.icon ? React.createElement(Icons[item.icon]) : null}
-							{item.title ?? item.id}{" "}
+							{item.title ?? item.id}
 						</h5>
 						{item.render ??
 							React.createElement(ItemTypes[item.type], {
-								onClick: (e) => this.handleEvent(e, item.id ?? "anon", item.type),
-								children: item.title ?? item.id,
 								...item.props,
 							})}
 					</div>
@@ -164,7 +182,14 @@ export class SettingsMenu extends React.Component {
 		if (this.props.session?.valid) {
 			return (
 				<div>
-					<antd.Button onClick={() => {session.logout(this.props.api)}} type="danger">Logout</antd.Button>
+					<antd.Button
+						onClick={() => {
+							session.logout(this.props.api)
+						}}
+						type="danger"
+					>
+						Logout
+					</antd.Button>
 				</div>
 			)
 		}
