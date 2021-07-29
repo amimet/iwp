@@ -4,16 +4,17 @@ import store from 'store'
 import config from 'config'
 
 const basicsKey = config.app.storage?.basics ?? "user"
+const getDefaultBridge = () => window.app.apiBridge
 
 export function updateData() {
     // update to api
 }
 
-export async function fetchData(bridge, payload = {}, callback) {
+export async function fetchData(bridge = getDefaultBridge(), payload = {}, callback) {
     return new RequestAdaptor(bridge.get.user, [undefined, { username: payload.username, user_id: payload.user_id }], callback).send()
 }
 
-export function getLocalBasics(bridge, callback) {
+export function getLocalBasics(bridge = getDefaultBridge(), callback) {
     const storagedData = store.get(basicsKey)
 
     if (typeof storagedData === "undefined") {
@@ -35,7 +36,7 @@ export function getLocalBasics(bridge, callback) {
     }
 }
 
-export function setLocalBasics(bridge, callback) {
+export function setLocalBasics(bridge = getDefaultBridge(), callback) {
     const sessionData = session.decodeSession()
     
     if (sessionData) {

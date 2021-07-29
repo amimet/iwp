@@ -4,8 +4,9 @@ import jwt_decode from "jwt-decode"
 import config from 'config'
 
 const tokenKey = config.app.storage?.token ?? "token"
+const getDefaultBridge = () => window.app.apiBridge
 
-export async function regenerate(bridge) {
+export async function regenerate(bridge = getDefaultBridge()) {
     return new RequestAdaptor(bridge.post.regenerate, []).send()
         .then((err, data) => {
             if (!err) {
@@ -14,7 +15,7 @@ export async function regenerate(bridge) {
         })
 }
 
-export async function handleLogin(bridge, payload, callback) {
+export async function handleLogin(bridge = getDefaultBridge(), payload, callback) {
     genToken(bridge, payload, (err, res) => {
         if (typeof callback === 'function') {
             callback(err, res)
@@ -25,7 +26,7 @@ export async function handleLogin(bridge, payload, callback) {
     })
 }
 
-export async function genToken(bridge, payload, callback) {
+export async function genToken(bridge = getDefaultBridge(), payload, callback) {
     return new RequestAdaptor(bridge.post.login, [{ username: window.btoa(payload.username), password: window.btoa(payload.password), allowRegenerate: payload.allowRegenerate }], callback).send()
 }
 
@@ -49,7 +50,7 @@ export async function clear() {
 }
 
 // [API] Get all sessions for current user
-export function getAll(bridge, callback) {
+export function getAll(bridge = getDefaultBridge(), callback) {
     return new RequestAdaptor(bridge.get.sessions, [], callback).send()
 }
 
@@ -64,24 +65,24 @@ export function decodeSession() {
     return data
 }
 
-export function getCurrentTokenValidation(bridge, callback) {
+export function getCurrentTokenValidation(bridge = getDefaultBridge(), callback) {
     const session = get()
 
     return new RequestAdaptor(bridge.post.validatesession, [{ session: session }], callback).send()
 }
 
-export async function validateCurrentSession(bridge) {
+export async function validateCurrentSession(bridge = getDefaultBridge()) {
     const validation = await getCurrentTokenValidation(bridge)
     return validation.valid
 }
 
-export async function logout(bridge) {
+export async function logout(bridge = getDefaultBridge()) {
     await destroySession(bridge)
     clear()
 }
 
 // [API] Destroy session for current storaged session
-export async function destroySession(bridge) {
+export async function destroySession(bridge = getDefaultBridge()) {
     const session = decodeSession()
 
     if (session) {
@@ -93,7 +94,7 @@ export async function destroySession(bridge) {
 }
 
 // [API] Destroy all session for current user
-export async function destroyAll(bridge) {
+export async function destroyAll(bridge = getDefaultBridge()) {
     const session = decodeSession()
 
     if (session) {

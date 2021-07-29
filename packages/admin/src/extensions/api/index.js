@@ -11,6 +11,8 @@ export default {
                 async (self) => {
                     const bridge = await self.createBridge()
                     self.apiBridge = bridge
+
+                    self.appendToApp("apiBridge", Object.freeze(self.apiBridge))
                 },
             ],
             self: {
