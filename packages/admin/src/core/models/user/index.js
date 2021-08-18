@@ -38,7 +38,7 @@ export function getLocalBasics(bridge = getDefaultBridge(), callback) {
 
 export function setLocalBasics(bridge = getDefaultBridge(), callback) {
     const sessionData = session.decodeSession()
-    
+
     if (sessionData) {
         fetchData(bridge, { username: sessionData.username }, (err, res) => {
             if (typeof callback === 'function') {
@@ -49,7 +49,30 @@ export function setLocalBasics(bridge = getDefaultBridge(), callback) {
                 store.set(basicsKey, window.btoa(JSON.stringify(res.data)))
             }
         })
-    }else {
+    } else {
         console.warn("Cannot setLocalBasic without an valid session")
     }
+}
+
+export function getCurrentUser() {
+    let currentUser = Object()
+
+    const sessionData = session.decodeSession()
+    const basicsData = getLocalBasics()
+
+    if (sessionData) {
+        currentUser = { ...currentUser, session: sessionData }
+    }
+    if (basicsData) {
+        currentUser = { ...currentUser, ...basicsData }
+    }
+
+    if (!currentUser.avatar) {
+        currentUser.avatar = config.defaults.avatar
+    }
+    if (!currentUser.username) {
+        currentUser.username = "Guest"
+    }
+
+    return currentUser
 }
