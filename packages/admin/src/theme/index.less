@@ -93,3 +93,33 @@ body {
 // @media (min-width: @screen-xxl) {
 
 // }
+
+.horizontal_actions_cascade {
+  > div:first-child {
+      transform: unset;
+  }
+
+  > div {
+      transform: translate(0, -10px);
+  }
+}
+
+
+.horizontal_actions {
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+
+  > div {
+      padding: 0 10px;
+  }
+
+  padding: 20px 0;
+
+  border-bottom: #424242 solid 1px;
+  border-left: #424242 solid 1px;
+  border-right: #424242 solid 1px;
+
+  border-radius: 0 0 12px 12px;
+}
