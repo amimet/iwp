@@ -9,6 +9,64 @@ const { Option } = Select
 
 const api = window.app.apiBridge
 
+class WorkloadCreator extends React.Component {
+	state = {
+		selectedRegion: null,
+		regions: [],
+	}
+
+	componentDidMount = async () => {
+		await api.get
+			.regions()
+			.then((data) => {
+				this.setState({ regions: data })
+			})
+			.catch((err) => {
+				console.log(err)
+				this.setState({ error: err })
+			})
+	}
+
+	generateRegionsOption = () => {
+		return this.state.regions.map((region) => {
+			return <Option value={region.id}>{region.data.name}</Option>
+		})
+	}
+
+	create = () => {}
+
+	render() {
+		return (
+			<div>
+				<div>
+					<h2><Icons.GitCommit /> Create new Workload</h2>
+				</div>
+
+				<div>
+					<Select
+						showSearch
+						style={{ width: "100%" }}
+						placeholder="Select a region"
+						optionFilterProp="children"
+						onChange={(region) => {
+							this.setState({ selectedRegion: region })
+						}}
+						filterOption={(input, option) =>
+							option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+						}
+					>
+						{this.generateRegionsOption()}
+					</Select>
+				</div>
+
+				<div className="component_bottom_centered" style={{ paddingBottom: "30px" }}>
+					<Button onClick={this.create}>Create</Button>
+				</div>
+			</div>
+		)
+	}
+}
+
 export default class Workload extends React.Component {
 	state = {
 		loading: true,
@@ -71,7 +129,18 @@ export default class Workload extends React.Component {
 		return (
 			<div className="horizontal_actions">
 				<div>
-					<Button icon={<Icons.Plus />}>New Workload</Button>
+					<Button
+						onClick={() => {
+							window.controllers.drawer.open("workload_creator", WorkloadCreator, {
+								props: {
+									width: "45%",
+								},
+							})
+						}}
+						icon={<Icons.Plus />}
+					>
+						New Workload
+					</Button>
 				</div>
 			</div>
 		)
