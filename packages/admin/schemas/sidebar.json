@@ -6,6 +6,11 @@
         "locked": true
     },
     {
+        "id": "workload",
+        "title": "Workload",
+        "icon": "GitCommit"
+    },
+    {
         "id": "users",
         "title": "Users",
         "icon": "Users",
@@ -19,11 +24,6 @@
                 "id": "users/roles",
                 "title": "Roles",
                 "icon": "Link"
-            },
-            {
-                "id": "users/workload",
-                "title": "Workload",
-                "icon": "GitCommit"
             },
             {
                 "id": "users/workshifts",
