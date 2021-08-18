@@ -24,7 +24,7 @@ const classAggregation = (baseClass, ...mixins) => {
 	}
 
 	mixins.forEach((mixin) => {
-		// outside contructor() to allow aggregation(A,B,C).staticFunction() to be called etc.
+		// outside constructor() to allow aggregation(A,B,C).staticFunction() to be called etc.
 		copyProps(base.prototype, mixin.prototype)
 		copyProps(base, mixin)
 	})
