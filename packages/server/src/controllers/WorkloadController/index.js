@@ -4,15 +4,13 @@ export const WorkloadController = {
     get: (req, res, next) => {
         const { region } = req.query
 
-        GeoRegion.findOne({ region }).then((regionsData) => {
-            if (!regionsData) return res.status(404).json(`No data finded`)
-            const subRegions = regionsData.sub
-
-            Workload.find({ region }).then((data) => {
-                if (!data) return res.status(404).json(`No workloads for this region`)
-                return res.json({ subRegions, data })
+        Workload.find({ regionId: region })
+            .then((data) => {
+                res.json(data)
             })
-        })
+            .catch((err) => {
+                res.status(500).res.json({ error: err})
+            })
 
     },
     update: (req, res, next) => {
