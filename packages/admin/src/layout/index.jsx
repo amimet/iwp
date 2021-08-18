@@ -48,7 +48,7 @@ export default class BaseLayout extends React.Component {
 		})
 
 		window.app.busEvent.on("cleanAll", () => {
-			window.controllers["drawer"].close()
+			window.controllers["drawer"].closeAll()
 		})
 	}
 

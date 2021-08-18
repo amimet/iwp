@@ -87,6 +87,7 @@ export default class DrawerController extends React.Component {
 	componentDidMount() {
 		this.windowController.add("open", this.open, { lock: true })
 		this.windowController.add("close", this.close, { lock: true })
+		this.windowController.add("closeAll", this.closeAll, { lock: true })
 	}
 
 	open = (id, component, options) => {
@@ -146,6 +147,12 @@ export default class DrawerController extends React.Component {
 		} else {
 			return console.warn("This drawer not exists")
 		}
+	}
+
+	closeAll = () => {
+		this.state.drawers.forEach(drawer =>{
+			drawer.ref.current.close()
+		})
 	}
 
 	render() {
