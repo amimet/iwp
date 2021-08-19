@@ -1,7 +1,6 @@
 import React from "react"
 import { Controller } from "core/libs"
 import * as antd from "antd"
-
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
 
@@ -20,7 +19,7 @@ export class Drawer extends React.Component {
 		this.close()
 	}
 
-	close = () => {
+	close = (context) => {
 		if (typeof this.options.onClose === "function") {
 			this.options.onClose(...context)
 		}
@@ -46,15 +45,15 @@ export class Drawer extends React.Component {
 		}
 	}
 
-	onDone = () => {
+	onDone = (...context) => {
 		if (typeof this.options.onDone === "function") {
-			this.options.onDone(this)
+			this.options.onDone(this, ...context)
 		}
 	}
 
-	onFail = () => {
+	onFail = (...context) => {
 		if (typeof this.options.onFail === "function") {
-			this.options.onFail(this)
+			this.options.onFail(this, ...context)
 		}
 	}
 
@@ -71,7 +70,11 @@ export class Drawer extends React.Component {
 			onFail: this.onFail,
 		}
 
-		return <antd.Drawer key={this.props.id} {...drawerProps}>{React.createElement(this.props.children, componentProps)}</antd.Drawer>
+		return (
+			<antd.Drawer key={this.props.id} {...drawerProps}>
+				{React.createElement(this.props.children, componentProps)}
+			</antd.Drawer>
+		)
 	}
 }
 
@@ -150,7 +153,7 @@ export default class DrawerController extends React.Component {
 	}
 
 	closeAll = () => {
-		this.state.drawers.forEach(drawer =>{
+		this.state.drawers.forEach((drawer) => {
 			drawer.ref.current.close()
 		})
 	}
