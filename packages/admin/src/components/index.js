@@ -9,6 +9,8 @@ export { default as RenderError } from './RenderError'
 
 export { default as Sessions } from './Sessions'
 export { default as Roles } from './Roles'
+export { default as ActionsBar } from './ActionsBar' 
+export { default as SelectableList } from './SelectableList'
 
 export {
     ButtonMenu,
