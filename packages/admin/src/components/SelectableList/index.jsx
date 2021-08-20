@@ -173,19 +173,19 @@ export default class SelectableList extends React.Component {
 						selected: this.state.selectedKeys.includes(item.key),
 					})}
 				>
-					{typeof this.props.renderItem === "function"? this.props.renderItem(item) : React.cloneElement(item.render)}
+					{typeof this.props.renderItem === "function"
+						? this.props.renderItem(item)
+						: React.cloneElement(item.render)}
 				</div>
 			)
 		}
-		
+		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } = this.props
+		const listProps = { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading }
+
 		return (
 			<div>
 				{this.renderActions()}
-				<List
-					{...this.props}
-					dataSource={this.state.data}
-					renderItem={renderMethod}
-				/>
+				<List {...listProps} dataSource={this.state.data} renderItem={renderMethod} />
 			</div>
 		)
 	}
