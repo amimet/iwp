@@ -60,7 +60,7 @@ function craftFabricObject({ obj, props, quantity = 1 }) {
 }
 
 const ActionIcon = (props) => (
-	<Space style={{ cursor: 'pointer' }} onClick={props.onClick}>
+	<Space key={props.key} style={{ cursor: 'pointer' }} onClick={props.onClick}>
 		{React.createElement(props.icon)}
 		{props.text}
 	</Space>
@@ -87,7 +87,7 @@ export default class WorkloadCreator extends React.Component {
 
 	generateRegionsOption = () => {
 		return this.state.regions.map((region) => {
-			return <Option value={region.id}>{region.data.name}</Option>
+			return <Option key={region.id} value={region.id}>{region.data.name}</Option>
 		})
 	}
 
