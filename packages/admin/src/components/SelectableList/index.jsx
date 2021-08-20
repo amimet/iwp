@@ -92,7 +92,7 @@ export default class SelectableList extends React.Component {
 			if (Array.isArray(this.props.actions)) {
 				return this.props.actions.map((action) => {
 					return (
-						<div>
+						<div key={action.key}>
 							<Button
 								style={{
 									...action.props.style,
@@ -136,7 +136,7 @@ export default class SelectableList extends React.Component {
 		return (
 			<div className="bottomActions_wrapper">
 				<ActionsBar style={{ borderRadius: "8px 8px 0 0", width: "fit-content" }}>
-					<div>
+					<div key="discard">
 						<Button
 							style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
 							shape="circle"
@@ -146,7 +146,7 @@ export default class SelectableList extends React.Component {
 							{this.props.onDiscardRender ?? <Icons.X style={{ margin: 0, padding: 0 }} />}
 						</Button>
 					</div>
-					<div>
+					<div key="done">
 						<Button type="primary" onClick={this.onDone} {...this.props.onDoneProps}>
 							{this.props.onDoneRender ?? (
 								<>

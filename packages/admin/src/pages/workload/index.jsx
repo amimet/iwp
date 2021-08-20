@@ -67,13 +67,13 @@ export default class Workload extends React.Component {
 
 	generateRegionsOption = () => {
 		return this.state.regions.map((region) => {
-			return <Option value={region.id}>{region.data.name}</Option>
+			return <Option key={region.id} value={region.id}>{region.data.name}</Option>
 		})
 	}
 
 	renderAdminActions = () => {
 		return [
-			<div>
+			<div key="new_workload">
 				<Button
 					type="primary"
 					onClick={() => {
@@ -117,6 +117,7 @@ export default class Workload extends React.Component {
 					<ActionsBar>
 						{hasAdmin() && this.renderAdminActions()}
 						<Select
+							key="region_select"
 							showSearch
 							style={{ width: 200 }}
 							placeholder="Select a region"
