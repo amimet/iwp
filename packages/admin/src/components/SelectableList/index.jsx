@@ -163,25 +163,28 @@ export default class SelectableList extends React.Component {
 	}
 
 	render() {
+		const renderMethod = (item) => {
+			return (
+				<div
+					key={item.key}
+					onClick={() => this.onClickKey(item.key)}
+					className={classnames("selectableList_item", {
+						selection: this.state.selectionEnabled,
+						selected: this.state.selectedKeys.includes(item.key),
+					})}
+				>
+					{typeof this.props.renderItem === "function"? this.props.renderItem(item) : React.cloneElement(item.render)}
+				</div>
+			)
+		}
+		
 		return (
 			<div>
 				{this.renderActions()}
 				<List
+					{...this.props}
 					dataSource={this.state.data}
-					renderItem={(item) => {
-						return (
-							<div
-								key={item.key}
-								onClick={() => this.onClickKey(item.key)}
-								className={classnames("selectableList_item", {
-									selection: this.state.selectionEnabled,
-									selected: this.state.selectedKeys.includes(item.key),
-								})}
-							>
-								{React.cloneElement(item.render)}
-							</div>
-						)
-					}}
+					renderItem={renderMethod}
 				/>
 			</div>
 		)
