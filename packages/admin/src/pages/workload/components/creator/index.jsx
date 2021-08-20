@@ -59,8 +59,8 @@ function craftFabricObject({ obj, props, quantity = 1 }) {
 	}
 }
 
-const IconText = (props) => (
-	<Space onClick={props.onClick}>
+const ActionIcon = (props) => (
+	<Space style={{ cursor: 'pointer' }} onClick={props.onClick}>
 		{React.createElement(props.icon)}
 		{props.text}
 	</Space>
@@ -152,7 +152,7 @@ export default class WorkloadCreator extends React.Component {
 							<List.Item
 								key={item.key}
 								actions={[
-									<IconText
+									<ActionIcon
 										onClick={() => {
 											this.removeItem(item.uuid)
 										}}
@@ -160,13 +160,13 @@ export default class WorkloadCreator extends React.Component {
 										text="Remove"
 										key="remove"
 									/>,
-									<IconText icon={Icons.Edit} text="Modify" key="modify" />,
+									<ActionIcon icon={Icons.Edit} text="Modify" key="modify" />,
 								]}
 							>
 								<List.Item.Meta
 									title={
 										<a>
-											{item.title} <Tag>{item.key}</Tag>
+											x{item.quantity?? 1} | {item.title} <Tag>{item.key}</Tag>
 										</a>
 									}
 									description={item.description}
