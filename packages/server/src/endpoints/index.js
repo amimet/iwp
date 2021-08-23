@@ -68,6 +68,27 @@ module.exports = [
         fn: "set"
     },
     {
+        route: "/fabricItem",
+        method: "PUT",
+        controller: "FabricController",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "create"
+    },
+    {
+        route: "/fabricItems",
+        method: "GET",
+        controller: "FabricController",
+        middleware: ["ensureAuthenticated"],
+        fn: "getAll"
+    },
+    {
+        route: "/fabricItem",
+        method: "GET",
+        controller: "FabricController",
+        middleware: ["ensureAuthenticated"],
+        fn: "get"
+    },
+    {
         route: "/workload",
         method: "GET",
         controller: "WorkloadController",
