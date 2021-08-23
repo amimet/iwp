@@ -1,62 +1,38 @@
 import React from "react"
 import { Icons } from "components/Icons"
 import { LoadingSpinner } from "components"
-import {  Button,  List,  Checkbox, InputNumber } from "antd"
+import { Button, List, Checkbox, InputNumber } from "antd"
 
 import "../../index.less"
 
-let mockFabricDB = [
-	{
-		key: "pantalon_test",
-		title: "Pantalon TEST (MARCA)",
-		img: "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png",
-		description: "Pantalon basico, prueba",
-		cost: 20,
-		timeSpend: 4000, // on seconds
-		props: {
-			color_white: {
-				title: "Color Blanco",
-				description: "Tinte de color blanco",
-			},
-			bolsillo_basico: {
-				title: "Bolsillo basico",
-				description: "Bolsillo (100x100 Profundidad)",
-				timeSpend: 1000,
-			},
-			buttons: {
-				title: "Botones",
-				timeSpend: 2400,
-				cost: 5,
-			},
-		},
-	},
-]
+const api = window.app.apiBridge
 
 export default class WorkloadSelector extends React.Component {
 	state = {
+		error: false,
 		loading: true,
 		items: [],
 		selectedItem: false,
 	}
 
 	componentDidMount = async () => {
-		let items = []
-
-		// TODO: collect all items from API
-
-		//mock data
-		items = mockFabricDB
-
-		//update state
-		this.setState({
-			items: [...this.state.items, ...items],
-			loading: false,
+		api.get.fabricitems()
+		.then((items) => {
+			this.setState({
+				items: [...this.state.items, ...items],
+				loading: false,
+			})
+		})
+		.catch((err) => {
+			this.setState({
+				error: err
+			})
 		})
 	}
 
 	handleDone = (obj, props, quantity) => {
 		if (typeof this.props.onDone === "function") {
-			this.props.onDone({obj, props, quantity})
+			this.props.onDone({ obj, props, quantity })
 		}
 	}
 
@@ -105,21 +81,22 @@ export default class WorkloadSelector extends React.Component {
 				</div>
 				<div className="workload_item_selection_wrapper">
 					<div className="workload_item_selection_header">
-						<img src={item.img} />
+						{item.img && <img src={item.img} />} 
 						<h3>{item.title}</h3>
 						<p>{item.description}</p>
 					</div>
 					<div className="workload_item_selection_props">
-						{Object.keys(item.props).map((key) => {
-							const prop = item.props[key]
-							return (
-								<div>
-									<Checkbox id={key} key={key} onChange={handlePropCheckbox}>
-										{prop.title}
-									</Checkbox>
-								</div>
-							)
-						})}
+						{item.props &&
+							Object.keys(item.props).map((key) => {
+								const prop = item.props[key]
+								return (
+									<div>
+										<Checkbox id={key} key={key} onChange={handlePropCheckbox}>
+											{prop.title}
+										</Checkbox>
+									</div>
+								)
+							})}
 					</div>
 					<div className="workload_item_selection_actions">
 						<InputNumber
