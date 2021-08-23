@@ -1,0 +1,28 @@
+export function schematized(schema, fn) {
+    return async (req, res, next) => {
+        const missingKeys = []
+        const requiredKeys = Object.keys(schema).filter((key) => {
+            const field = schema[key]
+
+            if (field.required) {
+                return key
+            }
+        })
+
+        for await (let key of requiredKeys) {
+            if (typeof req.body[key] === "undefined") {
+                missingKeys.push(key)
+            }
+        }
+
+        if (missingKeys.length > 0) {
+            return res.status(400).json({ error: `Missing required keys > ${missingKeys}` })
+        } else {
+            if (typeof fn === "function") {
+                return await fn(req, res, next)
+            }
+        }
+    }
+}
+
+export default schematized
