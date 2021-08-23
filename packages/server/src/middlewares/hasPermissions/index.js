@@ -2,6 +2,7 @@ export const hasPermissions = (req, res, next) => {
     if (typeof (req.userData) == "undefined") {
         return res.status(403).json(`User data is not available, please ensure if you are authenticated`)
     }
+    
     const { _id, username, roles } = req.userData
     const { permissions } = req.body
 
