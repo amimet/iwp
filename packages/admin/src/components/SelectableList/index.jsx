@@ -6,7 +6,6 @@ import { List, Button } from "antd"
 import classnames from "classnames"
 
 import "./index.less"
-
 export default class SelectableList extends React.Component {
 	state = {
 		data: [],
@@ -20,9 +19,9 @@ export default class SelectableList extends React.Component {
 			})
 		}
 
-		if (typeof this.props.data !== "undefined" && Array.isArray(this.props.data)) {
+		if (typeof this.props.items !== "undefined" && Array.isArray(this.props.items)) {
 			this.setState({
-				data: [...this.props.data],
+				data: [...this.state.data,...this.props.items],
 			})
 		}
 
@@ -164,13 +163,15 @@ export default class SelectableList extends React.Component {
 
 	render() {
 		const renderMethod = (item) => {
+			const _key = item.key ?? item.id ?? item._id
+
 			return (
 				<div
-					key={item.key}
-					onClick={() => this.onClickKey(item.key)}
+					key={_key}
+					onClick={() => this.onClickKey(_key)}
 					className={classnames("selectableList_item", {
 						selection: this.state.selectionEnabled,
-						selected: this.state.selectedKeys.includes(item.key),
+						selected: this.state.selectedKeys.includes(_key),
 					})}
 				>
 					{typeof this.props.renderItem === "function"
