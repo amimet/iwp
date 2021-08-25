@@ -1,8 +1,8 @@
-import { GeoRegion, Workload } from '../../models'
+import { Workload } from '../../models'
 import { Schematized } from '../../lib'
 
 export const WorkloadController = {
-    getAll: async (req, res, next) => {
+    getAll: async (req, res) => {
         let query = {}
 
         Object.keys(req.query).forEach(key => {
@@ -22,7 +22,7 @@ export const WorkloadController = {
         const workload = await Workload.findOne({ ...query })
         return res.json(workload)
     },
-    set: Schematized(["items"], async (req, res, next) => {
+    set: Schematized(["items"], async (req, res) => {
         const { items, region } = req.body
 
         const obj = {
@@ -31,14 +31,30 @@ export const WorkloadController = {
             region,
         }
 
-        // check with DB
-
-
+        Workload.create(obj)
 
         return res.json(obj)
     }),
-    remove: (req, res, next) => {
+    delete: async (req, res) => {
+        let deleted = []
+        let queue = []
 
+        const { id } = req.query
+
+        if (Array.isArray(id)) {
+            query = id
+        } else {
+            queue.push(id)
+        }
+
+        for await (let _id of queue) {
+            const result = await Workload.findByIdAndDelete({ _id })
+            if (result != null) {
+                deleted.push(_id)
+            }
+        }
+
+        return res.json({ deleted })
     },
 }
 

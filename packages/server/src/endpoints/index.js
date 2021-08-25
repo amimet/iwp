@@ -110,6 +110,13 @@ module.exports = [
         fn: "set"
     },
     {
+        route: "/workload",
+        method: "DELETE",
+        controller: "WorkloadController",
+        middleware: "ensureAuthenticated",
+        fn: "delete"
+    },
+    {
         route: "/vault",
         method: "GET",
         controller: "VaultController",

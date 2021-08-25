@@ -60,7 +60,7 @@ function craftFabricObject({ obj, props, quantity = 1 }) {
 }
 
 const ActionIcon = (props) => (
-	<Space style={{ cursor: 'pointer' }} onClick={props.onClick}>
+	<Space style={{ cursor: "pointer" }} onClick={props.onClick}>
 		{React.createElement(props.icon)}
 		{props.text}
 	</Space>
@@ -73,6 +73,12 @@ export default class WorkloadCreator extends React.Component {
 		items: [],
 	}
 
+	onDone = () => {
+		if (typeof this.props.onDone === "function") {
+			return this.props.onDone()
+		}
+	}
+
 	componentDidMount = async () => {
 		await api.get
 			.regions()
@@ -83,12 +89,6 @@ export default class WorkloadCreator extends React.Component {
 				console.log(err)
 				this.setState({ error: err })
 			})
-	}
-
-	generateRegionsOption = () => {
-		return this.state.regions.map((region) => {
-			return <Option key={region.id} value={region.id}>{region.data.name}</Option>
-		})
 	}
 
 	addItem = () => {
@@ -113,7 +113,39 @@ export default class WorkloadCreator extends React.Component {
 		this.setState({ items: this.state.items.filter((item) => item.uuid !== uuid) })
 	}
 
-	create = () => {}
+	submit = async () => {
+		this.setState({ submitting: true })
+
+		const { selectedRegion, items } = this.state
+		const workload = {
+			region: selectedRegion,
+			items,
+		}
+
+		await api.put
+			.workload(workload)
+			.then((data) => {
+				if (data) {
+					console.log(data)
+					this.setState({ submitting: false })
+					this.onDone()
+				}
+			})
+			.catch((err) => {
+				console.log(err)
+				this.setState({ error: err })
+			})
+	}
+
+	generateRegionsOption = () => {
+		return this.state.regions.map((region) => {
+			return (
+				<Option key={region.id} value={region.id}>
+					{region.data.name}
+				</Option>
+			)
+		})
+	}
 
 	render() {
 		if (this.state.loading) return <LoadingSpinner />
@@ -166,7 +198,7 @@ export default class WorkloadCreator extends React.Component {
 								<List.Item.Meta
 									title={
 										<a>
-											x{item.quantity?? 1} | {item.title} <Tag>{item.id}</Tag>
+											x{item.quantity ?? 1} | {item.title} <Tag>{item.id}</Tag>
 										</a>
 									}
 									description={item.description}
@@ -189,7 +221,8 @@ export default class WorkloadCreator extends React.Component {
 				<Button onClick={this.addItem}>Add item</Button>
 
 				<div className="component_bottom_centered" style={{ paddingBottom: "30px" }}>
-					<Button type="primary" onClick={this.create}>
+					<Button disabled={this.state.submitting} type="primary" onClick={this.submit}>
+						{this.state.submitting && <Icons.LoadingOutlined spin />}
 						Create
 					</Button>
 				</div>
