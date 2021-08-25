@@ -1,26 +1,25 @@
 import cloudlink from '@ragestudio/cloudlink'
-import { objectToArrayMap } from "@corenode/utils"
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
+import axios from 'axios'
 
 import { User } from './models'
+
+const b64Decode = global.b64Decode = (data) => {
+    return Buffer.from(data, 'base64').toString('utf-8')
+}
+
+const b64Encode = global.b64Encode = (data) => {
+    return Buffer.from(data, 'utf-8').toString('base64')
+}
 
 const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
 
-function b64Decode(data) {
-    return Buffer.from(data, 'base64').toString('utf-8')
-}
-
-function b64Encode(data) {
-    return Buffer.from(data, 'utf-8').toString('base64')
-}
-
 const invalidKeys = ["password"]
-
 class Server {
     constructor() {
         this.env = _env
@@ -64,37 +63,12 @@ class Server {
         }
 
         this.server.use((req, res, next) => {
-            res.safeSend = (data, ...context) => {
-                res.send(this.securizeData(data), ...context)
-            }
-
-            res.safeJson = (data, ...context) => {
-                res.json(this.securizeData(data), ...context)
-            }
-
-            next()
-        })
-
-        this.server.use((req, res, next) => {
             req.server_instance = this.instance
 
             next()
         })
 
         this.instance.init()
-    }
-
-    securizeData(data) {
-        if (typeof data === "object") {
-            const values = Object.values(data)
-            data = values[values.length - 2]
-
-            invalidKeys.forEach((key) => {
-                delete data[key]
-            })
-        }
-
-        return data
     }
 
     getDBConnectionString() {
@@ -130,14 +104,15 @@ class Server {
             session: false
         }, (username, password, done) => {
             User.findOne({ username: b64Decode(username) }).select('+password')
-                .then((data) => {
+                .then(async (data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
                     } else if (!bcrypt.compareSync(b64Decode(password), data.password)) {
                         return done(null, false, this.options.jwtStrategy)
                     }
-
-                    return done(null, data, this.options.jwtStrategy)
+                                        
+                    // create a token
+                    return done(null, data, this.options.jwtStrategy, { username, password })
                 })
                 .catch(err => done(err, null, this.options.jwtStrategy))
         }))
