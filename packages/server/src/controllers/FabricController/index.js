@@ -12,11 +12,7 @@ export const FabricController = {
 
         return res.json(objects)
     },
-    create: Schematized({
-        id: { required: true, type: String },
-        title: { required: true, type: String },
-        description: String,
-    }, async (req, res) => {
+    create: Schematized(["id", "title"], async (req, res) => {
         const { id, title, description, img, props, cost, timeSpend } = req.body
 
         let craft = { id, title, description, img, props, cost, timeSpend }
