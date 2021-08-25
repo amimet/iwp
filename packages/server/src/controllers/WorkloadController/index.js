@@ -1,27 +1,45 @@
 import { GeoRegion, Workload } from '../../models'
+import { Schematized } from '../../lib'
 
 export const WorkloadController = {
-    get: (req, res, next) => {
-        const { region } = req.query
+    getAll: async (req, res, next) => {
+        let query = {}
 
-        Workload.find({ regionId: region })
-            .then((data) => {
-                res.json(data)
-            })
-            .catch((err) => {
-                res.status(500).res.json({ error: err})
-            })
+        Object.keys(req.query).forEach(key => {
+            query[key] = req.query[key]
+        })
 
+        const workloads = await Workload.find({ ...query })
+        return res.json(workloads)
     },
-    update: (req, res, next) => {
+    get: async (req, res, next) => {
+        let query = {}
 
+        Object.keys(req.query).forEach(key => {
+            query[key] = req.query[key]
+        })
+
+        const workload = await Workload.findOne({ ...query })
+        return res.json(workload)
     },
+    set: Schematized(["items"], async (req, res, next) => {
+        const { items, region } = req.body
+
+        const obj = {
+            created: new Date().getTime(),
+            items,
+            region,
+        }
+
+        // check with DB
+
+
+
+        return res.json(obj)
+    }),
     remove: (req, res, next) => {
 
     },
-    set: (req, res, next) => {
-        const { } = req.body
-    }
 }
 
 export default WorkloadController
