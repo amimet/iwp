@@ -89,6 +89,13 @@ module.exports = [
         fn: "get"
     },
     {
+        route: "/workloads",
+        method: "GET",
+        controller: "WorkloadController",
+        middleware: "ensureAuthenticated",
+        fn: "getAll"
+    },
+    {
         route: "/workload",
         method: "GET",
         controller: "WorkloadController",
@@ -97,7 +104,7 @@ module.exports = [
     },
     {
         route: "/workload",
-        method: "POST",
+        method: "PUT",
         controller: "WorkloadController",
         middleware: "ensureAuthenticated",
         fn: "set"
