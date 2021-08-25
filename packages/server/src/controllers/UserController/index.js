@@ -1,7 +1,5 @@
 import passport from 'passport'
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { nanoid } from 'nanoid'
 
 import { User, Session } from '../../models'
 import SessionController from '../SessionController'
@@ -170,8 +168,8 @@ export const UserController = {
         await user.save()
         return res.send("done")
     },
-    login: (req, res, next) => {
-        passport.authenticate("local", { session: false }, (error, user, options) => {
+    login: async (req, res, next) => {
+        passport.authenticate("local", { session: false }, async (error, user, options) => {
             if (error) {
                 return res.status(500).json(`Error validating user > ${error.message}`)
             }
