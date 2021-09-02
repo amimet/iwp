@@ -179,12 +179,12 @@ export class SettingsMenu extends React.Component {
 	}
 
 	renderLogout() {
-		if (this.props.session?.valid) {
+		if (window.app.isValidSession()) {
 			return (
 				<div>
 					<antd.Button
 						onClick={() => {
-							session.logout(this.props.api)
+							session.logout()
 						}}
 						type="danger"
 					>
