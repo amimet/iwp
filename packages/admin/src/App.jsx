@@ -2,7 +2,7 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import ngProgress from "nprogress"
 
-import { AppLoading, NotFound, RenderError } from "components"
+import { NotFound, RenderError, AppLoading } from "components"
 import BaseLayout from "./layout"
 import config from "config"
 
@@ -12,11 +12,25 @@ import * as user from "core/models/user"
 import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
-import { createEviteApp, GlobalBindingProvider } from "evite"
-import { API, Render } from "extensions"
+import { createEviteApp, GlobalBindingProvider, createAppMethod } from "evite"
+import { API, Render, Splash } from "extensions"
 
+const SplashExtension = Splash({ 
+	logo: config.logo.alt, 
+	preset: "fadeOut",
+	velocity: 1000, 
+	props: {
+		logo: {
+			style: {
+				marginBottom: "10%",
+				stroke: "black",
+			}
+		},
+		
+	} 
+})
 export default class App extends createEviteApp({
-	extensions: [API, Render],
+	extensions: [API, Render, SplashExtension,],
 }) {
 	constructor(props) {
 		super(props)
@@ -34,8 +48,6 @@ export default class App extends createEviteApp({
 		}
 
 		//
-		this.appendToApp("reloadAppState", this.reloadAppState)
-
 		this.appendToApp("about", {
 			siteName: config.app.siteName,
 			title: config.app.title,
@@ -46,12 +58,16 @@ export default class App extends createEviteApp({
 
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
 
+	reloadAppState = createAppMethod("reloadAppState", async () => {
+		await this.initialization()
+	})
+
+	isValidSession = createAppMethod("isValidSession", () => {
+		return this.session?.valid ?? false
+	})
+
 	componentDidMount() {
 		this._init()
-	}
-
-	reloadAppState = async () => {
-		await this.initialization()
 	}
 
 	initialization = async () => {
@@ -123,26 +139,8 @@ export default class App extends createEviteApp({
 		}
 	}
 
-	reducer = (state, action) => {
-		const { type, payload } = action
-		switch (type) {
-			case "UPDATE_CART": {
-				return {
-					...state,
-					cart: {
-						...state.cart,
-						...payload,
-					},
-				}
-			}
-
-			default:
-				return state
-		}
-	}
-
 	render() {
-		const loading = this.state.loading
+		const { loading } = this.state
 
 		const Page = this.createPageRender({
 			on404: (props) => {
@@ -162,10 +160,6 @@ export default class App extends createEviteApp({
 				<GlobalBindingProvider
 					user={() => {
 						return this.user ?? {}
-					}}
-					withGlobalState={() => {
-						const [state, dispatch] = React.useReducer(this.reducer, {})
-						return () => [state, dispatch]
 					}}
 					api={() => {
 						return this.apiBridge
