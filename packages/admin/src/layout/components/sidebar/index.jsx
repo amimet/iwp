@@ -170,10 +170,6 @@ class SidebarEdit extends React.Component {
 export default class Sidebar extends React.Component {
     constructor(props){
         super(props)
-        const [state, dispatch] = this.props.withGlobalState()
-        
-        this.globalState = state ?? {}
-        this.dispatcher = dispatch
 
         this.controller = new Controller({ id: "sidebar", locked: true })
         this.sidebarComponentsMap = {
@@ -189,7 +185,7 @@ export default class Sidebar extends React.Component {
             loading: true,
             pathResolve: {},
             menus: {},
-            theme: this.globalState.theme?.activeTheme ?? "light"
+            theme: window.app.params.settings.get("activeTheme") ?? "light"
         }
     }
 
