@@ -98,7 +98,7 @@ export default class Workload extends React.Component {
 			content: keys.map((key) => {
 				return <div>{key}</div>
 			}),
-			onOk() {
+			onOk: () => {
 				return new Promise((resolve, reject) => {
 					api.delete
 						.workload({id: keys})
