@@ -2,8 +2,6 @@ import cloudlink from '@ragestudio/cloudlink'
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
-import axios from 'axios'
-
 import { User } from './models'
 
 const b64Decode = global.b64Decode = (data) => {
@@ -110,7 +108,7 @@ class Server {
                     } else if (!bcrypt.compareSync(b64Decode(password), data.password)) {
                         return done(null, false, this.options.jwtStrategy)
                     }
-                                        
+
                     // create a token
                     return done(null, data, this.options.jwtStrategy, { username, password })
                 })
