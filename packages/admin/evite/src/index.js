@@ -112,10 +112,10 @@ function getEviteConstructor(context) {
 			})
 		}
 
-		getThisContext(){
+		getThisContext() {
 			return this
 		}
-		
+
 		bindSelf(self) {
 			const keys = Object.keys(self)
 
@@ -200,6 +200,12 @@ const GlobalBindingProvider = (props) => {
 
 		context[prop.key] = prop.value
 	})
+
+	if (Array.isArray(props.children)) {
+		return props.children.map((children) => {
+			return React.cloneElement(children, { ...context })
+		})
+	}
 
 	return React.cloneElement(props.children, { ...context })
 }
