@@ -3,7 +3,7 @@ import { Session } from '../../models'
 
 export default async (req, res, next) => {
     function fail() {
-        return res.status(403).json(`This request needs authentication that you do not have`)
+        return res.status(401).json(`This request needs authentication that you do not have`)
     }
 
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -11,7 +11,7 @@ export default async (req, res, next) => {
 
         passport.authenticate('jwt', { session: false }, async (err, user, decoded) => {
             if (err) {
-                return res.status(403).json(`An error occurred while trying to authenticate > ${err.message}`)
+                return res.status(401).json(`An error occurred while trying to authenticate > ${err.message}`)
             }
 
             if (!user) {
