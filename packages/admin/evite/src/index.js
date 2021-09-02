@@ -210,10 +210,25 @@ const GlobalBindingProvider = (props) => {
 	return React.cloneElement(props.children, { ...context })
 }
 
+function createAppMethod(key, fn, ...args) {
+	if (typeof window[key] !== "undefined") {
+		throw new Error(`${key} already exists`)
+	}
+
+	if (typeof fn !== "function") {
+		throw new Error(`${key} must be a function`)
+	}
+
+	return (window.app[key] = () => {
+		return fn(...args)
+	})
+}
+
 export {
 	classAggregation,
 	createEviteApp,
 	GlobalBindingProvider,
+	createAppMethod,
 }
 
 export default createEviteApp
