@@ -145,6 +145,13 @@ module.exports = [
         fn: "hasPermissions"
     },
     {
+        route: "/self",
+        method: "GET",
+        controller: "UserController",
+        middleware: "ensureAuthenticated",
+        fn: "getSelf"
+    },
+    {
         route: "/users",
         method: "GET",
         controller: "UserController",

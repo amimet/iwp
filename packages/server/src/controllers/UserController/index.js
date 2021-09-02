@@ -9,6 +9,9 @@ export const UserController = {
     isAuth: (req, res, next) => {
         return res.json(`You look nice today 😎`)
     },
+    getSelf: (req, res, next) => {
+        return res.json(req.user)
+    },
     get: (req, res, next) => {
         const { id, username } = req.query
 
