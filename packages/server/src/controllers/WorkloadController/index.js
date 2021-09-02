@@ -35,14 +35,14 @@ export const WorkloadController = {
 
         return res.json(obj)
     }),
-    delete: async (req, res) => {
+    delete: Schematized(["id"], async (req, res) => {
         let deleted = []
         let queue = []
 
-        const { id } = req.query
+        const { id } = req.body
 
         if (Array.isArray(id)) {
-            query = id
+            queue = id
         } else {
             queue.push(id)
         }
@@ -55,7 +55,7 @@ export const WorkloadController = {
         }
 
         return res.json({ deleted })
-    },
+    }),
 }
 
 export default WorkloadController
