@@ -6,8 +6,8 @@ import './index.less'
 export default (props) => {
     const { children } = props
 
-    return <Card style={{ borderRadius: "8px", ...props.style }} >
-        <div className="actionsBar_flexWrapper">
+    return <Card style={props.style} className="actionsBar_card">
+        <div style={props.wrapperStyle} className="actionsBar_flexWrapper">
             {children}
         </div>
     </Card>

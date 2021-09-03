@@ -12,6 +12,19 @@ export class Drawer extends React.Component {
 	unlock = () => this.setState({ locked: false })
 	lock = () => this.setState({ locked: true })
 
+	componentDidMount = async () => {
+		if (typeof this.props.controller === "undefined") {
+			throw new Error(`Cannot mount an drawer without an controller`)
+		}
+		if (typeof this.props.children === "undefined") {
+			throw new Error(`Empty component`)
+		}
+
+		if (this.props.children) {
+			this.setState({ visible: true })
+		}
+	}
+
 	onClose = () => {
 		if (typeof this.options.props?.closable !== "undefined" && !this.options.props?.closable) {
 			return false
@@ -30,19 +43,6 @@ export class Drawer extends React.Component {
 		setTimeout(() => {
 			this.props.controller.destroy(this.props.id)
 		}, 400)
-	}
-
-	componentDidMount = async () => {
-		if (typeof this.props.controller === "undefined") {
-			throw new Error(`Cannot mount an drawer without an controller`)
-		}
-		if (typeof this.props.children === "undefined") {
-			throw new Error(`Empty component`)
-		}
-
-		if (this.props.children) {
-			this.setState({ visible: true })
-		}
 	}
 
 	onDone = (...context) => {

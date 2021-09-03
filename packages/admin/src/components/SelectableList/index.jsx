@@ -21,7 +21,7 @@ export default class SelectableList extends React.Component {
 
 		if (typeof this.props.items !== "undefined" && Array.isArray(this.props.items)) {
 			this.setState({
-				data: [...this.state.data,...this.props.items],
+				data: [...this.state.data, ...this.props.items],
 			})
 		}
 
@@ -106,8 +106,6 @@ export default class SelectableList extends React.Component {
 											let data = this.state.selectedKeys // by default send selectedKeys
 
 											if (typeof action.props.sendData === "string") {
-											}
-											{
 												switch (action.props.sendData) {
 													case "keys": {
 														data = this.state.selectedKeys
@@ -180,8 +178,21 @@ export default class SelectableList extends React.Component {
 				</div>
 			)
 		}
-		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } = this.props
-		const listProps = { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading }
+		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } =
+			this.props
+		const listProps = {
+			borderer,
+			grid,
+			header,
+			loadMore,
+			locale,
+			pagination,
+			rowKey,
+			size,
+			split,
+			itemLayout,
+			loading,
+		}
 
 		return (
 			<div>
