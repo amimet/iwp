@@ -1,12 +1,16 @@
 import React from "react"
 import * as antd from "antd"
+import { Icons } from "components/Icons"
 
 import { Sessions, Roles } from "components"
+import { AccountEditor } from "./components"
 
 import * as session from "core/models/session"
 import * as user from "core/models/user"
 
 import "./index.less"
+
+const api = window.app.apiBridge
 
 export default class Account extends React.Component {
 	state = {
@@ -55,6 +59,52 @@ export default class Account extends React.Component {
 		})
 	}
 
+	handleUpdateUserData = async (changes, callback) => {
+		const update = {}
+		if (Array.isArray(changes)) {
+			changes.forEach((change) => {
+				update[change.id] = change.value
+			})
+		}
+
+		api.put
+			.selfUser(update)
+			.then((data) => {
+				callback(false, data)
+			})
+			.catch((err) => {
+				callback(true, err)
+			})
+	}
+
+	openUserEdit = () => {
+		window.controllers.drawer.open("editAccount", AccountEditor, {
+			props: {
+				keyboard: false,
+				width: "45%",
+				bodyStyle: {
+					overflow: "hidden",
+				},
+			},
+			componentProps: {
+				onSave: this.handleUpdateUserData,
+				user: this.state.user,
+			},
+		})
+	}
+
+	renderSelfActions = () => {
+		if (this.state.isSelf) {
+			return (
+				<div onClick={this.openUserEdit}>
+					<antd.Button>Edit</antd.Button>
+				</div>
+			)
+		}
+
+		return null
+	}
+
 	render() {
 		const { user } = this.state ?? {}
 		const currentSession = this.props.user?.session?.uuid
@@ -68,6 +118,7 @@ export default class Account extends React.Component {
 						<span>#{user._id}</span>
 					</div>
 					<Roles roles={user.roles} />
+					{this.state.isSelf && this.renderSelfActions()}
 				</div>
 
 				{this.state.isSelf && (
