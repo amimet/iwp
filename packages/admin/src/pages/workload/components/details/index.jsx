@@ -2,7 +2,7 @@ import React from "react"
 import { AppLoading } from "components"
 import * as antd from "antd"
 
-import './index.less'
+import "./index.less"
 
 const api = window.app.apiBridge
 

@@ -14,5 +14,5 @@ export { default as SelectableList } from './SelectableList'
 
 export {
     ButtonMenu,
-    FormGenerator
+    FormGenerator,
 }
