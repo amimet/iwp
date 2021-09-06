@@ -4,15 +4,16 @@ import bcrypt from 'bcrypt'
 import { User, Session } from '../../models'
 import SessionController from '../SessionController'
 import { Token } from '../../lib'
+import AvatarController from 'dicebar_lib'
 
 export const UserController = {
-    isAuth: (req, res, next) => {
+    isAuth: (req, res) => {
         return res.json(`You look nice today 😎`)
     },
-    getSelf: (req, res, next) => {
+    getSelf: (req, res) => {
         return res.json(req.user)
     },
-    get: (req, res, next) => {
+    get: (req, res) => {
         const { id, username } = req.query
 
         let selector = {}
@@ -33,7 +34,7 @@ export const UserController = {
                 }
             })
     },
-    getOne: (req, res, next) => {
+    getOne: (req, res) => {
         const { id, username } = req.query
 
         let selector = {}
@@ -60,18 +61,20 @@ export const UserController = {
                 if (data) {
                     return res.status(409).json("Username is already exists")
                 }
-                else {
-                    var hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
-                    let document = new User({
-                        username: req.body.username,
-                        fullName: req.body.fullName,
-                        avatar: req.body.avatar,
-                        email: req.body.email,
-                        roles: ["registered"],
-                        password: hash
-                    })
-                    return document.save()
-                }
+
+                const avatar = AvatarController.generate(req.body.username)
+                const hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
+
+                let document = new User({
+                    username: req.body.username,
+                    fullName: req.body.fullName,
+                    avatar: avatar,
+                    email: req.body.email,
+                    roles: ["registered"],
+                    password: hash
+                })
+
+                return document.save()
             })
             .then(data => {
                 return res.send(data)
@@ -171,7 +174,26 @@ export const UserController = {
         await user.save()
         return res.send("done")
     },
-    login: async (req, res, next) => {
+    updatePassword: async (req, res) => {
+        //TODO
+    },
+    updateSelf: async (req, res) => {
+        Object.keys(req.body).forEach(key => {
+            req.user[key] = req.body[key]
+        })
+
+        User.findOneAndUpdate({ _id: req.user._id }, req.user)
+        .then(() => {
+            return res.send(req.user)
+        })
+        .catch((err) => {
+            return res.send(500).send(err)
+        })
+    },
+    update: async (req, res) => {
+        // TODO
+    },
+    login: async (req, res) => {
         passport.authenticate("local", { session: false }, async (error, user, options) => {
             if (error) {
                 return res.status(500).json(`Error validating user > ${error.message}`)
