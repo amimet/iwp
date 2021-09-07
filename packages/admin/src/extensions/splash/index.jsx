@@ -42,7 +42,7 @@ export default (params = {}) => {
 							}, fadeOutVelocity ?? 1000)
 						}
 
-						self.busEvent.on("app_load_done", removeSplash)
+						self.eventBus.on("app_load_done", removeSplash)
 					},
 				],
 			},

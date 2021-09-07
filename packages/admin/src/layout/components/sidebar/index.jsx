@@ -300,7 +300,7 @@ export default class Sidebar extends React.Component {
 
     handleClick = (e) => {
         if (typeof e.key === "undefined") {
-            window.app.busEvent.emit("invalidSidebarKey", e)
+            window.app.eventBus.emit("invalidSidebarKey", e)
             return false
         }
 
@@ -320,7 +320,7 @@ export default class Sidebar extends React.Component {
         }
 
         if (to) {
-            window.app.busEvent.emit("cleanAll")
+            window.app.eventBus.emit("cleanAll")
         }
 
         this.setState({ editMode: to })

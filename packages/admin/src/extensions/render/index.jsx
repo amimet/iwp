@@ -14,11 +14,11 @@ export default {
 					}
 
 					self.history.setLocation = (to, delay) => {
-						function sendToBusEvent(...context) {
-							if (typeof window.app.busEvent !== "undefined") {
-								window.app.busEvent.emit(...context)
+						function sendToeventBus(...context) {
+							if (typeof window.app.eventBus !== "undefined") {
+								window.app.eventBus.emit(...context)
 							} else {
-								console.warn("busEvent is not available")
+								console.warn("eventBus is not available")
 							}
 						}
 
@@ -27,10 +27,10 @@ export default {
 							return false
 						}
 
-						sendToBusEvent("setLocation", to, delay)
+						sendToeventBus("setLocation", to, delay)
 						setTimeout(() => {
 							self.history.push(to)
-							window.app.busEvent.emit("setLocationReady")
+							window.app.eventBus.emit("setLocationReady")
 						}, delay ?? 100)
 					}
 

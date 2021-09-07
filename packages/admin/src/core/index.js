@@ -176,9 +176,9 @@ export function generateRandomId(length = 15) {
 }
 
 //
-export function getBusEvent() {
-    if (typeof window.app.busEvent !== "undefined") {
-        return window.app.busEvent
+export function geteventBus() {
+    if (typeof window.app.eventBus !== "undefined") {
+        return window.app.eventBus
     }
     return null
 }

@@ -15,22 +15,21 @@ import SettingsController from "core/models/settings"
 import { createEviteApp, GlobalBindingProvider, createAppMethod } from "evite"
 import { API, Render, Splash } from "extensions"
 
-const SplashExtension = Splash({ 
-	logo: config.logo.alt, 
+const SplashExtension = Splash({
+	logo: config.logo.alt,
 	preset: "fadeOut",
-	velocity: 1000, 
+	velocity: 1000,
 	props: {
 		logo: {
 			style: {
 				marginBottom: "10%",
 				stroke: "black",
-			}
+			},
 		},
-		
-	} 
+	},
 })
 export default class App extends createEviteApp({
-	extensions: [API, Render, SplashExtension,],
+	extensions: [API, Render, SplashExtension],
 }) {
 	constructor(props) {
 		super(props)
@@ -53,6 +52,19 @@ export default class App extends createEviteApp({
 			title: config.app.title,
 			version: global.project.version,
 			environment: process.env.NODE_ENV,
+		})
+
+		this.eventBus.on("destroyAllSessions", () => {
+			session.destroyAll()
+		})
+
+		this.eventBus.on("forceReloadData", () => {
+			// TODO
+		})
+
+		this.eventBus.on("forceReloadUser", async () => {
+			console.log("forceReloadUser")
+			await this.loadUser()
 		})
 	}
 
@@ -77,11 +89,16 @@ export default class App extends createEviteApp({
 		}
 	}
 
+	loadUser = async () => {
+		await user.setLocalBasics(this.apiBridge)
+		this.user = await this.getCurrentUser()
+	}
+
 	sessionInitialization = async () => {
 		this.sessionToken = await session.get()
 
 		if (typeof this.sessionToken === "undefined") {
-			this.busEvent.emit("not_session")
+			this.eventBus.emit("not_session")
 		} else {
 			const validation = await session.getCurrentTokenValidation(this.apiBridge)
 			this.session = validation
@@ -96,7 +113,7 @@ export default class App extends createEviteApp({
 						throw new Error(`Session cant be regenerated`)
 					}
 				} catch (error) {
-					this.busEvent.emit("not_valid_session", validation.error)
+					this.eventBus.emit("not_valid_session", validation.error)
 					await session.clear()
 				}
 			} else {

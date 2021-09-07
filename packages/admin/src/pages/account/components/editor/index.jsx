@@ -53,7 +53,7 @@ export const EditAccountField = ({ id, component, props, header, handleChange, d
 		}
 	}
 
-	window.app.busEvent.on("discardAllChanges", () => {
+	window.app.eventBus.on("discardAllChanges", () => {
 		setCurrentValue(defaultValue)
 	})
 
@@ -87,7 +87,7 @@ export default class EditAccount extends React.Component {
 	}
 
 	discardAll = () => {
-		window.app.busEvent.emit("discardAllChanges")
+		window.app.eventBus.emit("discardAllChanges")
 		this.setState({ changes: [] }) // clean changes after emit, cause controller wont handle changes
 	}
 

@@ -5,10 +5,28 @@ import { Icons } from "components/icons"
 import config from "config"
 import { Sidebar, Header, Drawer } from "./components"
 
-import * as uiHelpers from "core/uiHelpers"
-
 import "theme/index.less"
 import "./index.less"
+
+import Login from "pages/login"
+
+export const uiViewLoad = {
+	login: (callback) => {
+		window.controllers.drawer.open("login", Login, {
+			locked: true,
+			onDone: (self) => {
+				if (typeof callback === "function") {
+					callback()
+				}
+				self.close()
+			},
+			props: {
+				closable: false,
+				width: "45%",
+			},
+		})
+	},
+}
 
 export default class BaseLayout extends React.Component {
 	layoutContentRef = React.createRef()
@@ -28,36 +46,36 @@ export default class BaseLayout extends React.Component {
 	}
 
 	componentDidMount() {
-		window.app.busEvent.on("not_session", () => {
-			uiHelpers.openLoginDrawer()
+		window.app.eventBus.on("not_session", () => {
+			uiViewLoad.login()
 		})
 
-        window.app.busEvent.on("not_valid_session", (error) => {
-            antd.notification.open({
-                message: 'Invalid Session',
-                description: error,
-                icon: <Icons.FieldTimeOutlined />,
-              })
-        })
+		window.app.eventBus.on("not_valid_session", (error) => {
+			antd.notification.open({
+				message: "Invalid Session",
+				description: error,
+				icon: <Icons.FieldTimeOutlined />,
+			})
+		})
 
-		window.app.busEvent.on("setLocation", (to, delay) => {
+		window.app.eventBus.on("setLocation", (to, delay) => {
 			this.handleTransition("leave")
 		})
-		window.app.busEvent.on("setLocationReady", (to, delay) => {
+		window.app.eventBus.on("setLocationReady", (to, delay) => {
 			this.handleTransition("enter")
 		})
 
-		window.app.busEvent.on("cleanAll", () => {
+		window.app.eventBus.on("cleanAll", () => {
 			window.controllers["drawer"].closeAll()
 		})
 	}
 
 	render() {
-		const Children = (props) => React.cloneElement(this.props.children,props)
+		const Children = (props) => React.cloneElement(this.props.children, props)
 		return (
 			<React.Fragment>
 				<antd.Layout style={{ minHeight: "100vh" }}>
-                    <Drawer {...this.props} />
+					<Drawer {...this.props} />
 
 					<Sidebar
 						{...this.props}
@@ -70,7 +88,7 @@ export default class BaseLayout extends React.Component {
 
 						<antd.Layout.Content {...this.props} className="app_wrapper">
 							<div ref={this.layoutContentRef}>
-							<Children {...this.props} />
+								<Children {...this.props} />
 							</div>
 						</antd.Layout.Content>
 					</antd.Layout>
