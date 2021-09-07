@@ -2,30 +2,81 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 
-import { Sessions, Roles } from "components"
-import { AccountEditor } from "./components"
+import { Roles } from "components"
+import { AccountEditor, SessionsView, StatisticsView } from "./components"
 
-import * as session from "core/models/session"
 import * as user from "core/models/user"
 
 import "./index.less"
 
 const api = window.app.apiBridge
 
+const SelfViewComponents = {
+	sessionsView: SessionsView,
+	statisticsView: StatisticsView,
+}
+const SelfViewTabDecorators = {
+	sessionsView: (
+		<div>
+			<Icons.Key /> Sessions
+		</div>
+	),
+	statisticsView: (
+		<div>
+			<Icons.PieChart /> Statistics
+		</div>
+	),
+}
+
+class SelfView extends React.Component {
+	renderComponents = () => {
+		const renderTagDecorator = (key) => {
+			if (typeof this.props.decorators[key] !== "undefined") {
+				return this.props.decorators[key]
+			}
+			return key
+		}
+
+		return Object.keys(this.props.components).map((key, index) => {
+			const Component = this.props.components[key]
+			const componentProps = {
+				user: this.props.user,
+			}
+
+			return (
+				<antd.Tabs.TabPane tab={renderTagDecorator(key)} key={index}>
+					<div key={key}>
+						<Component {...componentProps} />
+					</div>
+				</antd.Tabs.TabPane>
+			)
+		})
+	}
+
+	render() {
+		return (
+			<antd.Tabs defaultActiveKey="0" centered>
+				{this.renderComponents()}
+			</antd.Tabs>
+		)
+	}
+}
+
 export default class Account extends React.Component {
 	state = {
 		isSelf: true,
 		user: {},
-		sessions: null,
 	}
 
 	componentDidMount = async () => {
-		// TODO: CHECK with API & session token
-
 		const query = new URLSearchParams(window.location.search)
 		const requestedUser = query.get("username")
 
 		if (requestedUser != null) {
+			if (this.props.user.username === requestedUser) {
+				return false
+			}
+
 			this.setState({ isSelf: false })
 
 			await user
@@ -36,27 +87,7 @@ export default class Account extends React.Component {
 				.catch((err) => {
 					console.log(err)
 				})
-		} else {
-			this.setState({
-				user: this.props.user,
-			})
 		}
-
-		if (this.state.isSelf) {
-			const sessions = await session.getAll(this.props.api)
-			this.setState({ sessions })
-		}
-	}
-
-	signOutAll = () => {
-		antd.Modal.warning({
-			title: "Caution",
-			content: "This action will cause all sessions to be closed, you will have to log in again.",
-			onOk: () => {
-				session.destroyAll(this.props.api)
-			},
-			okCancel: true,
-		})
 	}
 
 	handleUpdateUserData = async (changes, callback) => {
@@ -67,7 +98,7 @@ export default class Account extends React.Component {
 			})
 		}
 
-		api.put
+		await api.put
 			.selfUser(update)
 			.then((data) => {
 				callback(false, data)
@@ -75,6 +106,8 @@ export default class Account extends React.Component {
 			.catch((err) => {
 				callback(true, err)
 			})
+
+		window.app.eventBus.emit("forceReloadUser")
 	}
 
 	openUserEdit = () => {
@@ -87,8 +120,7 @@ export default class Account extends React.Component {
 				},
 			},
 			componentProps: {
-				onSave: this.handleUpdateUserData,
-				user: this.state.user,
+				onSave: this.handleUpdateUserData
 			},
 		})
 	}
@@ -106,8 +138,7 @@ export default class Account extends React.Component {
 	}
 
 	render() {
-		const { user } = this.state ?? {}
-		const currentSession = this.props.user?.session?.uuid
+		const user = this.state.isSelf ? this.props.user : this.state.user
 
 		return (
 			<div className="account_wrapper">
@@ -122,14 +153,11 @@ export default class Account extends React.Component {
 				</div>
 
 				{this.state.isSelf && (
-					<div className="session_wrapper">
-						<Sessions current={currentSession} sessions={this.state.sessions} />
-						{this.state.sessions && (
-							<antd.Button onClick={() => this.signOutAll()} type="danger">
-								Destroy all sessions
-							</antd.Button>
-						)}
-					</div>
+					<SelfView
+						components={SelfViewComponents}
+						decorators={SelfViewTabDecorators}
+						user={this.props.user}
+					/>
 				)}
 			</div>
 		)
