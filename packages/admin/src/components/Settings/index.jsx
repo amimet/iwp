@@ -2,6 +2,8 @@ import React from "react"
 import { Icons } from "components/icons"
 import * as antd from "antd"
 import { SketchPicker } from "react-color"
+import { AboutApp } from ".."
+
 import "./index.less"
 
 const ItemTypes = {
@@ -204,6 +206,9 @@ export class SettingsMenu extends React.Component {
 				<div className="settings_bottom_items">
 					{this.renderLogout()}
 					{this.renderAboutApp()}
+					<antd.Button type="link" onClick={() => AboutApp.openModal()}>
+						About
+					</antd.Button>
 				</div>
 			</div>
 		)

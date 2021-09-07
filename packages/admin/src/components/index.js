@@ -1,5 +1,6 @@
 import FormGenerator from './formGenerator'
 import ButtonMenu from './buttonMenu'
+import * as AboutApp from './AboutApp'
 
 export { default as LoadingSpinner } from './LoadingSpinner'
 export { default as Settings } from './settings'
@@ -13,6 +14,7 @@ export { default as ActionsBar } from './ActionsBar'
 export { default as SelectableList } from './SelectableList'
 
 export {
+    AboutApp,
     ButtonMenu,
     FormGenerator,
 }
