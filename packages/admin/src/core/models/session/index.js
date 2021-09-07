@@ -22,6 +22,7 @@ export async function handleLogin(bridge = getDefaultBridge(), payload, callback
         }
         if (!err) {
             storage(res.data)
+            window.app.eventBus.emit("forceReloadUser")
         }
     })
 }
@@ -90,6 +91,8 @@ export async function destroySession(bridge = getDefaultBridge()) {
         return new RequestAdaptor(bridge.delete.session, [{ user_id: session.user_id, token: token }]).send()
     }
 
+    window.app.eventBus.emit("forceReloadUser")
+
     return false
 }
 
@@ -101,6 +104,8 @@ export async function destroyAll(bridge = getDefaultBridge()) {
         new RequestAdaptor(bridge.delete.sessions, [{ user_id: session.user_id }]).send()
         await clear()
     }
+
+    window.app.eventBus.emit("forceReloadUser")
 
     return false
 }
