@@ -2,6 +2,23 @@ import React from 'react'
 import { createBrowserHistory } from "history"
 import EventEmitter from "@foxify/events"
 import { objectToArrayMap } from "@corenode/utils"
+import { verbosity } from "@corenode/utils"
+
+const EventLog = verbosity.colors({ decorator: { text: "magenta" } }).options({ method: "[EVENTS]" })
+
+class EventBus extends EventEmitter {
+	constructor() {
+		super({ captureRejections: true })
+	}
+	on = (event, listener, context) => {
+		const _listener = (...args) => {
+			EventLog.log(`Event [${event}] resolved`)
+			listener(...args)
+		}
+		return this._addListener(event, _listener, context, true, false)
+	}
+}
+
 
 const classAggregation = (baseClass, ...mixins) => {
 	class base extends baseClass {
@@ -47,7 +64,7 @@ function getEviteConstructor(context) {
 
 			// controllers
 			this.history = window.app.history = createBrowserHistory()
-			this.busEvent = window.app.busEvent = new EventEmitter()
+			this.eventBus = window.app.eventBus = new EventBus()
 			this.builtInEvents = null
 
 			// global state
@@ -140,11 +157,11 @@ function createEviteApp(context) {
 			super(props)
 
 			// set events
-			this.busEvent.on("app_init", async () => {
+			this.eventBus.on("app_init", async () => {
 				this.toogleLoading(true)
 			})
 
-			this.busEvent.on("app_load_done", async () => {
+			this.eventBus.on("app_load_done", async () => {
 				this.toogleLoading(false)
 			})
 		}
@@ -162,12 +179,12 @@ function createEviteApp(context) {
 		}
 
 		_init = async () => {
-			this.busEvent.emit("app_init")
+			this.eventBus.emit("app_init")
 
 			//* preload tasks
 			if (this.builtInEvents !== null) {
 				objectToArrayMap(this.builtInEvents).forEach((event) => {
-					this.busEvent.on(event.key, event.value)
+					this.eventBus.on(event.key, event.value)
 				})
 			}
 
@@ -181,7 +198,7 @@ function createEviteApp(context) {
 
 			await this.initialization()
 
-			this.busEvent.emit("app_load_done")
+			this.eventBus.emit("app_load_done")
 		}
 	}
 }
