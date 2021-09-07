@@ -60,8 +60,7 @@ export default class Sessions extends React.Component {
 			return (
 				<div className="sessions_wrapper">
 					<h1>
-						<Icons.Key />
-						Sessions
+						All Sessions
 					</h1>
 					<antd.Collapse bordered={false} accordion>
 						{this.renderSessions()}
