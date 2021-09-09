@@ -8,36 +8,49 @@ import config from "config"
 import "./index.less"
 
 export class AboutApp extends React.Component {
-    state = {
-        visible: true
-    }
+	state = {
+		visible: true,
+	}
 
-    onClose = () => {
-        this.setState({ visible: false })
+	onClose = () => {
+		this.setState({ visible: false })
 
-        if (typeof this.props.onClose === "function") {
-            this.props.onClose()
-        }
-    }
+		if (typeof this.props.onClose === "function") {
+			this.props.onClose()
+		}
+	}
 
 	render() {
 		const { about } = window.app
 		const isDevMode = about.environment === "development"
 
 		return (
-			<antd.Modal destroyOnClose onCancel={this.onClose} visible={this.state.visible} centered footer={false} width="80%">
+			<antd.Modal
+				destroyOnClose
+				onCancel={this.onClose}
+				visible={this.state.visible}
+				centered
+				footer={false}
+				width="80%"
+			>
 				<div className="about_app_wrapper">
 					<div className="about_app_header">
 						<div>
 							<img src={config.logo.alt} />
 						</div>
-						<div >
+						<div>
 							<h1>{about.siteName}</h1>
 							<div>
 								<antd.Tag>
 									<Icons.Tag />v{about.version}
 								</antd.Tag>
-						
+								<antd.Tag color="geekblue">
+									eVite v{about.versions.evite}
+								</antd.Tag>
+								<antd.Tag color="green">
+									<Icons.Hexagon /> v{about.versions.node}
+								</antd.Tag>
+
 								<antd.Tag color={isDevMode ? "magenta" : "green"}>
 									{isDevMode ? <Icons.Triangle /> : <Icons.CheckCircle />}
 									{about.environment}
@@ -45,9 +58,7 @@ export class AboutApp extends React.Component {
 							</div>
 						</div>
 					</div>
-                    <div className="about_app_info">
-
-                    </div>
+					<div className="about_app_info"></div>
 				</div>
 			</antd.Modal>
 		)

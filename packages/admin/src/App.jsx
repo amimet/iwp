@@ -52,6 +52,10 @@ export default class App extends createEviteApp({
 			title: config.app.title,
 			version: global.project.version,
 			environment: process.env.NODE_ENV,
+			versions: {
+				evite: global._eviteVersion,
+				...global._versions
+			} 
 		})
 
 		this.eventBus.on("destroyAllSessions", () => {
