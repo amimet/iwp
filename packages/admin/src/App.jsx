@@ -12,7 +12,7 @@ import * as user from "core/models/user"
 import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
-import { createEviteApp, GlobalBindingProvider, createAppMethod } from "evite"
+import { createEviteApp, GlobalBindingProvider, appendMethodToApp } from "evite"
 import { API, Render, Splash } from "extensions"
 
 const SplashExtension = Splash({
@@ -70,11 +70,11 @@ export default class App extends createEviteApp({
 
 	loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
 
-	reloadAppState = createAppMethod("reloadAppState", async () => {
+	reloadAppState = appendMethodToApp("reloadAppState", async () => {
 		await this.initialization()
 	})
 
-	isValidSession = createAppMethod("isValidSession", () => {
+	isValidSession = appendMethodToApp("isValidSession", () => {
 		return this.session?.valid ?? false
 	})
 

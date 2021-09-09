@@ -10,6 +10,7 @@ export default class WorkloadDetails extends React.Component {
 	state = {
 		data: null,
 	}
+
 	componentDidMount = async () => {
 		if (typeof this.props.id === "string") {
 			this.id = this.props.id
@@ -20,6 +21,7 @@ export default class WorkloadDetails extends React.Component {
 
 		this.setState({ data })
 	}
+	
 	render() {
 		const { data } = this.state
 
