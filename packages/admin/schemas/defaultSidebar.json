@@ -9,5 +9,7 @@
     "users/workshifts",
     "geo",
     "regions",
-    "vault"
+    "vault",
+    "launchpad",
+    "server_manager"
 ]
