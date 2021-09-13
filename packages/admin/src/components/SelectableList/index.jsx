@@ -1,5 +1,4 @@
 import React from "react"
-
 import { Icons } from "components/Icons"
 import { ActionsBar } from "components"
 import { List, Button } from "antd"
@@ -167,7 +166,7 @@ export default class SelectableList extends React.Component {
 				<div
 					key={_key}
 					onClick={() => this.onClickKey(_key)}
-					className={classnames("selectableList_item", {
+					className={classnames("selectableList_item",  this.props.itemClassName,{
 						selection: this.state.selectionEnabled,
 						selected: this.state.selectedKeys.includes(_key),
 					})}
