@@ -2,11 +2,6 @@
     "main",
     "workload",
     "users",
-    "users/accounts",
-    "users/contracts",
-    "users/roles",
-    "users/workload",
-    "users/workshifts",
     "geo",
     "regions",
     "vault"
