@@ -18,6 +18,11 @@ const onClickHandlers = {
 		Settings.open()
 	},
 }
+
+const getStoragedKeys = () => {
+	return window.app.configuration.sidebar.get()
+}
+
 export default class Sidebar extends React.Component {
 	state = {
 		isHover: false,
@@ -46,13 +51,13 @@ export default class Sidebar extends React.Component {
 			{ lock: true },
 		)
 
-		this.setItems()
+		this.loadSidebarItems()
 	}
 
-	setItems = () => {
+	loadSidebarItems = () => {
 		const items = {}
 		const itemsMap = []
-		let keys = [...window.app.configuration.sidebar.get()]
+		let keys = [...getStoragedKeys()]
 
 		// parse all items
 		sidebarItems.forEach((item, index) => {
@@ -73,8 +78,6 @@ export default class Sidebar extends React.Component {
 
 			if (item.locked) {
 				if (item.index !== index) {
-					console.log(item.index, index)
-
 					keys = keys.move(index, item.index)
 
 					//update index
@@ -174,6 +177,10 @@ export default class Sidebar extends React.Component {
 
 		if (to) {
 			window.app.eventBus.emit("cleanAll")
+		}else {
+			if (this.itemsMap !== getStoragedKeys()) {
+				this.loadSidebarItems()
+			}
 		}
 
 		this.setState({ editMode: to })
