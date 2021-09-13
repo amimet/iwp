@@ -1,6 +1,5 @@
-@import "./vars.less";
-@import "./fonts.css";
-@import "./transition.less";
+@import "@/theme/vars.less";
+@import "@/theme/fonts.css";
 
 ::-webkit-scrollbar {
   position: absolute;
@@ -33,6 +32,7 @@ body, html {
   position: fixed;
   overflow: hidden;
   -webkit-overflow-scrolling: touch;
+  background-color: @app_layout_backgroundColor!important;
 }
 
 body {
@@ -40,7 +40,7 @@ body {
   -webkit-app-region: no-drag;
 
   user-select: none;
-  background-color: @app_wrapper_background;
+  background-color: @app_layout_backgroundColor!important;
   font-family: 'Varela Round', sans-serif;
 
   scroll-behavior: smooth;
@@ -61,6 +61,7 @@ body {
 
   overflow-x: hidden;
   overflow-y: hidden;
+  background-color: @app_layout_backgroundColor!important;
 }
 
 #nprogress {
@@ -104,7 +105,6 @@ body {
   }
 }
 
-
 .horizontal_actions {
   display: flex;
   flex-direction: row;
@@ -124,7 +124,6 @@ body {
   border-radius: 0 0 12px 12px;
 }
 
-
 .component_bottom_centered {
   position: absolute;
   bottom: 0;
@@ -135,4 +134,30 @@ body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
+}
+
+.fade-transverse-active {
+  transition: all .5s;
+}
+
+.fade-transverse-enter {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+.fade-transverse-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.fade-scale-leave-active,
+.fade-scale-enter-active {
+  transition: all .3s;
+}
+.fade-scale-enter {
+  opacity: 0;
+  transform: scale(1.2);
+}
+.fade-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
 }

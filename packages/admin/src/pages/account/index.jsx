@@ -142,7 +142,7 @@ export default class Account extends React.Component {
 
 		return (
 			<div className="account_wrapper">
-				<div className="app_account_header">
+				<div className="account_card">
 					<img src={user.avatar} />
 					<div style={{ margin: "0 15px" }}>
 						<h1>@{user.username}</h1>

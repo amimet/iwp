@@ -3,6 +3,8 @@ import * as antd from 'antd'
 import classnames from 'classnames'
 import Breadcrumb from '../breadcrumb'
 
+import "./index.less"
+
 export default class Header extends React.Component {
     state = {
         loadingSearch: false,

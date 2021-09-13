@@ -5,10 +5,9 @@ import { Icons } from "components/icons"
 import config from "config"
 import { Sidebar, Header, Drawer } from "./components"
 
-import "theme/index.less"
-import "./index.less"
-
 import Login from "pages/login"
+
+import "./index.less"
 
 export const uiViewLoad = {
 	login: (callback) => {
