@@ -4,6 +4,7 @@ import { Layout, Menu, Avatar } from "antd"
 
 import { Settings } from "components"
 import { Controller } from "core/libs"
+import { SidebarEditor } from "./components"
 
 import config from "config"
 import sidebarItems from "schemas/sidebar.json"
@@ -17,40 +18,82 @@ const onClickHandlers = {
 		Settings.open()
 	},
 }
-
 export default class Sidebar extends React.Component {
 	state = {
 		isHover: false,
-		collapsed: this.props.collapsed ?? window.app.params.settings.get("collapseOnLooseFocus") ?? false,
+		collapsed: this.props.collapsed ?? window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
 		editMode: false,
 		loading: true,
 		pathResolve: {},
 		menus: {},
-		theme: window.app.params.settings.get("activeTheme") ?? "light",
 	}
 	controller = new Controller({ id: "sidebar", locked: true })
 
 	componentDidMount = () => {
-		this.setHelpers()
+		this.controller.add(
+			"toogleEdit",
+			(to) => {
+				this.toogleEditMode(to)
+			},
+			{ lock: true },
+		)
 
-		let items = [
-			...sidebarItems.map((obj) => {
-				obj.position = "top"
-				return obj
-			}),
-		]
+		this.controller.add(
+			"toogleCollapse",
+			(to) => {
+				this.setState({ collapsed: to ?? !this.state.collapsed })
+			},
+			{ lock: true },
+		)
 
-		let itemsMap = []
-		let scopeKeys = [...window.app.params.sidebar.get()]
+		this.setItems()
+	}
 
-		items.forEach((item, index) => {
-			try {
-				let valid = true
+	setItems = () => {
+		const items = {}
+		const itemsMap = []
+		let keys = [...window.app.configuration.sidebar.get()]
 
-				// object validation
-				if (!scopeKeys.includes(item.id) && !item.locked) {
-					valid = false
+		// parse all items
+		sidebarItems.forEach((item, index) => {
+			items[item.id] = {
+				...item,
+				index,
+				content: (
+					<>
+						{createIconRender(item.icon)} {item.title}
+					</>
+				),
+			}
+		})
+
+		// short items
+		keys.forEach((id, index) => {
+			const item = items[id]
+
+			if (item.locked) {
+				if (item.index !== index) {
+					console.log(item.index, index)
+
+					keys = keys.move(index, item.index)
+
+					//update index
+					window.app.configuration.sidebar._push(keys)
 				}
+			}
+		})
+
+		// set items from scoped keys
+		keys.forEach((key, index) => {
+			const item = items[key]
+
+			try {
+				// avoid if item is duplicated
+				if (itemsMap.includes(item)) {
+					return false
+				}
+
+				let valid = true
 
 				if (typeof item.requireState === "object") {
 					const { key, value } = item.requireState
@@ -61,9 +104,6 @@ export default class Sidebar extends React.Component {
 				if (!valid) {
 					return false
 				}
-
-				// handle props
-				item.order = index
 
 				if (typeof item.path !== "undefined") {
 					let resolvers = this.state.pathResolve ?? {}
@@ -77,7 +117,8 @@ export default class Sidebar extends React.Component {
 			}
 		})
 
-		this.setState({ menus: itemsMap, loading: false })
+		// update states
+		this.setState({ items, menus: itemsMap, loading: false })
 	}
 
 	renderMenuItems(items) {
@@ -104,7 +145,7 @@ export default class Sidebar extends React.Component {
 
 			return (
 				<Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>
-					{item.content ?? item.title ?? item.id}
+					{item.title ?? item.id}
 				</Menu.Item>
 			)
 		})
@@ -146,28 +187,10 @@ export default class Sidebar extends React.Component {
 		this.setState({ isHover: false })
 	}
 
-	setHelpers() {
-		this.controller.add(
-			"toogleEdit",
-			(to) => {
-				this.toogleEditMode(to)
-			},
-			{ lock: true },
-		)
-
-		this.controller.add(
-			"toogleCollapse",
-			(to) => {
-				this.setState({ collapsed: to ?? !this.state.collapsed })
-			},
-			{ lock: true },
-		)
-	}
-
 	render() {
 		if (this.state.loading) return null
 
-		if (window.app.params.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+		if (window.app.configuration.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
 			while (this.state.isHover && this.state.collapsed) {
 				this.controller.toogleCollapse(false)
 				break
@@ -201,7 +224,7 @@ export default class Sidebar extends React.Component {
 					</div>
 				</div>
 
-				{this.state.editMode ? (
+				{this.state.editMode && (
 					<div>
 						<div
 							style={{ width: "" }}
@@ -211,29 +234,33 @@ export default class Sidebar extends React.Component {
 						>
 							{createIconRender("Save")} Done
 						</div>
-						<SidebarEdit />
+						<SidebarEditor />
 					</div>
-				) : null}
+				)}
 
-				<div key="menu" className="app_sidebar_menu">
-					<Menu selectable={true} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
-						{this.renderMenuItems(this.state.menus)}
-					</Menu>
-				</div>
+				{!this.state.editMode && (
+					<div key="menu" className="app_sidebar_menu">
+						<Menu selectable={true} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
+							{this.renderMenuItems(this.state.menus)}
+						</Menu>
+					</div>
+				)}
 
-				<div key="bottom" className="app_sidebar_bottom">
-					<Menu selectable={false} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
-						<Menu.Item key="settings" icon={<Icons.Settings />}>
-							Settings
-						</Menu.Item>
+				{!this.state.editMode && (
+					<div key="bottom" className="app_sidebar_bottom">
+						<Menu selectable={false} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
+							<Menu.Item key="settings" icon={<Icons.Settings />}>
+								Settings
+							</Menu.Item>
 
-						<Menu.Item key="account">
-							<div className="sidebar_account_component">
-								<Avatar src={this.props.user.avatar} />
-							</div>
-						</Menu.Item>
-					</Menu>
-				</div>
+							<Menu.Item key="account">
+								<div className="sidebar_account_component">
+									<Avatar src={this.props.user.avatar} />
+								</div>
+							</Menu.Item>
+						</Menu>
+					</div>
+				)}
 			</Sider>
 		)
 	}

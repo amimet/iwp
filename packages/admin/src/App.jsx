@@ -15,6 +15,12 @@ import SettingsController from "core/models/settings"
 import { createEviteApp, GlobalBindingProvider, appendMethodToApp } from "evite"
 import { API, Render, Splash } from "extensions"
 
+// append method to array prototype
+Array.prototype.move = function (from, to) {
+	this.splice(to, 0, this.splice(from, 1)[0])
+	return this
+}
+
 const SplashExtension = Splash({
 	logo: config.logo.alt,
 	preset: "fadeOut",
@@ -34,10 +40,10 @@ export default class App extends createEviteApp({
 	constructor(props) {
 		super(props)
 
-		// set params controllers
-		this.paramsController = this.app.params = {}
-		this.paramsController.settings = new SettingsController()
-		this.paramsController.sidebar = new SidebarController()
+		// set configuration controllers
+		this.appConfiguration = this.app.configuration = {}
+		this.appConfiguration.settings = new SettingsController()
+		this.appConfiguration.sidebar = new SidebarController()
 
 		// app statement
 		this.user = null

@@ -4,12 +4,12 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 
 import defaultSidebarKeys from "schemas/defaultSidebar.json"
 import sidebarItems from "schemas/sidebar.json"
-import bottomSidebarItems from "schemas/bottomSidebar.json"
 
 import "./index.less"
 
-const allItemsMap = [...sidebarItems, ...bottomSidebarItems].map((item, index) => {
+const allItemsMap = [...sidebarItems].map((item, index) => {
 	item.key = index.toString()
+	item.index = index
 	return item
 })
 
@@ -19,8 +19,6 @@ const getAllItems = () => {
 	allItemsMap.forEach((item) => {
 		items[item.id] = {
 			...item,
-			id: item.id,
-			key: item.key,
 			content: (
 				<>
 					{createIconRender(item.icon)} {item.title}
@@ -34,22 +32,28 @@ const getAllItems = () => {
 
 const allItems = getAllItems()
 
-export default class SidebarEdit extends React.Component {
+export default class SidebarEditor extends React.Component {
 	state = {
 		items: [],
-		activeObjects: [],
-		disabledObjects: [],
+		lockedIndex: []
 	}
 
-	update = () => {
-		const items = this.state.items
-		let obj = []
+	componentDidMount() {
+		const storagedKeys = window.app.configuration.sidebar.get() ?? defaultSidebarKeys
+		const active = []
+		const lockedIndex = []
 
-		items.forEach((item, index) => {
-			obj[index] = item.id
+		// set current active items
+		storagedKeys.forEach((key) => {
+			if (typeof allItems[key] !== "undefined") {
+				if (allItems[key].locked) {
+					lockedIndex.push(allItems[key].index)
+				}
+				active.push(key)
+			}
 		})
 
-		window.app.controllers.sidebar._push(obj)
+		this.setState({ items: active, lockedIndex })
 	}
 
 	reorder = (list, startIndex, endIndex) => {
@@ -62,36 +66,23 @@ export default class SidebarEdit extends React.Component {
 
 	onDragEnd = (result) => {
 		if (!result.destination) {
-			return
+			return false
 		}
 
+		if (this.state.lockedIndex.includes(result.destination.index)) {
+			return false
+		}
+
+		if (allItems[result.draggableId].locked) {
+			console.warn("Cannot move an locked item")
+			return false
+		}
+		
 		const items = this.reorder(this.state.items, result.source.index, result.destination.index)
 
 		this.setState({ items }, () => {
-			this.update()
+			window.app.configuration.sidebar._push(items)
 		})
-	}
-
-	componentDidMount() {
-		let active = []
-		let disabled = []
-
-		const storagedKeys = window.app.params.sidebar.get()
-
-		storagedKeys.forEach((key) => {
-			let item = allItems[key]
-			if (typeof item !== "undefined") {
-				active.push(item)
-			}
-		})
-
-		allItemsMap.forEach((item) => {
-			if (!active.includes(item.id)) {
-				disabled.push(item.id)
-			}
-		})
-
-		this.setState({ items: active })
 	}
 
 	render() {
@@ -126,23 +117,27 @@ export default class SidebarEdit extends React.Component {
 								ref={droppableProvided.innerRef}
 								style={getListStyle(droppableSnapshot.isDraggingOver)}
 							>
-								{this.state.items.map((item, index) => (
-									<Draggable key={item.id} draggableId={item.id} index={index}>
-										{(draggableProvided, draggableSnapshot) => (
-											<div
-												ref={draggableProvided.innerRef}
-												{...draggableProvided.draggableProps}
-												{...draggableProvided.dragHandleProps}
-												style={getItemStyle(
-													draggableSnapshot.isDragging,
-													draggableProvided.draggableProps.style,
-												)}
-											>
-												{item.content}
-											</div>
-										)}
-									</Draggable>
-								))}
+								{this.state.items.map((item, index) => {
+									const itemComponent = allItems[item]
+
+									return (
+										<Draggable isDragDisabled={itemComponent.locked} key={item} draggableId={item} index={index}>
+											{(draggableProvided, draggableSnapshot) => (
+												<div
+													ref={draggableProvided.innerRef}
+													{...draggableProvided.draggableProps}
+													{...draggableProvided.dragHandleProps}
+													style={getItemStyle(
+														draggableSnapshot.isDragging,
+														draggableProvided.draggableProps.style,
+													)}
+												>
+													{itemComponent.content ?? itemComponent.title ?? itemComponent.id}
+												</div>
+											)}
+										</Draggable>
+									)
+								})}
 								{droppableProvided.placeholder}
 							</div>
 						)}

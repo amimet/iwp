@@ -23,11 +23,11 @@ import * as session from "core/models/session"
 
 export class SettingsMenu extends React.Component {
 	state = {
-		settings: window.app.params.settings.get() ?? {},
+		settings: window.app.configuration.settings.get() ?? {},
 	}
 
 	_set(key, value) {
-		this.setState({ settings: window.app.params.settings.change(key, value) })
+		this.setState({ settings: window.app.configuration.settings.change(key, value) })
 	}
 
 	handleEvent(event, id, type) {
@@ -40,12 +40,12 @@ export class SettingsMenu extends React.Component {
 			return false
 		}
 
-		const value = window.app.params.settings.get(id) ?? false
+		const value = window.app.configuration.settings.get(id) ?? false
 		let to = !value
 
 		switch (type.toLowerCase()) {
 			case "button": {
-				window.app.params.settings.events.emit("changeSetting", { event, id, value, to })
+				window.app.configuration.settings.events.emit("changeSetting", { event, id, value, to })
 				break
 			}
 			default: {
@@ -80,7 +80,7 @@ export class SettingsMenu extends React.Component {
 							item.props.color = value.hex
 						}
 						item.props.onChangeComplete = (color, event) => {
-							window.app.params.settings.events.emit("changeSetting", { id: item.id, event, value: color })
+							window.app.configuration.settings.events.emit("changeSetting", { id: item.id, event, value: color })
 							this._set(item.id, color.hex)
 						}
 						break
