@@ -1,6 +1,6 @@
 {
   "name": "amimet_admin",
-  "version": "0.8.2",
+  "version": "0.8.4",
   "license": "MIT",
   "scripts": {
     "dev": "evite-dev",
@@ -29,8 +29,8 @@
     "format": "minimal"
   },
   "dependencies": {
-    "corenode": "^0.26.14",
-    "@corenode/utils": "^0.26.14",
+    "corenode": "^0.26.15",
+    "@corenode/utils": "^0.26.15",
     "evite": "^0.4.0",
     "@ant-design/icons": "^4.5",
     "antd": "^4.16.8",
