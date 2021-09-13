@@ -1,6 +1,10 @@
 import React from "react"
+import { Button } from "antd"
+import { ActionsBar } from "components"
 import { Icons, createIconRender } from "components/icons"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
+
+import Selector from "../selector"
 
 import defaultSidebarKeys from "schemas/defaultSidebar.json"
 import sidebarItems from "schemas/sidebar.json"
@@ -35,10 +39,14 @@ const allItems = getAllItems()
 export default class SidebarEditor extends React.Component {
 	state = {
 		items: [],
-		lockedIndex: []
+		lockedIndex: [],
 	}
 
 	componentDidMount() {
+		this.loadItems()
+	}
+
+	loadItems = () => {
 		const storagedKeys = window.app.configuration.sidebar.get() ?? defaultSidebarKeys
 		const active = []
 		const lockedIndex = []
@@ -54,6 +62,20 @@ export default class SidebarEditor extends React.Component {
 		})
 
 		this.setState({ items: active, lockedIndex })
+	}
+
+	onSave = () => {
+		window.app.configuration.sidebar._push(this.state.items)
+		window.controllers.sidebar.toogleEdit(false)
+	}
+
+	onDiscard = () => {
+		window.controllers.sidebar.toogleEdit(false)
+	}
+
+	onSetDefaults = () => {
+		window.app.configuration.sidebar._push(defaultSidebarKeys)
+		this.loadItems()
 	}
 
 	reorder = (list, startIndex, endIndex) => {
@@ -77,18 +99,58 @@ export default class SidebarEditor extends React.Component {
 			console.warn("Cannot move an locked item")
 			return false
 		}
-		
+
 		const items = this.reorder(this.state.items, result.source.index, result.destination.index)
 
-		this.setState({ items }, () => {
-			window.app.configuration.sidebar._push(items)
+		this.setState({ items })
+	}
+
+	deleteItem = (key) => {
+		this.setState({ items: this.state.items.filter((item) => item !== key) })
+	}
+
+	addItem = () => {
+		const keys = []
+
+		// filter by active keys
+		allItemsMap.forEach((item) => {
+			if (!this.state.items.includes(item.id)) {
+				keys.push(item.id)
+			}
+		})
+
+		window.controllers.drawer.open("sidebar_item_selector", Selector, {
+			props: {
+				width: "65%",
+			},
+			componentProps: {
+				items: keys
+			},
+			onDone: (drawer, selectedKeys) => {
+				drawer.close()
+
+				if (Array.isArray(selectedKeys)) {
+					const update = this.state.items ?? []
+
+					selectedKeys.forEach((key) => {
+						if (update.includes(key)) {
+							return false
+						}
+						
+						update.push(key)
+					})
+
+					this.setState({ items: update })
+				}
+			},
 		})
 	}
 
 	render() {
 		const grid = 6
 
-		const getItemStyle = (isDragging, draggableStyle) => ({
+		const getItemStyle = (isDragging, draggableStyle, component, isDraggingOver) => ({
+			cursor: component.locked ? "not-allowed" : "grab",
 			userSelect: "none",
 			padding: grid * 2,
 			margin: `0 0 ${grid}px 0`,
@@ -96,12 +158,19 @@ export default class SidebarEditor extends React.Component {
 			transition: "150ms all ease-in-out",
 			width: "100%",
 
-			background: isDragging ? "rgba(145, 145, 145, 0.5)" : "rgba(145, 145, 145, 0.9)",
+			border: isDraggingOver ? "2px dashed #e0e0e0" : "none",
+
+			color: component.locked ? "rgba(145,145,145,0.6)" : "#000",
+			background: component.locked
+				? "rgba(145, 145, 145, 0.2)"
+				: isDragging
+				? "rgba(145, 145, 145, 0.5)"
+				: "transparent",
 			...draggableStyle,
 		})
 
 		const getListStyle = (isDraggingOver) => ({
-			background: isDraggingOver ? "rgba(145, 145, 145, 0.5)" : "transparent",
+			background: "transparent",
 			transition: "150ms all ease-in-out",
 
 			padding: grid,
@@ -117,11 +186,16 @@ export default class SidebarEditor extends React.Component {
 								ref={droppableProvided.innerRef}
 								style={getListStyle(droppableSnapshot.isDraggingOver)}
 							>
-								{this.state.items.map((item, index) => {
-									const itemComponent = allItems[item]
+								{this.state.items.map((key, index) => {
+									const itemComponent = allItems[key]
 
 									return (
-										<Draggable isDragDisabled={itemComponent.locked} key={item} draggableId={item} index={index}>
+										<Draggable
+											isDragDisabled={itemComponent.locked}
+											key={key}
+											draggableId={key}
+											index={index}
+										>
 											{(draggableProvided, draggableSnapshot) => (
 												<div
 													ref={draggableProvided.innerRef}
@@ -130,9 +204,15 @@ export default class SidebarEditor extends React.Component {
 													style={getItemStyle(
 														draggableSnapshot.isDragging,
 														draggableProvided.draggableProps.style,
+														itemComponent,
+														droppableSnapshot.isDraggingOver,
 													)}
 												>
-													{itemComponent.content ?? itemComponent.title ?? itemComponent.id}
+													<Icons.Trash
+														onClick={() => this.deleteItem(key)}
+														className="sidebar_editor_deleteBtn"
+													/>
+													{itemComponent.title ?? itemComponent.id}
 												</div>
 											)}
 										</Draggable>
@@ -143,6 +223,35 @@ export default class SidebarEditor extends React.Component {
 						)}
 					</Droppable>
 				</DragDropContext>
+
+				<ActionsBar
+					style={{ position: "absolute", bottom: 0, left: 0, width: "100%", borderRadius: "12px 12px 0 0" }}
+				>
+					<div>
+						<Button
+							style={{ lineHeight: 0 }}
+							icon={<Icons.Plus style={{ margin: 0, padding: 0 }} />}
+							onClick={this.addItem}
+						/>
+					</div>
+					<div>
+						<Button
+							style={{ lineHeight: 0 }}
+							icon={<Icons.Check />}
+							type="primary"
+							onClick={this.onSave}
+						>
+							Done
+						</Button>
+					</div>
+					
+					<div>
+						<Button onClick={this.onDiscard} icon={<Icons.XCircle />} >Cancel</Button>
+					</div>
+					<div>
+						<Button type="link" onClick={this.onSetDefaults}>Set defaults</Button>
+					</div>
+				</ActionsBar>
 			</div>
 		)
 	}

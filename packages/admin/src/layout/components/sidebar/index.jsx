@@ -1,13 +1,14 @@
 import React from "react"
 import { Icons, createIconRender } from "components/icons"
-import { Layout, Menu, Avatar } from "antd"
+import { Layout, Menu, Avatar, Button } from "antd"
 
-import { Settings } from "components"
+import { Settings, ActionsBar } from "components"
 import { Controller } from "core/libs"
 import { SidebarEditor } from "./components"
 
 import config from "config"
 import sidebarItems from "schemas/sidebar.json"
+import defaultSidebarItems from "schemas/defaultSidebar.json"
 
 import "./index.less"
 
@@ -57,9 +58,8 @@ export default class Sidebar extends React.Component {
 	loadSidebarItems = () => {
 		const items = {}
 		const itemsMap = []
-		let keys = [...getStoragedKeys()]
-
-		// parse all items
+	
+		// parse all items from schema
 		sidebarItems.forEach((item, index) => {
 			items[item.id] = {
 				...item,
@@ -72,10 +72,17 @@ export default class Sidebar extends React.Component {
 			}
 		})
 
+		// filter undefined to avoid error
+		let keys = (getStoragedKeys() ?? defaultSidebarItems).filter((key) => {
+			if (typeof items[key] !== "undefined") {
+				return true
+			}
+		})
+
 		// short items
 		keys.forEach((id, index) => {
 			const item = items[id]
-
+			
 			if (item.locked) {
 				if (item.index !== index) {
 					keys = keys.move(index, item.index)
@@ -177,7 +184,7 @@ export default class Sidebar extends React.Component {
 
 		if (to) {
 			window.app.eventBus.emit("cleanAll")
-		}else {
+		} else {
 			if (this.itemsMap !== getStoragedKeys()) {
 				this.loadSidebarItems()
 			}
@@ -221,6 +228,7 @@ export default class Sidebar extends React.Component {
 				onMouseEnter={this.onMouseEnter}
 				onMouseLeave={this.handleMouseLeave}
 				theme={this.state.theme}
+				width={this.state.editMode ? 400 : 200}
 				collapsed={this.state.collapsed}
 				onCollapse={() => this.props.onCollapse()}
 				className={this.state.editMode ? "app_sidebar_sider_edit" : "app_sidebar_sider"}
@@ -232,15 +240,7 @@ export default class Sidebar extends React.Component {
 				</div>
 
 				{this.state.editMode && (
-					<div>
-						<div
-							style={{ width: "" }}
-							onClick={() => {
-								this.toogleEditMode()
-							}}
-						>
-							{createIconRender("Save")} Done
-						</div>
+					<div style={{ height: "100%" }}>
 						<SidebarEditor />
 					</div>
 				)}
