@@ -1,0 +1,4 @@
+{
+    "bundledWebRuntime": true,
+    "webDir": "dist"
+}

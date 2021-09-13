@@ -3,9 +3,10 @@
   "version": "0.8.4",
   "license": "MIT",
   "scripts": {
-    "dev": "evite-dev",
+    "dev": "evite dev",
     "prod": "npm run build && npm run server:prod",
-    "build": "vite build"
+    "build": "evite build",
+    "capacitor": "capacitor"
   },
   "lingui": {
     "locales": [
@@ -29,24 +30,24 @@
     "format": "minimal"
   },
   "dependencies": {
-    "corenode": "^0.26.15",
-    "@corenode/utils": "^0.26.15",
-    "evite": "^0.4.0",
     "@ant-design/icons": "^4.5",
+    "@corenode/utils": "^0.26.15",
     "antd": "^4.16.8",
     "classnames": "^2.3.1",
-    "js-cookie": "^2.2.1",
+    "corenode": "^0.26.15",
     "dicebar_lib": "^1.0.0",
     "enquire-js": "^0.2.1",
+    "evite": "^0.4.6",
     "feather-reactjs": "^2.0.13",
+    "js-cookie": "^2.2.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.19.3",
     "react-draggable": "^4.4.3",
     "react-reveal": "^1.2.2"
   },
   "devDependencies": {
-    "@capacitor/cli": "^3.0.2",
-    "@capacitor/core": "^3.0.2",
+    "@capacitor/cli": "^3.2.2",
+    "@capacitor/core": "^3.2.2",
     "@capacitor/ios": "^3.0.2",
     "@types/babel__core": "^7.1.14",
     "@types/node": "^14.14.36"

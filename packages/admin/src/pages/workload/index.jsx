@@ -158,7 +158,7 @@ export default class Workload extends React.Component {
 
 		window.controllers.drawer.open("workload_details", WorkloadDetails, {
 			componentProps: {
-				id
+				id,
 			},
 			props: {
 				width: "55%",
@@ -167,7 +167,6 @@ export default class Workload extends React.Component {
 				drawer.close()
 			},
 		})
-
 	}
 
 	renderWorkloads() {
@@ -221,11 +220,12 @@ export default class Workload extends React.Component {
 		return (
 			<div>
 				<div style={{ marginBottom: "10px" }}>
-					<ActionsBar
-						wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}
-					>
+					<ActionsBar wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
 						<div>
-							<Button onClick={this.toogleSelection} icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}>
+							<Button
+								onClick={this.toogleSelection}
+								icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}
+							>
 								{this.state.selectionEnabled ? "Done" : "Select"}
 							</Button>
 						</div>
