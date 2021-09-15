@@ -15,6 +15,9 @@ import SettingsController from "core/models/settings"
 import { createEviteApp, GlobalBindingProvider, appendMethodToApp } from "evite"
 import { API, Render, Splash } from "extensions"
 
+import "theme/index.less"
+import "antd/dist/antd.less"
+
 // append method to array prototype
 Array.prototype.move = function (from, to) {
 	this.splice(to, 0, this.splice(from, 1)[0])
@@ -58,10 +61,10 @@ export default class App extends createEviteApp({
 			title: config.app.title,
 			version: global.project.version,
 			environment: process.env.NODE_ENV,
-			versions: {
+			versions: {
 				evite: global._eviteVersion,
-				...global._versions
-			} 
+				...global._versions,
+			},
 		})
 
 		this.eventBus.on("destroyAllSessions", () => {
