@@ -14,7 +14,9 @@ export default {
 					}
 
 					self.history.setLocation = (to, delay) => {
-						function sendToeventBus(...context) {
+						console.time("setLocation")
+
+						function sendToEventBus(...context) {
 							if (typeof window.app.eventBus !== "undefined") {
 								window.app.eventBus.emit(...context)
 							} else {
@@ -27,11 +29,13 @@ export default {
 							return false
 						}
 
-						sendToeventBus("setLocation", to, delay)
+						sendToEventBus("setLocation", to, delay)
 						setTimeout(() => {
 							self.history.push(to)
 							window.app.eventBus.emit("setLocationReady")
+							console.timeEnd("setLocation")
 						}, delay ?? 100)
+
 					}
 
 					self.appendToApp("setLocation", self.history.setLocation)
@@ -40,25 +44,27 @@ export default {
 			self: {
 				createPageRender: function (params) {
 					return loadable((props) => {
-						const pagePath = `${global.aliases["pages"]}${window.location.pathname}`
-
-						return import(`${pagePath}`).catch((err) => {
+						const pagePath = `${globalThis.evite.aliases["pages"]}${window.location.pathname}`
+						
+						const _page = import(`${pagePath}`).catch((err) => {
 							const isNotFound = err.message.includes("Failed to fetch dynamically imported module")
-
+							
 							if (isNotFound) {
 								if (typeof params.on404 === "function") {
 									return () => React.createElement(params.on404, { path: pagePath })
 								}
-
+								
 								return () => <div>NOT FOUND</div>
 							} else {
 								if (typeof params.onRenderError === "function") {
 									return () => React.createElement(params.onRenderError, { error: err })
 								}
-
+								
 								return () => <div>{err.toString()}</div>
 							}
 						})
+
+						return _page
 					})
 				},
 				validateLocationSlash: (location) => {

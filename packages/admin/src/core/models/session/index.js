@@ -1,4 +1,4 @@
-import { RequestAdaptor } from '@ragestudio/cloudlink/dist/client'
+import { RequestAdaptor } from 'linebridge/client'
 import cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
 import config from 'config'

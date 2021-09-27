@@ -7,7 +7,6 @@ import { Sidebar, Header, Drawer } from "./components"
 
 import Login from "pages/login"
 
-import "./index.less"
 
 export const uiViewLoad = {
 	login: (callback) => {
@@ -72,27 +71,25 @@ export default class BaseLayout extends React.Component {
 	render() {
 		const Children = (props) => React.cloneElement(this.props.children, props)
 		return (
-			<React.Fragment>
-				<antd.Layout style={{ minHeight: "100vh" }}>
-					<Drawer {...this.props} />
+			<antd.Layout style={{ height: "100%" }}>
+				<Drawer {...this.props} />
 
-					<Sidebar
-						{...this.props}
-						onCollapse={() => this.toggleCollapseSider()}
-						collapsed={this.state.collapsedSidebar}
-					/>
+				<Sidebar
+					{...this.props}
+					onCollapse={() => this.toggleCollapseSider()}
+					collapsed={this.state.collapsedSidebar}
+				/>
 
-					<antd.Layout className="app_layout">
-						<Header {...this.props} siteName={config.app.title} />
+				<antd.Layout className="app_layout">
+					<Header {...this.props} siteName={config.app.title} />
 
-						<antd.Layout.Content {...this.props} className="app_wrapper">
-							<div ref={this.layoutContentRef}>
-								<Children {...this.props} />
-							</div>
-						</antd.Layout.Content>
-					</antd.Layout>
+					<antd.Layout.Content {...this.props} className="app_wrapper">
+						<div ref={this.layoutContentRef}>
+							<Children {...this.props} />
+						</div>
+					</antd.Layout.Content>
 				</antd.Layout>
-			</React.Fragment>
+			</antd.Layout>
 		)
 	}
 }

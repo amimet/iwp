@@ -4,5 +4,6 @@
     "prettier.tabWidth": 4,
     "prettier.trailingComma": "all",
     "prettier.useTabs": true,
-    "prettier.endOfLine": "auto"
+    "prettier.endOfLine": "auto",
+    "git.ignoreLimitWarning": true
 }

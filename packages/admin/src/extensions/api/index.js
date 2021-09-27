@@ -1,5 +1,5 @@
 import config from 'config'
-import cloudlinkClient from "@ragestudio/cloudlink/dist/client"
+import linebridge from "linebridge/client"
 import { notification } from "antd"
 import * as session from "core/models/session"
 
@@ -30,7 +30,7 @@ export default {
                         return obj
                     }
 
-                    return cloudlinkClient
+                    return linebridge
                         .createInterface(config.api.address, getSessionContext)
                         .catch((err) => {
                             notification.error({

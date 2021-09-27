@@ -1,4 +1,4 @@
-import { RequestAdaptor } from '@ragestudio/cloudlink/dist/client'
+import { RequestAdaptor } from 'linebridge/client'
 import * as session from '../session'
 import store from 'store'
 import config from 'config'

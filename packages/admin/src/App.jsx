@@ -1,4 +1,5 @@
 import React from "react"
+import ReactDOM from "react-dom"
 import { Helmet } from "react-helmet"
 import ngProgress from "nprogress"
 
@@ -59,11 +60,11 @@ export default class App extends createEviteApp({
 		this.appendToApp("about", {
 			siteName: config.app.siteName,
 			title: config.app.title,
-			version: global.project.version,
-			environment: process.env.NODE_ENV,
+			version: globalThis.evite.projectVersion,
+			environment: globalThis.evite.env.NODE_ENV,
 			versions: {
-				evite: global._eviteVersion,
-				...global._versions,
+				evite: globalThis.evite._eviteVersion,
+				...globalThis.evite._versions,
 			},
 		})
 
@@ -204,3 +205,5 @@ export default class App extends createEviteApp({
 		)
 	}
 }
+
+ReactDOM.render(<App />, document.getElementById("root"))

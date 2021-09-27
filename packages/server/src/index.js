@@ -1,4 +1,4 @@
-import cloudlink from '@ragestudio/cloudlink'
+import linebridge from 'linebridge'
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
@@ -27,7 +27,7 @@ class Server {
         this.controllers = require("./controllers")
         this.endpoints = require("./endpoints")
 
-        this.instance = new cloudlink.Server({
+        this.instance = new linebridge.Server({
             listen: "0.0.0.0",
             middlewares: this.middlewares,
             controllers: this.controllers,

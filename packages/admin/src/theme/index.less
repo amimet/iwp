@@ -1,5 +1,79 @@
-@import "@/theme/vars.less";
-@import "@/theme/fonts.css";
+@import "theme/vars.less";
+@import "theme/fonts.css";
+
+.ant-layout {
+  background: @app_layout_backgroundColor!important;
+  background-color: @app_layout_backgroundColor!important;
+
+  position: fixed;
+  -webkit-overflow-scrolling: touch;
+
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
+  
+  overflow: hidden;
+}
+
+.app_layout{
+  background: @app_layout_backgroundColor!important;
+  background-color: @app_layout_backgroundColor!important;
+
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  
+  display: flex;
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.app_wrapper {
+  position: relative;
+
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
+
+  margin: 16px 16px 16px 16px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+// Menus & Index's
+
+.app_login {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// GEO Regions
+.app_regions_wrapper {
+  > div {
+      margin-bottom: 10px;
+  }
+}
+
+.app_regions_card {
+  display: flow-root;
+  background-color: #ededed;
+  border: #454545 0.5px;
+  border-radius: 8px;
+  padding: 22px 22px;
+}
 
 ::-webkit-scrollbar {
   position: absolute;
@@ -28,11 +102,15 @@
   background-color: transparent;
 }
 
-body, html { 
+html { 
   position: fixed;
   overflow: hidden;
   -webkit-overflow-scrolling: touch;
   background-color: @app_layout_backgroundColor!important;
+
+  height: 100vh;
+  max-height: 100vh;
+  min-height: 100vh;
 }
 
 body {
@@ -44,7 +122,7 @@ body {
   font-family: 'Varela Round', sans-serif;
 
   scroll-behavior: smooth;
-  height: 100vh;
+  height: 100%;
 
   overflow: hidden;
 }
