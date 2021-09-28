@@ -3,6 +3,7 @@ import { Icons } from "components/icons"
 import * as antd from "antd"
 import { SketchPicker } from "react-color"
 import { AboutApp } from ".."
+import config from "config"
 
 import "./index.less"
 
@@ -159,21 +160,22 @@ export class SettingsMenu extends React.Component {
 	}
 
 	renderAboutApp() {
-		const { about } = window.app
-		const isDevMode = about.environment === "development"
+		const appConfig = config.app
+		const eviteNamespace = window.__evite
+		const isDevMode = eviteNamespace.env.NODE_ENV !== "production"
 
 		return (
 			<div className="settings_about_app">
-				<div>{about.siteName}</div>
+				<div>{appConfig.siteName}</div>
 				<div>
 					<antd.Tag>
-						<Icons.Tag />v{about.version}
+						<Icons.Tag />v{eviteNamespace.projectVersion}
 					</antd.Tag>
 				</div>
 				<div>
 					<antd.Tag color={isDevMode ? "magenta" : "green"}>
 						{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
-						{about.environment}
+						{isDevMode ? "development" : "stable"}
 					</antd.Tag>
 				</div>
 			</div>
