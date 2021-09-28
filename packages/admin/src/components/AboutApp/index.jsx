@@ -21,8 +21,9 @@ export class AboutApp extends React.Component {
 	}
 
 	render() {
-		const { about } = window.app
-		const isDevMode = about.environment === "development"
+		const eviteNamespace = window.__evite
+		const appConfig = config.app ?? {}
+		const isDevMode = eviteNamespace.env.NODE_ENV !== "production"
 
 		return (
 			<antd.Modal
@@ -39,21 +40,19 @@ export class AboutApp extends React.Component {
 							<img src={config.logo.alt} />
 						</div>
 						<div>
-							<h1>{about.siteName}</h1>
+							<h1>{appConfig.siteName}</h1>
 							<div>
 								<antd.Tag>
-									<Icons.Tag />v{about.version}
+									<Icons.Tag />v{eviteNamespace.projectVersion}
 								</antd.Tag>
-								<antd.Tag color="geekblue">
-									eVite v{about.versions.evite}
-								</antd.Tag>
+								<antd.Tag color="geekblue">eVite v{eviteNamespace.eviteVersion}</antd.Tag>
 								<antd.Tag color="green">
-									<Icons.Hexagon /> v{about.versions.node}
+									<Icons.Hexagon /> v{eviteNamespace.versions.node}
 								</antd.Tag>
 
 								<antd.Tag color={isDevMode ? "magenta" : "green"}>
 									{isDevMode ? <Icons.Triangle /> : <Icons.CheckCircle />}
-									{about.environment}
+									{isDevMode ? "development" : "stable"}
 								</antd.Tag>
 							</div>
 						</div>
