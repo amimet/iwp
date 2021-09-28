@@ -6,6 +6,12 @@ const commonjs = require("@rollup/plugin-commonjs")
 const aliases = {
     schemas: path.resolve(__dirname, './schemas'),
     extensions: path.resolve(__dirname, './src/extensions'),
+    theme: path.join(__dirname, 'src/theme'),
+    locales: path.join(__dirname, 'src/locales'),
+    core: path.join(__dirname, 'src/core'),
+    pages: path.join(__dirname, 'src/pages'),
+    components: path.join(__dirname, 'src/components'),
+    models: path.join(__dirname, 'src/models'),
 }
 
 // require( "vite-plugin-require").default(),
@@ -21,7 +27,9 @@ module.exports = (config) => {
         ...aliases,
     }
 
-    //config.plugins.push(commonjs())
+    // config.plugins.push(commonjs({
+    //     transformMixedEsModules: true
+    // }))
 
     config.css = {
         preprocessorOptions: {
@@ -33,19 +41,6 @@ module.exports = (config) => {
             }
         }
     }
-
-    if (typeof config.ssr === "undefined") {
-        config.ssr = Object()
-    }
-    config.ssr.external = [
-        "os",
-        "@corenode/utils",
-        "corenode",
-        "path",
-        "fs"
-    ]
-
-    config.ssr.target = "webworker"
 
     return config
 }
