@@ -44,7 +44,7 @@ export default {
 			self: {
 				createPageRender: function (params) {
 					return loadable((props) => {
-						const pagePath = `${globalThis.evite.aliases["pages"]}${window.location.pathname}`
+						const pagePath = `${window.__evite.aliases["pages"]}${window.location.pathname}`
 						
 						const _page = import(`${pagePath}`).catch((err) => {
 							const isNotFound = err.message.includes("Failed to fetch dynamically imported module")

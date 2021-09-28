@@ -56,18 +56,6 @@ export default class App extends createEviteApp({
 			isMobile: false,
 		}
 
-		//
-		this.appendToApp("about", {
-			siteName: config.app.siteName,
-			title: config.app.title,
-			version: globalThis.evite.projectVersion,
-			environment: globalThis.evite.env.NODE_ENV,
-			versions: {
-				evite: globalThis.evite._eviteVersion,
-				...globalThis.evite._versions,
-			},
-		})
-
 		this.eventBus.on("destroyAllSessions", () => {
 			session.destroyAll()
 		})
