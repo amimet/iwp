@@ -38,7 +38,7 @@
     "corenode": "^0.28.18",
     "dicebar_lib": "^1.0.0",
     "enquire-js": "^0.2.1",
-    "evite": "^0.6.7",
+    "evite": "^0.6.15",
     "feather-reactjs": "^2.0.13",
     "js-cookie": "^2.2.1",
     "less": "^4.1.1",
