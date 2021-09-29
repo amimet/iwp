@@ -47,7 +47,9 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.19.3",
     "react-draggable": "^4.4.3",
+    "react-json-view": "^1.21.3",
     "react-reveal": "^1.2.2",
+    "react-rnd": "^10.3.5",
     "vite-plugin-imp": "^2.0.9"
   },
   "devDependencies": {
