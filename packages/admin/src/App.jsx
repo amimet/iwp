@@ -14,7 +14,7 @@ import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { createEviteApp, GlobalBindingProvider, appendMethodToApp } from "evite"
-import { API, Render, Splash } from "extensions"
+import { API, Render, Splash, Debug, connect } from "extensions"
 
 import "theme/index.less"
 import "antd/dist/antd.less"
@@ -39,7 +39,7 @@ const SplashExtension = Splash({
 	},
 })
 export default class App extends createEviteApp({
-	extensions: [API, Render, SplashExtension],
+	extensions: [connect, API, Render, SplashExtension, Debug],
 }) {
 	constructor(props) {
 		super(props)
@@ -86,6 +86,7 @@ export default class App extends createEviteApp({
 
 	initialization = async () => {
 		await this.sessionInitialization()
+
 		if (typeof window.headerVisible !== "undefined" && !window.headerVisible) {
 			window.toogleHeader(true)
 		}
