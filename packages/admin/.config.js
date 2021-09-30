@@ -1,7 +1,6 @@
 const path = require('path')
 const fs = require("fs")
 const lessToJS = require("less-vars-to-js")
-const commonjs = require("@rollup/plugin-commonjs")
 
 const aliases = {
     schemas: path.resolve(__dirname, './schemas'),
@@ -14,7 +13,7 @@ const aliases = {
     models: path.join(__dirname, 'src/models'),
 }
 
-// require( "vite-plugin-require").default(),
+// require("vite-plugin-require").default(),
 
 module.exports = (config) => {
     if (typeof config.windowContext.process === 'undefined') {
@@ -27,17 +26,13 @@ module.exports = (config) => {
         ...aliases,
     }
 
-    // config.plugins.push(commonjs({
-    //     transformMixedEsModules: true
-    // }))
-
     config.css = {
         preprocessorOptions: {
             less: {
                 javascriptEnabled: true,
-                modifyVars: lessToJS(
-                    fs.readFileSync(path.resolve(__dirname, "./config/variables.less"), "utf8")
-                ),
+                // modifyVars: lessToJS(
+                //     fs.readFileSync(path.resolve(__dirname, "./config/variables.less"), "utf8")
+                // ),
             }
         }
     }
