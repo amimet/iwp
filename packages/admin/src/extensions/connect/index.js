@@ -7,8 +7,10 @@ export default {
             attachToInitializer: [
                 async (self) => {
                     self.connectWithApp = (component) => {
-                        return React.cloneElement(component, self)
+                        return React.createElement(component, { app: self })
                     }
+
+                    self.appendToApp("connect", self.connectWithApp)
                 },
             ],
         },
