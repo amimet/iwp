@@ -132,6 +132,8 @@ class WindowRender extends React.Component {
 		const { children, renderProps } = this.props
 		const { position, dimensions } = this.state
 
+		const Render = React.isValidElement(children) ? () => children : () => React.createElement(children)
+		
 		return (
 			<Rnd
 				default={{
@@ -164,7 +166,7 @@ class WindowRender extends React.Component {
 					</div>
 
 					<div className="window_body">
-						{React.cloneElement(children, {...renderProps})}
+						<Render {...renderProps} />
 					</div>
 				</div>
 			</Rnd>
