@@ -7,7 +7,6 @@ import { Sidebar, Header, Drawer } from "./components"
 
 import Login from "pages/login"
 
-
 export const uiViewLoad = {
 	login: (callback) => {
 		window.controllers.drawer.open("login", Login, {
