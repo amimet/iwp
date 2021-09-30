@@ -14,10 +14,9 @@ import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { createEviteApp, GlobalBindingProvider, appendMethodToApp } from "evite"
-import { API, Render, Splash, Debug, connect } from "extensions"
+import { API, Render, Splash, Debug, connect, theme } from "extensions"
 
 import "theme/index.less"
-import "antd/dist/antd.less"
 
 // append method to array prototype
 Array.prototype.move = function (from, to) {
@@ -39,7 +38,7 @@ const SplashExtension = Splash({
 	},
 })
 export default class App extends createEviteApp({
-	extensions: [connect, API, Render, SplashExtension, Debug],
+	extensions: [connect, theme, API, Render, SplashExtension, Debug],
 }) {
 	constructor(props) {
 		super(props)
