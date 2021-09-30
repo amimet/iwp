@@ -7,6 +7,9 @@ export default {
     api: {
         address: process.env.NODE_ENV !== 'production'? "https://api.amimet.es" : "https://api.amimet.es",
     },
+    theme: {
+        "primary-color": "#32b7bb",
+    },
     app: {
         title: packagejson.name,
         siteName: "AmimetApp",
