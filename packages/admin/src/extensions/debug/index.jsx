@@ -1,8 +1,11 @@
 import React from "react"
 import { Window } from "components"
 import { Skeleton, Tabs } from "antd"
+import { GlobalBindingProvider } from "evite"
 
 class DebuggerUI extends React.Component {
+	appBinding = this.props.app
+
 	state = {
 		loading: true,
 		error: null,
@@ -21,9 +24,10 @@ class DebuggerUI extends React.Component {
 		let renders = {}
 
 		Object.keys(debuggers).forEach((key) => {
-			renders[key] = () => {
+			renders[key] = (...context) => {
+				const _debugger = debuggers[key]
 				try {
-					return debuggers[key]()
+					return _debugger(...context)
 				} catch (error) {
 					return this.renderError(key, error)
 				}
@@ -36,7 +40,6 @@ class DebuggerUI extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		console.log(this)
 		await this.loadDebuggers()
 	}
 
@@ -70,24 +73,25 @@ class DebuggerUI extends React.Component {
 		})
 	}
 
-	renderDebugger = (key) => {
-		if (!key) {
-			return <div>Select a debugger</div>
-		}
-		return React.createElement(this.state.debuggers[key])
-	}
-
 	render() {
 		const { loading, error } = this.state
 
 		if (loading) {
 			return <Skeleton active />
 		}
+		const DebuggerRender = this.state.debuggers[this.state.active]
 
 		return (
 			<div>
 				<Tabs onChange={this.onChangeTab}>{this.renderTabs()}</Tabs>
-				<div>{error ? this.renderError(this.state.active, error) : this.renderDebugger(this.state.active)}</div>
+				{error && this.renderError(this.state.active, error)}
+				{!this.state.active ? (
+					<div> Select an debugger to start </div>
+				) : (
+					<GlobalBindingProvider appBinding={this.appBinding}>
+						<DebuggerRender />
+					</GlobalBindingProvider>
+				)}
 			</div>
 		)
 	}
@@ -100,7 +104,7 @@ export default {
 			attachToInitializer: [
 				async (self) => {
 					self.appendToApp("openDebug", () => {
-						new Window.DOMWindow({ id: "debugger", children: () => DebuggerUI }).create()
+						new Window.DOMWindow({ id: "debugger", children: self.connectWithApp(DebuggerUI) }).create()
 					})
 				},
 			],
