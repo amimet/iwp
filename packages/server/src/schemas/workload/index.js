@@ -6,4 +6,8 @@ export default {
     created: { type: Number, required: true },
     scheduledStart: { type: String, required: true },
     scheduledFinish: { type: String, required: true },
+    status: { type: String, default: 'pending' },
+    assigned: { type: Array, default: [] },
+    phase: { type: Number, default: false },
+    nof: { type: Number, default: false},
 }
