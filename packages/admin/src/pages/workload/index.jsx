@@ -2,8 +2,10 @@ import React from "react"
 import { Icons } from "components/Icons"
 import { LoadingSpinner, ActionsBar, SelectableList } from "components"
 import { hasAdmin } from "core/permissions"
+import moment from "moment"
+import classnames from "classnames"
 
-import { Select, Result, Button, Modal } from "antd"
+import { Select, Result, Button, Modal, Tag, Badge } from "antd"
 
 import { WorkloadCreator, WorkloadDetails } from "./components"
 
@@ -17,9 +19,23 @@ const renderDate = (time) => {
 	const dateNumber = Number(time)
 
 	if (dateNumber) {
-		return new Date(dateNumber).toString()
+		const date = new Date(dateNumber)
+		return [
+			<div>
+				<Icons.Clock /> {date.toLocaleTimeString()}
+			</div>,
+			<div>
+				<Icons.Calendar /> {date.toLocaleDateString()}
+			</div>,
+		]
 	}
-	return time
+	return (
+		<div>
+			<div>
+				<Icons.Clock /> {time}
+			</div>
+		</div>
+	)
 }
 
 export default class Workload extends React.Component {
@@ -169,6 +185,34 @@ export default class Workload extends React.Component {
 		})
 	}
 
+	renderWorkloadItem = (item) => {
+		const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
+
+		if (isExpired) {
+			item.status = "expired"
+		}
+
+		return (
+			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} key={item._id}>
+				<div className={classnames("indicator", item.status)}>
+					<div className="statusText">{item.status}</div>
+				</div>
+				<div>
+					<h1>
+						{item.name ?? "Unnamed workload"} <Tag>{item._id}</Tag>
+					</h1>
+				</div>
+				<div className="info">
+					{renderDate(item.created)}
+					<div>
+						<Icons.Box />
+						{item.items.length} items
+					</div>
+				</div>
+			</div>
+		)
+	}
+
 	renderWorkloads() {
 		if (this.state.workloads != null) {
 			if (!Array.isArray(this.state.workloads)) {
@@ -199,16 +243,7 @@ export default class Workload extends React.Component {
 					onDelete={this.onDeleteWorkloads}
 					onCheck={this.onCheckWorkloads}
 					items={this.state.workloads}
-					renderItem={(item) => {
-						return (
-							<div onClick={() => this.openWorkloadDetails(item._id)} key={item._id}>
-								<div>{item._id}</div>
-								<div>
-									<Icons.Clock /> {renderDate(item.created)}
-								</div>
-							</div>
-						)
-					}}
+					renderItem={this.renderWorkloadItem}
 				></SelectableList>
 			)
 		}

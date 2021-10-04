@@ -1,3 +1,59 @@
+.workload_order_item {
+	> div {
+		margin-bottom: 10px;
+	}
+	
+	.info {
+		display: flex;
+		> div {
+			margin-right: 10px;
+		}
+	}
+
+	.indicator {
+		display: flex;
+		justify-content: end;
+		align-items: center;
+
+		background-color: #424242;
+		color: #fff;
+
+		height: 18px;
+		width: fit-content;
+		border-radius: 24px;
+		padding: 12px;
+
+		transition: all 150ms ease-out;
+
+		&.expired {
+			background-color: #f5222d;
+		}
+
+		&.pending {
+			background-color: #ffc53d;
+		}
+
+		&.completed {
+			background-color: #bae637;
+		}
+
+		&.processing {
+			background-color: #1890ff;
+		}
+
+		&.onTrouble {
+			background-color: #722ed1;
+		}
+
+		font-size: 0;
+	}
+
+	.indicator:hover {
+		font-size: 12px;
+	}
+}
+
+
 .workload_fabric_item {
 	cursor: pointer;
 	transition: all 100ms ease-in-out;
@@ -13,46 +69,46 @@
 	.ant-btn {
 		line-height: 0 !important;
 	}
-    
-    > div {
-        margin-bottom: 20px;
 
-        .body {
-            padding-left: 20px;
-            width: 100%;
-        }
-    }
+	> div {
+		margin-bottom: 20px;
+
+		.body {
+			padding-left: 20px;
+			width: 100%;
+		}
+	}
 }
 
-.workload_workshift_selector{
-    align-items: center;
-    justify-content: space-between;
+.workload_workshift_selector {
+	align-items: center;
+	justify-content: space-between;
 
-    display: grid;
+	display: grid;
 
-    grid-template-columns: 1fr 3fr; 
-    grid-template-rows: 1fr; 
-    gap: 0px 20px; 
-    grid-template-areas: ". ."; 
+	grid-template-columns: 1fr 3fr;
+	grid-template-rows: 1fr;
+	gap: 0px 20px;
+	grid-template-areas: ". .";
 
-    .ant-select {
-        width: fit-content;
-    }
+	.ant-select {
+		width: fit-content;
+	}
 
-    > div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+	> div {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 }
 
 .workload_workshift_info {
-    > div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 10px;
-    }
+	> div {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 10px;
+	}
 }
 
 .workload_item_selection_wrapper {
@@ -62,12 +118,12 @@
 }
 
 .workload_creator_items {
-    border: 1px dashed rgba(66, 66, 66, 0.3);
-    border-radius: 12px;
-    padding: 10px;
+	border: 1px dashed rgba(66, 66, 66, 0.3);
+	border-radius: 12px;
+	padding: 10px;
 
-    height: 50vh;
-    overflow: scroll;
+	height: 50vh;
+	overflow: scroll;
 }
 
 .workload_item_selection_header {
