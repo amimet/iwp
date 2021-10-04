@@ -24,14 +24,7 @@ class DebuggerUI extends React.Component {
 		let renders = {}
 
 		Object.keys(debuggers).forEach((key) => {
-			renders[key] = (...context) => {
-				const _debugger = debuggers[key]
-				try {
-					return _debugger(...context)
-				} catch (error) {
-					return this.renderError(key, error)
-				}
-			}
+			renders[key] = debuggers[key]
 		})
 
 		this.setState({ debuggers: renders }, () => {
@@ -73,13 +66,20 @@ class DebuggerUI extends React.Component {
 		})
 	}
 
+	renderDebugger = (_debugger, context) => {
+		try {
+			return <_debugger {...context} />
+		} catch (error) {
+			return this.renderError(key, error)
+		}
+	}
+
 	render() {
 		const { loading, error } = this.state
 
 		if (loading) {
 			return <Skeleton active />
 		}
-		const DebuggerRender = this.state.debuggers[this.state.active]
 
 		return (
 			<div>
@@ -88,9 +88,7 @@ class DebuggerUI extends React.Component {
 				{!this.state.active ? (
 					<div> Select an debugger to start </div>
 				) : (
-					<GlobalBindingProvider appBinding={this.appBinding}>
-						<DebuggerRender />
-					</GlobalBindingProvider>
+					this.renderDebugger(this.state.debuggers[this.state.active], { appBinding: this.appBinding })
 				)}
 			</div>
 		)
