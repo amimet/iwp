@@ -1,4 +1,4 @@
-export function schematized(schema, fn) {
+export default (schema, fn) => {
     return async (req, res, next) => {
         const missingKeys = []
         const requiredKeys = Array.isArray(schema) ? schema : []
@@ -18,5 +18,3 @@ export function schematized(schema, fn) {
         }
     }
 }
-
-export default schematized
