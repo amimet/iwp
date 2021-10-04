@@ -23,11 +23,15 @@ export const WorkloadController = {
         return res.json(workload)
     },
     set: Schematized(["items"], async (req, res) => {
-        const { items, region } = req.body
+        const { items, region, name, scheduledStart, scheduledFinish, workshift } = req.body
 
         const obj = {
             created: new Date().getTime(),
             items,
+            name,
+            scheduledStart,
+            scheduledFinish,
+            workshift,
             region,
         }
 
