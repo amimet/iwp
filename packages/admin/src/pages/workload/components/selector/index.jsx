@@ -16,6 +16,10 @@ export default class WorkloadSelector extends React.Component {
 	}
 
 	componentDidMount = async () => {
+		this.setItemsFromDB()
+	}
+
+	setItemsFromDB = async () => {
 		api.get.fabricitems()
 		.then((items) => {
 			this.setState({
@@ -128,6 +132,7 @@ export default class WorkloadSelector extends React.Component {
 
 		return (
 			<div>
+				<h1><Icons.Globe /> Browse</h1>
 				<List
 					itemLayout="vertical"
 					size="large"
