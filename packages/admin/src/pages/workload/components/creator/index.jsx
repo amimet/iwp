@@ -2,10 +2,11 @@ import React from "react"
 import { Icons } from "components/Icons"
 import { nanoid } from "nanoid"
 
+import { Select, Button, List, Tag, Space, Input, DatePicker, Tabs, Row, Col } from "antd"
 import { LoadingSpinner } from "components"
-import { Select, Button, List, Tag, Space } from "antd"
 
 import { WorkloadSelector } from "../index"
+import moment from "moment"
 
 import "../../index.less"
 
@@ -68,9 +69,13 @@ const ActionIcon = (props) => (
 
 export default class WorkloadCreator extends React.Component {
 	state = {
+		name: null,
+		selectedDate: null,
 		selectedRegion: null,
+		selectedWorkshift: null,
 		regions: [],
 		items: [],
+		workshifts: {},
 	}
 
 	onDone = () => {
@@ -116,9 +121,17 @@ export default class WorkloadCreator extends React.Component {
 	submit = async () => {
 		this.setState({ submitting: true })
 
-		const { selectedRegion, items } = this.state
+		const { selectedRegion, selectedWorkshift, selectedDate, items, name } = this.state
+
+		const scheduledStart = selectedDate[0]
+		const scheduledFinish = selectedDate[1]
+
 		const workload = {
 			region: selectedRegion,
+			workshift: selectedWorkshift,
+			scheduledStart,
+			scheduledFinish,
+			name,
 			items,
 		}
 
@@ -147,78 +160,191 @@ export default class WorkloadCreator extends React.Component {
 		})
 	}
 
+	renderWorkshiftsOptions = () => {
+		return Object.keys(this.state.workshifts).map((key) => {
+			const workshift = this.state.workshifts[key]
+			return <Select.Option key={workshift._id}>{workshift.name}</Select.Option>
+		})
+	}
+
+	renderWorkshiftInfo = (id) => {
+		const workshift = this.state.workshifts[id]
+
+		return (
+			<div className="workload_workshift_info">
+				<div>
+					<Icons.LogIn style={{ color: "blue", marginRight: "10px" }} />
+					{workshift.start}
+				</div>
+				<div>
+					<Icons.ArrowRight />
+				</div>
+				<div>
+					<Icons.LogOut style={{ color: "red", marginRight: "10px" }} />
+					{workshift.end}
+				</div>
+			</div>
+		)
+	}
+
+	getWorkshiftsFromRegion = async (region) => {
+		const data = await api.get.workshifts(undefined, { regionId: region })
+		const obj = Object()
+
+		data.forEach((workshift) => {
+			obj[workshift._id] = workshift
+		})
+
+		this.setState({ workshifts: obj })
+	}
+
+	onSelectRegion = (region) => {
+		this.setState({ selectedRegion: region })
+		this.getWorkshiftsFromRegion(region)
+	}
+
+	onSetSchedule = (value, dateString) => {
+		this.setState({ selectedDate: dateString })
+	}
+
+	onSelectWorkshift = (key) => {
+		this.setState({ selectedWorkshift: key })
+	}
+
+	onChangeName = (event) => {
+		const value = event.target.value
+
+		if (value === "") {
+			this.setState({ name: null })
+		} else {
+			this.setState({ name: value })
+		}
+	}
+
 	render() {
 		if (this.state.loading) return <LoadingSpinner />
 
 		return (
-			<div>
+			<div className="workload_creator_wrapper">
 				<div>
 					<h2>
-						<Icons.GitCommit /> Create new Workload
+						<Icons.GitCommit /> New Workload
 					</h2>
 				</div>
 
-				<div style={{ marginBottom: "20px" }}>
-					<Select
-						showSearch
-						style={{ width: "100%" }}
-						placeholder="Select a region"
-						optionFilterProp="children"
-						onChange={(region) => {
-							this.setState({ selectedRegion: region })
-						}}
-						filterOption={(input, option) =>
-							option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-						}
-					>
-						{this.generateRegionsOption()}
-					</Select>
+				<div key="region">
+					<h4>
+						<Icons.Globe /> Region
+					</h4>
+					<div className="body">
+						<Select
+							showSearch
+							style={{ width: "100%" }}
+							placeholder="Select a region"
+							optionFilterProp="children"
+							onChange={this.onSelectRegion}
+							filterOption={(input, option) =>
+								option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+							}
+						>
+							{this.generateRegionsOption()}
+						</Select>
+					</div>
 				</div>
 
-				<div>
-					<List
-						dataSource={this.state.items}
-						itemLayout="vertical"
-						size="large"
-						renderItem={(item) => (
-							<List.Item
-								key={item.id}
-								actions={[
-									<ActionIcon
-										onClick={() => {
-											this.removeItem(item.uuid)
-										}}
-										icon={Icons.Trash}
-										text="Remove"
-										key="remove"
-									/>,
-									<ActionIcon icon={Icons.Edit} text="Modify" key="modify" />,
-								]}
-							>
-								<List.Item.Meta
-									title={
-										<a>
-											x{item.quantity ?? 1} | {item.title} <Tag>{item.id}</Tag>
-										</a>
-									}
-									description={item.description}
-								/>
-								<div className="workload_item_props">
-									{(item.selectedProps ?? []).map((propKey) => {
-										const prop = item.props[propKey]
-										return (
-											<div>
-												<Icons.Check />
-												{prop.title}
-											</div>
-										)
-									})}
-								</div>
-							</List.Item>
-						)}
-					/>
+				<div key="name">
+					<h4>
+						<Icons.Tag /> Name
+					</h4>
+
+					<div className="body">
+						<Input placeholder="Order name" onChange={this.onChangeName} />
+					</div>
 				</div>
-				<Button onClick={this.addItem}>Add item</Button>
+
+				<div key="workshift">
+					<h4>
+						<Icons.Clock /> Select a workshift
+					</h4>
+					<div className="body">
+						{Object.keys(this.state.workshifts).length > 0 ? (
+							<div className="workload_workshift_selector">
+								<Select onChange={this.onSelectWorkshift} placeholder="Select an workshift">
+									{this.renderWorkshiftsOptions()}
+								</Select>
+								{this.state.selectedWorkshift && this.renderWorkshiftInfo(this.state.selectedWorkshift)}
+							</div>
+						) : (
+							<div style={{ textAlign: "center" }}>No workshifts available for this region</div>
+						)}
+					</div>
+				</div>
+
+				<div key="">
+					<h4>
+						<Icons.Calendar /> Schedule
+					</h4>
+
+					<div className="body">
+						<DatePicker.RangePicker
+							showTime={{ format: "HH:mm" }}
+							format="DD-MM-YYYY HH:mm"
+							onChange={this.onSetSchedule}
+						/>
+					</div>
+				</div>
+
+				<div key="items">
+					<Icons.List /> Items
+					<div className="workload_creator_items">
+						<List
+							dataSource={this.state.items}
+							itemLayout="vertical"
+							size="large"
+							renderItem={(item) => (
+								<List.Item
+									key={item.id}
+									actions={[
+										<ActionIcon
+											onClick={() => {
+												this.removeItem(item.uuid)
+											}}
+											icon={Icons.Trash}
+											text="Remove"
+											key="remove"
+										/>,
+										<ActionIcon icon={Icons.Edit} text="Modify" key="modify" />,
+									]}
+								>
+									<List.Item.Meta
+										title={
+											<a>
+												x{item.quantity ?? 1} | {item.title} <Tag>{item.id}</Tag>
+											</a>
+										}
+										description={item.description}
+									/>
+									<div className="workload_item_props">
+										{(item.selectedProps ?? []).map((propKey) => {
+											const prop = item.props[propKey]
+											return (
+												<div>
+													<Icons.Check />
+													{prop.title}
+												</div>
+											)
+										})}
+									</div>
+								</List.Item>
+							)}
+						/>
+					</div>
+					<div style={{ textAlign: "center" }}>{this.state.items.length} Items</div>
+				</div>
+
+				<Button onClick={this.addItem} type="primary" icon={<Icons.PlusCircle />}>
+					Add item
+				</Button>
 
 				<div className="component_bottom_centered" style={{ paddingBottom: "30px" }}>
 					<Button disabled={this.state.submitting} type="primary" onClick={this.submit}>
