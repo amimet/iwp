@@ -204,5 +204,26 @@ module.exports = [
         controller: "UserController",
         middleware: "ensureAuthenticated",
         fn: "isAuth"
-    }
+    },
+    {
+        route: "/workshifts",
+        method: "GET",
+        controller: "WorkshiftsController",
+        middleware: "ensureAuthenticated",
+        fn: "get"
+    },
+    {
+        route: "/workshift",
+        method: "PUT",
+        controller: "WorkshiftsController",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "set"
+    },
+    {
+        route: "/workshift",
+        method: "DELETE",
+        controller: "WorkshiftsController",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "del"
+    },
 ]
