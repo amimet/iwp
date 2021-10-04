@@ -1,6 +1,4 @@
-import { Schema } from 'mongoose'
-
-export const UserSchema = Schema({
+export default {
     username: { type: String, required: true },
     password: { type: String, required: true, select: false },
     fullName: String,
@@ -9,4 +7,4 @@ export const UserSchema = Schema({
     roles: [],
     legal_id: Object,
     phone: Number,
-})
+}

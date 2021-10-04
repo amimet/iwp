@@ -1,8 +1,9 @@
-import { Schema } from 'mongoose'
-
-export const WorkloadSchema = Schema({
-    created: { type: Number, required: true },
+export default {
+    name: { type: String },
     items: { type: Object, required: true },
-    region: { type: String, default: "global" },
-    expiration: { type: Number },
-})
+    regionId: { type: String, default: 0 },
+    workshift: { type: String },
+    created: { type: Number, required: true },
+    scheduledStart: { type: String, required: true },
+    scheduledFinish: { type: String, required: true },
+}

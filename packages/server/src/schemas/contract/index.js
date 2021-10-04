@@ -1,6 +1,4 @@
-import { Schema } from 'mongoose'
-
-export const ContractSchema = Schema({
+export default {
     user_id: String,
     issuer: String,
     created: String,
@@ -8,4 +6,4 @@ export const ContractSchema = Schema({
     expire_date: String,
     conditions: String,
     monetary_value: String,
-})
+}

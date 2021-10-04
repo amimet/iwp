@@ -1,6 +1,4 @@
-import { Schema } from 'mongoose'
-
-export const SessionSchema = Schema({
+export default {
     allowRegenerate: { type: Boolean, default: false },
     uuid: { type: String, required: true },
     token: { type: String, required: true },
@@ -8,4 +6,4 @@ export const SessionSchema = Schema({
     date: { type: Number, default: 0 },
     location: { type: String, default: "Unknown" },
     geo: { type: String, default: "Unknown" },
-})
+}
