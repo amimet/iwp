@@ -7,7 +7,7 @@ import classnames from "classnames"
 
 import { Select, Result, Button, Modal, Tag, Badge } from "antd"
 
-import { WorkloadCreator, WorkloadDetails } from "./components"
+import { WorkloadCreator, WorkloadDetails, } from "./components"
 
 import "./index.less"
 
@@ -104,6 +104,27 @@ export default class Workload extends React.Component {
 		})
 	}
 
+	openWorkloadDetails = (id) => {
+		if (this.state.selectionEnabled) {
+			return false
+		}
+
+		//TODO: Open workload details drawer
+		console.log("Opening workload drawer...")
+
+		window.controllers.drawer.open("workload_details", WorkloadDetails, {
+			componentProps: {
+				id,
+			},
+			props: {
+				width: "55%",
+			},
+			onDone: (drawer) => {
+				drawer.close()
+			},
+		})
+	}
+
 	onChangeRegion = (regionId) => {
 		this.setState({ selectedRegion: regionId })
 		this.reloadWorkloads()
@@ -164,27 +185,7 @@ export default class Workload extends React.Component {
 		this.setState({ selectionEnabled: !this.state.selectionEnabled })
 	}
 
-	openWorkloadDetails = (id) => {
-		if (this.state.selectionEnabled) {
-			return false
-		}
-
-		//TODO: Open workload details drawer
-		console.log("Opening workload drawer...")
-
-		window.controllers.drawer.open("workload_details", WorkloadDetails, {
-			componentProps: {
-				id,
-			},
-			props: {
-				width: "55%",
-			},
-			onDone: (drawer) => {
-				drawer.close()
-			},
-		})
-	}
-
+	
 	renderWorkloadItem = (item) => {
 		const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
 
