@@ -9,7 +9,7 @@ export const RolesController = {
     get: (req, res, next) => {
         Role.find().then((data) => {
             if (!data) {
-                return res.status(404).json("No roles finded")
+                return res.status(404).json("No roles founded")
             }
             return res.json(data)
         })
