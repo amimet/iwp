@@ -194,13 +194,16 @@ export default class Workload extends React.Component {
 
 		return (
 			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} key={item._id}>
-				<div className={classnames("indicator", item.status)}>
-					<div className="statusText">{item.status}</div>
-				</div>
-				<div>
-					<h1>
-						{item.name ?? "Unnamed workload"} <Tag>{item._id}</Tag>
-					</h1>
+				<div className="header">
+					<div className={classnames("indicator", item.status)}>
+						<div className="statusText">{item.status}</div>
+					</div>
+					<div>
+						<h1>{item.name ?? "Unnamed workload"}</h1>
+					</div>
+					<div>
+						<Tag>{item._id}</Tag>
+					</div>
 				</div>
 				<div className="info">
 					{renderDate(item.created)}
