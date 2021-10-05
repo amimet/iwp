@@ -2,228 +2,196 @@ module.exports = [
     {
         route: "/regenerate",
         method: "POST",
-        controller: "SessionController",
         middleware: ["ensureAuthenticated", "useJwtStrategy"],
-        fn: "regenerate"
+        fn: "SessionController.regenerate"
     },
     {
         route: "/role",
         method: 'PUT',
-        controller: "UserController",
         middleware: ["ensureAuthenticated", "roles"],
-        fn: "grantRole"
+        fn: "UserController.grantRole"
     },
     {
         route: "/role",
         method: 'DELETE',
-        controller: "UserController",
         middleware: ["ensureAuthenticated", "roles"],
-        fn: "denyRole"
+        fn: "UserController.denyRole"
     },
     {
         route: "/roles",
         method: "GET",
-        controller: "RolesController",
-        fn: "getAll",
+        fn: "RolesController.getAll",
     },
     {
         route: "/session",
         method: 'DELETE',
-        controller : "SessionController",
         middleware: "ensureAuthenticated",
-        fn: "delete"
+        fn: "SessionController.delete",
     },
     {
         route: "/sessions",
         method: 'DELETE',
-        controller : "SessionController",
         middleware: "ensureAuthenticated",
-        fn: "deleteAll"
+        fn: "SessionController.deleteAll",
     },
     {
         route: "/validateSession",
         method: "POST",
-        controller: "SessionController",
         middleware: "useJwtStrategy",
-        fn: "validate"
+        fn: "SessionController.validate",
     },
     {
         route: "/sessions",
         method: "GET",
-        controller: "SessionController",
         middleware: "ensureAuthenticated",
-        fn: "get"
+        fn: "SessionController.get",
     },
     {
         route: "/itemVault",
         method: "GET",
-        controller: "VaultController",
-        middleware: "ensureAuthenticated"
+        middleware: "ensureAuthenticated",
+        fn: "VaultController.get",
     },
     {
         route: "/itemVault",
         method: "PUT",
-        controller: "VaultController",
         middleware: "ensureAuthenticated",
-        fn: "set"
+        fn: "VaultController.set",
     },
     {
         route: "/fabricItem",
         method: "PUT",
-        controller: "FabricController",
         middleware: ["ensureAuthenticated", "privileged"],
-        fn: "create"
+        fn: "FabricController.create",
     },
     {
         route: "/fabricItems",
         method: "GET",
-        controller: "FabricController",
         middleware: ["ensureAuthenticated"],
-        fn: "getAll"
+        fn: "FabricController.getAll",
     },
     {
         route: "/fabricItem",
         method: "GET",
-        controller: "FabricController",
         middleware: ["ensureAuthenticated"],
-        fn: "get"
+        fn: "FabricController.get",
     },
     {
         route: "/workloads",
         method: "GET",
-        controller: "WorkloadController",
         middleware: "ensureAuthenticated",
-        fn: "getAll"
+        fn: "WorkloadController.getAll",
     },
     {
         route: "/workload",
         method: "GET",
-        controller: "WorkloadController",
         middleware: "ensureAuthenticated",
-        fn: "get"
+        fn: "WorkloadController.get",
     },
     {
         route: "/workload",
         method: "PUT",
-        controller: "WorkloadController",
         middleware: "ensureAuthenticated",
-        fn: "set"
+        fn: "WorkloadController.set",
     },
     {
         route: "/workload",
         method: "DELETE",
-        controller: "WorkloadController",
         middleware: "ensureAuthenticated",
-        fn: "delete"
+        fn: "WorkloadController.delete",
     },
     {
         route: "/vault",
         method: "GET",
-        controller: "VaultController",
         middleware: "ensureAuthenticated",
-        fn: "getAll"
+        fn: "VaultController.getAll",
     },
     {
         route: "/region",
         method: "GET",
-        controller: "RegionController"
+        fn: "RegionController.get",
     },
     {
         route: "/regions",
         method: "GET",
-        controller: "RegionController",
-        fn: "getAll"
+        fn: "RegionController.getAll",
     },
     {
         route: "/hasPermissions",
         method: "POST",
-        controller: "RolesController",
         middleware: [
             "ensureAuthenticated",
             "hasPermissions"
-        ],
-        fn: "hasPermissions"
+        ]
     },
     {
         route: "/self",
         method: "GET",
-        controller: "UserController",
         middleware: "ensureAuthenticated",
-        fn: "getSelf"
+        fn: "UserController.getSelf",
     },
     {
         route: "/users",
         method: "GET",
-        controller: "UserController",
         middleware: "ensureAuthenticated",
-        fn: "get"
+        fn: "UserController.get",
     },
     {
         route: "/user",
         method: "GET",
-        controller: "UserController",
         middleware: "ensureAuthenticated",
-        fn: "getOne"
+        fn: "UserController.getOne",
     },
     {
         route: "/self_user",
         method: "PUT",
-        controller: "UserController",
         middleware: "ensureAuthenticated",
-        fn: "updateSelf"
+        fn: "UserController.updateSelf",
     },
     {
         route: "/user",
         method: "PUT",
-        controller: "UserController",
         middleware: ["ensureAuthenticated", "privileged"],
-        fn: "update"
+        fn: "UserController.update",
     },
     {
         route: "/login",
         method: "POST",
-        controller: "UserController",
-        fn: "login"
+        fn: "UserController.login",
     },
     {
         route: "/logout",
         method: "POST",
-        controller: "UserController",
         middleware: ["ensureAuthenticated"],
-        fn: "logout"
+        fn: "UserController.logout",
     },
     {
         route: "/register",
         method: "POST",
-        controller: "UserController",
-        fn: "register"
+        fn: "UserController.register",
     },
     {
         route: "/isAuth",
         method: "POST",
-        controller: "UserController",
         middleware: "ensureAuthenticated",
-        fn: "isAuth"
+        fn: "UserController.isAuth",
     },
     {
         route: "/workshifts",
         method: "GET",
-        controller: "WorkshiftsController",
         middleware: "ensureAuthenticated",
-        fn: "get"
+        fn: "WorkshiftsController.get",
     },
     {
         route: "/workshift",
         method: "PUT",
-        controller: "WorkshiftsController",
         middleware: ["ensureAuthenticated", "privileged"],
-        fn: "set"
+        fn: "WorkshiftsController.set",
     },
     {
         route: "/workshift",
         method: "DELETE",
-        controller: "WorkshiftsController",
         middleware: ["ensureAuthenticated", "privileged"],
-        fn: "del"
+        fn: "WorkshiftsController.del",
     },
 ]
