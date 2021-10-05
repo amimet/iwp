@@ -1,4 +1,4 @@
-import linebridge from 'linebridge'
+import linebridge from 'linebridge/server'
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
@@ -17,7 +17,6 @@ const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
 
-const invalidKeys = ["password"]
 class Server {
     constructor() {
         this.env = _env
@@ -27,7 +26,7 @@ class Server {
         this.controllers = require("./controllers")
         this.endpoints = require("./endpoints")
 
-        this.instance = new linebridge.Server({
+        this.instance = new linebridge.HttpServer({
             listen: "0.0.0.0",
             middlewares: this.middlewares,
             controllers: this.controllers,
