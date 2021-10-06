@@ -41,6 +41,10 @@ export default class SelectableList extends React.Component {
 		if (typeof this.props.onDone === "function") {
 			this.props.onDone(this.state.selectedKeys)
 		}
+		
+		this.setState({
+			selectedKeys: [],
+		})
 	}
 
 	onDiscard = () => {
