@@ -1,27 +1,17 @@
 import { Workload } from '../../models'
-import { Schematized } from '../../lib'
+import { Schematized, selectValues } from '../../lib'
 
 export const WorkloadController = {
-    getAll: async (req, res) => {
-        let query = {}
+    getAll: selectValues(["regionId", "_id", "name"], async (req, res) => {
+        const workloads = await Workload.find({ ...req.selectedValues })
 
-        Object.keys(req.query).forEach(key => {
-            query[key] = req.query[key]
-        })
-
-        const workloads = await Workload.find({ ...query })
         return res.json(workloads)
-    },
-    get: async (req, res, next) => {
-        let query = {}
+    }),
+    get: selectValues(["regionId", "_id", "name"], async (req, res, next) => {
+        const workload = await Workload.findOne({ ...req.selectedValues })
 
-        Object.keys(req.query).forEach(key => {
-            query[key] = req.query[key]
-        })
-
-        const workload = await Workload.findOne({ ...query })
         return res.json(workload)
-    },
+    }),
     set: Schematized(["items"], async (req, res) => {
         const { items, region, name, scheduledStart, scheduledFinish, workshift } = req.body
 
