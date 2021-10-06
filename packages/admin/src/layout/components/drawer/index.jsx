@@ -1,10 +1,11 @@
 import React from "react"
 import { Controller } from "core/libs"
 import * as antd from "antd"
+import EventEmitter from "@foxify/events"
 
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
-
+	events = new EventEmitter()
 	state = {
 		locked: this.options.locked ?? false,
 		visible: false,
@@ -46,6 +47,10 @@ export class Drawer extends React.Component {
 		}, 400)
 	}
 
+	sendEvent = (...context) => {
+		return this.props.controller.sendEvent(this.props.id, ...context)
+	}
+
 	onDone = (...context) => {
 		if (typeof this.options.onDone === "function") {
 			this.options.onDone(this, ...context)
@@ -71,6 +76,7 @@ export class Drawer extends React.Component {
 		}
 		const componentProps = {
 			...this.options.componentProps,
+			events: this.events,
 			onDone: this.onDone,
 			onFail: this.onFail,
 		}
@@ -102,6 +108,11 @@ export default class DrawerController extends React.Component {
 		this.windowController.add("open", this.open, { lock: true })
 		this.windowController.add("close", this.close, { lock: true })
 		this.windowController.add("closeAll", this.closeAll, { lock: true })
+	}
+
+	sendEvent = (id, ...context) => {
+		const ref = this.state.refs[id]?.current
+		return ref.events.emit(...context)
 	}
 
 	open = (id, component, options) => {
