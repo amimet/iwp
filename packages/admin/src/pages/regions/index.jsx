@@ -19,12 +19,18 @@ export default class Geo extends React.Component {
 			return null
 		}
 
-		return items.map((item) => {
+		return items.filter((item) => {
+			if (!item.geo || !item.data) {
+				return false
+			}
+
+			return true
+		}).map((item) => {
 			return (
 				<div key={item.id} className="app_regions_card">
 					<div style={{ float: "left" }}>
 						<antd.Tag>#{item.id}</antd.Tag>
-						<h1>{item.data.title}</h1>
+						<h1>{item.data.title ?? item.data.name}</h1>
 					</div>
 					<div style={{ float: "right" }}>
 						{GoogleMap({
