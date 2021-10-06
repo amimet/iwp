@@ -49,15 +49,47 @@ export default class Workload extends React.Component {
 		searchValue: null,
 	}
 
+	addWorkload = (payload) => {
+		let query = []
+		let workloads = this.state.workloads ?? []
+
+		if (Array.isArray(payload)) {
+			query = payload
+		} else {
+			query.push(payload)
+		}
+
+		query.forEach((_payload) => {
+			workloads.push(_payload)
+		})
+
+		this.setState({ workloads })
+	}
+
+	deleteWorkload = (id) => {
+		let query = []
+		let workloads = this.state.workloads
+
+		if (Array.isArray(id)) {
+			query = id
+		} else {
+			query.push(id)
+		}
+
+		workloads = workloads.filter((workload) => !id.includes(workload._id))
+
+		this.setState({ workloads })
+	}
+
 	componentDidMount = async () => {
 		await api.get
 			.regions()
 			.then((data) => {
 				this.setState({ regions: data })
 			})
-			.catch((err) => {
-				console.log(err)
-				this.setState({ error: err })
+			.catch((error) => {
+				console.error(error)
+				this.setState({ error })
 			})
 
 		this.loadWorkloadsFromRegion(this.state.selectedRegion)
@@ -78,24 +110,10 @@ export default class Workload extends React.Component {
 			})
 	}
 
-	createNewWorkload = () => {
-		window.controllers.drawer.open("workload_creator", WorkloadCreator, {
-			props: {
-				width: "55%",
-			},
-			onDone: (drawer) => {
-				drawer.close()
-			},
-		})
-	}
-
 	openWorkloadDetails = (id) => {
 		if (this.state.selectionEnabled) {
 			return false
 		}
-
-		//TODO: Open workload details drawer
-		console.log("Opening workload drawer...")
 
 		window.controllers.drawer.open("workload_details", WorkloadDetails, {
 			componentProps: {
@@ -111,9 +129,31 @@ export default class Workload extends React.Component {
 	}
 
 	onChangeRegion = (regionId) => {
-		console.log("SelectedRegion >",regionId)
 		this.setState({ selectedRegion: regionId }, async () => {
 			await this.loadWorkloadsFromRegion(regionId)
+		})
+	}
+
+	onCreateWorkload = () => {
+		window.controllers.drawer.open("workload_creator", WorkloadCreator, {
+			props: {
+				width: "55%",
+			},
+			onDone: (drawer, workload) => {
+				const request = api.put.workload(workload)
+
+				request.then((data) => {
+					if (data) {
+						this.addWorkload(data)
+						drawer.close()
+					}
+				})
+
+				request.catch((error) => {
+					console.error(error)
+					drawer.sendEvent("create_error", error)
+				})
+			},
 		})
 	}
 
@@ -129,7 +169,7 @@ export default class Workload extends React.Component {
 					api.delete
 						.workload({ id: keys })
 						.then(() => {
-							this.reloadWorkloads()
+							this.deleteWorkload(keys)
 							return resolve()
 						})
 						.catch((err) => {
@@ -162,8 +202,6 @@ export default class Workload extends React.Component {
 		})
 		const result = searcher.search(value)
 
-		console.log(result)
-
 		this.setState({
 			searchValue: result.map((entry) => {
 				return entry.item
@@ -187,7 +225,7 @@ export default class Workload extends React.Component {
 		}
 		return [
 			<div key="new_workload">
-				<Button type="primary" onClick={this.createNewWorkload} icon={<Icons.Plus />}>
+				<Button type="primary" onClick={this.onCreateWorkload} icon={<Icons.Plus />}>
 					New Workload
 				</Button>
 			</div>,
@@ -199,10 +237,12 @@ export default class Workload extends React.Component {
 	}
 
 	renderWorkloadItem = (item) => {
-		const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
+		if (typeof item.scheduledFinish !== "undefined") {
+			const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
 
-		if (isExpired) {
-			item.status = "expired"
+			if (isExpired) {
+				item.status = "expired"
+			}
 		}
 
 		return (
@@ -222,7 +262,7 @@ export default class Workload extends React.Component {
 					{renderDate(item.created)}
 					<div>
 						<Icons.Box />
-						{item.items.length} items
+						{item.items?.length} items
 					</div>
 				</div>
 			</div>
@@ -230,15 +270,21 @@ export default class Workload extends React.Component {
 	}
 
 	renderWorkloads = (list) => {
+		const actions = []
+
+		if (hasAdmin()) {
+			actions.push(
+				<div key="delete" call="onDelete">
+					<Icons.Trash />
+					Delete
+				</div>,
+			)
+		}
+
 		return (
 			<SelectableList
 				selectionEnabled={this.state.selectionEnabled}
-				actions={[
-					<div key="delete" call="onDelete">
-						<Icons.Trash />
-						Delete
-					</div>,
-				]}
+				actions={actions}
 				onDoneRender={
 					<>
 						<Icons.Check /> Check
@@ -255,12 +301,27 @@ export default class Workload extends React.Component {
 		)
 	}
 
+	addTestWorkload = () => {
+		this.addWorkload({
+			_id: "test",
+			name: "Test Workload",
+			status: "funny"
+		})
+	}
+
+	removeTestWorkload = () => {
+		this.deleteWorkload("test")
+	}
+
+
 	render() {
 		if (this.state.loading) {
 			return <LoadingSpinner />
 		}
 		return (
 			<div>
+				<Button onClick={this.addTestWorkload}>Add test</Button>
+				<Button onClick={this.removeTestWorkload}>Del test</Button>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
 						<div>
@@ -277,7 +338,12 @@ export default class Workload extends React.Component {
 						</div>
 
 						<div>
-							<Input.Search placeholder="Search" allowClear onSearch={this.onSearch} onChange={this.onSearch} />
+							<Input.Search
+								placeholder="Search"
+								allowClear
+								onSearch={this.onSearch}
+								onChange={this.onSearch}
+							/>
 						</div>
 
 						{!this.state.selectionEnabled && (
