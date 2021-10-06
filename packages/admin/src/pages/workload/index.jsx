@@ -1,13 +1,14 @@
 import React from "react"
 import { Icons } from "components/Icons"
-import { LoadingSpinner, ActionsBar, SelectableList } from "components"
+import { LoadingSpinner, ActionsBar, SelectableList, QRReader } from "components"
 import { hasAdmin } from "core/permissions"
 import moment from "moment"
 import classnames from "classnames"
+import fuse from "fuse.js"
 
-import { Select, Result, Button, Modal, Tag, Badge } from "antd"
+import { Select, Result, Button, Modal, Tag, Badge, Input } from "antd"
 
-import { WorkloadCreator, WorkloadDetails, } from "./components"
+import { WorkloadCreator, WorkloadDetails } from "./components"
 
 import "./index.less"
 
@@ -43,8 +44,9 @@ export default class Workload extends React.Component {
 		loading: true,
 		workloads: null,
 		regions: [],
-		selectedRegion: null,
+		selectedRegion: 0,
 		selectionEnabled: false,
+		searchValue: null,
 	}
 
 	componentDidMount = async () => {
@@ -58,31 +60,14 @@ export default class Workload extends React.Component {
 				this.setState({ error: err })
 			})
 
-		this.reloadWorkloads()
-	}
-
-	reloadWorkloads() {
-		this.setState({ loading: true })
-
-		api.get
-			.workloads(this.state.selectedRegion)
-			.then((data) => {
-				this.setState({
-					loading: false,
-					workloads: data,
-				})
-			})
-			.catch((err) => {
-				console.error(err)
-				this.setState({
-					err,
-				})
-			})
+		this.loadWorkloadsFromRegion(this.state.selectedRegion)
 	}
 
 	loadWorkloadsFromRegion = async (id) => {
+		this.setState({ loading: true })
+
 		await api.get
-			.workloads({ region: id })
+			.workloads({ regionId: id }, { regionId: id })
 			.then((data) => {
 				console.log(data)
 				this.setState({ workloads: data, loading: false })
@@ -117,7 +102,7 @@ export default class Workload extends React.Component {
 				id,
 			},
 			props: {
-				width: "55%",
+				width: "85%",
 			},
 			onDone: (drawer) => {
 				drawer.close()
@@ -126,8 +111,10 @@ export default class Workload extends React.Component {
 	}
 
 	onChangeRegion = (regionId) => {
-		this.setState({ selectedRegion: regionId })
-		this.reloadWorkloads()
+		console.log("SelectedRegion >",regionId)
+		this.setState({ selectedRegion: regionId }, async () => {
+			await this.loadWorkloadsFromRegion(regionId)
+		})
 	}
 
 	onDeleteWorkloads = (keys) => {
@@ -158,6 +145,32 @@ export default class Workload extends React.Component {
 		this.reloadWorkloads()
 	}
 
+	onSearch = (value) => {
+		if (typeof value !== "string") {
+			if (typeof value.target?.value === "string") {
+				value = value.target.value
+			}
+		}
+
+		if (value === "") {
+			return this.setState({ searchValue: null })
+		}
+
+		const searcher = new fuse(this.state.workloads, {
+			includeScore: true,
+			keys: ["name", "_id"],
+		})
+		const result = searcher.search(value)
+
+		console.log(result)
+
+		this.setState({
+			searchValue: result.map((entry) => {
+				return entry.item
+			}),
+		})
+	}
+
 	renderRegionsOptions = () => {
 		return this.state.regions.map((region) => {
 			return (
@@ -185,7 +198,6 @@ export default class Workload extends React.Component {
 		this.setState({ selectionEnabled: !this.state.selectionEnabled })
 	}
 
-	
 	renderWorkloadItem = (item) => {
 		const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
 
@@ -217,45 +229,36 @@ export default class Workload extends React.Component {
 		)
 	}
 
-	renderWorkloads() {
-		if (this.state.workloads != null) {
-			if (!Array.isArray(this.state.workloads)) {
-				return <div>Invalid</div>
-			}
-
-			if (this.state.workloads.length === 0) {
-				return <Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
-			}
-
-			return (
-				<SelectableList
-					selectionEnabled={this.state.selectionEnabled}
-					actions={[
-						<div key="delete" call="onDelete">
-							<Icons.Trash />
-							Delete
-						</div>,
-					]}
-					onDoneRender={
-						<>
-							<Icons.Check /> Check
-						</>
-					}
-					onDone={(value) => {
-						console.log(value)
-					}}
-					onDelete={this.onDeleteWorkloads}
-					onCheck={this.onCheckWorkloads}
-					items={this.state.workloads}
-					renderItem={this.renderWorkloadItem}
-				></SelectableList>
-			)
-		}
-
-		return <LoadingSpinner />
+	renderWorkloads = (list) => {
+		return (
+			<SelectableList
+				selectionEnabled={this.state.selectionEnabled}
+				actions={[
+					<div key="delete" call="onDelete">
+						<Icons.Trash />
+						Delete
+					</div>,
+				]}
+				onDoneRender={
+					<>
+						<Icons.Check /> Check
+					</>
+				}
+				onDone={(value) => {
+					console.log(value)
+				}}
+				onDelete={this.onDeleteWorkloads}
+				onCheck={this.onCheckWorkloads}
+				items={list}
+				renderItem={this.renderWorkloadItem}
+			></SelectableList>
+		)
 	}
 
 	render() {
+		if (this.state.loading) {
+			return <LoadingSpinner />
+		}
 		return (
 			<div>
 				<div style={{ marginBottom: "10px" }}>
@@ -269,6 +272,14 @@ export default class Workload extends React.Component {
 							</Button>
 						</div>
 
+						<div>
+							<Button onClick={QRReader.openModal}>Scan QR</Button>
+						</div>
+
+						<div>
+							<Input.Search placeholder="Search" allowClear onSearch={this.onSearch} onChange={this.onSearch} />
+						</div>
+
 						{!this.state.selectionEnabled && (
 							<div>
 								<Select
@@ -278,6 +289,7 @@ export default class Workload extends React.Component {
 									placeholder="Select a region"
 									optionFilterProp="children"
 									onChange={this.onChangeRegion}
+									value={this.state.selectedRegion}
 									filterOption={(input, option) =>
 										option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 									}
@@ -291,7 +303,11 @@ export default class Workload extends React.Component {
 					</ActionsBar>
 				</div>
 
-				{this.renderWorkloads()}
+				{this.state.workloads.length === 0 && (
+					<Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
+				)}
+
+				{this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
 			</div>
 		)
 	}
