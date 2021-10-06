@@ -78,13 +78,11 @@ export default class WorkloadCreator extends React.Component {
 		workshifts: {},
 	}
 
-	onDone = () => {
-		if (typeof this.props.onDone === "function") {
-			return this.props.onDone()
-		}
-	}
-
 	componentDidMount = async () => {
+		this.props.events.on("create_error", (error) => {
+			this.setState({ submitting: false, submittingError: error })
+		})
+
 		await api.get
 			.regions()
 			.then((data) => {
@@ -119,35 +117,25 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	submit = async () => {
-		this.setState({ submitting: true })
+		this.setState({ submitting: true, submittingError: null })
 
 		const { selectedRegion, selectedWorkshift, selectedDate, items, name } = this.state
-
-		const scheduledStart = selectedDate[0]
-		const scheduledFinish = selectedDate[1]
 
 		const workload = {
 			region: selectedRegion,
 			workshift: selectedWorkshift,
-			scheduledStart,
-			scheduledFinish,
 			name,
 			items,
 		}
 
-		await api.put
-			.workload(workload)
-			.then((data) => {
-				if (data) {
-					console.log(data)
-					this.setState({ submitting: false })
-					this.onDone()
-				}
-			})
-			.catch((err) => {
-				console.log(err)
-				this.setState({ error: err })
-			})
+		if (selectedDate != null) {
+			workload.scheduledStart = selectedDate[0]
+			workload.scheduledFinish = selectedDate[1]
+		}
+
+		if (typeof this.props.onDone === "function") {
+			return this.props.onDone(workload)
+		}
 	}
 
 	generateRegionsOption = () => {
@@ -221,6 +209,13 @@ export default class WorkloadCreator extends React.Component {
 		}
 	}
 
+	canSubmit = () => {
+		const isRegionSet = this.state.selectedRegion !== null
+		const isNameSet = this.state.name !== null
+
+		return isRegionSet && isNameSet
+	}
+
 	render() {
 		if (this.state.loading) return <LoadingSpinner />
 
@@ -280,7 +275,7 @@ export default class WorkloadCreator extends React.Component {
 					</div>
 				</div>
 
-				<div key="">
+				<div key="schedule">
 					<h4>
 						<Icons.Calendar /> Schedule
 					</h4>
@@ -347,11 +342,16 @@ export default class WorkloadCreator extends React.Component {
 				</Button>
 
 				<div className="component_bottom_centered" style={{ paddingBottom: "30px" }}>
-					<Button disabled={this.state.submitting} type="primary" onClick={this.submit}>
+					<Button disabled={this.state.submitting || !this.canSubmit()} type="primary" onClick={this.submit}>
 						{this.state.submitting && <Icons.LoadingOutlined spin />}
 						Create
 					</Button>
 				</div>
+				{this.state.submittingError && (
+					<div className="component_bottom_centered" style={{ color: "#f5222d" }}>
+						{this.state.submittingError}
+					</div>
+				)}
 			</div>
 		)
 	}
