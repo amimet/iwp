@@ -5,9 +5,9 @@ import { List, Button } from "antd"
 import classnames from "classnames"
 
 import "./index.less"
+
 export default class SelectableList extends React.Component {
 	state = {
-		data: [],
 		selectedKeys: [],
 	}
 
@@ -15,31 +15,6 @@ export default class SelectableList extends React.Component {
 		if (typeof this.props.defaultSelected !== "undefined" && Array.isArray(this.props.defaultSelected)) {
 			this.setState({
 				selectedKeys: [...this.props.defaultSelected],
-			})
-		}
-
-		if (typeof this.props.items !== "undefined" && Array.isArray(this.props.items)) {
-			this.setState({
-				data: [...this.state.data, ...this.props.items],
-			})
-		}
-
-		if (typeof this.props.children !== "undefined") {
-			let childrenItems = []
-
-			if (!Array.isArray(this.props.children)) {
-				childrenItems.push(this.props.children)
-			} else {
-				childrenItems = this.props.children
-			}
-
-			this.setState({
-				data: [
-					...this.state.data,
-					...childrenItems.map((item) => {
-						return { key: item.key, render: item }
-					}),
-				],
 			})
 		}
 	}
@@ -160,23 +135,27 @@ export default class SelectableList extends React.Component {
 
 	render() {
 		const renderMethod = (item) => {
-			const _key = item.key ?? item.id ?? item._id
+			if (typeof this.props.renderItem === "function") {
+				const _key = item.key ?? item.id ?? item._id
 
-			return (
-				<div
-					key={_key}
-					onClick={() => this.onClickKey(_key)}
-					className={classnames("selectableList_item",  this.props.itemClassName,{
-						selection: this.state.selectionEnabled,
-						selected: this.state.selectedKeys.includes(_key),
-					})}
-				>
-					{typeof this.props.renderItem === "function"
-						? this.props.renderItem(item)
-						: React.cloneElement(item.render)}
-				</div>
-			)
+				return (
+					<div
+						key={_key}
+						onClick={() => this.onClickKey(_key)}
+						className={classnames("selectableList_item", this.props.itemClassName, {
+							selection: this.state.selectionEnabled,
+							selected: this.state.selectedKeys.includes(_key),
+						})}
+					>
+						{this.props.renderItem(item)}
+					</div>
+				)
+			}
+
+			console.warn("renderItem method is not defined!")
+			return null
 		}
+
 		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } =
 			this.props
 		const listProps = {
@@ -196,7 +175,14 @@ export default class SelectableList extends React.Component {
 		return (
 			<div>
 				{this.renderActions()}
-				<List {...listProps} dataSource={this.state.data} renderItem={renderMethod} />
+				<List
+					{...listProps}
+					dataSource={[
+						...(Array.isArray(this.props.items) ? this.props.items : []),
+						...(Array.isArray(this.props.children) ? this.props.children : []),
+					]}
+					renderItem={renderMethod}
+				/>
 			</div>
 		)
 	}
