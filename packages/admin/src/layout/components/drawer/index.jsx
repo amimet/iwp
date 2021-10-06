@@ -1,6 +1,7 @@
 import React from "react"
 import { Controller } from "core/libs"
 import * as antd from "antd"
+
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
 
@@ -59,9 +60,13 @@ export class Drawer extends React.Component {
 
 	render() {
 		const drawerProps = {
+			destroyOnClose: true,
+			bodyStyle: { padding: 0 },
 			...this.options.props,
-			onClose: this.onClose,
 			ref: this.props.ref,
+			closable: false,
+			key: this.props.id,
+			onClose: this.onClose,
 			visible: this.state.visible,
 		}
 		const componentProps = {
@@ -71,8 +76,14 @@ export class Drawer extends React.Component {
 		}
 
 		return (
-			<antd.Drawer key={this.props.id} {...drawerProps}>
-				{React.createElement(this.props.children, componentProps)}
+			<antd.Drawer {...drawerProps}>
+				<antd.PageHeader
+					onBack={this.onClose}
+					title={this.props.title ?? "Close"}
+					backIcon={this.props.backIcon}
+					subTitle={this.props.subtitle}
+				/>
+				<div style={{ padding: "10px 30px" }}>{React.createElement(this.props.children, componentProps)}</div>
 			</antd.Drawer>
 		)
 	}
