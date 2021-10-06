@@ -12,7 +12,7 @@ export const WorkloadController = {
 
         return res.json(workload)
     }),
-    set: Schematized(["items"], async (req, res) => {
+    set: Schematized(["items", "region", "name"], async (req, res) => {
         const { items, region, name, scheduledStart, scheduledFinish, workshift } = req.body
 
         const obj = {
@@ -25,9 +25,9 @@ export const WorkloadController = {
             region,
         }
 
-        Workload.create(obj)
+        const result = await Workload.create(obj)
 
-        return res.json(obj)
+        return res.json(result)
     }),
     delete: Schematized(["id"], async (req, res) => {
         let deleted = []
