@@ -108,7 +108,10 @@ export default class WorkloadDetails extends React.Component {
 				<div className="header">
 					<div>
 						<h1>
-							<Icons.Box /> {data.name}
+							<antd.Badge.Ribbon text={data.expired? "expired" : `${datesDiff.daysLeft} days left`} color={data.expired ? "red" : undefined}>
+								<Icons.Box /> {data.name}
+								
+							</antd.Badge.Ribbon>
 						</h1>
 						<div>
 							<antd.Tag>
