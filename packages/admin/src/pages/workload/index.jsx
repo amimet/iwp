@@ -120,7 +120,7 @@ export default class Workload extends React.Component {
 				id,
 			},
 			props: {
-				width: "85%",
+				width: "fit-content",
 			},
 			onDone: (drawer) => {
 				drawer.close()
@@ -241,15 +241,17 @@ export default class Workload extends React.Component {
 			const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
 
 			if (isExpired) {
-				item.status = "expired"
+				item.expired = true
 			}
 		}
+
+		const indicatorStatus = item.expired ? "expired" : item.status
 
 		return (
 			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} key={item._id}>
 				<div className="header">
-					<div className={classnames("indicator", item.status)}>
-						<div className="statusText">{item.status}</div>
+					<div className={classnames("indicator", indicatorStatus)}>
+						<div className="statusText">{indicatorStatus}</div>
 					</div>
 					<div>
 						<h1>{item.name ?? "Unnamed workload"}</h1>
