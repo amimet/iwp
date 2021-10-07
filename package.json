@@ -8,8 +8,7 @@
     "author": "Amimet",
     "license": "MIT",
     "scripts": {
-        "start:admin": "cd packages/admin && npm start",
-        "start:client": "cd packages/client && npm start",
-        "start:server": "cd packages/server && npm start"
+        "app:dev": "cd packages/app && yarn dev",
+        "server:dev": "cd packages/server && yarn dev"
     }
 }
