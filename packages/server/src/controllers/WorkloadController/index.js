@@ -1,6 +1,6 @@
 import { Workload } from '../../models'
 import { Schematized, selectValues } from '../../lib'
-
+import moment from "moment"
 export const WorkloadController = {
     getAll: selectValues(["regionId", "_id", "name"], async (req, res) => {
         const workloads = await Workload.find({ ...req.selectedValues })
@@ -8,7 +8,15 @@ export const WorkloadController = {
         return res.json(workloads)
     }),
     get: selectValues(["regionId", "_id", "name"], async (req, res, next) => {
-        const workload = await Workload.findOne({ ...req.selectedValues })
+        let workload = await Workload.findOne({ ...req.selectedValues })
+        
+        // parse expiration status
+        if (typeof workload.expired !== "undefined") {
+            // check if is expired
+            if (moment(workload.scheduledFinish).isBefore(moment())) {
+                workload.expired = true
+            }
+        }
 
         return res.json(workload)
     }),
