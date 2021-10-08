@@ -19,11 +19,16 @@ module.exports = (config) => {
     if (typeof config.windowContext.process === 'undefined') {
         config.windowContext.process = Object()
     }
-
+    
+    config.windowContext.process = config.windowContext.__evite
     config.windowContext.process["versions"] = process.versions
     config.resolve.alias = {
         ...config.resolve.alias,
         ...aliases,
+    }
+    
+    config.define = {
+        global: Object()
     }
 
     config.css = {

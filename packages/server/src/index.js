@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
 import { User } from './models'
+import uws from "uWebSockets.js"
+import socketIo from 'socket.io'
+import http from "http";
 
 const b64Decode = global.b64Decode = (data) => {
     return Buffer.from(data, 'base64').toString('utf-8')
@@ -16,6 +19,73 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
+
+class WebSocket {
+    constructor(params) {
+        this.params = { ...params }
+
+        this.listenPort = this.params.listenPort ?? 9001
+        this.token = null
+
+        this.endpoints = Object()
+        this.server = uws.App()
+    }
+
+    register = (route, handlers = {}, options = {}) => {
+        const fns = Object()
+
+        const handlersKeys = {
+            onOpen: "open",
+            onMessage: "message",
+            onClose: "close",
+        }
+
+        Object.keys(handlers).forEach(key => {
+            const handler = handlers[key]
+
+            if (typeof handler === "function") {
+                fns[(handlersKeys[key] ?? key)] = (...context) => {
+                    try {
+                        handler(...context)
+                    } catch (error) {
+                        console.error(error)
+                    }
+                }
+            }
+        })
+
+        this.server.ws(route, {
+            idleTimeout: 10,
+            maxBackpressure: 1024,
+            maxPayloadLength: 512,
+            ...options,
+            ...fns
+        })
+    }
+
+    _defaultListenCallback(token, port){
+        if (token) {
+            console.log('Listening to port ' + port);
+        } else {
+            console.log('Failed to listen to port ' + port);
+        }
+    }
+
+    _listenCallback(token, port){
+        if (typeof this.listenCallback !== "undefined") {
+            this.listenCallback(token, port)
+        }else {
+            this._defaultListenCallback(token, port)
+        }
+    } 
+
+    listen = (port = this.listenPort) => {
+        return this.server.listen(port, (token) => {
+            this.token = token
+            return this._listenCallback(token, port)
+        })
+    }
+}
 
 class Server {
     constructor() {
@@ -35,6 +105,19 @@ class Server {
         })
 
         this.server = this.instance.httpServer
+        this.ioHttp = http.createServer()
+        this.io = new socketIo.Server(this.ioHttp, {
+            maxHttpBufferSize: 100000000,
+            connectTimeout: 5000,
+            transports:['websocket','polling'],
+            pingInterval: 25 * 1000,
+            pingTimeout: 5000,
+            allowEIO3: true,
+            cors: {
+                origin: "http://localhost:8000",
+                methods: ["GET", "POST"],
+            }
+        }).of("/main")
 
         this.options = {
             jwtStrategy: {
@@ -65,6 +148,13 @@ class Server {
             next()
         })
 
+        
+        this.io.on("connection", (socket) => {
+            console.log(socket.id)
+        })
+
+        this.ioHttp.listen(9001)
+
         this.instance.init()
     }
 
@@ -92,6 +182,19 @@ class Server {
                 this.connectToDB()
             }, 1000)
         })
+    }
+
+    setWebsocketRooms = () => {
+        this.ws.register("/test", {
+            onOpen: (socket) => {
+                console.log(socket)
+                setInterval(() => {
+                    socket.send("Hello")
+                }, 1000)
+            }
+        })
+
+        this.ws.listen()
     }
 
     initPassport() {

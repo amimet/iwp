@@ -40,6 +40,7 @@
     "dicebar_lib": "^1.0.0",
     "enquire-js": "^0.2.1",
     "evite": "^0.6.15",
+    "faye": "^1.4.0",
     "feather-reactjs": "^2.0.13",
     "fuse.js": "^6.4.6",
     "js-cookie": "^2.2.1",
@@ -55,6 +56,7 @@
     "react-qr-reader": "^2.2.1",
     "react-reveal": "^1.2.2",
     "react-rnd": "^10.3.5",
+    "socket.io-client": "^4.2.0",
     "vite-plugin-imp": "^2.0.9"
   },
   "devDependencies": {

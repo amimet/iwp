@@ -9,6 +9,7 @@ import QRCode from "qrcode"
 import "./index.less"
 
 const api = window.app.apiBridge
+const dateFormat = "DD-MM-YYYY hh:mm"
 
 export default class WorkloadDetails extends React.Component {
 	state = {
@@ -43,10 +44,9 @@ export default class WorkloadDetails extends React.Component {
 	}
 
 	isDateReached = (date) => {
-		const now = moment()
-		const isReached = now.isSameOrAfter(date)
+		const now = moment().format(dateFormat)
 
-		return isReached
+		return moment(now).isAfter(date)
 	}
 
 	getDiffBetweenDates = (start, end) => {
@@ -54,19 +54,35 @@ export default class WorkloadDetails extends React.Component {
 
 		const startDate = moment(start, format)
 		const endDate = moment(end, format)
-		const now = moment()
+		const now = moment().format(format)
 
-		const daysLeft = endDate.diff(now, "days")
-		const daysPassed = now.diff(startDate, "days")
+		// count days will took to complete
+		const days = endDate.diff(startDate, "days")
 
-		let percentage = (daysPassed / daysLeft) * 100
+		const daysLeft = endDate.diff(moment(now, format), "days")
+		const daysPassed = moment(now, format).diff(startDate, "days")
 
-		if (Math.sign(percentage) <= 0) {
-			percentage = 100
+		let percentage = 0
+
+		switch (daysLeft) {
+			case 0: {
+				percentage = 99
+				break
+			}
+			case 1: {
+				percentage = 95
+				break
+			}
+			default: {
+				if (daysPassed > 0 && daysPassed < days) {
+					percentage = (daysPassed / days) * 100
+				}
+				break
+			}
 		}
 
-		if (daysLeft == 0) {
-			percentage = 99
+		if (daysPassed > days) {
+			percentage = 100
 		}
 
 		return { daysLeft, daysPassed, percentage }
@@ -91,6 +107,13 @@ export default class WorkloadDetails extends React.Component {
 		})
 	}
 
+	isExpired = (isFinishReached, status) => {
+		if (status !== "completed" && isFinishReached) {
+			return true
+		}
+		return false
+	}
+
 	render() {
 		const { data } = this.state
 
@@ -101,16 +124,41 @@ export default class WorkloadDetails extends React.Component {
 		const createdDate = new Date(data.created)
 		const startReached = this.isDateReached(data.scheduledStart)
 		const finishReached = this.isDateReached(data.scheduledFinish)
+
 		const datesDiff = this.getDiffBetweenDates(data.scheduledStart, data.scheduledFinish)
+		const isExpired = this.isExpired(finishReached, data.status)
+
+		const getSchedulerProgressStatus = () => {
+			let status = "normal"
+
+			if (isExpired && data.status !== "completed") {
+				return "exception"
+			} else {
+				switch (data.status) {
+					case "complete": {
+						status = undefined
+						break
+					}
+					default: {
+						status = "active"
+						break
+					}
+				}
+			}
+
+			return status
+		}
 
 		return (
 			<div className="workload_details">
 				<div className="header">
 					<div>
 						<h1>
-							<antd.Badge.Ribbon text={data.expired? "expired" : `${datesDiff.daysLeft} days left`} color={data.expired ? "red" : undefined}>
+							<antd.Badge.Ribbon
+								text={isExpired ? "expired" : `${datesDiff.daysLeft} days left`}
+								color={isExpired ? "red" : undefined}
+							>
 								<Icons.Box /> {data.name}
-								
 							</antd.Badge.Ribbon>
 						</h1>
 						<div>
@@ -150,7 +198,6 @@ export default class WorkloadDetails extends React.Component {
 						</div>
 						<antd.Progress
 							size="small"
-							strokeColor="default"
 							percent={datesDiff.percentage}
 							showInfo={false}
 							className={classnames("ant-progress", {
@@ -158,7 +205,7 @@ export default class WorkloadDetails extends React.Component {
 								finishReached: finishReached,
 							})}
 							type="line"
-							status={data.status !== "done" ? "active" : "normal"}
+							status={getSchedulerProgressStatus()}
 						/>
 						<div className={classnames("point", "right", { reached: finishReached })}>
 							{data.scheduledFinish}

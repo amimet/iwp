@@ -5,6 +5,7 @@ import { hasAdmin } from "core/permissions"
 import moment from "moment"
 import classnames from "classnames"
 import fuse from "fuse.js"
+import { w3cwebsocket as W3CWebSocket } from "websocket"
 
 import { Select, Result, Button, Modal, Tag, Badge, Input } from "antd"
 
@@ -307,14 +308,13 @@ export default class Workload extends React.Component {
 		this.addWorkload({
 			_id: "test",
 			name: "Test Workload",
-			status: "funny"
+			status: "funny",
 		})
 	}
 
 	removeTestWorkload = () => {
 		this.deleteWorkload("test")
 	}
-
 
 	render() {
 		if (this.state.loading) {
