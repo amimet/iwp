@@ -5,7 +5,6 @@ import { hasAdmin } from "core/permissions"
 import moment from "moment"
 import classnames from "classnames"
 import fuse from "fuse.js"
-import { w3cwebsocket as W3CWebSocket } from "websocket"
 
 import { Select, Result, Button, Modal, Tag, Badge, Input } from "antd"
 
@@ -14,6 +13,8 @@ import { WorkloadCreator, WorkloadDetails } from "./components"
 import "./index.less"
 
 const { Option } = Select
+
+const dateFormat = "DD-MM-YYYY hh:mm"
 
 const api = window.app.apiBridge
 
@@ -239,7 +240,9 @@ export default class Workload extends React.Component {
 
 	renderWorkloadItem = (item) => {
 		if (typeof item.scheduledFinish !== "undefined") {
-			const isExpired = moment().isAfter(moment(item.scheduledFinish, "DD:MM:YYYY hh:mm"))
+			const now = moment().format(dateFormat)
+
+			const isExpired = moment(item.scheduledFinish, dateFormat).isBefore(moment(now, dateFormat))
 
 			if (isExpired) {
 				item.expired = true

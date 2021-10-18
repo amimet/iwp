@@ -45,8 +45,11 @@ export default class WorkloadDetails extends React.Component {
 
 	isDateReached = (date) => {
 		const now = moment().format(dateFormat)
+		const result = moment(date, dateFormat).isSameOrBefore(moment(now, dateFormat))
 
-		return moment(now).isAfter(date)
+		//console.log(`[${date}] is before [${now}] => ${result}`)
+		
+		return result
 	}
 
 	getDiffBetweenDates = (start, end) => {
