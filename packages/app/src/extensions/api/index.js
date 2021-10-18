@@ -2,6 +2,7 @@ import config from 'config'
 import linebridge from "linebridge/client"
 import { notification } from "antd"
 import * as session from "core/models/session"
+import io from "socket.io-client"
 
 export default {
     key: "apiBridge",
@@ -9,9 +10,18 @@ export default {
         {
             attachToInitializer: [
                 async (self) => {
-                    const bridge = await self.createBridge()
-                    self.apiBridge = bridge
+                    self.apiBridge = await self.createBridge()
+                    self.ws = io("http://localhost:9001/main",{ transports: ["websocket"] })
+                    
+                    self.ws.on("connect", () => {
+                        console.log(self.ws.id)
+                    })
 
+                    self.ws.on("connect_error", (...context) => {
+                        console.log(...context)
+                    })
+
+                    self.appendToApp("wsApi", self.ws)
                     self.appendToApp("apiBridge", Object.freeze(self.apiBridge))
                 },
             ],
