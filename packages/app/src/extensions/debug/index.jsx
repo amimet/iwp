@@ -95,15 +95,36 @@ class DebuggerUI extends React.Component {
 	}
 }
 
+class Debugger {
+	constructor(self, params = {}) {
+		this.app = self
+		this.params = {...params}
+
+		this.bindings = {}
+	}
+
+	openWindow = () => {
+		new Window.DOMWindow({ id: "debugger", children: this.app.connectWithApp(DebuggerUI) }).create()
+	}
+
+	bind = (id, binding) => {
+		this.bindings[id] = binding
+
+		return binding
+	}
+
+	unbind = (id) => {
+		delete this.bindings[id]
+	}
+}
+
 export default {
 	key: "visualDebugger",
 	expose: [
 		{
 			attachToInitializer: [
 				async (self) => {
-					self.appendToApp("openDebug", () => {
-						new Window.DOMWindow({ id: "debugger", children: self.connectWithApp(DebuggerUI) }).create()
-					})
+					self.appendToApp("debug", new Debugger(self))
 				},
 			],
 		},
