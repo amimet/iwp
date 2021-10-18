@@ -1,7 +1,7 @@
 import passport from 'passport'
 import bcrypt from 'bcrypt'
 
-import { User, Session } from '../../models'
+import { User } from '../../models'
 import SessionController from '../SessionController'
 import { Token } from '../../lib'
 import AvatarController from 'dicebar_lib'
@@ -13,7 +13,7 @@ export const UserController = {
     getSelf: (req, res) => {
         return res.json(req.user)
     },
-    get: (req, res) => {
+    get: async (req, res) => {
         const { id, username } = req.query
 
         let selector = {}
@@ -29,8 +29,7 @@ export const UserController = {
                 if (response) {
                     return res.json(response)
                 } else {
-                    res.status(404)
-                    return res.json("User not exists")
+                    return res.status(404).json("User not exists")
                 }
             })
     },
