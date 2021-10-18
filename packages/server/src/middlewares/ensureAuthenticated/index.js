@@ -3,7 +3,7 @@ import { Session } from '../../models'
 
 export default async (req, res, next) => {
     function fail() {
-        return res.status(401).json(`This request needs authentication that you do not have`)
+        return res.status(401).json({ error: 'Unauthorized', message: "This request needs authentication that you do not have" })
     }
 
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -27,8 +27,8 @@ export default async (req, res, next) => {
             req.user = user
             req.jwtToken = token
             req.decodedToken = decoded
-            
-            next()
+
+            return next()
         })(req, res, next)
     } else {
         return fail()
