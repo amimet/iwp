@@ -32,6 +32,10 @@ export default class Sidebar extends React.Component {
 		loading: true,
 		pathResolve: {},
 		menus: {},
+		extraItems: {
+			bottom: [],
+			top: [],
+		},
 	}
 	controller = new Controller({ id: "sidebar", locked: true })
 
@@ -52,7 +56,23 @@ export default class Sidebar extends React.Component {
 			{ lock: true },
 		)
 
+		this.controller.add("appendItem", this.appendItem)
 		this.loadSidebarItems()
+	}
+
+	appendItem = (item = {}) => {
+		const { position } = item
+
+		if (typeof position === "undefined" && typeof this.state.extraItems[position] === "undefined") {
+			console.error("Invalid position")
+			return false
+		}
+
+		const state = this.state.extraItems
+
+		state[position].push(item)
+
+		this.setState({ extraItems: state })
 	}
 
 	loadSidebarItems = () => {
@@ -201,6 +221,20 @@ export default class Sidebar extends React.Component {
 		this.setState({ isHover: false })
 	}
 
+	renderExtraBottomItems = () => {
+		return this.state.extraItems.bottom.map((item = {}) => {
+			if (typeof item.icon !== "undefined") {
+				if (typeof item.props !== "object") {
+					item.props = Object()
+				}
+				
+				item.props["icon"] = createIconRender(item.icon)
+			}
+
+			return <Menu.Item key={item.id} {...item.props}>{item.children}</Menu.Item>
+		})
+	}
+
 	render() {
 		if (this.state.loading) return null
 
@@ -265,6 +299,8 @@ export default class Sidebar extends React.Component {
 									<Avatar src={this.props.user.avatar} />
 								</div>
 							</Menu.Item>
+
+							{this.renderExtraBottomItems()}
 						</Menu>
 					</div>
 				)}
