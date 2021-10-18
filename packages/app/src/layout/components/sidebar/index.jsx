@@ -221,13 +221,13 @@ export default class Sidebar extends React.Component {
 		this.setState({ isHover: false })
 	}
 
-	renderExtraBottomItems = () => {
-		return this.state.extraItems.bottom.map((item = {}) => {
+	renderExtraItems = (position) => {
+		return this.state.extraItems[position].map((item = {}) => {
 			if (typeof item.icon !== "undefined") {
 				if (typeof item.props !== "object") {
 					item.props = Object()
 				}
-				
+
 				item.props["icon"] = createIconRender(item.icon)
 			}
 
@@ -283,6 +283,7 @@ export default class Sidebar extends React.Component {
 					<div key="menu" className="app_sidebar_menu">
 						<Menu selectable={true} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
 							{this.renderMenuItems(this.state.menus)}
+							{this.renderExtraItems("top")}
 						</Menu>
 					</div>
 				)}
@@ -300,7 +301,7 @@ export default class Sidebar extends React.Component {
 								</div>
 							</Menu.Item>
 
-							{this.renderExtraBottomItems()}
+							{this.renderExtraItems("bottom")}
 						</Menu>
 					</div>
 				)}
