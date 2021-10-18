@@ -41,7 +41,7 @@ const renderDate = (time) => {
 	)
 }
 
-export default class Workload extends React.Component {
+class Workload extends React.Component {
 	state = {
 		loading: true,
 		workloads: null,
@@ -49,6 +49,30 @@ export default class Workload extends React.Component {
 		selectedRegion: 0,
 		selectionEnabled: false,
 		searchValue: null,
+	}
+
+	componentDidMount = async () => {
+		await api.get
+			.regions()
+			.then((data) => {
+				this.setState({ regions: data })
+			})
+			.catch((error) => {
+				console.error(error)
+				this.setState({ error })
+			})
+
+		this.loadWorkloadsFromRegion(this.state.selectedRegion)
+
+		if (typeof window.app.debug !== "undefined") {
+			window.app.debug.bind("workload_list", this)
+		}
+	}
+
+	componentWillUnmount = () => {
+		if (typeof window.app.debug !== "undefined") {
+			window.app.debug.unbind("workload_list", this)
+		}
 	}
 
 	addWorkload = (payload) => {
@@ -83,20 +107,7 @@ export default class Workload extends React.Component {
 		this.setState({ workloads })
 	}
 
-	componentDidMount = async () => {
-		await api.get
-			.regions()
-			.then((data) => {
-				this.setState({ regions: data })
-			})
-			.catch((error) => {
-				console.error(error)
-				this.setState({ error })
-			})
-
-		this.loadWorkloadsFromRegion(this.state.selectedRegion)
-	}
-
+	
 	loadWorkloadsFromRegion = async (id) => {
 		this.setState({ loading: true })
 
@@ -307,26 +318,12 @@ export default class Workload extends React.Component {
 		)
 	}
 
-	addTestWorkload = () => {
-		this.addWorkload({
-			_id: "test",
-			name: "Test Workload",
-			status: "funny",
-		})
-	}
-
-	removeTestWorkload = () => {
-		this.deleteWorkload("test")
-	}
-
 	render() {
 		if (this.state.loading) {
 			return <LoadingSpinner />
 		}
 		return (
 			<div>
-				<Button onClick={this.addTestWorkload}>Add test</Button>
-				<Button onClick={this.removeTestWorkload}>Del test</Button>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
 						<div>
@@ -383,3 +380,5 @@ export default class Workload extends React.Component {
 		)
 	}
 }
+
+export default Workload
