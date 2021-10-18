@@ -19,7 +19,7 @@ export const WorkloadController = {
             const endDate = moment(workload.scheduledFinish, format)
             const now = moment().format(format)
 
-            if (moment(now, format).isAfter(endDate)) {
+            if (endDate.isBefore(moment(now, format))) {
                 workload.expired = true
             }
         }
