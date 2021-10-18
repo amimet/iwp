@@ -5,6 +5,7 @@ import { Icons } from "components/Icons"
 import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
+import html2pdf from "html2pdf.js"
 
 import "./index.less"
 
@@ -12,6 +13,7 @@ const api = window.app.apiBridge
 const dateFormat = "DD-MM-YYYY hh:mm"
 
 export default class WorkloadDetails extends React.Component {
+	ref = React.createRef()
 	state = {
 		data: null,
 		qrCanvas: null,
@@ -153,9 +155,9 @@ export default class WorkloadDetails extends React.Component {
 		}
 
 		return (
-			<div className="workload_details">
+			<div className="workload_details" id={this.id} ref={this.ref} >
 				<div className="header">
-					<div>
+					<div className="content">
 						<h1>
 							<antd.Badge.Ribbon
 								text={isExpired ? "expired" : `${datesDiff.daysLeft} days left`}
@@ -181,6 +183,11 @@ export default class WorkloadDetails extends React.Component {
 								<Icons.Activity />
 								{data.status}
 							</antd.Tag>
+						</div>
+						<div>
+							<antd.Button icon={<Icons.Save />}>
+								Export
+							</antd.Button>
 						</div>
 					</div>
 
