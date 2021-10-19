@@ -89,12 +89,12 @@ class WindowRender extends React.Component {
 	getCenterPosition = () => {
 		const dimensions = this.state?.dimensions ?? {}
 
-		const height = dimensions.height ?? 600
-		const width = dimensions.width ?? 400
+		const windowHeight = dimensions.height ?? 600
+		const windowWidth = dimensions.width ?? 400
 
 		return {
-			y: Number(window.screen.height / 2 - height / 2),
-			x: Number(window.screen.width / 2 - width / 2),
+			x: window.innerWidth / 2 - windowWidth / 2,
+			y: window.innerHeight / 2 - windowHeight / 2,
 		}
 	}
 
