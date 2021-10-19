@@ -59,20 +59,19 @@ class DOMWindow {
 }
 
 class WindowRender extends React.Component {
-	constructor(props) {
-		super(props)
+	state = {
+		actions: [],
+		dimensions: {
+			height: this.props.height ?? 600,
+			width: this.props.width ?? 400,
+		},
+		position: this.props.defaultPosition,
+		visible: false,
+	}
 
-		this.state = {
-			actions: [],
-			dimensions: {
-				height: this.props.height ?? 600,
-				width: this.props.width ?? 400,
-			},
-			position: this.props.defaultPosition ?? this.getCenterPosition(),
-		}
-
+	componentDidMount = () => {
 		this.setDefaultActions()
-
+		
 		if (typeof this.props.actions !== "undefined") {
 			if (Array.isArray(this.props.actions)) {
 				const actions = this.state.actions ?? []
@@ -84,6 +83,16 @@ class WindowRender extends React.Component {
 				this.setState({ actions })
 			}
 		}
+
+		if (!this.state.position) {
+			this.setState({ position: this.getCenterPosition() })
+		}
+
+		this.toogleVisibility(true)
+	}
+	
+	toogleVisibility = (to) => {
+		this.setState({ visible: to ?? !this.state.visible })
 	}
 
 	getCenterPosition = () => {
@@ -128,11 +137,18 @@ class WindowRender extends React.Component {
 		return null
 	}
 
-	render() {
-		const { children, renderProps } = this.props
-		const { position, dimensions } = this.state
+	getComponentRender = () => {
+		return React.isValidElement(this.props.children)
+			? React.cloneElement(this.props.children, this.props.renderProps)
+			: React.createElement(this.props.children, this.props.renderProps)
+	}
 
-		const Render = React.isValidElement(children) ? () => children : () => React.createElement(children)
+	render() {
+		const { position, dimensions, visible } = this.state
+
+		if (!visible) {
+			return null
+		}
 		
 		return (
 			<Rnd
@@ -165,9 +181,7 @@ class WindowRender extends React.Component {
 						<div className="actions">{this.renderActions()}</div>
 					</div>
 
-					<div className="window_body">
-						<Render {...renderProps} />
-					</div>
+					<div className="window_body">{this.getComponentRender()}</div>
 				</div>
 			</Rnd>
 		)
