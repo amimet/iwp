@@ -73,5 +73,10 @@
         "id": "launchpad",
         "title": "Launchpad",
         "icon": "Command"
+    },
+    {
+        "id": "statistics",
+        "title": "Statistics",
+        "icon": "BarChart"
     }
 ]
