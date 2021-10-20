@@ -35,7 +35,7 @@ export default class WorkloadDebugger extends React.Component {
 
 		return (
 			<div className="wrapper">
-				<div key="test_item" className="section">
+				<div key="statement" className="section">
 					<h4>State</h4>
 					<div>
 						<RJson name="state.workloads" collapsed="true" src={this.binding.state.workloads} />
