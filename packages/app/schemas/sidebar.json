@@ -6,9 +6,26 @@
         "locked": true
     },
     {
-        "id": "workload",
-        "title": "Workload",
-        "icon": "GitCommit"
+        "id": "workloads",
+        "title": "Workloads",
+        "icon": "GitCommit",
+        "children": [
+            {
+                "id": "workloads/pool",
+                "title": "Pool",
+                "icon": "Archive"
+            },
+            {
+                "id": "workloads/sections",
+                "title": "Sections",
+                "icon": "Target"
+            },
+            {
+                "id": "workloads/items",
+                "title": "Items",
+                "icon": "Tag"
+            }
+        ]
     },
     {
         "id": "users",
