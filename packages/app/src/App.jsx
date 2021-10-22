@@ -37,9 +37,8 @@ const SplashExtension = Splash({
 		},
 	},
 })
-export default class App extends createEviteApp({
-	extensions: [connect, theme, API, Render, SplashExtension, Debug],
-}) {
+
+class App extends React.Component {
 	constructor(props) {
 		super(props)
 
@@ -194,4 +193,6 @@ export default class App extends createEviteApp({
 	}
 }
 
-ReactDOM.render(<App />, document.getElementById("root"))
+export default createEviteApp(App, {
+	extensions: [connect, theme, API, Render, SplashExtension, Debug],
+})
