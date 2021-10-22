@@ -4,7 +4,7 @@ export default {
     key: "connect",
     expose: [
         {
-            attachToInitializer: [
+            initialization: [
                 async (self) => {
                     self.connectWithApp = (component) => {
                         return React.createElement(component, { app: self })

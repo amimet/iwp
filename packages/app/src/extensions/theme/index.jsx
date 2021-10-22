@@ -42,7 +42,7 @@ export default {
 	key: "theme",
 	expose: [
 		{
-			attachToInitializer: [
+			initialization: [
 				async (self) => {
 					self.themeController = new ThemeController()
 					self.appendToApp("themeController", self.themeController)

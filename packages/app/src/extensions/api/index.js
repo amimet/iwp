@@ -8,7 +8,7 @@ export default {
     key: "apiBridge",
     expose: [
         {
-            attachToInitializer: [
+            initialization: [
                 async (self) => {
                     self.apiBridge = await self.createBridge()
                     self.ws = io("http://localhost:9001/main",{ transports: ["websocket"] })
@@ -25,7 +25,7 @@ export default {
                     self.appendToApp("apiBridge", Object.freeze(self.apiBridge))
                 },
             ],
-            self: {
+            mutateContext: {
                 createBridge: async () => {
                     const getSessionContext = () => {
                         const obj = {}

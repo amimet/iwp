@@ -17,7 +17,7 @@ export default (params = {}) => {
 		key: "splash",
 		expose: [
 			{
-				attachToInitializer: [
+				initialization: [
 					async (self) => {
 						const fadeOutVelocity = params.velocity ?? 1000 //on milliseconds
 						const splashElement = document.createElement("div")

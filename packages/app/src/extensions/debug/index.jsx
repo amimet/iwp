@@ -122,7 +122,7 @@ export default {
 	key: "visualDebugger",
 	expose: [
 		{
-			attachToInitializer: [
+			initialization: [
 				async (self) => {
 					self.appendToApp("debug", new Debugger(self))
 				},

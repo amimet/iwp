@@ -5,7 +5,7 @@ export default {
 	key: "customRender",
 	expose: [
 		{
-			attachToInitializer: [
+			initialization: [
 				async (self) => {
 					self.history._push = self.history.push
 					self.history.push = (key) => {
@@ -41,7 +41,7 @@ export default {
 					self.appendToApp("setLocation", self.history.setLocation)
 				},
 			],
-			self: {
+			mutateContext: {
 				createPageRender: function (params) {
 					return loadable((props) => {
 						const pagePath = `${window.__evite.aliases["pages"]}${window.location.pathname}`
