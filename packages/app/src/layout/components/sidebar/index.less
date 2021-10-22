@@ -1,11 +1,11 @@
-@import "@/theme/index.less";
+@import "@/theme/vars.less";
 
 //  SIDEBAR
 .ant-layout-sider {
     background: @app_sidebar_backgroundColor!important;
     background-color: @app_sidebar_backgroundColor!important;
 
-    border-radius: 0 18px 18px 0;
+    border-radius: 0 @app_sidebar_borderRadius @app_sidebar_borderRadius 0;
     overflow: hidden;
     border: 1px solid @app_sidebar_backgroundColor!important;
 }
