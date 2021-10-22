@@ -1,56 +1,30 @@
 @import "theme/index.less";
 
 .app_header {
-    user-select: none;
+	user-select: none;
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    z-index: 100;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	z-index: 100;
 
-    height: @app_header_height!important;
-    padding: 0 16px;
+	height: @app_header_height!important;
+	padding: 10px;
 
-    transition: all ease-in-out 150ms;
-    
-    background: @app_header_background!important;
-    background-color: @app_header_background!important;
+	transition: all ease-in-out 150ms;
 
-    border-bottom: 1px @app_background_accent solid;
+	background: @app_header_background!important;
+	background-color: @app_header_background!important;
 
-    > div {
-        margin: 0 16px;
-    }
+	border-bottom: 1px @app_background_accent solid;
 
-    &.hidden{
-        opacity: 0;
-        height: 0!important;
-        padding: 0!important;
-    }
-}
+	> div {
+		margin-right: 16px;
+	}
 
-.app_searchBar {
-    user-select: none;
-
-    border: 0!important;
-    width: 40%!important;
-    border-radius: 7px!important;
-    margin: 12px 0;
-
-    .ant-input {
-        background-color: @app_background_accent!important;
-        color: @app_background_contrast!important;
-        border: 0!important;
-    }
-
-    .ant-input-group{
-        display: flex;
-    }
-
-    // .ant-input-search-button
-    .ant-btn {
-        margin-right: 12px;
-        background-color: transparent!important;
-        border: 0!important;
-    }
+	&.hidden {
+		opacity: 0;
+		height: 0 !important;
+		padding: 0 !important;
+	}
 }
