@@ -1,5 +1,7 @@
 import React from "react"
 import * as antd from "antd"
+import { Icons } from "components/Icons"
+import { ActionsBar } from "components"
 import fuse from "fuse.js"
 
 import "./index.less"
@@ -17,6 +19,7 @@ export default class WorkloadsItems extends React.Component {
 			console.error(error)
 			return []
 		})
+
 		this.setState({ items })
 	}
 
@@ -59,14 +62,22 @@ export default class WorkloadsItems extends React.Component {
 	render() {
 		return (
 			<div className="wrapper">
-				<div>
-					<antd.Input.Search
-						placeholder="Search"
-						allowClear
-						onSearch={this.onSearch}
-						onChange={this.onSearch}
-					/>
-				</div>
+				<ActionsBar>
+					<div>
+						<antd.Button type="primary" icon={<Icons.Plus />}>
+							New
+						</antd.Button>
+					</div>
+					<div>
+						<antd.Input.Search
+							placeholder="Search"
+							allowClear
+							onSearch={this.onSearch}
+							onChange={this.onSearch}
+						/>
+					</div>
+				</ActionsBar>
+
 				<div>
 					<antd.List
 						itemLayout="vertical"
@@ -85,3 +96,6 @@ export default class WorkloadsItems extends React.Component {
 		)
 	}
 }
+
+// TODO: Add create new `fabricItem` method
+// TODO: Render selected item inspector
