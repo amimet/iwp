@@ -3,7 +3,7 @@ import * as antd from "antd"
 import { Icons } from "components/icons"
 
 import config from "config"
-import { Sidebar, Header, Drawer } from "./components"
+import { Sidebar, Header, Drawer, Sidedrawer } from "./components"
 
 import Login from "pages/login"
 
@@ -88,6 +88,8 @@ export default class BaseLayout extends React.Component {
 						</div>
 					</antd.Layout.Content>
 				</antd.Layout>
+
+				<Sidedrawer {...this.props} />
 			</antd.Layout>
 		)
 	}
