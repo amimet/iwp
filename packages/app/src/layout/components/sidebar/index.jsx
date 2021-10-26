@@ -21,7 +21,7 @@ const onClickHandlers = {
 }
 
 const getStoragedKeys = () => {
-	return window.app.configuration.sidebar.get()
+	return window.app.configuration?.sidebar.get()
 }
 
 export default class Sidebar extends React.Component {
@@ -238,7 +238,9 @@ export default class Sidebar extends React.Component {
 	render() {
 		if (this.state.loading) return null
 
-		if (window.app.configuration.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+		const { user } = this.props
+
+		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
 			while (this.state.isHover && this.state.collapsed) {
 				this.controller.toogleCollapse(false)
 				break
@@ -297,7 +299,7 @@ export default class Sidebar extends React.Component {
 
 							<Menu.Item key="account">
 								<div className="sidebar_account_component">
-									<Avatar src={this.props.user.avatar} />
+									<Avatar src={user?.avatar} />
 								</div>
 							</Menu.Item>
 
