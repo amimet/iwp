@@ -3,109 +3,117 @@ import cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
 import config from 'config'
 
-const tokenKey = config.app.storage?.token ?? "token"
-const getDefaultBridge = () => window.app.apiBridge
+export default class Session {
+    constructor(bridge = window.app.apiBridge) {
+        this.bridge = bridge
+    }
 
-export async function regenerate(bridge = getDefaultBridge()) {
-    return new RequestAdaptor(bridge.post.regenerate, []).send()
-        .then((err, data) => {
+    static tokenKey = config.app.storage?.token ?? "token"
+
+    static get token() {
+        return cookies.get(this.tokenKey)
+    }
+
+    static set token(token) {
+        return cookies.set(this.tokenKey, token)
+    }
+
+    //* BASIC HANDLERS
+    login = (payload, callback) => {
+        const body = {
+            username: window.btoa(payload.username),
+            password: window.btoa(payload.password),
+            allowRegenerate: payload.allowRegenerate
+        }
+
+        return this.generateNewToken(body, (err, res) => {
+            if (typeof callback === 'function') {
+                callback(err, res)
+            }
+
             if (!err) {
-                return storage(data)
+                this.token = res.data
+                window.app.eventBus.emit("new_session")
             }
         })
-}
+    }
 
-export async function handleLogin(bridge = getDefaultBridge(), payload, callback) {
-    genToken(bridge, payload, (err, res) => {
-        if (typeof callback === 'function') {
-            callback(err, res)
+    logout = async () => {
+        await this.destroyCurrentSession(this.bridge)
+        this.forgetLocalSession()
+    }
+
+    //* TOKEN UTILS
+    decodeToken = (token) => {
+        return jwt_decode(token)
+    }
+
+    decodeCurrentToken = () => {
+        return this.decodeToken(Session.storagedToken)
+    }
+
+    //* GENERATORS
+    generateNewToken = (payload, callback) => {
+        const endpoint = this.bridge.post.login
+        return new RequestAdaptor(endpoint, [payload], callback).send()
+    }
+
+    regenerateToken = () => {
+        const endpoint = this.bridge.post.regenerate
+
+        return new RequestAdaptor(endpoint).send()
+            .then((err, data) => {
+                if (!err) {
+                    return storage(data)
+                }
+            })
+    }
+
+    //* GETTERS
+    getAllSessions = async () => {
+        const endpoint = this.bridge.post.sessions
+
+        return new RequestAdaptor(endpoint, [], callback).send()
+    }
+
+    getTokenHealth = async () => {
+        const session = this.storagedToken
+        const endpoint = this.bridge.post.validatesession
+
+        return await endpoint({ session })
+    }
+
+    isCurrentTokenValid = async () => {
+        const health = await this.getTokenHealth()
+
+        return health.valid
+    }
+
+    forgetLocalSession = () => {
+        cookies.remove(this.tokenKey)
+        window.app.eventBus.emit("session_deleted")
+    }
+
+    destroyAllSessions = async () => {
+        const session = decodeSession()
+        const endpoint = this.bridge.delete.sessions
+
+        if (session) {
+            new RequestAdaptor(endpoint, [{ user_id: session.user_id }]).send()
+            this.forgetLocalSession()
         }
-        if (!err) {
-            storage(res.data)
-            window.app.eventBus.emit("forceReloadUser")
+        return false
+    }
+
+    destroyCurrentSession = async () => {
+        const session = decodeSession()
+        const endpoint = this.bridge.delete.session
+
+        if (session) {
+            const token = this.storagedToken
+            return new RequestAdaptor(endpoint, [{ user_id: session.user_id, token: token }]).send()
         }
-    })
-}
 
-export async function genToken(bridge = getDefaultBridge(), payload, callback) {
-    return new RequestAdaptor(bridge.post.login, [{ username: window.btoa(payload.username), password: window.btoa(payload.password), allowRegenerate: payload.allowRegenerate }], callback).send()
-}
-
-// Gets the current session storaged
-export function get() {
-    return cookies.get(tokenKey)
-}
-
-export function storage(payload = {}) {
-    if (typeof payload.token === "undefined") {
-        throw new Error(`Cannot set an new session without a token! (missing token)`)
+        return false
     }
-
-    cookies.set(tokenKey, payload.token)
-    window.app.reloadAppState()
-}
-
-export async function clear() {
-    cookies.remove(tokenKey)
-    window.app.reloadAppState()
-}
-
-// [API] Get all sessions for current user
-export function getAll(bridge = getDefaultBridge(), callback) {
-    return new RequestAdaptor(bridge.get.sessions, [], callback).send()
-}
-
-export function decodeSession() {
-    let data = null
-    const session = get()
-
-    if (typeof session !== "undefined") {
-        data = jwt_decode(session)
-    }
-
-    return data
-}
-
-export function getCurrentTokenValidation(bridge = getDefaultBridge(), callback) {
-    const session = get()
-
-    return new RequestAdaptor(bridge.post.validatesession, [{ session: session }], callback).send()
-}
-
-export async function validateCurrentSession(bridge = getDefaultBridge()) {
-    const validation = await getCurrentTokenValidation(bridge)
-    return validation.valid
-}
-
-export async function logout(bridge = getDefaultBridge()) {
-    await destroySession(bridge)
-    clear()
-}
-
-// [API] Destroy session for current storaged session
-export async function destroySession(bridge = getDefaultBridge()) {
-    const session = decodeSession()
-
-    if (session) {
-        const token = get()
-        return new RequestAdaptor(bridge.delete.session, [{ user_id: session.user_id, token: token }]).send()
-    }
-
-    window.app.eventBus.emit("forceReloadUser")
-
-    return false
-}
-
-// [API] Destroy all session for current user
-export async function destroyAll(bridge = getDefaultBridge()) {
-    const session = decodeSession()
-
-    if (session) {
-        new RequestAdaptor(bridge.delete.sessions, [{ user_id: session.user_id }]).send()
-        await clear()
-    }
-
-    window.app.eventBus.emit("forceReloadUser")
-
-    return false
 }
