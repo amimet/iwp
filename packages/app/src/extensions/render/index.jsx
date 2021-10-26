@@ -6,44 +6,42 @@ export default {
 	expose: [
 		{
 			initialization: [
-				async (self) => {
-					self.history._push = self.history.push
-					self.history.push = (key) => {
-						self.history._push(key)
-						self.forceUpdate()
+				async (app, main) => {
+					function sendToEventBus(...context) {
+						if (typeof window.app.eventBus !== "undefined") {
+							window.app.eventBus.emit(...context)
+						} else {
+							console.warn("eventBus is not available")
+						}
+					}
+			
+					main.history._push = main.history.push
+					main.history.push = (key) => {
+						main.history._push(key)
+						main.forceUpdate()
 					}
 
-					self.history.setLocation = (to, delay) => {
-						console.time("setLocation")
-
-						function sendToEventBus(...context) {
-							if (typeof window.app.eventBus !== "undefined") {
-								window.app.eventBus.emit(...context)
-							} else {
-								console.warn("eventBus is not available")
-							}
-						}
-
+					main.history.setLocation = (to, delay) => {
 						if (typeof to !== "string") {
 							console.warn(`Invalid location`)
 							return false
 						}
 
 						sendToEventBus("setLocation", to, delay)
-						setTimeout(() => {
-							self.history.push(to)
-							window.app.eventBus.emit("setLocationReady")
-							console.timeEnd("setLocation")
-						}, delay ?? 100)
 
+						setTimeout(() => {
+							main.history.push(to)
+							sendToEventBus("setLocationReady", to, delay)
+						}, delay ?? 100)
 					}
 
-					self.appendToApp("setLocation", self.history.setLocation)
+					main.setToWindowContext("setLocation", main.history.setLocation)
 				},
 			],
 			mutateContext: {
 				createPageRender: function (params) {
 					return loadable((props) => {
+						// TODO: Cache imported modules storaging on memory
 						const pagePath = `${window.__evite.aliases["pages"]}${window.location.pathname}`
 						
 						const _page = import(pagePath).catch((err) => {

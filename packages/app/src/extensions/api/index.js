@@ -1,7 +1,7 @@
 import config from 'config'
 import linebridge from "linebridge/client"
 import { notification } from "antd"
-import * as session from "core/models/session"
+import Session from "core/models/session"
 import io from "socket.io-client"
 
 export default {
@@ -9,31 +9,31 @@ export default {
     expose: [
         {
             initialization: [
-                async (self) => {
-                    self.apiBridge = await self.createBridge()
-                    self.ws = io("http://localhost:9001/main",{ transports: ["websocket"] })
+                async (app, main) => {
+                    app.apiBridge = await app.createBridge()
+                    app.ws = io("http://localhost:9001/main",{ transports: ["websocket"] })
                     
-                    self.ws.on("connect", () => {
-                        console.log(self.ws.id)
+                    app.ws.on("connect", () => {
+                        console.log(app.ws.id)
                     })
 
-                    self.ws.on("connect_error", (...context) => {
+                    app.ws.on("connect_error", (...context) => {
                         console.log(...context)
                     })
 
-                    self.appendToApp("wsApi", self.ws)
-                    self.appendToApp("apiBridge", Object.freeze(self.apiBridge))
+                    main.setToWindowContext("wsApi", app.ws)
+                    main.setToWindowContext("apiBridge", Object.freeze(app.apiBridge))
                 },
             ],
             mutateContext: {
                 createBridge: async () => {
                     const getSessionContext = () => {
                         const obj = {}
-                        const thisSession = session.get()
+                        const storagedToken = Session.storagedToken
 
-                        if (typeof thisSession !== "undefined") {
+                        if (typeof storagedToken !== "undefined") {
                             obj.headers = {
-                                Authorization: `Bearer ${thisSession ?? null}`,
+                                Authorization: `Bearer ${storagedToken ?? null}`,
                             }
                         }
 

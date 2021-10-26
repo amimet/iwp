@@ -43,9 +43,9 @@ export default {
 	expose: [
 		{
 			initialization: [
-				async (self) => {
-					self.themeController = new ThemeController()
-					self.appendToApp("themeController", self.themeController)
+				async (app, main) => {
+					app.themeController = new ThemeController()
+					main.setToWindowContext("themeController", app.themeController)
 				},
 			],
 		},

@@ -18,7 +18,7 @@ export default (params = {}) => {
 		expose: [
 			{
 				initialization: [
-					async (self) => {
+					async (app, main) => {
 						const fadeOutVelocity = params.velocity ?? 1000 //on milliseconds
 						const splashElement = document.createElement("div")
 
@@ -42,7 +42,7 @@ export default (params = {}) => {
 							}, fadeOutVelocity ?? 1000)
 						}
 
-						self.eventBus.on("app_load_done", removeSplash)
+						main.eventBus.on("initialization_done", removeSplash)
 					},
 				],
 			},

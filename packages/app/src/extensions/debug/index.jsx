@@ -1,7 +1,6 @@
 import React from "react"
 import { Window } from "components"
 import { Skeleton, Tabs } from "antd"
-import { GlobalBindingProvider } from "evite"
 
 class DebuggerUI extends React.Component {
 	appBinding = this.props.app
@@ -96,9 +95,9 @@ class DebuggerUI extends React.Component {
 }
 
 class Debugger {
-	constructor(self, params = {}) {
-		this.app = self
-		this.params = {...params}
+	constructor(app, params = {}) {
+		this.app = app
+		this.params = { ...params }
 
 		this.bindings = {}
 	}
@@ -123,8 +122,8 @@ export default {
 	expose: [
 		{
 			initialization: [
-				async (self) => {
-					self.appendToApp("debug", new Debugger(self))
+				async (app, main) => {
+					main.setToWindowContext("debug", new Debugger(app))
 				},
 			],
 		},

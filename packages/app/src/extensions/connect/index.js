@@ -5,12 +5,12 @@ export default {
     expose: [
         {
             initialization: [
-                async (self) => {
-                    self.connectWithApp = (component) => {
-                        return React.createElement(component, { app: self })
+                async (app, main) => {
+                    main.connectWithApp = (component) => {
+                        return React.createElement(component, { app: app })
                     }
 
-                    self.appendToApp("connect", self.connectWithApp)
+                    main.setToWindowContext("connect", app.connectWithApp)
                 },
             ],
         },
