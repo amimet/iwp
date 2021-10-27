@@ -5,7 +5,7 @@ import { Icons } from "components/Icons"
 import { Roles } from "components"
 import { AccountEditor, SessionsView, StatisticsView } from "./components"
 
-import * as user from "core/models/user"
+import Session from "core/models/session"
 
 import "./index.less"
 
@@ -15,6 +15,7 @@ const SelfViewComponents = {
 	sessionsView: SessionsView,
 	statisticsView: StatisticsView,
 }
+
 const SelfViewTabDecorators = {
 	sessionsView: (
 		<div>
@@ -39,14 +40,11 @@ class SelfView extends React.Component {
 
 		return Object.keys(this.props.components).map((key, index) => {
 			const Component = this.props.components[key]
-			const componentProps = {
-				user: this.props.user,
-			}
 
 			return (
 				<antd.Tabs.TabPane tab={renderTagDecorator(key)} key={index}>
 					<div key={key}>
-						<Component {...componentProps} />
+						<Component {...this.props.componentProps} />
 					</div>
 				</antd.Tabs.TabPane>
 			)
@@ -63,31 +61,31 @@ class SelfView extends React.Component {
 }
 
 export default class Account extends React.Component {
-	state = {
-		isSelf: true,
-		user: {},
-	}
+	static connectContext = ["userController", "sessionController"]
 
+	state = {
+		isSelf: false,
+		user: null,
+		sessions: null
+	}
+	
 	componentDidMount = async () => {
+		const token = Session.decodedToken
 		const query = new URLSearchParams(window.location.search)
-		const requestedUser = query.get("username")
+		const requestedUser = query.get("username") ?? token?.username
+
+		let state = this.state
 
 		if (requestedUser != null) {
-			if (this.props.user.username === requestedUser) {
-				return false
+			if (token.username === requestedUser) {
+				state.isSelf = true
+				state.sessions = await this.props.sessionController.getAllSessions()
 			}
-
-			this.setState({ isSelf: false })
-
-			await user
-				.fetchData(this.props.api, { username: requestedUser })
-				.then((data) => {
-					this.setState({ user: data })
-				})
-				.catch((err) => {
-					console.log(err)
-				})
+			
+			state.user = await this.props.userController.getData({ username: requestedUser })
 		}
+
+		this.setState(state)
 	}
 
 	handleUpdateUserData = async (changes, callback) => {
@@ -138,7 +136,11 @@ export default class Account extends React.Component {
 	}
 
 	render() {
-		const user = this.state.isSelf ? this.props.user : this.state.user
+		const user = this.state.user
+
+		if (!user) {
+			return <antd.Skeleton active />
+		}
 
 		return (
 			<div className="account_wrapper">
@@ -156,7 +158,11 @@ export default class Account extends React.Component {
 					<SelfView
 						components={SelfViewComponents}
 						decorators={SelfViewTabDecorators}
-						user={this.props.user}
+						componentProps={{
+							sessions: this.state.sessions,
+							user: this.state.user,
+							decodedToken: Session.decodedToken,
+						}}
 					/>
 				)}
 			</div>

@@ -51,6 +51,8 @@ class ChartGenerator extends React.Component {
 }
 
 export default class Main extends React.Component {
+	static connectContext = ["globalState", "setGlobalState"]
+
 	state = {}
 
 	componentWillUnmount = () => {
@@ -65,7 +67,7 @@ export default class Main extends React.Component {
 		}
 
 		const user = this.props.user ?? {}
-		console.log(user)
+
 		return (
 			<div className="dashboard">
 				<div className="top">

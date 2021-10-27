@@ -70,6 +70,8 @@ const formInstance = [
 ]
 
 export default class Login extends React.Component {
+    static connectContext = ["sessionController", "configuration"]
+
     async handleSend(values) {
         const payload = {
             username: values.username,
@@ -77,10 +79,10 @@ export default class Login extends React.Component {
             allowRegenerate: values.allowRegenerate,
         }
         
-        session.handleLogin(this.props.api, payload, (err, res) => {
+        this.props.sessionController.login(payload, (err, res) => {
             window.currentForms["normal_login"].toogleValidation(false)
             window.currentForms["normal_login"].clearErrors()
-
+            console.log(res)
             if (err) {
                 try {
                     if (res.status !== 401) {
@@ -107,6 +109,12 @@ export default class Login extends React.Component {
     componentDidMount() {
         if (window.headerVisible) {
             window.toogleHeader(false)
+        }
+    }
+
+    componentWillUnmount() {
+        if (!window.headerVisible) {
+            window.toogleHeader(true)
         }
     }
 
