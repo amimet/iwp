@@ -7,15 +7,17 @@ import BaseLayout from "./layout"
 import config from "config"
 
 import Session from "core/models/session"
-import * as user from "core/models/user"
+import User from "core/models/user"
 
 import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
-import { CreateEviteApp, BindPropsProvider, SetToWindowContext } from "evite"
+import { CreateEviteApp, BindPropsProvider } from "evite"
+import { Subscribe, createStateContainer } from "evite/client/statement"
 import { API, Render, Splash, Debug, connect, theme } from "extensions"
 
 import "theme/index.less"
+
 
 // append method to array prototype
 Array.prototype.move = function (from, to) {
@@ -37,92 +39,109 @@ const SplashExtension = Splash({
 	},
 })
 
-class App extends React.Component {
-	constructor(props) {
-		super(props)
+const AppStatement = createStateContainer({})
 
-		// load bar
-		window.app.eventBus.on("top_loadBar_start", () => {
+class App {
+	static initialize(props) {
+		this.loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+
+		this.sessionController = new Session()
+		this.userController = new User()
+
+		this.configuration = {
+			settings: new SettingsController(),
+			sidebar: new SidebarController(),
+		}
+
+		this.eventBus = this.contexts.main.eventBus
+
+		this.eventBus.on("top_loadBar_start", () => {
 			this.loadBar.start()
 		})
-
-		window.app.eventBus.on("top_loadBar_stop", () => {
+		this.eventBus.on("top_loadBar_stop", () => {
 			this.loadBar.done()
 		})
 
-		window.app.eventBus.on("destroyAllSessions", () => {
-			session.destroyAll()
+		this.eventBus.on("setLocation", () => {
+			this.eventBus.emit("top_loadBar_start")
+		})
+		this.eventBus.on("setLocationReady", () => {
+			this.eventBus.emit("top_loadBar_stop")
 		})
 
-		window.app.eventBus.on("forceReloadData", () => {
-			// TODO
+		this.eventBus.on("forceInitialize", async () => {
+			await this.initialization()
+		})
+		this.eventBus.on("forceReloadUser", async () => {
+			await this.__init_user()
+		})
+		this.eventBus.on("forceReloadSession", async () => {
+			await this.__init_session()
 		})
 
-		window.app.eventBus.on("forceReloadUser", async () => {
-			await this.loadUser()
+		this.eventBus.on("destroyAllSessions", async () => {
+			await this.sessionController.destroyAllSessions()
 		})
+		this.eventBus.on("new_session", () => {
+			this.eventBus.emit("forceInitialize")
 
-		// emit loadbar on setLocation
-		window.app.eventBus.on("setLocation", () => {
-			window.app.eventBus.emit("top_loadBar_start")
+			if (this.beforeLoginLocation) {
+				window.app.setLocation(this.beforeLoginLocation)
+				this.beforeLoginLocation = null
+			}
 		})
-		window.app.eventBus.on("setLocationReady", () => {
-			window.app.eventBus.emit("top_loadBar_stop")
+		this.eventBus.on("destroy_session", () => {
+			this.eventBus.emit("forceInitialize")
+		})
+		this.eventBus.on("invalid_session", () => {
+			this.sessionController.destroySession()
 		})
 	}
 
-	static get initialize() {
-		return async (app, main, self) => {
-			console.log(main)
-			app.sessionController = new Session()
-			app.configuration = SetToWindowContext("configuration", {
-				settings: new SettingsController(),
-				sidebar: new SidebarController(),
-			})
-			app.loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+	static windowContext() {
+		return {
+			configuration: this.configuration,
+			isValidSession: this.isValidSession,
+			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args)
+		}
+	}
+
+	static appContext() {
+		return {
+			sessionController: this.sessionController,
+			userController: this.userController,
+			configuration: this.configuration,
+			loadBar: this.loadBar,
 		}
 	}
 
 	state = {
 		renderLoading: false,
-		isMobile: false
+		isMobile: false,
+		session: null,
+		data: null
 	}
 
-	isValidSession = SetToWindowContext("isValidSession", async () => {
-		return await this.app.sessionController.isCurrentTokenValid()
-	})
-
-	reloadAppState = SetToWindowContext("reloadAppState", async () => {
-		await this.initialization()
-	})
+	isValidSession = async () => {
+		return await this.sessionController.isCurrentTokenValid()
+	}
 
 	componentDidMount = async () => {
 		await this.initialization()
 	}
 
 	initialization = async () => {
-		await this.sessionInitialization()
+		await this.__init_session()
+		await this.__init_user()
 	}
 
-	loadUser = async () => {
-		await user.setLocalBasics()
-		this.user = await this.getCurrentUser()
-	}
-
-	sessionInitialization = async () => {
-		this.sessionToken = await Session.storagedToken
-
-		if (typeof this.sessionToken === "undefined") {
+	__init_session = async () => {
+		if (typeof Session.token === "undefined") {
 			window.app.eventBus.emit("not_session")
 		} else {
-			const health = await this.sessionController.getTokenHealth()
+			this.session = await this.sessionController.getTokenInfo()
 
-			console.log(health)
-
-			this.session = health
-			this.validSession = health.valid
-
-			if (!this.validSession) {
+			if (!this.session.valid) {
 				// try to regenerate
 				try {
 					// if (this.session.allowRegenerate) {
@@ -131,47 +150,41 @@ class App extends React.Component {
 					// 	throw new Error(`Session cant be regenerated`)
 					// }
 				} catch (error) {
-					window.app.eventBus.emit("not_valid_session", health.error)
-					session.forgetLocalSession()
+					window.app.eventBus.emit("invalid_session", this.session.error)
 				}
-			} else {
-				await user.setLocalBasics(this.apiBridge)
-				this.user = await this.getCurrentUser()
+
+				if (window.location.pathname == "/login") {
+					this.beforeLoginLocation = "/main"
+				}else {
+					this.beforeLoginLocation = window.location.pathname
+				}
+
+				window.app.setLocation("/login")
 			}
 		}
+
+		this.setState({ session: this.session })
 	}
 
-	getCurrentUser = () => {
-		let currentUser = Object()
-
-		const sessionData = session.decodeSession()
-		const basicsData = user.getLocalBasics(this.apiBridge)
-
-		if (sessionData) {
-			currentUser = { ...currentUser, session: sessionData }
-		}
-		if (basicsData) {
-			currentUser = { ...currentUser, ...basicsData }
+	__init_user = async () => {
+		if (!this.session || !this.session.valid) {
+			return false
 		}
 
-		if (!currentUser.avatar) {
-			currentUser.avatar = config.defaults.avatar
+		try {
+			this.user = await User.data
+			this.setState({ user: this.user })
+		} catch (error) {
+			console.log(error)
 		}
-		if (!currentUser.username) {
-			currentUser.username = "Guest"
-		}
-
-		return currentUser
 	}
 
 	handleLoading = (to) => {
 		this.setState({ renderLoading: to ?? !this.state.renderLoading })
 	}
 
-	render() {
-		const { renderLoading } = this.state
-
-		const Page = this.app.createPageRender({
+	render = () => {
+		const Render = this.contexts.app.createPageRender({
 			on404: (props) => {
 				return <NotFound />
 			},
@@ -187,11 +200,12 @@ class App extends React.Component {
 				</Helmet>
 
 				<BindPropsProvider
-					app={() => {
-						return this.app
-					}}
+					user={this.state.user}
+					session={this.state.session}
 				>
-					<BaseLayout>{renderLoading ? <AppLoading /> : <Page />}</BaseLayout>
+					<BaseLayout>
+						<Render />
+					</BaseLayout>
 				</BindPropsProvider>
 			</React.Fragment>
 		)
