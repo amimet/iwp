@@ -40,11 +40,13 @@ export default {
 			],
 			mutateContext: {
 				createPageRender: function (params) {
-					return loadable((props) => {
+					return loadable(async () => {
+						let elementProps = {}
+
 						// TODO: Cache imported modules storaging on memory
 						const pagePath = `${window.__evite.aliases["pages"]}${window.location.pathname}`
 						
-						const _page = import(pagePath).catch((err) => {
+						let render = await import(pagePath).catch((err) => {
 							const isNotFound = err.message.includes("Failed to fetch dynamically imported module")
 							
 							if (isNotFound) {
@@ -61,8 +63,16 @@ export default {
 								return () => <div>{err.toString()}</div>
 							}
 						})
+						
+						render = render.default || render
 
-						return _page
+						if (Array.isArray(render.connectContext)) {
+							render.connectContext.forEach((contextKey) => {
+								elementProps[contextKey] = this[contextKey]
+							})
+						}
+
+						return (props) => React.createElement(render, {...elementProps, ...props })
 					})
 				},
 				validateLocationSlash: (location) => {
