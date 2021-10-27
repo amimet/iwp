@@ -5,26 +5,6 @@ import { Icons } from "components/icons"
 import config from "config"
 import { Sidebar, Header, Drawer, Sidedrawer } from "./components"
 
-import Login from "pages/login"
-
-export const uiViewLoad = {
-	login: (callback) => {
-		window.controllers.drawer.open("login", Login, {
-			locked: true,
-			onDone: (self) => {
-				if (typeof callback === "function") {
-					callback()
-				}
-				self.close()
-			},
-			props: {
-				closable: false,
-				width: "45%",
-			},
-		})
-	},
-}
-
 export default class BaseLayout extends React.Component {
 	layoutContentRef = React.createRef()
 
@@ -43,11 +23,7 @@ export default class BaseLayout extends React.Component {
 	}
 
 	componentDidMount() {
-		window.app.eventBus.on("not_session", () => {
-			uiViewLoad.login()
-		})
-
-		window.app.eventBus.on("not_valid_session", (error) => {
+		window.app.eventBus.on("invalid_session", (error) => {
 			antd.notification.open({
 				message: "Invalid Session",
 				description: error,
@@ -69,6 +45,7 @@ export default class BaseLayout extends React.Component {
 
 	render() {
 		const Children = (props) => React.cloneElement(this.props.children, props)
+
 		return (
 			<antd.Layout style={{ height: "100%" }}>
 				<Drawer {...this.props} />
