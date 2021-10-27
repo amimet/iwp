@@ -6,7 +6,11 @@ export default {
         {
             initialization: [
                 async (app, main) => {
-                    main.connectWithApp = (component) => {
+                    app.connectWithApp = (component) => {
+                        if (React.isValidElement(component)) {
+                          return React.cloneElement(component, {app})  
+                        }
+
                         return React.createElement(component, { app: app })
                     }
 

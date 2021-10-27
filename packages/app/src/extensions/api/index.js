@@ -29,11 +29,11 @@ export default {
                 createBridge: async () => {
                     const getSessionContext = () => {
                         const obj = {}
-                        const storagedToken = Session.storagedToken
+                        const token = Session.token
 
-                        if (typeof storagedToken !== "undefined") {
+                        if (typeof token !== "undefined") {
                             obj.headers = {
-                                Authorization: `Bearer ${storagedToken ?? null}`,
+                                Authorization: `Bearer ${token ?? null}`,
                             }
                         }
 
