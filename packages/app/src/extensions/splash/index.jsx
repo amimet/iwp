@@ -1,8 +1,9 @@
 import React from "react"
 import ReactDOM from "react-dom"
+
 import "./index.less"
 
-const Splash = ({ props, logo }) => {
+export const SplashComponent = ({ props = {}, logo }) => {
 	return (
 		<div className="splash_wrapper">
 			<div {...props.logo} className="splash_logo">
@@ -12,7 +13,7 @@ const Splash = ({ props, logo }) => {
 	)
 }
 
-export default (params = {}) => {
+export const extension = (params = {}) => {
 	return {
 		key: "splash",
 		expose: [
@@ -32,7 +33,7 @@ export default (params = {}) => {
                         `
 
 						document.body.appendChild(splashElement)
-						ReactDOM.render(<Splash logo={params.logo} props={params.props} />, splashElement)
+						ReactDOM.render(<SplashComponent logo={params.logo} props={params.props} />, splashElement)
 
 						const removeSplash = () => {
 							splashElement.style.animation = `${params.preset ?? "fadeOut"} ${fadeOutVelocity ?? 1000}ms`
@@ -49,3 +50,5 @@ export default (params = {}) => {
 		],
 	}
 }
+
+export default extension
