@@ -6,15 +6,19 @@ export default {
         {
             initialization: [
                 async (app, main) => {
-                    app.connectWithApp = (component) => {
-                        if (React.isValidElement(component)) {
-                          return React.cloneElement(component, {app})  
+                    app.connectedContext = (component) => {
+                        let elementProps = {}
+
+                        if (Array.isArray(component.connectContext)) {
+                            component.connectContext.forEach((contextKey) => {
+                                elementProps[contextKey] = app[contextKey]
+                            })
                         }
 
-                        return React.createElement(component, { app: app })
+                        return (props) => React.createElement(component, { ...props, ...elementProps })
                     }
 
-                    main.setToWindowContext("connect", app.connectWithApp)
+                    main.setToWindowContext("connect", app.connectedContext)
                 },
             ],
         },
