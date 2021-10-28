@@ -1,9 +1,8 @@
 import React from "react"
 import { Icons, createIconRender } from "components/icons"
-import { Layout, Menu, Avatar, Button } from "antd"
+import { Layout, Menu, Avatar } from "antd"
 
-import { Settings, ActionsBar } from "components"
-import { Controller } from "core/libs"
+import { Settings } from "components"
 import { SidebarEditor } from "./components"
 
 import config from "config"
@@ -21,15 +20,10 @@ const onClickHandlers = {
 	},
 }
 
-const getStoragedKeys = () => {
-	return window.app.configuration?.sidebar.get()
-}
-
 export default class Sidebar extends React.Component {
 	state = {
-		isHover: false,
-		collapsed: this.props.collapsed ?? window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
 		loading: true,
+		collapsed: this.props.collapsed ?? window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
 		pathResolve: {},
 		menus: {},
 		extraItems: {
@@ -38,8 +32,14 @@ export default class Sidebar extends React.Component {
 		},
 	}
 
+	collapseDebounce = null
+
 	componentDidMount = () => {
 		this.loadSidebarItems()
+	}
+
+	getStoragedKeys = () => {
+		return window.app.configuration?.sidebar.get()
 	}
 
 	appendItem = (item = {}) => {
@@ -75,7 +75,7 @@ export default class Sidebar extends React.Component {
 		})
 
 		// filter undefined to avoid error
-		let keys = (getStoragedKeys() ?? defaultSidebarItems).filter((key) => {
+		let keys = (this.getStoragedKeys() ?? defaultSidebarItems).filter((key) => {
 			if (typeof items[key] !== "undefined") {
 				return true
 			}
@@ -187,7 +187,7 @@ export default class Sidebar extends React.Component {
 		if (to) {
 			window.app.eventBus.emit("cleanAll")
 		} else {
-			if (this.itemsMap !== getStoragedKeys()) {
+			if (this.itemsMap !== this.getStoragedKeys()) {
 				this.loadSidebarItems()
 			}
 		}
@@ -196,15 +196,26 @@ export default class Sidebar extends React.Component {
 	}
 
 	toogleCollapse = (to) => {
-		this.setState({ collapsed: to ?? !this.state.collapsed })
+		if(window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.props.editMode ){
+			this.setState({ collapsed: to ?? !this.state.collapsed })
+		}else {
+			this.setState({ collapsed: false })
+		}
 	}
 
-	onMouseEnter = (event) => {
-		this.setState({ isHover: true })
+	onMouseEnter = () => {
+		clearTimeout(this.collapseDebounce)
+		this.collapseDebounce = null
+
+		if (this.state.collapsed) {
+			this.toogleCollapse(false)
+		}
 	}
 
-	handleMouseLeave = (event) => {
-		this.setState({ isHover: false })
+	handleMouseLeave = () => {
+		if (!this.state.collapsed) {
+			this.collapseDebounce = setTimeout(() => {this.toogleCollapse(true)}, 500)
+		}		
 	}
 
 	renderExtraItems = (position) => {
@@ -225,25 +236,6 @@ export default class Sidebar extends React.Component {
 		if (this.state.loading) return null
 
 		const { user } = this.props
-
-		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.props.editMode) {
-			while (this.state.isHover && this.state.collapsed) {
-				this.toogleCollapse(false)
-				break
-			}
-			while (!this.state.isHover && !this.state.collapsed) {
-				const delay = 500
-				setTimeout(() => {
-					this.toogleCollapse(true)
-				}, delay)
-
-				break
-			}
-		} else {
-			if (this.state.collapsed) {
-				this.toogleCollapse(false)
-			}
-		}
 
 		return (
 			<Sider
