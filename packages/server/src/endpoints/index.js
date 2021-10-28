@@ -20,7 +20,7 @@ module.exports = [
     {
         route: "/roles",
         method: "GET",
-        fn: "RolesController.getAll",
+        fn: "RolesController.get",
     },
     {
         route: "/session",

@@ -1,19 +1,22 @@
-import { Role } from '../../models'
+import { Role, User } from '../../models'
+import { selectValues } from "../../lib"
 
 export const RolesController = {
-    getAll: async (req, res, next) => {
-        const roles = await Role.find()
-        
-        return res.json(roles)
-    },
-    get: (req, res, next) => {
-        Role.find().then((data) => {
-            if (!data) {
-                return res.status(404).json("No roles founded")
+    get: selectValues(["user_id", "username"], async (req, res) => {
+        const { user_id, username } = req.selectedValues
+
+        if (typeof user_id !== "undefined" || typeof username !== "undefined") {
+            const user = await User.findOne(req.selectedValues)
+            if (!user) {
+                return res.status(404).json({ error: "No user founded" })
             }
-            return res.json(data)
-        })
-    },
+            return res.json(user.roles)
+        }
+
+        const roles = await Role.find({})
+
+        return res.json(roles)
+    }),
     set: (req, res, next) => {
         const { name, description } = req.body
         Role.findOne({ name }).then((data) => {
