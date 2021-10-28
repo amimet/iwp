@@ -7,6 +7,8 @@ import classnames from "classnames"
 import "./index.less"
 
 export default class Users extends React.Component {
+	static connectContext = ["apiBridge"]
+
 	state = {
 		data: null,
 		error: null,
@@ -15,7 +17,7 @@ export default class Users extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		await this.props.api.get
+		await this.props.apiBridge.get
 			.users()
 			.then((data) => {
 				this.setState({ data })
