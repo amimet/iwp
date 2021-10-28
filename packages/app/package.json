@@ -1,6 +1,6 @@
 {
   "name": "amimet_admin",
-  "version": "0.8.4",
+  "version": "0.10.0",
   "license": "MIT",
   "scripts": {
     "dev": "evite dev",
