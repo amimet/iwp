@@ -145,6 +145,7 @@ export default class SelectableList extends React.Component {
 				return (
 					<div
 						key={_key}
+						id={_key}
 						onClick={() => this.onClickKey(_key)}
 						className={classnames("selectableList_item", this.props.itemClassName, {
 							selection: this.state.selectionEnabled,
