@@ -1,7 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
 import { FormGenerator } from 'components'
-import * as session from 'core/models/session'
 
 const formInstance = [
     {
@@ -70,7 +69,7 @@ const formInstance = [
 ]
 
 export default class Login extends React.Component {
-    static connectContext = ["sessionController", "configuration"]
+    static connectContext = ["sessionController"]
 
     async handleSend(values) {
         const payload = {
@@ -78,7 +77,7 @@ export default class Login extends React.Component {
             password: values.password,
             allowRegenerate: values.allowRegenerate,
         }
-        
+
         this.props.sessionController.login(payload, (err, res) => {
             window.currentForms["normal_login"].toogleValidation(false)
             window.currentForms["normal_login"].clearErrors()
@@ -92,7 +91,7 @@ export default class Login extends React.Component {
                 } catch (error) {
                     window.currentForms["normal_login"].handleFormError("result", `${error}`)
                 }
-            }else {
+            } else {
                 if (res.status === 200) {
                     this.onDone()
                 }
@@ -106,15 +105,18 @@ export default class Login extends React.Component {
         }
     }
 
-    componentDidMount() {
-        if (window.headerVisible) {
-            window.toogleHeader(false)
-        }
+    componentWillUnmount() {
+        window.app.SidebarController.toogleVisible(true)
+        window.app.HeaderController.toogleVisible(true)
     }
 
-    componentWillUnmount() {
-        if (!window.headerVisible) {
-            window.toogleHeader(true)
+    componentDidMount() {
+        if (window.app.SidebarController.isVisible()) {
+            window.app.SidebarController.toogleVisible(false)
+        }
+
+        if (window.app.HeaderController.isVisible()) {
+            window.app.HeaderController.toogleVisible(false)
         }
     }
 
