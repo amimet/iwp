@@ -68,7 +68,7 @@ export default class Account extends React.Component {
 		user: null,
 		sessions: null
 	}
-	
+
 	componentDidMount = async () => {
 		const token = Session.decodedToken
 		const query = new URLSearchParams(window.location.search)
@@ -81,7 +81,7 @@ export default class Account extends React.Component {
 				state.isSelf = true
 				state.sessions = await this.props.sessionController.getAllSessions()
 			}
-			
+
 			state.user = await this.props.userController.getData({ username: requestedUser })
 		}
 
@@ -118,7 +118,8 @@ export default class Account extends React.Component {
 				},
 			},
 			componentProps: {
-				onSave: this.handleUpdateUserData
+				onSave: this.handleUpdateUserData,
+				user: this.state.user,
 			},
 		})
 	}
@@ -147,8 +148,16 @@ export default class Account extends React.Component {
 				<div className="account_card">
 					<img src={user.avatar} />
 					<div style={{ margin: "0 15px" }}>
-						<h1>@{user.username}</h1>
-						<span>#{user._id}</span>
+						{Boolean(user.fullName) ?
+							<>
+								<h1>{user.fullName}</h1>
+								<span>@{user.username}#{user._id}</span>
+							</> :
+							<>
+								<h1>@{user.username}</h1>
+								<span>#{user._id}</span>
+							</>
+						}
 					</div>
 					<Roles roles={user.roles} />
 					{this.state.isSelf && this.renderSelfActions()}
