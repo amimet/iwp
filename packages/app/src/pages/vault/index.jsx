@@ -30,6 +30,8 @@ const categoriesKeys = {
 }
 
 
+const api = window.app.apiBridge
+
 class AddVaultDevice extends React.Component {
     state = {
         visible: false,
@@ -338,7 +340,7 @@ export default class Vault extends React.Component {
     }
 
     componentDidMount = async () => {
-        const vault = await this.props.api.get.vault()
+        const vault = await api.get.vault()
         this.setState({ data: vault })
     }
 

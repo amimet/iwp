@@ -3,13 +3,15 @@ import * as antd from "antd"
 import GoogleMap from "components/googleMap"
 import { LoadingSpinner } from "components"
 
+const api = window.app.apiBridge
+
 export default class Geo extends React.Component {
 	state = {
 		data: null,
 	}
 
 	componentDidMount = async () => {
-		const data = await this.props.api.get.regions()
+		const data = await api.get.regions()
 		this.setState({ data })
 	}
 

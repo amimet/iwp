@@ -6,6 +6,8 @@ import { LoadingSpinner, FormGenerator } from 'components'
 
 import { Drawer, Button, Select } from 'antd'
 
+const api = window.app.apiBridge
+
 class ModifyRole extends React.Component {
     handleSubmit(context) {
         console.log(context)
@@ -13,48 +15,48 @@ class ModifyRole extends React.Component {
 
     render() {
         return <FormGenerator
-                    name="roles_createnew"
-                    renderLoadingIcon
-                    onFinish={(context) => this.handleSubmit(context)}
-                    items={[
-                        {
-                            id: "title",
-                            title: "Role name",
-                            element: {
-                                component: "Input"
+            name="roles_createnew"
+            renderLoadingIcon
+            onFinish={(context) => this.handleSubmit(context)}
+            items={[
+                {
+                    id: "title",
+                    title: "Role name",
+                    element: {
+                        component: "Input"
+                    },
+                    item: {
+                        hasFeedback: true,
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Input an name for role',
                             },
-                            item: {
-                                hasFeedback: true,
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: 'Input an name for role',
-                                    },
-                                ],
-                            }
-                        },
-                        {
-                            id: "permissions",
-                            title: "Permissions",
-                            element: {
-                                component: "Select",
-                                props: {
-                                    mode: "multiple",
-                                    allowClear: true,
-                                }
+                        ],
+                    }
+                },
+                {
+                    id: "permissions",
+                    title: "Permissions",
+                    element: {
+                        component: "Select",
+                        props: {
+                            mode: "multiple",
+                            allowClear: true,
+                        }
+                    },
+                    item: {
+                        hasFeedback: true,
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Input an name for Device',
                             },
-                            item: {
-                                hasFeedback: true,
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: 'Input an name for Device',
-                                    },
-                                ],
-                            }
-                        },
-                    ]}
-                />
+                        ],
+                    }
+                },
+            ]}
+        />
     }
 }
 
@@ -63,15 +65,15 @@ export default class Roles extends React.Component {
         data: null,
     }
 
-    componentDidMount = async() => {
-        await this.props.api.get
-        .roles()
-        .then((data) => {
-            this.setState({ data })
-        })
-        .catch((err) => {
-            this.setState({ error: err.message })
-        })
+    componentDidMount = async () => {
+        await api.get
+            .roles()
+            .then((data) => {
+                this.setState({ data })
+            })
+            .catch((err) => {
+                this.setState({ error: err.message })
+            })
     }
 
     openRoleCreator = () => {
@@ -103,7 +105,7 @@ export default class Roles extends React.Component {
                     console.log(roleDescription)
 
                     // TODO: post to api 
-                 
+
                 })
             }
         })
