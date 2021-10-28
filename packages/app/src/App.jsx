@@ -1,23 +1,22 @@
 import React from "react"
 import { Helmet } from "react-helmet"
-import ngProgress from "nprogress"
+import progressBar from "nprogress"
+import * as antd from "antd"
 
-import { NotFound, RenderError, AppLoading } from "components"
-import BaseLayout from "./layout"
+import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
+import { NotFound, RenderError } from "components"
+import { Icons } from "components/icons"
+
 import config from "config"
-
 import Session from "core/models/session"
 import User from "core/models/user"
-
 import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { CreateEviteApp, BindPropsProvider } from "evite"
-import { Subscribe, createStateContainer } from "evite/client/statement"
 import { API, Render, Splash, Debug, connect, theme } from "extensions"
 
 import "theme/index.less"
-
 
 // append method to array prototype
 Array.prototype.move = function (from, to) {
@@ -25,7 +24,7 @@ Array.prototype.move = function (from, to) {
 	return this
 }
 
-const SplashExtension = Splash({
+const SplashExtension = Splash.extension({
 	logo: config.logo.alt,
 	preset: "fadeOut",
 	velocity: 1000,
@@ -39,11 +38,9 @@ const SplashExtension = Splash({
 	},
 })
 
-const AppStatement = createStateContainer({})
-
 class App {
 	static initialize(props) {
-		this.loadBar = ngProgress.configure({ parent: "#root", showSpinner: false })
+		this.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 		this.sessionController = new Session()
 		this.userController = new User()
@@ -56,16 +53,16 @@ class App {
 		this.eventBus = this.contexts.main.eventBus
 
 		this.eventBus.on("top_loadBar_start", () => {
-			this.loadBar.start()
+			this.progressBar.start()
 		})
 		this.eventBus.on("top_loadBar_stop", () => {
-			this.loadBar.done()
+			this.progressBar.done()
 		})
 
 		this.eventBus.on("setLocation", () => {
 			this.eventBus.emit("top_loadBar_start")
 		})
-		this.eventBus.on("setLocationReady", () => {
+		this.eventBus.on("setLocationDone", () => {
 			this.eventBus.emit("top_loadBar_stop")
 		})
 
@@ -96,13 +93,33 @@ class App {
 		this.eventBus.on("invalid_session", () => {
 			this.sessionController.destroySession()
 		})
+
+		this.eventBus.on("invalid_session", (error) => {
+			antd.notification.open({
+				message: "Invalid Session",
+				description: error,
+				icon: <Icons.FieldTimeOutlined />,
+			})
+		})
+
+		this.eventBus.on("setLocation", (to, delay) => {
+			this.handlePageTransition("leave")
+		})
+		this.eventBus.on("setLocationDone", (to, delay) => {
+			this.handlePageTransition("enter")
+		})
+		this.eventBus.on("cleanAll", () => {
+			window.controllers["drawer"].closeAll()
+		})
 	}
 
 	static windowContext() {
 		return {
 			configuration: this.configuration,
 			isValidSession: this.isValidSession,
-			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args)
+			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
+			SidebarController: this.sidebarController,
+			HeaderController: this.headerController,
 		}
 	}
 
@@ -111,15 +128,56 @@ class App {
 			sessionController: this.sessionController,
 			userController: this.userController,
 			configuration: this.configuration,
-			loadBar: this.loadBar,
+			progressBar: this.progressBar,
+		}
+	}
+
+	static staticRenders = {
+		on404: (props) => {
+			return <NotFound />
+		},
+		onRenderError: (props) => {
+			return <RenderError {...props} />
+		},
+		initialization: () => {
+			return <Splash.SplashComponent logo={config.logo.alt} />
 		}
 	}
 
 	state = {
+		// app
 		renderLoading: false,
 		isMobile: false,
+
+		// sidebar
+		sidebarVisible: true,
+		sidebarEditMode: false,
+
+		// header
+		headerVisible: true,
+
+		// app session
 		session: null,
-		data: null
+		data: null,
+	}
+
+	layoutContentRef = React.createRef()
+
+	sidebarController = {
+		toogleVisible: (to) => {
+			this.setState({ sidebarVisible: to ?? !this.state.sidebarVisible })
+		},
+		toogleEdit: (to) => {
+			this.setState({ sidebarEditMode: to ?? !this.state.sidebarEditMode })
+		},
+		isVisible: () => this.state.sidebarVisible,
+	}
+
+	headerController = {
+		toogleVisible: (to) => {
+			this.setState({ headerVisible: to ?? !this.state.headerVisible })
+		},
+		isVisible: () => this.state.headerVisible,
 	}
 
 	isValidSession = async () => {
@@ -155,7 +213,7 @@ class App {
 
 				if (window.location.pathname == "/login") {
 					this.beforeLoginLocation = "/main"
-				}else {
+				} else {
 					this.beforeLoginLocation = window.location.pathname
 				}
 
@@ -183,35 +241,49 @@ class App {
 		this.setState({ renderLoading: to ?? !this.state.renderLoading })
 	}
 
-	render = () => {
-		const Render = this.contexts.app.createPageRender({
-			on404: (props) => {
-				return <NotFound />
-			},
-			onRenderError: (props) => {
-				return <RenderError {...props} />
-			},
-		})
+	handlePageTransition = (state, delay) => {
+		const { current } = this.layoutContentRef
 
+		if (state === "leave") {
+			current.className = `fade-transverse-active fade-transverse-leave-to`
+		} else {
+			current.className = `fade-transverse-active fade-transverse-enter-to`
+		}
+	}
+
+	render() {
 		return (
 			<React.Fragment>
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
+				<antd.Layout style={{ height: "100%" }}>
+					<Drawer />
 
-				<BindPropsProvider
-					user={this.state.user}
-					session={this.state.session}
-				>
-					<BaseLayout>
-						<Render />
-					</BaseLayout>
-				</BindPropsProvider>
+					<Sidebar user={this.state.user} visible={this.state.sidebarVisible} editMode={this.state.sidebarEditMode} />
+
+					<antd.Layout className="app_layout">
+						<Header visible={this.state.headerVisible} />
+
+						<antd.Layout.Content className="app_wrapper">
+							<div ref={this.layoutContentRef}>
+								<BindPropsProvider
+									user={this.state.user}
+									session={this.state.session}
+								>
+									<Render.RenderController staticRenders={App.staticRenders} location={window.location.pathname} />
+								</BindPropsProvider>
+							</div>
+						</antd.Layout.Content>
+					</antd.Layout>
+
+					<Sidedrawer />
+				</antd.Layout>
 			</React.Fragment>
 		)
 	}
 }
 
 export default CreateEviteApp(App, {
-	extensions: [connect, theme, API, Render, SplashExtension, Debug],
+	extensions: [connect, theme, API, Render.extension, SplashExtension, Debug],
 })
