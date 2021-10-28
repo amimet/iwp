@@ -12,7 +12,7 @@ export const EditAccountField = ({ id, component, props, header, handleChange, d
 	const [emittedValue, setEmittedValue] = React.useState(null)
 
 	const debouncedHandleChange = React.useCallback(
-		debounce((value) => handleChange({ id, value }), delay ?? 1000),
+		debounce((value) => handleChange({ id, value }), delay ?? 300),
 		[],
 	)
 
