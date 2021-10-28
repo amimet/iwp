@@ -1,12 +1,12 @@
 import React from "react"
 import { Icons } from "components/Icons"
-import { LoadingSpinner, ActionsBar, SelectableList, QRReader } from "components"
+import { ActionsBar, SelectableList, QRReader } from "components"
 import { hasAdmin } from "core/permissions"
 import moment from "moment"
 import classnames from "classnames"
 import fuse from "fuse.js"
 
-import { Select, Result, Button, Modal, Tag, Badge, Input } from "antd"
+import { Select, Result, Button, Modal, Tag, Skeleton, Input } from "antd"
 
 import { WorkloadCreator, WorkloadDetails } from "./components"
 
@@ -107,7 +107,6 @@ class Workload extends React.Component {
 		this.setState({ workloads })
 	}
 
-	
 	loadWorkloadsFromRegion = async (id) => {
 		this.setState({ loading: true })
 
@@ -263,7 +262,7 @@ class Workload extends React.Component {
 		const indicatorStatus = item.expired ? "expired" : item.status
 
 		return (
-			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} key={item._id}>
+			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} >
 				<div className="header">
 					<div className={classnames("indicator", indicatorStatus)}>
 						<div className="statusText">{indicatorStatus}</div>
@@ -298,6 +297,10 @@ class Workload extends React.Component {
 			)
 		}
 
+		if (list.length === 0) {
+			return <Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
+		}
+
 		return (
 			<SelectableList
 				selectionEnabled={this.state.selectionEnabled}
@@ -319,9 +322,6 @@ class Workload extends React.Component {
 	}
 
 	render() {
-		if (this.state.loading) {
-			return <LoadingSpinner />
-		}
 		return (
 			<div>
 				<div style={{ marginBottom: "10px" }}>
@@ -371,11 +371,7 @@ class Workload extends React.Component {
 					</ActionsBar>
 				</div>
 
-				{this.state.workloads.length === 0 && (
-					<Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
-				)}
-
-				{this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
+				{this.state.loading ? <Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
 			</div>
 		)
 	}
