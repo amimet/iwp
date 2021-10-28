@@ -1,17 +1,15 @@
-import { getCurrentUser } from "core/models/user"
+import User from "core/models/user"
 
 export function hasPermissions() {
 
 }
 
-export function hasAdmin() {
-    const user = getCurrentUser()
-
-    if (!user) {
+export async function hasAdmin() {
+    const roles = await User.roles
+    
+    if (!roles) {
         return false
     }
 
-    // TODO: Check with API
-    
-    return Array.isArray(user.roles) && user.roles.includes("admin")
+    return Array.isArray(roles) && roles.includes("admin")
 }
