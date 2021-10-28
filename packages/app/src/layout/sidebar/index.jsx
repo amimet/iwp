@@ -9,6 +9,7 @@ import { SidebarEditor } from "./components"
 import config from "config"
 import sidebarItems from "schemas/sidebar.json"
 import defaultSidebarItems from "schemas/defaultSidebar.json"
+import classnames from "classnames"
 
 import "./index.less"
 
@@ -28,7 +29,6 @@ export default class Sidebar extends React.Component {
 	state = {
 		isHover: false,
 		collapsed: this.props.collapsed ?? window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
-		editMode: false,
 		loading: true,
 		pathResolve: {},
 		menus: {},
@@ -37,31 +37,13 @@ export default class Sidebar extends React.Component {
 			top: [],
 		},
 	}
-	controller = new Controller({ id: "sidebar", locked: true })
 
 	componentDidMount = () => {
-		this.controller.add(
-			"toogleEdit",
-			(to) => {
-				this.toogleEditMode(to)
-			},
-			{ lock: true },
-		)
-
-		this.controller.add(
-			"toogleCollapse",
-			(to) => {
-				this.setState({ collapsed: to ?? !this.state.collapsed })
-			},
-			{ lock: true },
-		)
-
-		this.controller.add("appendItem", this.appendItem)
 		this.loadSidebarItems()
 	}
 
 	appendItem = (item = {}) => {
-		const { position } = item
+		const { position } = item
 
 		if (typeof position === "undefined" && typeof this.state.extraItems[position] === "undefined") {
 			console.error("Invalid position")
@@ -78,7 +60,7 @@ export default class Sidebar extends React.Component {
 	loadSidebarItems = () => {
 		const items = {}
 		const itemsMap = []
-	
+
 		// parse all items from schema
 		sidebarItems.forEach((item, index) => {
 			items[item.id] = {
@@ -102,7 +84,7 @@ export default class Sidebar extends React.Component {
 		// short items
 		keys.forEach((id, index) => {
 			const item = items[id]
-			
+
 			if (item.locked) {
 				if (item.index !== index) {
 					keys = keys.move(index, item.index)
@@ -197,7 +179,7 @@ export default class Sidebar extends React.Component {
 		return window.app.setLocation(`/${e.key}`, 150)
 	}
 
-	toogleEditMode(to) {
+	toogleEditMode = (to) => {
 		if (typeof to === "undefined") {
 			to = !this.state.editMode
 		}
@@ -211,6 +193,10 @@ export default class Sidebar extends React.Component {
 		}
 
 		this.setState({ editMode: to })
+	}
+
+	toogleCollapse = (to) => {
+		this.setState({ collapsed: to ?? !this.state.collapsed })
 	}
 
 	onMouseEnter = (event) => {
@@ -240,22 +226,22 @@ export default class Sidebar extends React.Component {
 
 		const { user } = this.props
 
-		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.props.editMode) {
 			while (this.state.isHover && this.state.collapsed) {
-				this.controller.toogleCollapse(false)
+				this.toogleCollapse(false)
 				break
 			}
 			while (!this.state.isHover && !this.state.collapsed) {
 				const delay = 500
 				setTimeout(() => {
-					this.controller.toogleCollapse(true)
+					this.toogleCollapse(true)
 				}, delay)
 
 				break
 			}
 		} else {
 			if (this.state.collapsed) {
-				this.controller.toogleCollapse(false)
+				this.toogleCollapse(false)
 			}
 		}
 
@@ -263,11 +249,11 @@ export default class Sidebar extends React.Component {
 			<Sider
 				onMouseEnter={this.onMouseEnter}
 				onMouseLeave={this.handleMouseLeave}
-				theme={this.state.theme}
-				width={this.state.editMode ? 400 : 200}
+				theme={this.props.theme}
+				width={this.props.editMode ? 400 : 200}
 				collapsed={this.state.collapsed}
 				onCollapse={() => this.props.onCollapse()}
-				className={this.state.editMode ? "app_sidebar_sider_edit" : "app_sidebar_sider"}
+				className={classnames("sidebar", { ["edit_mode"]: this.props.editMode, ["hidden"]: !this.props.visible })}
 			>
 				<div className="app_sidebar_header">
 					<div className="app_sidebar_header_logo">
@@ -275,24 +261,24 @@ export default class Sidebar extends React.Component {
 					</div>
 				</div>
 
-				{this.state.editMode && (
+				{this.props.editMode && (
 					<div style={{ height: "100%" }}>
 						<SidebarEditor />
 					</div>
 				)}
 
-				{!this.state.editMode && (
+				{!this.props.editMode && (
 					<div key="menu" className="app_sidebar_menu">
-						<Menu selectable={true} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
+						<Menu selectable={true} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
 							{this.renderMenuItems(this.state.menus)}
 							{this.renderExtraItems("top")}
 						</Menu>
 					</div>
 				)}
 
-				{!this.state.editMode && (
+				{!this.props.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
-						<Menu selectable={false} mode="inline" theme={this.state.theme} onClick={this.handleClick}>
+						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
 							<Menu.Item key="settings" icon={<Icons.Settings />}>
 								Settings
 							</Menu.Item>
