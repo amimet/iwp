@@ -27,9 +27,9 @@ module.exports = (config) => {
         ...aliases,
     }
     
-    config.define = {
-        global: Object()
-    }
+    // config.define = {
+    //     global: Object()
+    // }
 
     config.css = {
         preprocessorOptions: {

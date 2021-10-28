@@ -38,7 +38,7 @@
     "corenode": "^0.28.26",
     "dicebar_lib": "^1.0.0",
     "enquire-js": "^0.2.1",
-    "evite": "^0.8.7",
+    "evite": "^0.8.8",
     "faye": "^1.4.0",
     "feather-reactjs": "^2.0.13",
     "fuse.js": "^6.4.6",
