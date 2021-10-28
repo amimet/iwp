@@ -33,12 +33,12 @@ class ChartGenerator extends React.Component {
 			labels: [],
 			datasets: [],
 		}
-	
+
 		if (!this.Chart) {
 			console.error("Chart type is not valid")
 		}
 	}
-	
+
 	render() {
 		const { Chart } = this
 
@@ -46,26 +46,24 @@ class ChartGenerator extends React.Component {
 			return null
 		}
 
-		return <Chart data={this.state}/>
+		return <Chart data={this.state} />
 	}
 }
 
 export default class Main extends React.Component {
-	static connectContext = ["globalState", "setGlobalState"]
-
-	state = {}
-
-	componentWillUnmount = () => {
-		if (!window.headerVisible) {
-			window.toogleHeader(true)
+	componentWillUnmount() {
+		if (!window.app.HeaderController.isVisible()) {
+			window.app.HeaderController.toogleVisible(true)
+		}
+	}
+	
+	componentDidMount() {
+		if (window.app.HeaderController.isVisible()) {
+			window.app.HeaderController.toogleVisible(false)
 		}
 	}
 
 	render() {
-		if (window.headerVisible) {
-			window.toogleHeader(false)
-		}
-
 		const user = this.props.user ?? {}
 
 		return (
