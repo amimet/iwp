@@ -90,11 +90,13 @@ class App {
 		this.eventBus.on("destroy_session", () => {
 			this.eventBus.emit("forceInitialize")
 		})
-		this.eventBus.on("invalid_session", () => {
-			this.sessionController.destroySession()
+		this.eventBus.on("not_session", () => {
+			window.app.setLocation("/login")
 		})
 
 		this.eventBus.on("invalid_session", (error) => {
+			this.sessionController.forgetLocalSession()
+
 			antd.notification.open({
 				message: "Invalid Session",
 				description: error,
@@ -201,15 +203,8 @@ class App {
 
 			if (!this.session.valid) {
 				// try to regenerate
-				try {
-					// if (this.session.allowRegenerate) {
-					// 	await session.regenerate()
-					// } else {
-					// 	throw new Error(`Session cant be regenerated`)
-					// }
-				} catch (error) {
-					window.app.eventBus.emit("invalid_session", this.session.error)
-				}
+
+				window.app.eventBus.emit("invalid_session", this.session.error)
 
 				if (window.location.pathname == "/login") {
 					this.beforeLoginLocation = "/main"

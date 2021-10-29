@@ -21,7 +21,7 @@ export default class Session {
     static get decodedToken() {
         return this.token && jwt_decode(this.token)
     }
-    
+
     //* BASIC HANDLERS
     login = (payload, callback) => {
         const body = {
@@ -92,7 +92,6 @@ export default class Session {
 
     forgetLocalSession = () => {
         cookies.remove(this.tokenKey)
-        window.app.eventBus.emit("destroy_session")
     }
 
     destroyAllSessions = async () => {
@@ -102,9 +101,10 @@ export default class Session {
         if (!session) {
             return false
         }
-        
+
         const result = await new RequestAdaptor(endpoint, [{ user_id: session.user_id }]).send()
         this.forgetLocalSession()
+        window.app.eventBus.emit("destroy_session")
 
         return result
     }
@@ -117,9 +117,10 @@ export default class Session {
         if (!session || !token) {
             return false
         }
-        
+
         const result = await new RequestAdaptor(endpoint, [{ user_id: session.user_id, token: token }]).send()
         this.forgetLocalSession()
+        window.app.eventBus.emit("destroy_session")
 
         return result
     }
