@@ -120,7 +120,6 @@ class App {
 			configuration: this.configuration,
 			isValidSession: this.isValidSession,
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
-			SidebarController: this.sidebarController,
 			HeaderController: this.headerController,
 		}
 	}
