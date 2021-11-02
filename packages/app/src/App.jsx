@@ -120,7 +120,6 @@ class App {
 			configuration: this.configuration,
 			isValidSession: this.isValidSession,
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
-			HeaderController: this.headerController,
 		}
 	}
 
@@ -150,22 +149,12 @@ class App {
 		renderLoading: false,
 		isMobile: false,
 
-		// header
-		headerVisible: true,
-
 		// app session
 		session: null,
 		data: null,
 	}
 
 	layoutContentRef = React.createRef()
-
-	headerController = {
-		toogleVisible: (to) => {
-			this.setState({ headerVisible: to ?? !this.state.headerVisible })
-		},
-		isVisible: () => this.state.headerVisible,
-	}
 
 	isValidSession = async () => {
 		return await this.sessionController.isCurrentTokenValid()
