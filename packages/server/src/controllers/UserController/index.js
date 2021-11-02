@@ -61,13 +61,13 @@ export const UserController = {
                     return res.status(409).json("Username is already exists")
                 }
 
-                const avatar = AvatarController.generate(req.body.username)
+                const avatar = AvatarController.generate({ seed: req.body.username, type: "micah" })
                 const hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
-
+                
                 let document = new User({
                     username: req.body.username,
                     fullName: req.body.fullName,
-                    avatar: avatar,
+                    avatar: avatar.uri,
                     email: req.body.email,
                     roles: ["registered"],
                     password: hash
