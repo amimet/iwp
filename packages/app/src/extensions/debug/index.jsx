@@ -3,8 +3,6 @@ import { Window } from "components"
 import { Skeleton, Tabs } from "antd"
 
 class DebuggerUI extends React.Component {
-	appBinding = this.props.app
-
 	state = {
 		loading: true,
 		error: null,
@@ -65,9 +63,9 @@ class DebuggerUI extends React.Component {
 		})
 	}
 
-	renderDebugger = (_debugger, context) => {
+	renderDebugger = (_debugger) => {
 		try {
-			return <_debugger {...context} />
+			return React.createElement(window.app.bindContexts(_debugger))
 		} catch (error) {
 			return this.renderError(key, error)
 		}
@@ -87,7 +85,7 @@ class DebuggerUI extends React.Component {
 				{!this.state.active ? (
 					<div> Select an debugger to start </div>
 				) : (
-					this.renderDebugger(this.state.debuggers[this.state.active], { appBinding: this.appBinding })
+					this.renderDebugger(this.state.debuggers[this.state.active])
 				)}
 			</div>
 		)
@@ -95,15 +93,15 @@ class DebuggerUI extends React.Component {
 }
 
 class Debugger {
-	constructor(app, params = {}) {
-		this.app = app
+	constructor(mainContext, params = {}) {
+		this.mainContext = mainContext
 		this.params = { ...params }
 
 		this.bindings = {}
 	}
 
 	openWindow = () => {
-		new Window.DOMWindow({ id: "debugger", children: this.app.connectWithApp(DebuggerUI) }).create()
+		new Window.DOMWindow({ id: "debugger", children: window.app.bindContexts(DebuggerUI) }).create()
 	}
 
 	bind = (id, binding) => {
@@ -123,7 +121,7 @@ export default {
 		{
 			initialization: [
 				async (app, main) => {
-					main.setToWindowContext("debug", new Debugger(app))
+					main.setToWindowContext("debug", new Debugger(main))
 				},
 			],
 		},
