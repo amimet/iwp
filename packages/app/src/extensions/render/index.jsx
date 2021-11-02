@@ -17,7 +17,7 @@ export class RenderController extends React.PureComponent {
 				render = staticRenders.onRenderError ?? <div>
 					Render Error
 				</div>
-				break	
+				break
 			}
 		}
 
@@ -26,7 +26,7 @@ export class RenderController extends React.PureComponent {
 
 	loadRender = async (from, source) => {
 		// TODO: Cache imported modules storaged on memory
-		
+
 		//const isEmpty = window.location.pathname === "/"
 		const aliaser = window.__evite?.aliases["pages"]
 
@@ -47,14 +47,14 @@ export class RenderController extends React.PureComponent {
 		return loadable(async () => {
 			let render = await this.loadRender(key, source)
 
-			return window.app?.connect ? window.app.connect(render) : render
+			return window.app?.bindContexts ? window.app.bindContexts(render) : render
 		})
 	}
 
 	render() {
 		const Page = this.getRender((this.props.location ?? window.location.pathname), this.props.source)
 
-		return <Page {...this.props}/>
+		return <Page {...this.props} />
 	}
 }
 
@@ -64,18 +64,58 @@ export const extension = {
 		{
 			initialization: [
 				async (app, main) => {
+					app.bindContexts = (component) => {
+						let contexts = {
+							main: {},
+							app: {},
+						}
+
+						if (typeof component.bindApp === "string") {
+							if (component.bindApp === "all") {
+								Object.keys(app).forEach((key) => {
+									contexts.app[key] = app[key]
+								})
+							}
+						} else {
+							if (Array.isArray(component.bindApp)) {
+								component.bindApp.forEach((key) => {
+									contexts.app[key] = app[key]
+								})
+							}
+						}
+
+						if (typeof component.bindMain === "string") {
+							if (component.bindMain === "all") {
+								Object.keys(main).forEach((key) => {
+									contexts.main[key] = main[key]
+								})
+							}
+						} else {
+							if (Array.isArray(component.bindMain)) {
+								component.bindMain.forEach((key) => {
+									contexts.main[key] = main[key]
+								})
+							}
+						}
+
+						return (props) => React.createElement(component, { ...props, contexts })
+					}
+
+					main.setToWindowContext("bindContexts", app.bindContexts)
+				},
+				async (app, main) => {
 					const defaultTransitionDelay = 100
 
 					main.history.listen((event) => {
 						switch (event.action) {
 							case "PUSH": {
-								
+
 							}
 							default: {
 								const to = event.location.pathname
 
 								main.eventBus.emit("setLocation", to)
-								
+
 								main.forceUpdate()
 
 								setTimeout(() => {
