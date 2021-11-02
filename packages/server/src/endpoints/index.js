@@ -194,4 +194,22 @@ module.exports = [
         middleware: ["ensureAuthenticated", "privileged"],
         fn: "WorkshiftsController.del",
     },
+    {
+        route: "/reports",
+        method: "GET",
+        middleware: ["ensureAuthenticated"],
+        fn: "ReportsController.get"
+    },
+    {
+        route: "/report",
+        method: "PUT",
+        middleware: ["ensureAuthenticated"],
+        fn: "ReportsController.new"
+    },
+    {
+        route: "/report",
+        method: "delete",
+        middleware: ["ensureAuthenticated"],
+        fn: "ReportsController.delete"
+    },
 ]

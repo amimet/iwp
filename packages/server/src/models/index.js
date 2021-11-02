@@ -25,3 +25,4 @@ export const Contract = mongoose.model('Contract', schemas.Contract, "contracts"
 export const User = mongoose.model('User', schemas.User, "accounts")
 export const Session = mongoose.model('Session', schemas.Session, "sessions")
 export const Workshift = mongoose.model("Workshift", schemas.Workshift, "workshifts")
+export const Report = mongoose.model("Report", schemas.Report, "reports")
