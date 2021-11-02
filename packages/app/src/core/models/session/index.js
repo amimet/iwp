@@ -59,15 +59,10 @@ export default class Session {
         return await new RequestAdaptor(endpoint, [payload], callback).send()
     }
 
-    regenerateToken = () => {
+    regenerateToken = async () => {
         const endpoint = Session.bridge.post.regenerate
 
-        return new RequestAdaptor(endpoint).send()
-            .then((err, data) => {
-                if (!err) {
-                    return storage(data)
-                }
-            })
+        return await new RequestAdaptor(endpoint).send()
     }
 
     //* GETTERS
