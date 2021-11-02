@@ -1,6 +1,6 @@
 const handlers = {
     "edit_sidebar": () => {
-        window.controllers["sidebar"].toogleEdit()
+        window.app.SidebarController.toogleEdit()
     }
 }
 

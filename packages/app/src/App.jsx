@@ -151,10 +151,6 @@ class App {
 		renderLoading: false,
 		isMobile: false,
 
-		// sidebar
-		sidebarVisible: true,
-		sidebarEditMode: false,
-
 		// header
 		headerVisible: true,
 
@@ -164,16 +160,6 @@ class App {
 	}
 
 	layoutContentRef = React.createRef()
-
-	sidebarController = {
-		toogleVisible: (to) => {
-			this.setState({ sidebarVisible: to ?? !this.state.sidebarVisible })
-		},
-		toogleEdit: (to) => {
-			this.setState({ sidebarEditMode: to ?? !this.state.sidebarEditMode })
-		},
-		isVisible: () => this.state.sidebarVisible,
-	}
 
 	headerController = {
 		toogleVisible: (to) => {
@@ -255,7 +241,7 @@ class App {
 				<antd.Layout style={{ height: "100%" }}>
 					<Drawer />
 
-					<Sidebar user={this.state.user} visible={this.state.sidebarVisible} editMode={this.state.sidebarEditMode} />
+					<Sidebar user={this.state.user} />
 
 					<antd.Layout className="app_layout">
 						<Header visible={this.state.headerVisible} />

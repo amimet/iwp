@@ -21,15 +21,33 @@ const onClickHandlers = {
 }
 
 export default class Sidebar extends React.Component {
-	state = {
-		loading: true,
-		collapsed: this.props.collapsed ?? window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
-		pathResolve: {},
-		menus: {},
-		extraItems: {
-			bottom: [],
-			top: [],
-		},
+	constructor(props) {
+		super(props)
+
+		this.state = {
+			editMode: false,
+			visible: true,
+			loading: true,
+			collapsed: window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
+			pathResolve: {},
+			menus: {},
+			extraItems: {
+				bottom: [],
+				top: [],
+			},
+		}
+
+		this.SidebarController = {
+			toogleVisible: (to) => {
+				this.setState({ visible: to ?? !this.state.visible })
+			},
+			toogleEdit: this.toogleEditMode,
+			isVisible: () => this.state.visible,
+			isEditMode: () => this.state.visible,
+			isCollapsed: () => this.state.collapsed,
+		}
+
+		window.app["SidebarController"] = this.SidebarController
 	}
 
 	collapseDebounce = null
@@ -196,7 +214,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	toogleCollapse = (to) => {
-		if(window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.props.editMode ){
+		if(window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode ){
 			this.setState({ collapsed: to ?? !this.state.collapsed })
 		}else {
 			this.setState({ collapsed: false })
@@ -242,10 +260,10 @@ export default class Sidebar extends React.Component {
 				onMouseEnter={this.onMouseEnter}
 				onMouseLeave={this.handleMouseLeave}
 				theme={this.props.theme}
-				width={this.props.editMode ? 400 : 200}
-				collapsed={this.state.collapsed}
+				width={this.state.editMode ? 400 : 200}
+				collapsed={this.state.editMode? false : this.state.collapsed}
 				onCollapse={() => this.props.onCollapse()}
-				className={classnames("sidebar", { ["edit_mode"]: this.props.editMode, ["hidden"]: !this.props.visible })}
+				className={classnames("sidebar", { ["edit_mode"]: this.state.editMode, ["hidden"]: !this.state.visible })}
 			>
 				<div className="app_sidebar_header">
 					<div className="app_sidebar_header_logo">
@@ -253,13 +271,13 @@ export default class Sidebar extends React.Component {
 					</div>
 				</div>
 
-				{this.props.editMode && (
+				{this.state.editMode && (
 					<div style={{ height: "100%" }}>
 						<SidebarEditor />
 					</div>
 				)}
 
-				{!this.props.editMode && (
+				{!this.state.editMode && (
 					<div key="menu" className="app_sidebar_menu">
 						<Menu selectable={true} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
 							{this.renderMenuItems(this.state.menus)}
@@ -268,7 +286,7 @@ export default class Sidebar extends React.Component {
 					</div>
 				)}
 
-				{!this.props.editMode && (
+				{!this.state.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
 							<Menu.Item key="settings" icon={<Icons.Settings />}>
