@@ -69,7 +69,7 @@ const formInstance = [
 ]
 
 export default class Login extends React.Component {
-    static connectContext = ["sessionController"]
+    static bindApp = ["sessionController"]
 
     async handleSend(values) {
         const payload = {
@@ -78,7 +78,7 @@ export default class Login extends React.Component {
             allowRegenerate: values.allowRegenerate,
         }
 
-        this.props.sessionController.login(payload, (err, res) => {
+        this.props.contexts.app.sessionController.login(payload, (err, res) => {
             window.currentForms["normal_login"].toogleValidation(false)
             window.currentForms["normal_login"].clearErrors()
             console.log(res)

@@ -14,7 +14,7 @@ import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { CreateEviteApp, BindPropsProvider } from "evite"
-import { API, Render, Splash, Debug, connect, theme } from "extensions"
+import { API, Render, Splash, Debug, theme } from "extensions"
 
 import "theme/index.less"
 
@@ -177,7 +177,9 @@ class App {
 
 			if (!this.session.valid) {
 				// try to regenerate
-
+				const regeneration = await this.sessionController.regenerateToken()
+				console.log(regeneration)
+				
 				window.app.eventBus.emit("invalid_session", this.session.error)
 
 				if (window.location.pathname == "/login") {
@@ -254,5 +256,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [connect, theme, API, Render.extension, SplashExtension, Debug],
+	extensions: [theme, API, Render.extension, SplashExtension, Debug],
 })

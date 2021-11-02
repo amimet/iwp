@@ -61,7 +61,7 @@ class SelfView extends React.Component {
 }
 
 export default class Account extends React.Component {
-	static connectContext = ["userController", "sessionController"]
+	static bindApp = ["userController", "sessionController"]
 
 	state = {
 		isSelf: false,
@@ -79,10 +79,10 @@ export default class Account extends React.Component {
 		if (requestedUser != null) {
 			if (token.username === requestedUser) {
 				state.isSelf = true
-				state.sessions = await this.props.sessionController.getAllSessions()
+				state.sessions = await this.props.contexts.app.sessionController.getAllSessions()
 			}
 
-			state.user = await this.props.userController.getData({ username: requestedUser })
+			state.user = await this.props.contexts.app.userController.getData({ username: requestedUser })
 		}
 
 		this.setState(state)
