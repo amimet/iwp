@@ -3,54 +3,55 @@ import ReactJson from "react-json-view"
 
 import "./index.less"
 
-export default (props = {}) => {
-	const { appBinding } = props
+export default class EviteDebugger extends React.Component { 
+	static bindMain = "all"
 
-	console.log(appBinding)
-	
-	const getClassname = (classname) => {
+	getClassname(classname) {
 		return `evite-debugger_${classname}`
 	}
 
-	const getExtensions = () => {
+	getExtensions() {
 		const extensions = {}
 
-		Array.from(appBinding.constructorContext.extensions).forEach((extension) => {
+		Array.from(this.props.contexts.main.extensionsKeys).forEach((extension) => {
 			extensions[extension.key] = extension
 		})
 
 		return extensions
 	}
 
-	return (
-		<div>
-			{!appBinding && (
-				<div className={getClassname("warning_bindingDisabled")}>
-					<strong>
-						⚠️ Warning! Cannot access to <code>evite.appBinding</code>, debugger is limited.
-					</strong>
-				</div>
-			)}
-			<div className={getClassname("content")}>
-				<div>
-					<h4>📦 Namespace</h4>
+	render() {
+		const { app, main } = this.props.contexts
+
+		return (
+			<div>
+				<div className={this.getClassname("content")}>
 					<div>
-						<ReactJson name="window.__evite" collapsed="true" src={window.__evite} />
+						<h4>📦 Namespace</h4>
+						<div>
+							<ReactJson name="window.__evite" collapsed="true" src={window.__evite} />
+						</div>
 					</div>
-				</div>
-				<div>
-					<h4>📦 AppContext</h4>
 					<div>
-						<ReactJson name="app" collapsed="true" src={appBinding} />
+						<h4>📦 AppContext</h4>
+						<div>
+							<ReactJson name="app" collapsed="true" src={this.props.contexts.app} />
+						</div>
 					</div>
-				</div>
-				<div>
-					<h4>🧰 Extensions</h4>
 					<div>
-						<ReactJson name="extensions" collapsed="true" src={getExtensions()} />
+						<h4>📦 MainContext</h4>
+						<div>
+							<ReactJson name="app" collapsed="true" src={this.props.contexts.main} />
+						</div>
+					</div>
+					<div>
+						<h4>🧰 Extensions</h4>
+						<div>
+							<ReactJson name="extensions" collapsed="true" src={getExtensions()} />
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	)
+		)
+	}
 }
