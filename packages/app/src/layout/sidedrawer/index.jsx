@@ -1,21 +1,24 @@
 import React from "react"
-import * as antd from "antd"
 import classnames from "classnames"
-import { Controller } from "core/libs"
 
 import "./index.less"
 
 export default class Sidedrawer extends React.Component {
-	state = {
-		render: null,
-	}
-	containerRef = React.createRef()
-	controller = new Controller({ id: "sidedrawer" })
+	constructor(props) {
+		super(props)
+		this.state = {
+			render: null
+		}
 
-	componentDidMount = () => {
-		this.controller.add("render", this._render, { lock: true })
-		this.controller.add("close", this.close, { lock: true })
+		this.SidedrawerController = {
+			render: this._render,
+			close: this._close
+		}
+
+		window.app["SidedrawerController"] = this.SidedrawerController
 	}
+
+	containerRef = React.createRef()
 
 	componentWillUnmount = () => {
 		this.unlistenEscape()
@@ -59,9 +62,9 @@ export default class Sidedrawer extends React.Component {
 	}
 
 	renderComponent = (component) => {
-        if (!component) {
-            return null
-        }
+		if (!component) {
+			return null
+		}
 
 		if (React.isValidElement(component)) {
 			return React.cloneElement(component)

@@ -43,7 +43,7 @@ export default class AppSearcher extends React.Component {
     }
 
     openResults = () => {
-		window.controllers.sidedrawer.render(() => <Results results={this.state.searchResult} />)
+		window.app.SidedrawerController.render(() => <Results results={this.state.searchResult} />)
 	}
 
 	render() {
