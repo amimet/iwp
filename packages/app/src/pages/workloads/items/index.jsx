@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { ActionsBar } from "components"
+import { ActionsBar, FabricCreator } from "components"
 import fuse from "fuse.js"
 
 import "./index.less"
@@ -59,12 +59,20 @@ export default class WorkloadsItems extends React.Component {
 		)
 	}
 
+	createNew = async () => {
+		window.app.DrawerController.open("FabricCreator", FabricCreator, {
+			props: {
+				width: "70%",
+			}
+		})
+	}
+
 	render() {
 		return (
 			<div className="wrapper">
 				<ActionsBar>
 					<div>
-						<antd.Button type="primary" icon={<Icons.Plus />}>
+						<antd.Button onClick={this.createNew} type="primary" icon={<Icons.Plus />}>
 							New
 						</antd.Button>
 					</div>
