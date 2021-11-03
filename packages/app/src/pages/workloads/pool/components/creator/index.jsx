@@ -6,7 +6,6 @@ import { Select, Button, List, Tag, Space, Input, DatePicker, Tabs, Row, Col } f
 import { LoadingSpinner } from "components"
 
 import { WorkloadSelector } from "../index"
-import moment from "moment"
 
 import "../../index.less"
 
@@ -95,7 +94,7 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	addItem = () => {
-		window.controllers.drawer.open("workload_item_selector", WorkloadSelector, {
+		window.app.DrawerController.open("workload_item_selector", WorkloadSelector, {
 			props: {
 				width: "65%",
 			},

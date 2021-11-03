@@ -127,7 +127,7 @@ class Workload extends React.Component {
 			return false
 		}
 
-		window.controllers.drawer.open("workload_details", WorkloadDetails, {
+		window.app.DrawerController.open("workload_details", WorkloadDetails, {
 			componentProps: {
 				id,
 			},
@@ -147,7 +147,7 @@ class Workload extends React.Component {
 	}
 
 	onCreateWorkload = () => {
-		window.controllers.drawer.open("workload_creator", WorkloadCreator, {
+		window.app.DrawerController.open("workload_creator", WorkloadCreator, {
 			props: {
 				width: "55%",
 			},

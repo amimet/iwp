@@ -220,7 +220,7 @@ export class SettingsMenu extends React.Component {
 const controller = {
 	open: (key) => {
 		// TODO: Scroll to content
-		window.controllers.drawer.open("settings", SettingsMenu, {
+		window.app.DrawerController.open("settings", SettingsMenu, {
 			props: {
 				width: "45%",
 			},
@@ -228,7 +228,7 @@ const controller = {
 	},
 
 	close: () => {
-		window.controllers.drawer.close("settings")
+		window.app.DrawerController.close("settings")
 	},
 }
 

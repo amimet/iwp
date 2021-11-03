@@ -109,7 +109,7 @@ export default class Account extends React.Component {
 	}
 
 	openUserEdit = () => {
-		window.controllers.drawer.open("editAccount", AccountEditor, {
+		window.app.DrawerController.open("editAccount", AccountEditor, {
 			props: {
 				keyboard: false,
 				width: "45%",

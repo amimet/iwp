@@ -119,7 +119,7 @@ export default class SidebarEditor extends React.Component {
 			}
 		})
 
-		window.controllers.drawer.open("sidebar_item_selector", Selector, {
+		window.app.DrawerController.open("sidebar_item_selector", Selector, {
 			props: {
 				width: "65%",
 			},

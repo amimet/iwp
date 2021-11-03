@@ -4,8 +4,6 @@ import { Icons } from 'components/icons'
 
 import { LoadingSpinner, FormGenerator } from 'components'
 
-import { Drawer, Button, Select } from 'antd'
-
 const api = window.app.apiBridge
 
 class ModifyRole extends React.Component {
@@ -77,7 +75,7 @@ export default class Roles extends React.Component {
     }
 
     openRoleCreator = () => {
-        window.controllers["drawer"].open("roleCreator", ModifyRole)
+        window.app.DrawerController.open("roleCreator", ModifyRole)
     }
 
     createNewRole() {

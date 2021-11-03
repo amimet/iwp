@@ -111,7 +111,7 @@ class App {
 			this.handlePageTransition("enter")
 		})
 		this.eventBus.on("cleanAll", () => {
-			window.controllers["drawer"].closeAll()
+			window.app.DrawerController.closeAll()
 		})
 	}
 

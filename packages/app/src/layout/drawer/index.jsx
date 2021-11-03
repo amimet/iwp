@@ -1,5 +1,4 @@
 import React from "react"
-import { Controller } from "core/libs"
 import * as antd from "antd"
 import EventEmitter from "@foxify/events"
 
@@ -96,18 +95,21 @@ export class Drawer extends React.Component {
 }
 
 export default class DrawerController extends React.Component {
-	windowController = new Controller({ id: "drawer", locked: true })
+	constructor(props) {
+		super(props)
+		this.state = {
+			addresses: {},
+			refs: {},
+			drawers: [],
+		}
 
-	state = {
-		addresses: {},
-		refs: {},
-		drawers: [],
-	}
+		this.DrawerController = {
+			open: this.open,
+			close: this.close,
+			closeAll: this.closeAll,
+		}
 
-	componentDidMount() {
-		this.windowController.add("open", this.open, { lock: true })
-		this.windowController.add("close", this.close, { lock: true })
-		this.windowController.add("closeAll", this.closeAll, { lock: true })
+		window.app["DrawerController"] = this.DrawerController
 	}
 
 	sendEvent = (id, ...context) => {
