@@ -1,0 +1,88 @@
+.fabric_creator {
+    .name {
+        display: flex;
+        align-items: center;
+        font-size: 45px;
+
+        height: fit-content;
+        line-height: 0;
+
+        input {
+            color: unset;
+            line-height: 0;
+            font-size: 45px;
+            height: fit-content;
+            transition: all 0.2s ease-in-out;
+            border: 0;
+        }
+
+        input:focus {
+            color: #5e5e5e;
+        }
+
+        svg {
+            margin: 0!important;
+            padding-right: 0!important;    
+        }
+
+        .type {
+            border-radius: 10px;
+            height: fit-content;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .type:hover{
+            background-color: antiquewhite;
+        }
+
+        margin-bottom: 20px;
+    }
+
+    .fields {
+        display: flex;
+        flex-direction: column;
+        padding: 0 30px;
+        align-items: center;
+        justify-content: center;
+
+        .wrap {
+            display: flex;
+            flex-wrap: wrap;
+            
+            width: 100%;
+
+            .field {
+                margin: 10px;
+                min-width: 100px;
+                width: fit-content;
+            }
+        }
+
+        .bottom_actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            width: 100px;
+            margin-top: 20px;
+            
+            font-size: 25px;
+            color: #5e5e5e;
+            border: transparent solid 1px;
+            border-radius: 8px;
+
+            transition: all 150ms ease-in-out;
+
+            svg {
+                margin: 0!important;
+                padding-right: 0!important;
+            }
+        }
+
+        .bottom_actions:hover {
+            cursor: pointer;
+            border-color: #5e5e5e;
+        }
+    }
+}
