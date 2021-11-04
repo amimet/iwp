@@ -21,6 +21,11 @@ const FieldsForms = {
             placeholder: "Describe something...",
         }
     },
+    operations: {
+        label: "Operations",
+        type: "input",
+
+    },
 }
 
 //FORMULAS
@@ -73,8 +78,12 @@ export default class FabricCreator extends React.Component {
     state = {
         loading: true,
         values: {},
+
+        fields: [],
+
         defaultFields: [],
         customFields: [],
+
         name: null,
         type: null,
         uuid: null,
@@ -152,34 +161,50 @@ export default class FabricCreator extends React.Component {
         this.setState(state)
     }
 
-    renderFields = (fields) => {
-        return fields.map((field) => {
-            const form = FieldsForms[field]
+    removeField = (key) => {
+        console.log(key)
+    }
 
-            if (typeof form === "undefined") {
-                console.error(`No form available for field [${field}]`)
-                return null
-            }
+    generateFieldRender = (field) => {
+        const { key, style, icon, type, label, updateEvent, props } = field
 
-            const { type, label, icon, updateEvent, style, props } = form
-            const component = FormComponents[type]
-            
-            if (typeof component === "undefined") {
-                console.error(`No component type available for field [${field}]`)
-                return null
-            }
-            
-            let key = `${field}_${Object.keys(this.state.values).length}`
-            
-            return <div key={key} className="field" style={style}>
-                <h4>{icon && createIconRender(icon)}{label}</h4>
-                {React.createElement(component, {
-                    ...props, [updateEvent]: (...args) => {
-                        this.onUpdateValue({ updateEvent, key }, ...args)
-                    },
-                })}
-            </div>
+        const component = FormComponents[type]
+
+        if (typeof component === "undefined") {
+            console.error(`No component type available for field [${key}]`)
+            return null
+        }
+
+        return <div key={key} id={key} className="field" style={style}>
+            <div className="close" onClick={() => { this.removeField(key) }}><Icons.X /></div>
+            <h4>{icon && createIconRender(icon)}{label}</h4>
+            {React.createElement(component, {
+                ...props, [updateEvent]: (...args) => {
+                    this.onUpdateValue({ updateEvent, key }, ...args)
+                },
+            })}
+        </div>
+    }
+
+    generateRendersFieldsByTypes = (...maps) => {
+        const renders = []
+        
+        maps.forEach((fieldsTypes) => {
+            fieldsTypes.forEach((fieldType) => {
+                const form = FieldsForms[fieldType]
+
+                if (typeof form === "undefined") {
+                    console.error(`No form available for field [${fieldType}]`)
+                    return null
+                }
+
+                let key = `${fieldType}_${renders.length}`
+
+                renders.push(this.generateFieldRender({ key: key, ...form }))
+            })
         })
+
+        return renders
     }
 
     render() {
@@ -188,7 +213,8 @@ export default class FabricCreator extends React.Component {
         }
 
         const TypeIcon = FabricItemTypesIcons[this.state.type] && createIconRender(FabricItemTypesIcons[this.state.type])
-        
+        const Renders = () => this.generateRendersFieldsByTypes(this.state.defaultFields, this.state.customFields)
+
         return <div className="fabric_creator">
             <div key="name" className="name">
                 <div className="type">
@@ -200,8 +226,7 @@ export default class FabricCreator extends React.Component {
             </div>
             <div className="fields">
                 <div className="wrap">
-                    {this.renderFields(this.state.defaultFields)}
-                    {this.renderFields(this.state.customFields)}
+                    <Renders />
                 </div>
                 <antd.Dropdown trigger={['click']} placement="topCenter" overlay={this.renderNewCustomFieldMenuSelector}>
                     <div className="bottom_actions">
