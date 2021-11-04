@@ -42,7 +42,6 @@
     .fields {
         display: flex;
         flex-direction: column;
-        padding: 0 30px;
         align-items: center;
         justify-content: center;
 
@@ -56,6 +55,29 @@
                 margin: 10px;
                 min-width: 100px;
                 width: fit-content;
+
+                border-radius: 12px;
+                padding: 10px;
+                border: transparent dashed 1px;
+
+                transition: all 150ms ease-out;
+
+                .close {
+                    color: #8d8d8dc4;
+                    opacity: 0;
+                    position: absolute;
+                    transform: translate(-85%, -100%);
+                    cursor: pointer;
+                    transition: all 150ms ease-out;
+                }
+            }
+
+            .field:hover {
+                border-color: #8d8d8dc4;
+
+                .close {
+                    opacity: 1;
+                }
             }
         }
 
