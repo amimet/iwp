@@ -294,8 +294,8 @@ export default class Sidebar extends React.Component {
 							</Menu.Item>
 
 							<Menu.Item key="account">
-								<div className="sidebar_account_component">
-									<Avatar src={user?.avatar} />
+								<div className="user_avatar">
+									<Avatar shape="square" src={user?.avatar} />
 								</div>
 							</Menu.Item>
 
