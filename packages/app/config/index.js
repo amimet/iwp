@@ -5,7 +5,7 @@ export default {
         alt: "https://dl.amimet.es/branding/amimet_alt/SVG/index.svg"
     },
     api: {
-        address: process.env.NODE_ENV !== 'production'? "https://api.amimet.es" : "https://api.amimet.es",
+        address: process.env.NODE_ENV !== 'production'? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
     },
     theme: {
         "primary-color": "#32b7bb",
