@@ -133,7 +133,7 @@ export default class Users extends React.Component {
 										<div className="user_card_title">
 											<div style={{ width: "100%", height: "33px" }}>
 												<div style={{ float: "left" }}>
-													<h1>{item.fullName ? item.fullName : null}</h1>
+													<h1>{item.fullName ?? item.username}</h1>
 												</div>
 												<div style={{ float: "right" }}>{this.renderRoles(item.roles)}</div>
 											</div>
