@@ -1,17 +1,21 @@
 import { GeoRegion } from '../../models'
+import { selectValues } from "../../lib"
 
 export const RegionController = {
     // TODO: Register new region
-    get: (req, res, next) => {
-        GeoRegion.findOne({ id: req.query.id }).then((response) => {
-            if (response) {
-                return res.json(response)
-            } else {
-                return res.status(404).send("No data found")
-            }
-        })
-    },
-    getAll: (req, res, next) => {
+    new: selectValues(["name", "title", "geo"], async (req, res) => {
+        const { name, title, cords } = req.selectValues
+
+        const region = new GeoRegion({ name, title, cords })
+        await region.save()
+
+        return res.json(region)
+    }),
+    get: selectValues(["name", "title"], async (req, res) => {
+        const region = await GeoRegion.findOne(req.selectValues)
+        return res.json(region)
+    }),
+    getAll: (req, res) => {
         GeoRegion.find().then((data) => {
             return res.json(data)
         })
