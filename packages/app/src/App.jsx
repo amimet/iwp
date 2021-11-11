@@ -14,7 +14,7 @@ import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { CreateEviteApp, BindPropsProvider } from "evite"
-import { API, Render, Splash, Debug, theme } from "extensions"
+import { API, Render, Splash, Debug, theme , Sound } from "extensions"
 
 import "theme/index.less"
 
@@ -112,6 +112,13 @@ class App {
 		})
 		this.eventBus.on("cleanAll", () => {
 			window.app.DrawerController.closeAll()
+		})
+
+		this.eventBus.on("crash", (error) => {
+			antd.notification.error({
+				message: "Fatal error",
+				description: error,
+			})
 		})
 	}
 
@@ -256,5 +263,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [theme, API, Render.extension, SplashExtension, Debug],
+	extensions: [theme, API, Render.extension, Sound.extension, SplashExtension, Debug],
 })
