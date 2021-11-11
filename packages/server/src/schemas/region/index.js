@@ -1,6 +1,5 @@
 export default {
-    id: Number,
-    geo: Object,
-    data: Object,
-    sub: Object,
+    name: Number,
+    title: String,
+    cords: Object,
 }
