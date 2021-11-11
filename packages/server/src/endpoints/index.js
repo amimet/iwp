@@ -117,6 +117,12 @@ module.exports = [
         fn: "RegionController.getAll",
     },
     {
+        route: "/region",
+        method: "PUT",
+        middleware: "ensureAuthenticated",
+        fn: "RegionController.new",
+    },
+    {
         route: "/hasPermissions",
         method: "POST",
         middleware: [
