@@ -1,5 +1,4 @@
 import React from 'react'
-import * as antd from 'antd'
 import { FormGenerator } from 'components'
 
 const formInstance = [
@@ -71,7 +70,9 @@ const formInstance = [
 export default class Login extends React.Component {
     static bindApp = ["sessionController"]
 
-    async handleSend(values) {
+    handleFinish = async (values, ref) => {
+        ref.toogleValidation(true)
+        
         const payload = {
             username: values.username,
             password: values.password,
@@ -79,17 +80,17 @@ export default class Login extends React.Component {
         }
 
         this.props.contexts.app.sessionController.login(payload, (err, res) => {
-            window.currentForms["normal_login"].toogleValidation(false)
-            window.currentForms["normal_login"].clearErrors()
-            console.log(res)
+            ref.toogleValidation(false)
+            ref.clearErrors()
+
             if (err) {
                 try {
                     if (res.status !== 401) {
-                        window.currentForms["normal_login"].handleFormError("result", `${err}`)
+                        ref.error("result", `${err}`)
                     }
-                    window.currentForms["normal_login"].handleFormError("all", `${err}`)
+                    ref.error("all", `${err}`)
                 } catch (error) {
-                    window.currentForms["normal_login"].handleFormError("result", `${error}`)
+                    ref.error("result", `${error}`)
                 }
             } else {
                 if (res.status === 200) {
@@ -128,10 +129,7 @@ export default class Login extends React.Component {
                     renderLoadingIcon
                     className="login-form"
                     items={formInstance}
-                    onFinish={(...context) => {
-                        window.currentForms["normal_login"].toogleValidation(true)
-                        this.handleSend(...context)
-                    }}
+                    onFinish={this.handleFinish}
                 />
             </div>
         )
