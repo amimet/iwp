@@ -13,10 +13,8 @@ class DOMWindow {
 		this.key = 0
 
 		this.root = document.getElementById("app_windows")
-		this.window = document.getElementById(this.id)
-	}
+		this.element = document.getElementById(this.id)
 
-	create = () => {
 		// handle root container
 		if (!this.root) {
 			this.root = document.createElement("div")
@@ -36,24 +34,31 @@ class DOMWindow {
 			this.key = lastChildKey + 1
 		}
 
-		// create window
-		this.window = document.createElement("div")
-		this.window.setAttribute("id", this.id)
-		this.window.setAttribute("key", this.key)
+		this.element = document.createElement("div")
+		this.element.setAttribute("id", this.id)
+		this.element.setAttribute("key", this.key)
 
-		this.root.appendChild(this.window)
+		this.root.appendChild(this.element)
+	}
 
-		// set render
+	render = (fragment) => {
 		ReactDOM.render(
-			<WindowRender {...this.props} id={this.id} key={this.key} destroy={this.destroy} />,
-			this.window,
+			fragment,
+			this.element,
 		)
 
 		return this
 	}
 
+	create = () => {
+		// set render
+		this.render(<WindowRender {...this.props} id={this.id} key={this.key} destroy={this.destroy} />)
+
+		return this
+	}
+
 	destroy = () => {
-		this.window.remove()
+		this.element.remove()
 		return this
 	}
 }
@@ -71,7 +76,7 @@ class WindowRender extends React.Component {
 
 	componentDidMount = () => {
 		this.setDefaultActions()
-		
+
 		if (typeof this.props.actions !== "undefined") {
 			if (Array.isArray(this.props.actions)) {
 				const actions = this.state.actions ?? []
@@ -90,7 +95,7 @@ class WindowRender extends React.Component {
 
 		this.toogleVisibility(true)
 	}
-	
+
 	toogleVisibility = (to) => {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
@@ -149,7 +154,7 @@ class WindowRender extends React.Component {
 		if (!visible) {
 			return null
 		}
-		
+
 		return (
 			<Rnd
 				default={{
