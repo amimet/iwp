@@ -1,19 +1,30 @@
 import React from 'react'
 import * as antd from 'antd'
-import { Icons, createIconRender } from "components/Icons"
+import { Icons as FIcons, createIconRender } from "components/Icons"
+import * as MDIcons from "react-icons/md"
+
+const Icons = {
+    ...FIcons,
+    ...MDIcons
+}
 
 import "./index.less"
 
 const FormComponents = {
     "input": antd.Input,
+    "textarea": antd.Input.TextArea,
+    "select": antd.Select,
 }
 
 // FIELDS
 const FieldsForms = {
     description: {
         label: "Description",
-        type: "input",
+        component: "input",
         updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.target.value
+        },
         style: {
             minWidth: "300px",
         },
@@ -23,8 +34,32 @@ const FieldsForms = {
     },
     operations: {
         label: "Operations",
-        type: "input",
-
+        component: "input",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.target.value
+        },
+    },
+    vaultItemTypeSelector: {
+        label: "Type",
+        component: "select",
+        updateEvent: "onChange",
+        props: {
+            placeholder: "Select a type",
+            children: [
+                <antd.Select.OptGroup label="Computers">
+                    <antd.Select.Option value="computers-desktop">Desktop</antd.Select.Option>
+                    <antd.Select.Option value="computers-laptop">Laptop</antd.Select.Option>
+                    <antd.Select.Option value="computers-phone">Phone</antd.Select.Option>
+                    <antd.Select.Option value="computers-tablet">Tablet</antd.Select.Option>
+                    <antd.Select.Option value="computers-other">Other</antd.Select.Option>
+                </antd.Select.OptGroup>,
+                <antd.Select.OptGroup label="Peripherals">
+                    <antd.Select.Option value="peripherals-monitor">Monitor</antd.Select.Option>
+                    <antd.Select.Option value="peripherals-printer">Printer</antd.Select.Option>
+                </antd.Select.OptGroup>,
+            ]
+        }
     },
 }
 
@@ -57,11 +92,18 @@ const TaskFormula = {
     ]
 }
 
+const VaultItemFormula = {
+    defaultFields: [
+        "vaultItemTypeSelector",
+    ]
+}
+
 const FORMULAS = {
     product: ProductFormula,
     operation: OperationFormula,
     phase: PhaseFormula,
     task: TaskFormula,
+    vaultItem: VaultItemFormula,
 }
 
 // TYPES
@@ -70,9 +112,10 @@ const FabricItemTypesIcons = {
     "operation": "Settings",
     "phase": "GitCommit",
     "task": "Tool",
+    "vaultItem": "Archive",
 }
 
-const FabricItemTypes = ["product", "operation", "phase", "task"]
+const FabricItemTypes = ["product", "operation", "phase", "task", "vaultItem"]
 
 export default class FabricCreator extends React.Component {
     state = {
@@ -80,9 +123,6 @@ export default class FabricCreator extends React.Component {
         values: {},
 
         fields: [],
-
-        defaultFields: [],
-        customFields: [],
 
         name: null,
         type: null,
@@ -94,33 +134,51 @@ export default class FabricCreator extends React.Component {
         this.setState({ loading: false })
     }
 
-    setItemType = (type) => {
+    clearValues = async () => {
+        await this.setState({ values: {} })
+    }
+
+    clearFields = async () => {
+        await this.setState({ fields: [] })
+    }
+
+    setItemType = async (type) => {
         const formulaKeys = Object.keys(FORMULAS)
-        const defaultFields = []
 
         if (formulaKeys.includes(type)) {
             const formula = FORMULAS[type]
+
+            await this.clearValues()
+            await this.clearFields()
+
             formula.defaultFields.forEach(field => {
-                defaultFields.push(field)
+                this.appendFieldByType(field)
             })
+
+            this.setState({ type: type, name: "New item" })
         } else {
             console.error(`Cannot load default fields from formula with type ${type}`)
         }
-
-        this.setState({ type: type, name: `New fabric ${type}`, defaultFields: defaultFields })
     }
 
-    addNewCustomField = (fieldType) => {
-        const customFields = [...this.state.customFields]
-        customFields.push(fieldType)
+    appendFieldByType = (fieldType) => {
+        const form = FieldsForms[fieldType]
 
-        this.setState({ customFields })
+        if (typeof form === "undefined") {
+            console.error(`No form available for field [${fieldType}]`)
+            return null
+        }
+
+        const fields = this.state.fields
+        fields.push(this.generateFieldRender({ type: fieldType, ...form }))
+
+        this.setState({ fields: fields })
     }
 
-    renderNewCustomFieldMenuSelector = () => {
+    renderFieldSelectorMenu = () => {
         return <antd.Menu
             onClick={(e) => {
-                this.addNewCustomField(e.key)
+                this.appendFieldByType(e.key)
             }}
         >
             {Object.keys(FieldsForms).map((field) => {
@@ -152,6 +210,10 @@ export default class FabricCreator extends React.Component {
         </antd.Menu>
     }
 
+    onDone = () => {
+        console.log(this.getValues())
+    }
+
     onUpdateValue = (event, value) => {
         const { updateEvent, key } = event
 
@@ -162,49 +224,47 @@ export default class FabricCreator extends React.Component {
     }
 
     removeField = (key) => {
-        console.log(key)
+        this.setState({ fields: this.state.fields.filter(field => field.key != key) })
+    }
+
+    getValues = () => {
+        return this.state.fields.map((field) => {
+            return {
+                type: field.props.type,
+                value: this.state.values[field.key],
+            }
+        })
     }
 
     generateFieldRender = (field) => {
-        const { key, style, icon, type, label, updateEvent, props } = field
+        let { key, style, type, icon, component, label, updateEvent, props, onUpdate } = field
 
-        const component = FormComponents[type]
+        if (!key) {
+            key = this.state.fields.length
+        }
 
-        if (typeof component === "undefined") {
+        if (typeof FormComponents[component] === "undefined") {
             console.error(`No component type available for field [${key}]`)
             return null
         }
 
-        return <div key={key} id={key} className="field" style={style}>
+        return <div key={key} id={`${type}-${key}`} type={type} className="field" style={style}>
             <div className="close" onClick={() => { this.removeField(key) }}><Icons.X /></div>
             <h4>{icon && createIconRender(icon)}{label}</h4>
-            {React.createElement(component, {
-                ...props, [updateEvent]: (...args) => {
-                    this.onUpdateValue({ updateEvent, key }, ...args)
-                },
-            })}
+            <div className="fieldContent">
+                {React.createElement(FormComponents[component], {
+                    ...props,
+                    value: this.state.values[key],
+                    [updateEvent]: (...args) => {
+                        if (typeof onUpdate === "function") {
+                            return this.onUpdateValue({ updateEvent, key }, onUpdate(...args))
+                        }
+                        return this.onUpdateValue({ updateEvent, key }, ...args)
+                    },
+                })}
+            </div>
+
         </div>
-    }
-
-    generateRendersFieldsByTypes = (...maps) => {
-        const renders = []
-        
-        maps.forEach((fieldsTypes) => {
-            fieldsTypes.forEach((fieldType) => {
-                const form = FieldsForms[fieldType]
-
-                if (typeof form === "undefined") {
-                    console.error(`No form available for field [${fieldType}]`)
-                    return null
-                }
-
-                let key = `${fieldType}_${renders.length}`
-
-                renders.push(this.generateFieldRender({ key: key, ...form }))
-            })
-        })
-
-        return renders
     }
 
     render() {
@@ -213,7 +273,6 @@ export default class FabricCreator extends React.Component {
         }
 
         const TypeIcon = FabricItemTypesIcons[this.state.type] && createIconRender(FabricItemTypesIcons[this.state.type])
-        const Renders = () => this.generateRendersFieldsByTypes(this.state.defaultFields, this.state.customFields)
 
         return <div className="fabric_creator">
             <div key="name" className="name">
@@ -226,13 +285,14 @@ export default class FabricCreator extends React.Component {
             </div>
             <div className="fields">
                 <div className="wrap">
-                    <Renders />
+                    {this.state.fields}
                 </div>
-                <antd.Dropdown trigger={['click']} placement="topCenter" overlay={this.renderNewCustomFieldMenuSelector}>
-                    <div className="bottom_actions">
+                <div className="bottom_actions">
+                    <antd.Dropdown trigger={['click']} placement="topCenter" overlay={this.renderFieldSelectorMenu}>
                         <Icons.Plus />
-                    </div>
-                </antd.Dropdown>
+                    </antd.Dropdown>
+                    <antd.Button onClick={this.onDone}>Done</antd.Button>
+                </div>
             </div>
         </div>
     }
