@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import GoogleMap from "components/googleMap"
 import * as Icons from "react-icons/md"
+import { FormGenerator } from "components"
 
 import "./index.less"
 
@@ -20,26 +21,67 @@ export default class Geo extends React.Component {
 	}
 
 	createNewRegion = async () => {
-		antd.Modal.confirm({
-			title: <div style={{ display: "flex",  }}>
-				<h2><Icons.MdLocationSearching style={{ marginRight: "8px",  }} /> New Location</h2>
-			</div>,
-			icon: false,
-			content: <div className="creator_modal">
-				<div>
-					<h4><Icons.MdOutlineTag /> Name</h4>
-					<div>
-						<antd.Input placeholder="room_100" />
-					</div>
+		window.app.DrawerController.open("new_region_form",
+			() => <div>
+				<div style={{ display: "flex", }}>
+					<h2><Icons.MdLocationSearching style={{ marginRight: "8px", }} /> New Location</h2>
 				</div>
-				<div>
-					<h4><Icons.MdTitle /> Title</h4>
-					<div>
-						<antd.Input placeholder="Room 100" />
-					</div>
-				</div>
+				<FormGenerator
+					name="new_region_form"
+					onFinish={(values, ref) => {
+						console.log(values, ctx)
+					}}
+					items={[
+						{
+							id: "name",
+							element: {
+								component: "Input",
+								icon: <Icons.MdOutlineTag />,
+								placeholder: "New region",
+								props: null
+							},
+							item: {
+								hasFeedback: true,
+								rules: [
+									{
+										required: true,
+										message: 'Please input an name!',
+									},
+								],
+								props: null
+							}
+						},
+						{
+							id: "address",
+							element: {
+								component: "Input",
+								icon: <Icons.MdMyLocation />,
+								placeholder: "Av. de Zaragoza, 70, Pamplona",
+								props: null
+							},
+							item: {
+								hasFeedback: true,
+								props: null
+							}
+						},
+						{
+							id: "submit",
+							withValidation: true,
+							element: {
+								component: "Button",
+								props: {
+									children: "Create",
+									type: "primary",
+									htmlType: "submit"
+								}
+							}
+						},
+					]}
+				/>
 			</div>
-		})
+		)
+
+		return false
 	}
 
 	renderRegions(items) {
