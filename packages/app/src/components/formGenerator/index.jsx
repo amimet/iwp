@@ -31,7 +31,7 @@ const allComponents = {
 }
 
 export default class FormGenerator extends React.Component {
-	FormRef = React.createRef()
+	ref = React.createRef()
 
 	fieldsReferences = {}
 	unsetValues = {}
@@ -43,36 +43,64 @@ export default class FormGenerator extends React.Component {
 		failed: {},
 	}
 
-	handleFinish(payload) {
-		if (typeof this.props.onFinish === "function") {
-			// try to read unset values
-			Object.keys(this.fieldsReferences).forEach((key) => {
-				const ref = this.fieldsReferences[key].current
-
-				if (typeof ref.state !== "undefined") {
-					this.unsetValues[key] = ref.state?.value || ref.state?.checked
-				}
-			})
-
-			// filter discarded values
-			try {
-				const keys = Object.keys(payload)
-				this.discardedValues.forEach((id) => {
-					if (keys.includes(id)) {
-						delete payload[id]
-					}
-				})
-			} catch (error) {
-				// terrible
+	ctx = {
+		clearErrors: () => {
+			this.setState({ failed: {} })
+		},
+		clearForm: () => {
+			this.ctx.clearErrors()
+			this.ctx.toogleValidation(false)
+			this.ref.current.resetFields()
+		},
+		finish: () => this.ref.current.submit(),
+		error: (id, error) => {
+			this.handleFormError(id, error)
+		},
+		shake: (id) => {
+			this.formItemShake(id)
+		},
+		toogleValidation: (to) => {
+			if (typeof to !== "undefined") {
+				return this.setState({ validating: to })
 			}
+			this.setState({ validating: !this.state.validating })
 
-			// fulfil unset values
-			payload = { ...payload, ...this.unsetValues }
+			return this.state.validating
+		},
+		formRef: this.ref,
+	}
 
-			return this.props.onFinish(payload)
+	handleFinish(payload) {
+		if (typeof this.props.onFinish !== "function") {
+			console.error(`onFinish is not an function`)
+			return false
 		}
 
-		console.warn(`onFinish not provided`)
+		// try to read unset values
+		Object.keys(this.fieldsReferences).forEach((key) => {
+			const ref = this.fieldsReferences[key].current
+
+			if (typeof ref.state !== "undefined") {
+				this.unsetValues[key] = ref.state?.value || ref.state?.checked
+			}
+		})
+
+		// filter discarded values
+		try {
+			const keys = Object.keys(payload)
+			this.discardedValues.forEach((id) => {
+				if (keys.includes(id)) {
+					delete payload[id]
+				}
+			})
+		} catch (error) {
+			// terrible
+		}
+
+		// fulfil unset values
+		payload = { ...payload, ...this.unsetValues }
+
+		return this.props.onFinish(payload, this.ctx)
 	}
 
 	formItemShake(id) {
@@ -184,10 +212,9 @@ export default class FormGenerator extends React.Component {
 				return elements.map((field) => {
 					let { item, element } = field
 
-					// check if has an id
+					// if item has no id, return an uncontrolled field
 					if (typeof field.id === "undefined") {
-						console.error("An component does not have an ID provided")
-						return null
+						return React.createElement(allComponents[element.component], element.props)
 					}
 
 					// fulfill
@@ -236,10 +263,6 @@ export default class FormGenerator extends React.Component {
 							}
 							break
 						}
-						case "Divider": {
-							this.discardValueFromId(field.id)
-							break
-						}
 						case "Button": {
 							this.discardValueFromId(field.id)
 							if (field.withValidation) {
@@ -280,8 +303,7 @@ export default class FormGenerator extends React.Component {
 								elementProps.children = element.options.map((option) => {
 									return (
 										<Select.Option key={option.id ?? Math.random} value={option.value ?? option.id}>
-											{" "}
-											{option.name ?? null}{" "}
+											{option.name ?? null}
 										</Select.Option>
 									)
 								})
@@ -334,35 +356,6 @@ export default class FormGenerator extends React.Component {
 			console.warn(`items not provided, nothing to render`)
 			return null
 		}
-		// set handlers to current window
-		if (typeof window.currentForms == "undefined") {
-			window.currentForms = {}
-		}
-
-		window.currentForms[`${this.props.name ?? this.props.id}`] = {
-			clearErrors: () => {
-				this.setState({ failed: {} })
-			},
-			handleFinish: () => this.FormRef.current.submit(),
-			handleFormError: (id, error) => {
-				this.handleFormError(id, error)
-			},
-			formItemShake: (id) => {
-				this.formItemShake(id)
-			},
-			toogleValidation: (to) => {
-				if (typeof to !== "undefined") {
-					return this.setState({ validating: to })
-				}
-				this.setState({ validating: !this.state.validating })
-				// if (typeof(this.props.validationTimeout) !== "number" || timeout) {
-				//     setTimeout(() => {
-				//         this.setState({ validating: !this.state.validating })
-				//     }, this.props.validationTimeout || timeout)
-				// }
-				return this.state.validating
-			},
-		}
 
 		// handle discardedValues
 		if (Array.isArray(this.props.items)) {
@@ -389,7 +382,7 @@ export default class FormGenerator extends React.Component {
 					hideRequiredMark={this.props.hideRequiredMark ?? false}
 					name={this.props.name ?? "new_form"}
 					onFinish={(e) => this.handleFinish(e)}
-					ref={this.FormRef}
+					ref={this.ref}
 					{...this.props.formProps}
 				>
 					{this.renderItems(this.props.items)}
