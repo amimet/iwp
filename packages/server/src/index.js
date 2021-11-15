@@ -41,7 +41,7 @@ class Server {
         this.io = new socketIo.Server(this.ioHttp, {
             maxHttpBufferSize: 100000000,
             connectTimeout: 5000,
-            transports:['websocket','polling'],
+            transports: ['websocket', 'polling'],
             pingInterval: 25 * 1000,
             pingTimeout: 5000,
             allowEIO3: true,
@@ -129,7 +129,7 @@ class Server {
             session: false
         }, (username, password, done) => {
             User.findOne({ username: b64Decode(username) }).select('+password')
-                .then(async (data) => {
+                .then((data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
                     } else if (!bcrypt.compareSync(b64Decode(password), data.password)) {
@@ -142,16 +142,18 @@ class Server {
                 .catch(err => done(err, null, this.options.jwtStrategy))
         }))
 
-        passport.use(new JwtStrategy(this.options.jwtStrategy, (token, done) => {
+        passport.use(new JwtStrategy(this.options.jwtStrategy, (token, callback) => {
             User.findOne({ _id: token.user_id })
-                .then(data => {
+                .then((data) => {
                     if (data === null) {
-                        return done(null, false)
+                        return callback(null, false)
                     } else {
-                        return done(null, data, token)
+                        return callback(null, data, token)
                     }
                 })
-                .catch(err => done(err, null))
+                .catch((err) => {
+                    return callback(err, null)
+                })
         }))
 
         this.server.use(passport.initialize())
