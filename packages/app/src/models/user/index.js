@@ -1,4 +1,3 @@
-import { RequestAdaptor } from 'linebridge/client'
 import Session from '../session'
 
 export default class User {
@@ -13,7 +12,7 @@ export default class User {
             return false
         }
 
-        return User.bridge.get.user(undefined, { username: token.username, user_id: token.user_id })
+        return User.bridge.get.user({ username: token.username, user_id: token.user_id })
     }
 
     static get roles() {
@@ -22,11 +21,19 @@ export default class User {
         if (!token || !User.bridge) {
             return false
         }
-        
-        return User.bridge.get.roles(undefined, { username: token.username })
+
+        return User.bridge.get.roles({ username: token.username })
     }
 
     getData = async (payload, callback) => {
-        return await new RequestAdaptor(User.bridge.get.user, [undefined, { username: payload.username, user_id: payload.user_id }], callback).send()
+        const request = await User.bridge.get.user({ username: payload.username, user_id: payload.user_id }, undefined, {
+            parseData: false
+        })
+
+        if (typeof callback === "function") {
+            callback(request.error, request.response)
+        }
+
+        return request.response.data
     }
 }

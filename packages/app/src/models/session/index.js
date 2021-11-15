@@ -1,4 +1,3 @@
-import { RequestAdaptor } from 'linebridge/client'
 import cookies from 'js-cookie'
 import jwt_decode from "jwt-decode"
 import config from 'config'
@@ -55,28 +54,30 @@ export default class Session {
 
     //* GENERATORS
     generateNewToken = async (payload, callback) => {
-        const endpoint = Session.bridge.post.login
-        return await new RequestAdaptor(endpoint, [payload], callback).send()
+        const request = await Session.bridge.post.login(payload, undefined, {
+            parseData: false
+        })
+
+        if (typeof callback === 'function') {
+            callback(request.error, request.response)
+        }
+
+        return request
     }
 
     regenerateToken = async () => {
-        const endpoint = Session.bridge.post.regenerate
-
-        return await new RequestAdaptor(endpoint).send()
+        return await Session.bridge.post.regenerate()
     }
 
     //* GETTERS
     getAllSessions = async () => {
-        const endpoint = Session.bridge.get.sessions
-
-        return await new RequestAdaptor(endpoint, []).send()
+        return await Session.bridge.get.sessions()
     }
 
     getTokenInfo = async () => {
         const session = Session.token
-        const endpoint = Session.bridge.post.validatesession
 
-        return await endpoint({ session })
+        return await Session.bridge.post.validateSession({ session })
     }
 
     isCurrentTokenValid = async () => {
@@ -91,15 +92,14 @@ export default class Session {
 
     destroyAllSessions = async () => {
         const session = Session.decodedToken
-        const endpoint = Session.bridge.delete.sessions
 
         if (!session) {
             return false
         }
 
-        const result = await new RequestAdaptor(endpoint, [{ user_id: session.user_id }]).send()
+        const result = await Session.bridge.delete.sessions({ user_id: session.user_id })
         this.forgetLocalSession()
-        window.app.eventBus.emit("destroy_session")
+        window.app.eventBus.emit("destroyed_session")
 
         return result
     }
@@ -107,16 +107,17 @@ export default class Session {
     destroyCurrentSession = async () => {
         const token = Session.token
         const session = Session.decodedToken
-        const endpoint = Session.bridge.delete.session
 
         if (!session || !token) {
             return false
         }
 
-        const result = await new RequestAdaptor(endpoint, [{ user_id: session.user_id, token: token }]).send()
+        const result = await Session.bridge.delete.session({ user_id: session.user_id, token: token })
         this.forgetLocalSession()
-        window.app.eventBus.emit("destroy_session")
+        window.app.eventBus.emit("destroyed_session")
 
         return result
     }
+
+    logout = this.destroyCurrentSession
 }
