@@ -2,17 +2,22 @@ import { GeoRegion } from '../../models'
 import { selectValues } from "../../lib"
 
 export const RegionController = {
-    // TODO: Register new region
-    new: selectValues(["name", "title", "geo"], async (req, res) => {
-        const { name, title, cords } = req.selectValues
+    new: selectValues(["name", "address"], async (req, res) => {
+        const { name, address } = req.selectedValues
 
-        const region = new GeoRegion({ name, title, cords })
+        const regions = await GeoRegion.find({ name })
+
+        if (regions.length > 0) {
+            return res.status(409).json({ error: "Region already exists" })
+        }
+
+        const region = new GeoRegion({ name, address })
         await region.save()
 
         return res.json(region)
     }),
-    get: selectValues(["name", "title"], async (req, res) => {
-        const region = await GeoRegion.findOne(req.selectValues)
+    get: selectValues(["name", "address"], async (req, res) => {
+        const region = await GeoRegion.findOne(req.selectedValues)
         return res.json(region)
     }),
     getAll: (req, res) => {
