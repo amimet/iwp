@@ -17,13 +17,14 @@ export default class Users extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		await api.get
-			.users()
+	 	api.get.users()
 			.then((data) => {
+				console.log(data)
 				this.setState({ data })
 			})
 			.catch((err) => {
-				this.setState({ error: err.message })
+				console.log(err)
+				this.setState({ error: err })
 			})
 	}
 
@@ -75,9 +76,11 @@ export default class Users extends React.Component {
 	}
 
 	render() {
-		if (this.state.errror)
+		if (this.state.error)
 			return (
-				<antd.Result>
+				<antd.Result
+					status="error"
+				>
 					<span>{this.state.error}</span>
 				</antd.Result>
 			)
