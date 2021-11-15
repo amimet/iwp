@@ -1,6 +1,5 @@
 import config from 'config'
 import { Bridge } from "linebridge/client"
-import { notification } from "antd"
 import { Session } from "models"
 import io from "socket.io-client"
 
@@ -46,10 +45,7 @@ export default {
                     })
 
                     await bridge.initialize().catch((err) => {
-                        notification.error({
-                            message: "API Bridge",
-                            description: err.message,
-                        })
+                        window.app.eventBus.emit("crash", "Cannot connect with API", err.message)
                     })
 
                     return bridge.endpoints
