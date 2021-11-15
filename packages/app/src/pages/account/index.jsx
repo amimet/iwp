@@ -5,7 +5,7 @@ import { Icons } from "components/Icons"
 import { Roles } from "components"
 import { AccountEditor, SessionsView, StatisticsView } from "./components"
 
-import Session from "core/models/session"
+import { Session } from "models"
 
 import "./index.less"
 

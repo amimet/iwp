@@ -1,4 +1,4 @@
-import User from "core/models/user"
+import { User } from "models"
 
 export function hasPermissions() {
 
@@ -6,7 +6,7 @@ export function hasPermissions() {
 
 export async function hasAdmin() {
     const roles = await User.roles
-    
+
     if (!roles) {
         return false
     }

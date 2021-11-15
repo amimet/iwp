@@ -20,7 +20,7 @@ const ItemTypes = {
 
 import settingList from "schemas/settingsList.json"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
-import * as session from "core/models/session"
+import { Session } from "models"
 
 export class SettingsMenu extends React.Component {
 	state = {
@@ -76,7 +76,7 @@ export class SettingsMenu extends React.Component {
 
 				// fix handlers
 				switch (item.type.toLowerCase()) {
-					case "colorpicker":{
+					case "colorpicker": {
 						item.props.onChange = (value) => {
 							item.props.color = value.hex
 						}
@@ -188,7 +188,7 @@ export class SettingsMenu extends React.Component {
 				<div>
 					<antd.Button
 						onClick={() => {
-							session.logout()
+							Session.logout()
 						}}
 						type="danger"
 					>
