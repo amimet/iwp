@@ -81,9 +81,9 @@ class App {
 		})
 		this.eventBus.on("new_session", () => {
 			this.eventBus.emit("forceInitialize")
-
-			if (this.beforeLoginLocation) {
-				window.app.setLocation(this.beforeLoginLocation)
+		
+			if (window.location.pathname == "/login") {
+				window.app.setLocation(this.beforeLoginLocation ?? "/main")
 				this.beforeLoginLocation = null
 			}
 		})
@@ -102,6 +102,10 @@ class App {
 				description: error,
 				icon: <Icons.FieldTimeOutlined />,
 			})
+
+			this.beforeLoginLocation = window.location.pathname
+			
+			window.app.setLocation("/login")
 		})
 
 		this.eventBus.on("setLocation", (to, delay) => {
@@ -180,7 +184,9 @@ class App {
 		if (typeof Session.token === "undefined") {
 			window.app.eventBus.emit("not_session")
 		} else {
-			this.session = await this.sessionController.getTokenInfo()
+			this.session = await this.sessionController.getTokenInfo().catch((error) => {
+				window.app.eventBus.emit("invalid_session", error)
+			})
 
 			if (!this.session.valid) {
 				// try to regenerate
@@ -188,14 +194,6 @@ class App {
 				console.log(regeneration)
 				
 				window.app.eventBus.emit("invalid_session", this.session.error)
-
-				if (window.location.pathname == "/login") {
-					this.beforeLoginLocation = "/main"
-				} else {
-					this.beforeLoginLocation = window.location.pathname
-				}
-
-				window.app.setLocation("/login")
 			}
 		}
 
