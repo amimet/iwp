@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 
 import { User } from '../../models'
 import SessionController from '../SessionController'
-import { Token } from '../../lib'
+import { Token, selectValues } from '../../lib'
 import AvatarController from 'dicebar_lib'
 
 export const UserController = {
@@ -13,47 +13,24 @@ export const UserController = {
     getSelf: (req, res) => {
         return res.json(req.user)
     },
-    get: async (req, res) => {
-        const { id, username } = req.query
+    get: selectValues(["id", "username"], async (req, res) => {
+        const user = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
 
-        let selector = {}
-
-        if (typeof (id) !== "undefined") {
-            selector = { id }
-        } else if (typeof (username) !== "undefined") {
-            selector = { username }
+        if (!user) {
+            return res.status(404).json("User not exists")
         }
 
-        User.find(selector, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
-            .then((response) => {
-                if (response) {
-                    return res.json(response)
-                } else {
-                    return res.status(404).json("User not exists")
-                }
-            })
-    },
-    getOne: (req, res) => {
-        const { id, username } = req.query
+        return res.json(user)
+    }),
+    getOne: selectValues(["id", "username"], async (req, res) => {
+        const user = await User.findOne(req.selectedValues)
 
-        let selector = {}
-
-        if (typeof (id) !== "undefined") {
-            selector = { id }
-        } else if (typeof (username) !== "undefined") {
-            selector = { username }
+        if (!user) {
+            return res.status(404).json({error: "User not exists"})
         }
-
-        User.findOne(selector)
-            .then((response) => {
-                if (response) {
-                    return res.json(response)
-                } else {
-                    res.status(404)
-                    return res.json("User not exists")
-                }
-            })
-    },
+        
+        return res.json(user)
+    }),
     register: (req, res, next) => {
         User.findOne({ username: req.body.username })
             .then((data) => {
