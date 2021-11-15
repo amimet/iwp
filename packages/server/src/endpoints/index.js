@@ -35,7 +35,7 @@ module.exports = [
         fn: "SessionController.deleteAll",
     },
     {
-        route: "/validateSession",
+        route: "/validate_session",
         method: "POST",
         middleware: "useJwtStrategy",
         fn: "SessionController.validate",
@@ -47,31 +47,31 @@ module.exports = [
         fn: "SessionController.get",
     },
     {
-        route: "/itemVault",
+        route: "/item_vault",
         method: "GET",
         middleware: "ensureAuthenticated",
         fn: "VaultController.get",
     },
     {
-        route: "/itemVault",
+        route: "/item_vault",
         method: "PUT",
         middleware: "ensureAuthenticated",
         fn: "VaultController.set",
     },
     {
-        route: "/fabricItem",
+        route: "/fabric_item",
         method: "PUT",
         middleware: ["ensureAuthenticated", "privileged"],
         fn: "FabricController.create",
     },
     {
-        route: "/fabricItems",
+        route: "/fabric_items",
         method: "GET",
         middleware: ["ensureAuthenticated"],
         fn: "FabricController.getAll",
     },
     {
-        route: "/fabricItem",
+        route: "/fabric_item",
         method: "GET",
         middleware: ["ensureAuthenticated"],
         fn: "FabricController.get",
@@ -123,7 +123,7 @@ module.exports = [
         fn: "RegionController.new",
     },
     {
-        route: "/hasPermissions",
+        route: "/has_permissions",
         method: "POST",
         middleware: [
             "ensureAuthenticated",
@@ -177,7 +177,7 @@ module.exports = [
         fn: "UserController.register",
     },
     {
-        route: "/isAuth",
+        route: "/is_auth",
         method: "POST",
         middleware: "ensureAuthenticated",
         fn: "UserController.isAuth",
