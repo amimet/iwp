@@ -20,7 +20,7 @@ export default class WorkloadSelector extends React.Component {
 	}
 
 	setItemsFromDB = async () => {
-		api.get.fabricitems()
+		api.get.fabricItems()
 		.then((items) => {
 			this.setState({
 				items: [...this.state.items, ...items],
