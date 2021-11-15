@@ -5,16 +5,16 @@ import * as antd from "antd"
 
 import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
 import { NotFound, RenderError } from "components"
-import { Icons } from "components/icons"
+import { Icons } from "components/Icons"
 
 import config from "config"
-import Session from "core/models/session"
-import User from "core/models/user"
+import { Session, User } from "models"
+
 import SidebarController from "core/models/sidebar"
 import SettingsController from "core/models/settings"
 
 import { CreateEviteApp, BindPropsProvider } from "evite"
-import { API, Render, Splash, Debug, theme , Sound } from "extensions"
+import { API, Render, Splash, Debug, theme, Sound } from "extensions"
 
 import "theme/index.less"
 
@@ -39,7 +39,7 @@ const SplashExtension = Splash.extension({
 })
 
 class App {
-	static initialize(props) {
+	static initialize() {
 		this.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 		this.sessionController = new Session()
@@ -75,37 +75,40 @@ class App {
 		this.eventBus.on("forceReloadSession", async () => {
 			await this.__init_session()
 		})
+		this.eventBus.on("forceToLogin", () => {
+			if (window.location.pathname !== "/login") {
+				this.beforeLoginLocation = window.location.pathname
+			}
+			window.app.setLocation("/login")
+		})
 
 		this.eventBus.on("destroyAllSessions", async () => {
 			await this.sessionController.destroyAllSessions()
 		})
 		this.eventBus.on("new_session", () => {
 			this.eventBus.emit("forceInitialize")
-		
+
 			if (window.location.pathname == "/login") {
 				window.app.setLocation(this.beforeLoginLocation ?? "/main")
 				this.beforeLoginLocation = null
 			}
 		})
-		this.eventBus.on("destroy_session", () => {
-			this.eventBus.emit("forceInitialize")
+		this.eventBus.on("destroyed_session", () => {
+			this.eventBus.emit("forceToLogin")
 		})
-		this.eventBus.on("not_session", () => {
-			window.app.setLocation("/login")
-		})
-
+	
 		this.eventBus.on("invalid_session", (error) => {
-			this.sessionController.forgetLocalSession()
+			if (window.location.pathname !== "/login") {
+				this.sessionController.forgetLocalSession()
 
-			antd.notification.open({
-				message: "Invalid Session",
-				description: error,
-				icon: <Icons.FieldTimeOutlined />,
-			})
+				antd.notification.open({
+					message: "Invalid Session",
+					description: error,
+					icon: <Icons.MdOutlineAccessTimeFilled />,
+				})
 
-			this.beforeLoginLocation = window.location.pathname
-			
-			window.app.setLocation("/login")
+				this.eventBus.emit("forceToLogin")
+			}
 		})
 
 		this.eventBus.on("setLocation", (to, delay) => {
@@ -118,10 +121,11 @@ class App {
 			window.app.DrawerController.closeAll()
 		})
 
-		this.eventBus.on("crash", (error) => {
+		this.eventBus.on("crash", (message, error) => {
+			this.setState({ crash: { message, error } })
 			antd.notification.error({
 				message: "Fatal error",
-				description: error,
+				description: message,
 			})
 		})
 	}
@@ -157,8 +161,8 @@ class App {
 
 	state = {
 		// app
-		renderLoading: false,
 		isMobile: false,
+		crash: false,
 
 		// app session
 		session: null,
@@ -192,7 +196,7 @@ class App {
 				// try to regenerate
 				const regeneration = await this.sessionController.regenerateToken()
 				console.log(regeneration)
-				
+
 				window.app.eventBus.emit("invalid_session", this.session.error)
 			}
 		}
@@ -209,12 +213,9 @@ class App {
 			this.user = await User.data
 			this.setState({ user: this.user })
 		} catch (error) {
-			console.log(error)
+			console.error(error)
+			this.eventBus.emit("crash", "Cannot initialize user data", error)
 		}
-	}
-
-	handleLoading = (to) => {
-		this.setState({ renderLoading: to ?? !this.state.renderLoading })
 	}
 
 	handlePageTransition = (state, delay) => {
@@ -228,6 +229,17 @@ class App {
 	}
 
 	render() {
+		if (this.state.crash) {
+			return <div className="app_crash">
+				<div className="header">
+					<Icons.MdOutlineError />
+					<h1>Crash</h1>
+				</div>
+				<h2>{this.state.crash.message}</h2>
+				<pre>{this.state.crash.error}</pre>
+			</div>
+		}
+
 		return (
 			<React.Fragment>
 				<Helmet>
