@@ -1,5 +1,10 @@
 import React from 'react'
+import config from "config"
+import * as antd from "antd"
 import { FormGenerator } from 'components'
+import { Icons } from 'components/Icons'
+
+import "./index.less"
 
 const formInstance = [
     {
@@ -70,30 +75,24 @@ const formInstance = [
 export default class Login extends React.Component {
     static bindApp = ["sessionController"]
 
-    handleFinish = async (values, ref) => {
-        ref.toogleValidation(true)
-        
+    handleFinish = async (values, ctx) => {
+        ctx.toogleValidation(true)
+
         const payload = {
             username: values.username,
             password: values.password,
             allowRegenerate: values.allowRegenerate,
         }
 
-        this.props.contexts.app.sessionController.login(payload, (err, res) => {
-            ref.toogleValidation(false)
-            ref.clearErrors()
+        this.props.contexts.app.sessionController.login(payload, (error, response) => {
+            ctx.toogleValidation(false)
+            ctx.clearErrors()
 
-            if (err) {
-                try {
-                    if (res.status !== 401) {
-                        ref.error("result", `${err}`)
-                    }
-                    ref.error("all", `${err}`)
-                } catch (error) {
-                    ref.error("result", `${error}`)
-                }
+            if (error) {
+                ctx.shake("all")
+                return ctx.error("result", error)
             } else {
-                if (res.status === 200) {
+                if (response.status === 200) {
                     this.onDone()
                 }
             }
@@ -124,13 +123,22 @@ export default class Login extends React.Component {
     render() {
         return (
             <div className="app_login">
-                <FormGenerator
-                    name="normal_login"
-                    renderLoadingIcon
-                    className="login-form"
-                    items={formInstance}
-                    onFinish={this.handleFinish}
-                />
+                {this.props.session?.valid && <div className="session_available">
+                    <h3><Icons.AlertCircle /> You already have a valid session.</h3>
+                    <div className="session_card">
+                        @{this.props.session.username}
+                    </div>
+                    <antd.Button type="primary" onClick={() => window.app.setLocation(config.app?.mainPath ?? "/main")} >Go to main</antd.Button>
+                </div>}
+                <div>
+                    <FormGenerator
+                        name="normal_login"
+                        renderLoadingIcon
+                        className="login-form"
+                        items={formInstance}
+                        onFinish={this.handleFinish}
+                    />
+                </div>
             </div>
         )
     }
