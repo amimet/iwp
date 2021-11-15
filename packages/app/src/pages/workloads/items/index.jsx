@@ -15,7 +15,7 @@ export default class WorkloadsItems extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		const items = await api.get.fabricitems().catch((error) => {
+		const items = await api.get.fabricItems().catch((error) => {
 			console.error(error)
 			return []
 		})
