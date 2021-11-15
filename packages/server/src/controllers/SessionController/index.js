@@ -5,7 +5,7 @@ import { Token } from '../../lib'
 export const SessionController = {
     regenerate: async (req, res) => {
         jwt.verify(req.jwtToken, req.jwtStrategy.secretOrKey, async (err, decoded) => {
-            if (err && !decoded.allowRegenerate) {
+            if (err && !decoded?.allowRegenerate) {
                 return res.status(403).send("This token is invalid and is not allowed to be regenerated")
             }
 
@@ -90,14 +90,14 @@ export const SessionController = {
             }
         })
 
-        res.json(result)
+        return res.json(result)
     },
     get: async (req, res) => {
         // get current session _id
         const { _id } = req.user
         const sessions = await Session.find({ user_id: _id }, { token: 0 })
 
-        res.json(sessions)
+        return res.json(sessions)
     },
 }
 
