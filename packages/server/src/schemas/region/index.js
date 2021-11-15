@@ -1,5 +1,4 @@
 export default {
-    name: Number,
-    title: String,
-    cords: Object,
+    name: String,
+    address: String,
 }
