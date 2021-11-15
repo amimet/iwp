@@ -50,13 +50,13 @@ export class Drawer extends React.Component {
 		return this.props.controller.sendEvent(this.props.id, ...context)
 	}
 
-	onDone = (...context) => {
+	handleDone = (...context) => {
 		if (typeof this.options.onDone === "function") {
 			this.options.onDone(this, ...context)
 		}
 	}
 
-	onFail = (...context) => {
+	handleFail = (...context) => {
 		if (typeof this.options.onFail === "function") {
 			this.options.onFail(this, ...context)
 		}
@@ -76,8 +76,9 @@ export class Drawer extends React.Component {
 		const componentProps = {
 			...this.options.componentProps,
 			events: this.events,
-			onDone: this.onDone,
-			onFail: this.onFail,
+			close: this.close,
+			handleDone: this.handleDone,
+			handleFail: this.handleFail,
 		}
 
 		return (
