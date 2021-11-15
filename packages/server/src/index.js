@@ -1,4 +1,4 @@
-import linebridge from 'linebridge/server'
+import LinebridgeServer from 'linebridge/server'
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
@@ -28,7 +28,7 @@ class Server {
         this.controllers = require("./controllers")
         this.endpoints = require("./endpoints")
 
-        this.instance = new linebridge.HttpServer({
+        this.instance = new LinebridgeServer({
             listen: "0.0.0.0",
             middlewares: this.middlewares,
             controllers: this.controllers,
