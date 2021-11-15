@@ -13,7 +13,7 @@ export default {
     app: {
         title: packagejson.name,
         siteName: "AmimetApp",
-        mainPath: 'main',
+        mainPath: '/main',
         storage: {
             basics: "user",
             token: "token",
