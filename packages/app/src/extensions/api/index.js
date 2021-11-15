@@ -1,7 +1,7 @@
 import config from 'config'
-import linebridge from "linebridge/client"
+import { Bridge } from "linebridge/client"
 import { notification } from "antd"
-import Session from "core/models/session"
+import { Session } from "models"
 import io from "socket.io-client"
 
 export default {
@@ -11,8 +11,8 @@ export default {
             initialization: [
                 async (app, main) => {
                     app.apiBridge = await app.createBridge()
-                    app.ws = io("http://localhost:9001/main",{ transports: ["websocket"] })
-                    
+                    app.ws = io("http://localhost:9001/main", { transports: ["websocket"] })
+
                     app.ws.on("connect", () => {
                         console.log(app.ws.id)
                     })
@@ -40,15 +40,19 @@ export default {
                         return obj
                     }
 
-                    return linebridge
-                        .createInterface(config.api.address, getSessionContext)
-                        .catch((err) => {
-                            notification.error({
-                                message: `Cannot connect with the API`,
-                                description: err.toString(),
-                            })
-                            console.error(`CANNOT BRIDGE API > ${err}`)
+                    const bridge = new Bridge({
+                        origin: config.api.address,
+                        onRequestContext: getSessionContext,
+                    })
+
+                    await bridge.initialize().catch((err) => {
+                        notification.error({
+                            message: "API Bridge",
+                            description: err.message,
                         })
+                    })
+
+                    return bridge.endpoints
                 },
             },
         },
