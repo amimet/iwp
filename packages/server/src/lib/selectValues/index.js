@@ -3,9 +3,16 @@ export default (query = [], fn) => {
         if (typeof fn === "function") {
             const obj = {}
 
+            if (!req.body) {
+                req.body = {}
+            }
+            if (!req.query) {
+                req.query = {}
+            }
+
             if (Array.isArray(query)) {
                 query.forEach(key => {
-                    const value = req.query[key] ?? req.body[key]
+                    const value = req.body[key] ?? req.query[key]
                     if (typeof value !== "undefined") {
                         obj[key] = value
                     }
