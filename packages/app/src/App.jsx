@@ -94,9 +94,10 @@ class App {
 			}
 		})
 		this.eventBus.on("destroyed_session", () => {
+			this.flushState()
 			this.eventBus.emit("forceToLogin")
 		})
-	
+
 		this.eventBus.on("invalid_session", (error) => {
 			if (window.location.pathname !== "/login") {
 				this.sessionController.forgetLocalSession()
@@ -170,6 +171,10 @@ class App {
 	}
 
 	layoutContentRef = React.createRef()
+
+	flushState = () => {
+		this.setState({ session: null, data: null })
+	}
 
 	isValidSession = async () => {
 		return await this.sessionController.isCurrentTokenValid()
