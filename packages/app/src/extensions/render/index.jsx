@@ -1,7 +1,7 @@
 import React from "react"
 import loadable from "@loadable/component"
 
-export class RenderController extends React.PureComponent {
+export class RenderController extends React.Component {
 	getStaticRenders = (cause, props) => {
 		let render = null
 		const staticRenders = this.props.staticRenders
@@ -49,10 +49,6 @@ export class RenderController extends React.PureComponent {
 
 			return window.app?.bindContexts ? window.app.bindContexts(render) : render
 		})
-	}
-
-	shouldComponentUpdate(){
-		return true
 	}
 
 	render() {
