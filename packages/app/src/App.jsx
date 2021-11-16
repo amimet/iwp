@@ -268,12 +268,9 @@ class App {
 				</Helmet>
 				<antd.Layout style={{ height: "100%" }}>
 					<Drawer />
-
 					<Sidebar user={this.state.user} />
-
 					<antd.Layout className="app_layout">
 						<Header visible={this.state.headerVisible} />
-
 						<antd.Layout.Content className="app_wrapper">
 							<div ref={this.layoutContentRef}>
 								<BindPropsProvider
@@ -285,7 +282,6 @@ class App {
 							</div>
 						</antd.Layout.Content>
 					</antd.Layout>
-
 					<Sidedrawer />
 				</antd.Layout>
 			</React.Fragment>
