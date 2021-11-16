@@ -38,6 +38,20 @@ const SplashExtension = Splash.extension({
 	},
 })
 
+class ThrowCrash {
+	constructor(message, description) {
+		this.message = message
+		this.description = description
+
+		antd.notification.error({
+			message: "Fatal error",
+			description: message,
+		})
+
+		window.app.eventBus.emit("crash", this.message, this.description)
+	}
+}
+
 class App {
 	static initialize() {
 		this.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
@@ -124,10 +138,7 @@ class App {
 
 		this.eventBus.on("crash", (message, error) => {
 			this.setState({ crash: { message, error } })
-			antd.notification.error({
-				message: "Fatal error",
-				description: message,
-			})
+			this.contexts.app.SoundEngine.play("crash")
 		})
 	}
 
@@ -185,13 +196,18 @@ class App {
 	}
 
 	initialization = async () => {
-		await this.__init_session()
-		await this.__init_user()
+		try {
+			await this.contexts.app.initializeDefaultBridge()
+			await this.__init_session()
+			await this.__init_user()
+		} catch (error) {
+			throw new ThrowCrash(error.message, error.description)
+		}
 	}
 
 	__init_session = async () => {
 		if (typeof Session.token === "undefined") {
-			window.app.eventBus.emit("not_session")
+			window.app.eventBus.emit("forceToLogin")
 		} else {
 			this.session = await this.sessionController.getTokenInfo().catch((error) => {
 				window.app.eventBus.emit("invalid_session", error)
@@ -199,8 +215,8 @@ class App {
 
 			if (!this.session.valid) {
 				// try to regenerate
-				const regeneration = await this.sessionController.regenerateToken()
-				console.log(regeneration)
+				//const regeneration = await this.sessionController.regenerateToken()
+				//console.log(regeneration)
 
 				window.app.eventBus.emit("invalid_session", this.session.error)
 			}
@@ -278,5 +294,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [theme, API, Render.extension, Sound.extension, SplashExtension, Debug],
+	extensions: [Sound.extension, Render.extension, theme, API, SplashExtension, Debug],
 })
