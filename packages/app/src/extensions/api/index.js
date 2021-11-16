@@ -7,24 +7,21 @@ export default {
     key: "apiBridge",
     expose: [
         {
-            initialization: [
-                async (app, main) => {
-                    app.apiBridge = await app.createBridge()
-                    app.ws = io("http://localhost:9001/main", { transports: ["websocket"] })
+            mutateContext: {
+                async initializeDefaultBridge() {
+                    this.apiBridge = await this.createBridge()
+                    this.ws = io("http://localhost:9001/main", { transports: ["websocket"] })
 
-                    app.ws.on("connect", () => {
-                        console.log(app.ws.id)
+                    this.ws.on("connect", () => {
+                        console.log(this.ws.id)
                     })
 
-                    app.ws.on("connect_error", (...context) => {
+                    this.ws.on("connect_error", (...context) => {
                         console.log(...context)
                     })
 
-                    main.setToWindowContext("wsApi", app.ws)
-                    main.setToWindowContext("apiBridge", Object.freeze(app.apiBridge))
+                    window.app.apiBridge = this.apiBridge
                 },
-            ],
-            mutateContext: {
                 createBridge: async () => {
                     const getSessionContext = () => {
                         const obj = {}
@@ -45,7 +42,10 @@ export default {
                     })
 
                     await bridge.initialize().catch((err) => {
-                        window.app.eventBus.emit("crash", "Cannot connect with API", err.message)
+                        throw {
+                            message: "Failed to connect with API",
+                            description: err.message,
+                        }
                     })
 
                     return bridge.endpoints
