@@ -2,6 +2,7 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import progressBar from "nprogress"
 import * as antd from "antd"
+import classnames from "classnames"
 
 import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
 import { NotFound, RenderError } from "components"
@@ -73,13 +74,6 @@ class App {
 			this.progressBar.done()
 		})
 
-		this.eventBus.on("setLocation", () => {
-			this.eventBus.emit("top_loadBar_start")
-		})
-		this.eventBus.on("setLocationDone", () => {
-			this.eventBus.emit("top_loadBar_stop")
-		})
-
 		this.eventBus.on("forceInitialize", async () => {
 			await this.initialization()
 		})
@@ -126,11 +120,13 @@ class App {
 			}
 		})
 
-		this.eventBus.on("setLocation", (to, delay) => {
-			this.handlePageTransition("leave")
+		this.eventBus.on("setLocation", () => {
+			this.eventBus.emit("top_loadBar_start")
+			this.setState({ isOnTransition: true })
 		})
-		this.eventBus.on("setLocationDone", (to, delay) => {
-			this.handlePageTransition("enter")
+		this.eventBus.on("setLocationDone", () => {
+			this.eventBus.emit("top_loadBar_stop")
+			this.setState({ isOnTransition: false })
 		})
 		this.eventBus.on("cleanAll", () => {
 			window.app.DrawerController.closeAll()
@@ -175,6 +171,7 @@ class App {
 		// app
 		isMobile: false,
 		crash: false,
+		isOnTransition: false,
 
 		// app session
 		session: null,
@@ -239,16 +236,6 @@ class App {
 		}
 	}
 
-	handlePageTransition = (state, delay) => {
-		const { current } = this.layoutContentRef
-
-		if (state === "leave") {
-			current.className = `fade-transverse-active fade-transverse-leave-to`
-		} else {
-			current.className = `fade-transverse-active fade-transverse-enter-to`
-		}
-	}
-
 	render() {
 		if (this.state.crash) {
 			return <div className="app_crash">
@@ -272,12 +259,12 @@ class App {
 					<antd.Layout className="app_layout">
 						<Header visible={this.state.headerVisible} />
 						<antd.Layout.Content className="app_wrapper">
-							<div ref={this.layoutContentRef}>
+							<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
 								<BindPropsProvider
 									user={this.state.user}
 									session={this.state.session}
 								>
-									<Render.RenderController staticRenders={App.staticRenders} location={window.location.pathname} />
+									<Render.RenderController staticRenders={App.staticRenders} />
 								</BindPropsProvider>
 							</div>
 						</antd.Layout.Content>
