@@ -12,7 +12,7 @@ export default class User {
             return false
         }
 
-        return User.bridge.get.user({ username: token.username, user_id: token.user_id })
+        return User.bridge.get.user(undefined, { username: token.username, _id: token.user_id })
     }
 
     static get roles() {
@@ -26,7 +26,7 @@ export default class User {
     }
 
     getData = async (payload, callback) => {
-        const request = await User.bridge.get.user({ username: payload.username, user_id: payload.user_id }, undefined, {
+        const request = await User.bridge.get.user(undefined, { username: payload.username, _id: payload.user_id }, {
             parseData: false
         })
 
