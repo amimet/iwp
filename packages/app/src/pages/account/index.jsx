@@ -71,9 +71,10 @@ export default class Account extends React.Component {
 
 	componentDidMount = async () => {
 		const token = Session.decodedToken
-		const query = new URLSearchParams(window.location.search)
-		const requestedUser = query.get("username") ?? token?.username
+		const location = window.app.history.location
+		const query = new URLSearchParams(location.search)
 
+		const requestedUser = location.state?.username ?? query.get("username") ?? token?.username
 		let state = this.state
 
 		if (requestedUser != null) {
