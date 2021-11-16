@@ -13,22 +13,22 @@ export const UserController = {
     getSelf: (req, res) => {
         return res.json(req.user)
     },
-    get: selectValues(["id", "username"], async (req, res) => {
+    get: selectValues(["_id", "username"], async (req, res) => {
         const user = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
 
         if (!user) {
-            return res.status(404).json("User not exists")
+            return res.status(404).json({ error: "User not exists" })
         }
 
         return res.json(user)
     }),
-    getOne: selectValues(["id", "username"], async (req, res) => {
+    getOne: selectValues(["_id", "username"], async (req, res) => {
         const user = await User.findOne(req.selectedValues)
 
         if (!user) {
-            return res.status(404).json({error: "User not exists"})
+            return res.status(404).json({ error: "User not exists" })
         }
-        
+
         return res.json(user)
     }),
     register: (req, res, next) => {
@@ -40,7 +40,7 @@ export const UserController = {
 
                 const avatar = AvatarController.generate({ seed: req.body.username, type: "initials" })
                 const hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
-                
+
                 let document = new User({
                     username: req.body.username,
                     fullName: req.body.fullName,
@@ -159,12 +159,12 @@ export const UserController = {
         })
 
         User.findOneAndUpdate({ _id: req.user._id }, req.user)
-        .then(() => {
-            return res.send(req.user)
-        })
-        .catch((err) => {
-            return res.send(500).send(err)
-        })
+            .then(() => {
+                return res.send(req.user)
+            })
+            .catch((err) => {
+                return res.send(500).send(err)
+            })
     },
     update: async (req, res) => {
         // TODO

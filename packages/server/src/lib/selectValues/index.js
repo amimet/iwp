@@ -9,7 +9,7 @@ export default (query = [], fn) => {
             if (!req.query) {
                 req.query = {}
             }
-
+            
             if (Array.isArray(query)) {
                 query.forEach(key => {
                     const value = req.body[key] ?? req.query[key]
