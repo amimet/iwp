@@ -3,7 +3,6 @@ import { Howl } from "howler"
 export class SoundEngine {
     constructor() {
         this.sounds = {}
-        this.initialize()
     }
 
     initialize = async () => {
@@ -25,7 +24,7 @@ export class SoundEngine {
         return sounds
     }
 
-    play(name) {
+    play = (name) => {
         if (this.sounds[name]) {
             this.sounds[name].play()
         }
@@ -39,9 +38,7 @@ export const extension = {
             initialization: [
                 async (app, main) => {
                     app.SoundEngine = new SoundEngine()
-                    main.eventBus.on("crash", () => {
-                        app.SoundEngine.play("crash")
-                    })
+                    await app.SoundEngine.initialize()
                 }
             ]
         }
