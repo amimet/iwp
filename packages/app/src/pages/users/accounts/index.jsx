@@ -17,7 +17,7 @@ export default class Users extends React.Component {
 	}
 
 	componentDidMount = async () => {
-	 	api.get.users()
+		api.get.users()
 			.then((data) => {
 				console.log(data)
 				this.setState({ data })
@@ -57,12 +57,12 @@ export default class Users extends React.Component {
 		})
 	}
 
-	openUser(user) {
+	openUser(username) {
 		if (this.state.selectionEnabled) {
 			return false
 		}
-		
-		window.app.setLocation(`/account?username=${user}`)
+
+		window.app.setLocation(`/account`, { username })
 	}
 
 	renderSelectionBulkActions = () => {
