@@ -51,8 +51,13 @@ export class RenderController extends React.PureComponent {
 		})
 	}
 
+	shouldComponentUpdate(){
+		return true
+	}
+
 	render() {
-		const Page = this.getRender((this.props.location ?? window.location.pathname), this.props.source)
+		const location = this.props.location ?? window.app.history.location.pathname
+		const Page = this.getRender(location, this.props.source)
 
 		return <Page {...this.props} />
 	}
@@ -104,35 +109,29 @@ export const extension = {
 					main.setToWindowContext("bindContexts", app.bindContexts)
 				},
 				async (app, main) => {
-					const defaultTransitionDelay = 100
+					const defaultTransitionDelay = 150
 
 					main.history.listen((event) => {
 						switch (event.action) {
-							case "PUSH": {
-
-							}
 							default: {
-								const to = event.location.pathname
-
-								main.eventBus.emit("setLocation", to)
-
-								main.forceUpdate()
-
-								setTimeout(() => {
-									main.eventBus.emit("setLocationDone", to)
-								}, defaultTransitionDelay)
-								break
+								main.eventBus.emit("setLocationDone")
 							}
 						}
 					})
 
-					main.history.setLocation = (to, delay) => {
+					main.history.setLocation = (to, state) => {
 						if (typeof to !== "string") {
 							console.warn(`Invalid location`)
 							return false
 						}
 
-						return main.history.push(to)
+						main.eventBus.emit("setLocation")
+
+						setTimeout(() => {
+							main.history.push({
+								pathname: to,
+							}, state)
+						}, defaultTransitionDelay)
 					}
 
 					main.setToWindowContext("setLocation", main.history.setLocation)
