@@ -4,18 +4,22 @@ import * as antd from "antd"
 import { SelectableList } from "components"
 
 // http://192.168.1.144:8080/live/srgooglo_ff.m3u8
-const streamsApi = "http://192.168.1.144:1985/api/v1"
+const streamsApi = "http://media.ragestudio.net/api"
 const bridge = axios.create({
     baseURL: streamsApi,
+    auth: {
+        username: "admin",
+        password: "sharedpass1414"
+    }
 })
 
 export default class Streams extends React.Component {
     state = {
-        list: [],
+        list: {},
     }
 
     updateStreamsList = async () => {
-        const streams = ((await bridge.get("/streams")).data).streams
+        const streams = ((await bridge.get("/streams")).data).live
         this.setState({ list: streams })
     }
 
@@ -24,13 +28,14 @@ export default class Streams extends React.Component {
     }
 
     onClickItem = (item) => {
-        window.app.setLocation(`/streams/viewer?key=${item.name}`)
+        window.app.setLocation(`/streams/viewer?key=${item}`)
     }
 
-    renderListItem = (item) => {
-        console.log(item)
-        return <div key={item.id} onClick={() => this.onClickItem(item)}>
-            <h1>@{item.name} #{item.id}</h1>
+    renderListItem = (key) => {
+        const streaming = this.state.list[key]
+        console.log(streaming)
+        return <div key={streaming.publisher.clientId} onClick={() => this.onClickItem(key)}>
+            <h1>@{streaming.publisher.stream} #{streaming.publisher.clientId}</h1>
         </div>
     }
 
@@ -41,7 +46,7 @@ export default class Streams extends React.Component {
                 <SelectableList 
                     selectionEnabled={false}
                     renderItem={this.renderListItem}
-                    items={this.state.list}
+                    items={Object.keys(this.state.list)}
                 />
             </div>
         </div>

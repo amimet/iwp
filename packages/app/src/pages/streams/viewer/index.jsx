@@ -6,7 +6,7 @@ import mpegts from 'mpegts.js'
 
 import "plyr/dist/plyr.css"
 
-const streamsSource = "http://192.168.1.144:8017/live"
+const streamsSource = "http://media.ragestudio.net/live"
 
 export default class StreamViewer extends React.Component {
     state = {
