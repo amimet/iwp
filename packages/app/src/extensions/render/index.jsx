@@ -50,13 +50,16 @@ export const LazyRouteRender = (props) => {
 
 export class RenderRouter extends React.Component {
 	lastPathname = null
+	lastHistoryState = null
 
 	shouldComponentUpdate() {
-		return window.location.pathname !== this.lastPathname
+		return window.location.pathname !== this.lastPathname || this.lastHistoryState !== window.app.history.location.state
 	}
 
 	render() {
 		this.lastPathname = window.location.pathname
+		this.lastHistoryState = window.app.history.location.state
+
 		return LazyRouteRender({ ...this.props, path: this.lastPathname })
 	}
 }
