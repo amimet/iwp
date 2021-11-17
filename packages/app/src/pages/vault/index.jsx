@@ -108,7 +108,7 @@ class AddVaultDevice extends React.Component {
                     </div>
                 }
             >
-               <div className={}>
+               <div>
 
                </div>
             </Drawer>
