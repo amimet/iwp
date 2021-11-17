@@ -148,6 +148,7 @@ class App {
 
 	static appContext() {
 		return {
+			renderRef: this.renderRef,
 			sessionController: this.sessionController,
 			userController: this.userController,
 			configuration: this.configuration,
@@ -156,13 +157,13 @@ class App {
 	}
 
 	static staticRenders = {
-		on404: (props) => {
+		NotFound: (props) => {
 			return <NotFound />
 		},
-		onRenderError: (props) => {
+		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
-		initialization: () => {
+		Initialization: () => {
 			return <Splash.SplashComponent logo={config.logo.alt} />
 		}
 	}
@@ -264,7 +265,7 @@ class App {
 									user={this.state.user}
 									session={this.state.session}
 								>
-									<Render.RenderController staticRenders={App.staticRenders} />
+									<Render.RenderRouter staticRenders={App.staticRenders} />
 								</BindPropsProvider>
 							</div>
 						</antd.Layout.Content>
