@@ -89,12 +89,7 @@ export const extension = {
 					const defaultTransitionDelay = 150
 
 					main.history.listen((event) => {
-						switch (event.action) {
-							default: {
-								main.eventBus.emit("setLocationDone")
-								return
-							}
-						}
+						main.eventBus.emit("setLocationDone")
 					})
 
 					main.history.setLocation = (to, state) => {
