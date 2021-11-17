@@ -22,10 +22,30 @@ export const LazyRouteRender = (props) => {
 		})
 		module = module.default || module
 
-		return ConnectWithApp(module)
-	})  
+		return class extends React.PureComponent {
+			state = {
+				error: null
+			}
 
-	return React.createElement(component, props)
+			componentDidCatch(info, stack) {
+				this.setState({ error: { info, stack } })
+			}
+
+			render() {
+				if (this.state.error) {
+					if (props.staticRenders?.RenderError) {
+						return React.createElement(props.staticRenders?.RenderError, { error: this.state.error })
+					}
+
+					return JSON.stringify(this.state.error)
+				}
+
+				return React.createElement(ConnectWithApp(module), props)
+			}
+		}
+	})
+
+	return React.createElement(component)
 }
 
 export class RenderRouter extends React.Component {
@@ -34,6 +54,7 @@ export class RenderRouter extends React.Component {
 	shouldComponentUpdate() {
 		return window.location.pathname !== this.lastPathname
 	}
+
 	render() {
 		this.lastPathname = window.location.pathname
 		return LazyRouteRender({ ...this.props, path: this.lastPathname })

@@ -1,27 +1,33 @@
-import React from 'react'
+import React from "react"
 import { Result, Button, Typography } from "antd"
 import { CloseCircleOutlined } from "@ant-design/icons"
 
 const { Paragraph, Text } = Typography
 
+const ErrorEntry = (props) => {
+	const { error } = props
+	
+	if (!error) {
+		return <Paragraph>
+			<CloseCircleOutlined style={{
+				color: "red",
+				marginRight: "10px",
+			}} />
+			Unhandled error
+		</Paragraph>
+	}
+
+	return <Paragraph>
+		<CloseCircleOutlined style={{
+			color: "red",
+			marginRight: "10px",
+		}} />
+		{error.info.toString()}
+	</Paragraph>
+}
+
 export default (props) => {
 	let errors = []
-	const getErrors = () => {
-		return errors.map((err) => {
-			if (err instanceof Error) {
-				return (
-					<Paragraph>
-						<CloseCircleOutlined style={{
-							color: "red",
-							marginRight: "10px",
-						}} />
-						{err.toString()}
-					</Paragraph>
-				)
-			}
-			return <div></div>
-		})
-	}
 
 	if (Array.isArray(props.error)) {
 		errors = props.error
@@ -47,7 +53,9 @@ export default (props) => {
 							We have detected the following errors:
 						</Text>
 					</Paragraph>
-					{getErrors()}
+					{errors.map((error) => {
+						return <ErrorEntry error={error} />
+					})}
 				</div>
 			</Result>
 		</div>
