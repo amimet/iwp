@@ -1,61 +1,42 @@
 import React from "react"
 import loadable from "@loadable/component"
 
-export class RenderController extends React.Component {
-	getStaticRenders = (cause, props) => {
-		let render = null
-		const staticRenders = this.props.staticRenders
+export const ConnectWithApp = (component) => {
+	return window.app.bindContexts(component)
+}
 
-		switch (cause) {
-			case "notFound": {
-				render = staticRenders.on404 ?? <div>
-					Not Found
-				</div>
-				break
-			}
-			default: {
-				render = staticRenders.onRenderError ?? <div>
-					Render Error
-				</div>
-				break
-			}
-		}
+export function GetRoutesMap() {
+	const jsxFiles = import.meta.glob('/src/pages/**/**.jsx')
+	const tsxFiles = import.meta.glob('/src/pages/**/**.tsx')
 
-		return () => React.createElement(render, props)
-	}
+	return { ...jsxFiles, ...tsxFiles }
+}
 
-	loadRender = async (from, source) => {
-		// TODO: Cache imported modules storaged on memory
+export const LazyRouteRender = (props) => {
+	const component = loadable(async () => {
+		const location = window.location
+		const path = props.path ?? location.pathname
 
-		//const isEmpty = window.location.pathname === "/"
-		const aliaser = window.__evite?.aliases["pages"]
-
-		const pagePath = `${source ?? aliaser}${from}`
-
-		/* @vite-ignore */
-		let render = await import(pagePath).catch((err) => {
-			const isNotFound = err.message.includes("Failed to fetch dynamically imported module")
-			console.log(err)
-
-			return this.getStaticRenders(isNotFound ? "notFound" : err)
+		let module = await import(`/src/pages/${path}`).catch(() => {
+			return props.staticRenders?.NotFound ?? import("./statics/404")
 		})
+		module = module.default || module
 
-		return render.default || render
+		return ConnectWithApp(module)
+	})  
+
+	return React.createElement(component, props)
+}
+
+export class RenderRouter extends React.Component {
+	lastPathname = null
+
+	shouldComponentUpdate() {
+		return window.location.pathname !== this.lastPathname
 	}
-
-	getRender = (key, source) => {
-		return loadable(async () => {
-			let render = await this.loadRender(key, source)
-
-			return window.app?.bindContexts ? window.app.bindContexts(render) : render
-		})
-	}
-
 	render() {
-		const location = this.props.location ?? window.app.history.location.pathname
-		const Page = this.getRender(location, this.props.source)
-
-		return <Page {...this.props} />
+		this.lastPathname = window.location.pathname
+		return LazyRouteRender({ ...this.props, path: this.lastPathname })
 	}
 }
 
@@ -111,6 +92,7 @@ export const extension = {
 						switch (event.action) {
 							default: {
 								main.eventBus.emit("setLocationDone")
+								return
 							}
 						}
 					})
