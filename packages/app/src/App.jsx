@@ -163,7 +163,7 @@ class App {
 		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
-		Initialization: () => {
+		initialization: () => {
 			return <Splash.SplashComponent logo={config.logo.alt} />
 		}
 	}
