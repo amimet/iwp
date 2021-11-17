@@ -6,7 +6,7 @@ const { Paragraph, Text } = Typography
 
 const ErrorEntry = (props) => {
 	const { error } = props
-	
+
 	if (!error) {
 		return <Paragraph>
 			<CloseCircleOutlined style={{
@@ -53,8 +53,8 @@ export default (props) => {
 							We have detected the following errors:
 						</Text>
 					</Paragraph>
-					{errors.map((error) => {
-						return <ErrorEntry error={error} />
+					{errors.map((error, index) => {
+						return <ErrorEntry key={index} error={error} />
 					})}
 				</div>
 			</Result>
