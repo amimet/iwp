@@ -16,6 +16,7 @@ export { default as ActionsBar } from './ActionsBar'
 export { default as SelectableList } from './SelectableList'
 export { default as ObjectInspector } from './ObjectInspector'
 export { default as FabricCreator } from './FabricCreator'
+export { default as ServerStatus } from './ServerStatus'
 
 export * as QRReader from "./QRReader"
 export * as Window from './RenderWindow'
