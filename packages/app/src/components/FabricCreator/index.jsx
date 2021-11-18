@@ -14,6 +14,7 @@ const FormComponents = {
     "input": antd.Input,
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
+    "datepicker": antd.DatePicker,
 }
 
 // FIELDS
@@ -61,6 +62,39 @@ const FieldsForms = {
             ]
         }
     },
+    vaultItemSerial: {
+        label: "Serial number",
+        component: "input",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.target.value
+        },
+        props: {
+            placeholder: "S/N 00000000X",
+        }
+    },
+    vaultItemManufacturer: {
+        label: "Manufacturer",
+        component: "input",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.target.value
+        },
+        props: {
+            placeholder: "e.g. Hewlett Packard",
+        }
+    },
+    vaultItemManufacturedYear: {
+        label: "Manufactured Year",
+        component: "datepicker",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.year()
+        },
+        props: {
+            picker: "year"
+        }
+    },
 }
 
 //FORMULAS
@@ -94,7 +128,11 @@ const TaskFormula = {
 
 const VaultItemFormula = {
     defaultFields: [
+        // TODO: include location
         "vaultItemTypeSelector",
+        "vaultItemSerial",
+        "vaultItemManufacturer",
+        "vaultItemManufacturedYear",
     ]
 }
 
