@@ -84,6 +84,7 @@ export default class Users extends React.Component {
 					<span>{this.state.error}</span>
 				</antd.Result>
 			)
+
 		if (!this.state.data) return <LoadingSpinner />
 
 		return (
@@ -134,17 +135,15 @@ export default class Users extends React.Component {
 											<antd.Avatar shape="square" src={item.avatar} />
 										</div>
 										<div className="user_card_title">
-											<div style={{ width: "100%", height: "33px" }}>
-												<div style={{ float: "left" }}>
+											<div className="line">
+												<div>
 													<h1>{item.fullName ?? item.username}</h1>
 												</div>
-												<div style={{ float: "right" }}>{this.renderRoles(item.roles)}</div>
+												<div>
+													<h3>#{item._id}</h3>
+												</div>
 											</div>
-											<div>
-												<h3>
-													@{item.username}#{item._id}
-												</h3>
-											</div>
+											<div>{this.renderRoles(item.roles)}</div>
 										</div>
 									</div>
 								)
