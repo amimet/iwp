@@ -2,7 +2,7 @@ import packagejson from '../package.json'
 
 export default {
     logo: {
-        alt: `${window.location.origin}/src/assets/logo_alt.svg`
+        alt: new URL(`../src/assets/logo_alt.svg`, import.meta.url).href
     },
     api: {
         address: process.env.NODE_ENV !== 'production'? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
