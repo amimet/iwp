@@ -262,7 +262,12 @@ export default class FabricCreator extends React.Component {
     }
 
     removeField = (key) => {
-        this.setState({ fields: this.state.fields.filter(field => field.key != key) })
+        let values = this.state.values
+        let fields = this.state.fields.filter(field => field.key != key)
+        
+        delete values[key]
+
+        this.setState({ fields: fields, values: values })
     }
 
     getValues = () => {
