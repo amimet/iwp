@@ -41,6 +41,18 @@ const FieldsForms = {
             return update.target.value
         },
     },
+    location: {
+        label: "Location",
+        component: "select",
+        updateEvent: "onChange",
+        props: {
+            placeholder: "Select a location",
+            children: [
+                // TODO: Fetch locations from api
+                <antd.Select.Option value="none">None</antd.Select.Option>,
+            ]
+        }
+    },
     vaultItemTypeSelector: {
         label: "Type",
         component: "select",
@@ -62,7 +74,7 @@ const FieldsForms = {
             ]
         }
     },
-    vaultItemSerial: {
+    vaultItemSerial: {
         label: "Serial number",
         component: "input",
         updateEvent: "onChange",
@@ -264,7 +276,7 @@ export default class FabricCreator extends React.Component {
     removeField = (key) => {
         let values = this.state.values
         let fields = this.state.fields.filter(field => field.key != key)
-        
+
         delete values[key]
 
         this.setState({ fields: fields, values: values })
