@@ -5,7 +5,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 
 import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
-import { NotFound, RenderError } from "components"
+import { NotFound, RenderError, FabricCreator } from "components"
 import { Icons } from "components/Icons"
 
 import config from "config"
@@ -140,6 +140,13 @@ class App {
 
 	static windowContext() {
 		return {
+			openFabric: () => {
+				window.app.DrawerController.open("FabricCreator", FabricCreator, {
+					props: {
+						width: "70%",
+					}
+				})
+			},
 			configuration: this.configuration,
 			isValidSession: this.isValidSession,
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
