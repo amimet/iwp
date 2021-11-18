@@ -1,5 +1,3 @@
-import crash from './crash.wav'
-
 export default {
-    "crash": crash
+    "crash": new URL('./crash.wav', import.meta.url).href
 }
