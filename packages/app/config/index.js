@@ -2,10 +2,13 @@ import packagejson from '../package.json'
 
 export default {
     logo: {
-        alt: "https://dl.amimet.es/branding/amimet_alt/SVG/index.svg"
+        alt: `${window.location.origin}/src/assets/logo_alt.svg`
     },
     api: {
         address: process.env.NODE_ENV !== 'production'? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
+    },
+    ws: {
+        address: process.env.NODE_ENV !== 'production'? `ws://${window.location.hostname}:3001` : "https://ws.amimet.es",
     },
     theme: {
         "primary-color": "#32b7bb",
