@@ -5,29 +5,43 @@
 }
 
 .region_card {
-	display: flow-root;
+	cursor: pointer;
+
+	display: flex;
+	align-items: center;
+
 	background-color: #ededed;
-	border: #454545 0.5px;
 	border-radius: 8px;
-	padding: 22px 22px;
+	padding: 10px 25px;
+
+	transition: all 150ms ease-in-out;
+
+	h1 {
+		font-size: 22px;
+		margin: 0;
+	}
+}
+
+.region_card:hover {
+	background-color: #f5f5f5;
 }
 
 .create_new {
-    position: sticky;
-    bottom: 0;
-    left: 0;
+	position: sticky;
+	bottom: 0;
+	left: 0;
 
-    width: 100px;
-    height: 20px;
-    background: red;
+	width: 100px;
+	height: 20px;
+	background: red;
 }
 
-.creator_modal{
+.creator_modal {
 	display: flex;
 	flex-direction: column;
 
 	svg {
-		height: 100%!important;
+		height: 100% !important;
 		margin: 0 8px 0 0;
 		line-height: 0;
 		padding: 0;
@@ -38,7 +52,6 @@
 		h4 {
 			display: flex;
 			align-items: center;
-			
 		}
 		> div {
 			margin-left: 15px;

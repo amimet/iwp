@@ -60,8 +60,8 @@
         "icon": "MapPin",
         "children": [
             {
-                "id": "regions",
-                "title": "Regions",
+                "id": "locations",
+                "title": "Locations",
                 "icon": "Map"
             }
         ]

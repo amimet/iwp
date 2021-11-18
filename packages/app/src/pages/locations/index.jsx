@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import GoogleMap from "components/googleMap"
-import * as Icons from "react-icons/md"
+import { Icons } from "components/Icons"
 import { FormGenerator } from "components"
 
 import "./index.less"
@@ -16,21 +16,16 @@ class NewRegionForm extends React.Component {
 		ctx.clearErrors()
 
 		api.put.region({ name, address })
-			.then((err, data) => {
-				console.log(err, data)
-
-				if (response.status !== 200) {
-					ctx.shake("all")
-					ctx.error("result", response.data.error)
-
-					return false
-				}
-
-				this.props.handleDone()
+			.then((data) => {
+				this.props.handleDone(data)
 				this.props.close()
 			})
+			.catch((err) => {
+				ctx.toogleValidation(false)
+				ctx.shake("all")
+				ctx.error("result", err)
 
-
+			})
 	}
 
 	render() {
@@ -104,25 +99,27 @@ export default class Geo extends React.Component {
 		this.setState({ data })
 	}
 
+	appendRegion = (data) => {
+		let update = this.state.data
+		
+		update.push(data)
+
+		this.setState({ data: update })
+	}
+
 	createNewRegion = async () => {
-		window.app.DrawerController.open("new_region_form", NewRegionForm)
+		window.app.DrawerController.open("new_region_form", NewRegionForm, {
+			onDone: (ctx, data) => {
+				this.appendRegion(data)
+			},
+		})
 	}
 
 	renderRegions(items) {
 		return items.map((item) => {
 			return (
 				<div key={item._id} className="region_card">
-					<div style={{ float: "left" }}>
-						<h1>{item.name}</h1>
-					</div>
-					<div style={{ float: "right" }}>
-						{GoogleMap({
-							zoom: 15,
-							lat: 0,
-							lng: 0,
-							markerText: item.name,
-						})}
-					</div>
+					<h1><Icons.MapPin />{item.name}</h1>
 				</div>
 			)
 		})
