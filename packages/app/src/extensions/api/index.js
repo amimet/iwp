@@ -10,17 +10,23 @@ export default {
             mutateContext: {
                 async initializeDefaultBridge() {
                     this.apiBridge = await this.createBridge()
-                    this.ws = io("http://localhost:9001/main", { transports: ["websocket"] })
+                    this.ws = io(config.ws.address, { transports: ["websocket"] })
 
-                    this.ws.on("connect", () => {
-                        console.log(this.ws.id)
+                    this.ws.on("connect", (...context) => {
+                        window.app.eventBus.emit("websocket_connected", ...context)
+                    })
+
+                    this.ws.on("disconnect", (...context) => {
+                        window.app.eventBus.emit("websocket_disconnected", ...context)
                     })
 
                     this.ws.on("connect_error", (...context) => {
-                        console.log(...context)
+                        window.app.eventBus.emit("websocket_connection_error", ...context)
                     })
 
-                    window.app.apiBridge = this.apiBridge
+                    window.app.ws = this.ws
+                    window.app.api = this.apiBridge
+                    window.app.request = this.apiBridge.endpoints
                 },
                 createBridge: async () => {
                     const getSessionContext = () => {
@@ -48,7 +54,7 @@ export default {
                         }
                     })
 
-                    return bridge.endpoints
+                    return bridge
                 },
             },
         },

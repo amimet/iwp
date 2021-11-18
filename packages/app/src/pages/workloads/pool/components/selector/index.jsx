@@ -5,7 +5,7 @@ import { Button, List, Checkbox, InputNumber } from "antd"
 
 import "../../index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 export default class WorkloadSelector extends React.Component {
 	state = {

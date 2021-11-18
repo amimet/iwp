@@ -6,7 +6,7 @@ import classnames from "classnames"
 
 import "./index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 export default class Users extends React.Component {
 	state = {

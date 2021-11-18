@@ -2,7 +2,7 @@ import Session from '../session'
 
 export default class User {
     static get bridge() {
-        return window.app?.apiBridge
+        return window.app?.request
     }
 
     static get data() {

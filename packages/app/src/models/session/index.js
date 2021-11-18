@@ -4,7 +4,7 @@ import config from 'config'
 
 export default class Session {
     static get bridge() {
-        return window.app?.apiBridge
+        return window.app?.request
     }
 
     static tokenKey = config.app?.storage?.token ?? "token"

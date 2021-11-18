@@ -9,7 +9,7 @@ import html2pdf from "html2pdf.js"
 
 import "./index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 const dateFormat = "DD-MM-YYYY hh:mm"
 
 export default class WorkloadDetails extends React.Component {

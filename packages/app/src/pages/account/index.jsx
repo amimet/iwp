@@ -9,7 +9,7 @@ import { Session } from "models"
 
 import "./index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 const SelfViewComponents = {
 	sessionsView: SessionsView,

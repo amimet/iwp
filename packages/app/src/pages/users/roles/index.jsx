@@ -4,7 +4,7 @@ import { Icons } from 'components/icons'
 
 import { LoadingSpinner, FormGenerator } from 'components'
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 class ModifyRole extends React.Component {
     handleSubmit(context) {

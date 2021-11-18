@@ -11,7 +11,7 @@ import "../../index.less"
 
 const { Option } = Select
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 function craftFabricObject({ obj, props, quantity = 1 }) {
 	const defaultKeys = {

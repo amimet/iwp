@@ -6,7 +6,7 @@ import { LoadingSpinner } from 'components'
 import { Drawer, Button, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 class AddVaultDevice extends React.Component {
     state = {

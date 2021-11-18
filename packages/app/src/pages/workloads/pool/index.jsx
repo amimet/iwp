@@ -16,7 +16,7 @@ const { Option } = Select
 
 const dateFormat = "DD-MM-YYYY hh:mm"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 const renderDate = (time) => {
 	const dateNumber = Number(time)

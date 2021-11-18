@@ -6,7 +6,7 @@ import fuse from "fuse.js"
 
 import "./index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 export default class WorkloadsItems extends React.Component {
 	state = {

@@ -3,7 +3,7 @@ import { ActionsBar, SelectableList } from "components"
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 export default class Reports extends React.Component {
     state = {

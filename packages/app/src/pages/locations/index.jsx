@@ -6,7 +6,7 @@ import { FormGenerator } from "components"
 
 import "./index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 class NewRegionForm extends React.Component {
 	handleFinishNewRegion = async (values, ctx) => {
