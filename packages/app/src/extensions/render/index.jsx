@@ -49,19 +49,21 @@ export const LazyRouteRender = (props) => {
 }
 
 export class RenderRouter extends React.Component {
-	renderTime = 0
+	lastPathname = null
+	lastHistoryState = null
 
 	shouldComponentUpdate() {
-		if (this.renderTime > 0) {
-			this.renderTime = 0
-			return false
+		if (this.lastPathname !== window.location.pathname || this.lastHistoryState !== window.app.history.location.state) {
+			return true
 		}
 
-		return true
+		return false
 	}
 
 	render() {
-		this.renderTime++
+		this.lastPathname = window.location.pathname
+		this.lastHistoryState = window.app.history.location.state
+
 		return LazyRouteRender({ ...this.props, path: this.lastPathname })
 	}
 }
@@ -116,11 +118,13 @@ export const extension = {
 
 					main.history.listen((event) => {
 						main.eventBus.emit("setLocationDone")
+
 					})
 
 					main.history.setLocation = (to, state) => {
-						if (typeof to !== "string") {
-							console.warn(`Invalid location`)
+						const lastLocation = main.history.lastLocation
+
+						if (typeof lastLocation !== "undefined" && lastLocation?.pathname === to && lastLocation?.state === state) {
 							return false
 						}
 
@@ -130,6 +134,7 @@ export const extension = {
 							main.history.push({
 								pathname: to,
 							}, state)
+							main.history.lastLocation = main.history.location
 						}, defaultTransitionDelay)
 					}
 
