@@ -170,6 +170,7 @@ class App {
 
 	state = {
 		// app
+		initialized: false,
 		isMobile: false,
 		crash: false,
 		isOnTransition: false,
@@ -191,6 +192,7 @@ class App {
 
 	componentDidMount = async () => {
 		await this.initialization()
+		this.setState({ initialized: true })
 	}
 
 	initialization = async () => {
@@ -247,6 +249,10 @@ class App {
 				<h2>{this.state.crash.message}</h2>
 				<pre>{this.state.crash.error}</pre>
 			</div>
+		}
+
+		if (!this.state.initialized) {
+			return null
 		}
 
 		return (
