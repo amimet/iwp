@@ -1,6 +1,11 @@
 export default {
-    id: String,
+    uuid: { type: String, required: true },
     created_date: String,
-    current_location: String,
-    item: Object,
+    location: String,
+    serial: String,
+    manufacturer: String,
+    manufacturedYear: String,
+    description: String,
+    type: String,
+    attributes: Array,
 }
