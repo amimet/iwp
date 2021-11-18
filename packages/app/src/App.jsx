@@ -67,6 +67,9 @@ class App {
 
 		this.eventBus = this.contexts.main.eventBus
 
+		this.eventBus.on("app_ready", () => {
+			this.setState({ initialized: true })
+		})
 		this.eventBus.on("top_loadBar_start", () => {
 			this.progressBar.start()
 		})
@@ -199,7 +202,6 @@ class App {
 
 	componentDidMount = async () => {
 		await this.initialization()
-		this.setState({ initialized: true })
 	}
 
 	initialization = async () => {
@@ -207,6 +209,7 @@ class App {
 			await this.contexts.app.initializeDefaultBridge()
 			await this.__init_session()
 			await this.__init_user()
+			this.eventBus.emit("app_ready")
 		} catch (error) {
 			throw new ThrowCrash(error.message, error.description)
 		}

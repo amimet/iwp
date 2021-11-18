@@ -43,7 +43,7 @@ export const extension = (params = {}) => {
 							}, fadeOutVelocity ?? 1000)
 						}
 
-						main.eventBus.on("initialization_done", removeSplash)
+						main.eventBus.on("app_ready", removeSplash)
 					},
 				],
 			},
