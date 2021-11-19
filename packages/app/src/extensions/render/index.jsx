@@ -1,5 +1,6 @@
 import React from "react"
 import loadable from "@loadable/component"
+import resolve from "pages"
 
 export const ConnectWithApp = (component) => {
 	return window.app.bindContexts(component)
@@ -15,9 +16,17 @@ export function GetRoutesMap() {
 export const LazyRouteRender = (props) => {
 	const component = loadable(async () => {
 		const location = window.location
-		const path = props.path ?? location.pathname
+		let path = props.path ?? location.pathname
 
-		let module = await import(`/src/pages/${path}`).catch(() => {
+		if (path.startsWith("/")) {
+			path = path.substring(1)
+		}
+
+		const src = resolve(path)
+		console.log(src)
+
+		let module = await import(src).catch((err) => {
+			console.error(err)
 			return props.staticRenders?.NotFound ?? import("./statics/404")
 		})
 		module = module.default || module
@@ -118,7 +127,6 @@ export const extension = {
 
 					main.history.listen((event) => {
 						main.eventBus.emit("setLocationDone")
-
 					})
 
 					main.history.setLocation = (to, state) => {
