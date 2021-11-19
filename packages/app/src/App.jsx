@@ -206,13 +206,16 @@ class App {
 
 	initialization = async () => {
 		try {
+			this.eventBus.emit("splash_show")
 			await this.contexts.app.initializeDefaultBridge()
 			await this.__init_session()
 			await this.__init_user()
 			this.eventBus.emit("app_ready")
 		} catch (error) {
+			this.eventBus.emit("splash_close")
 			throw new ThrowCrash(error.message, error.description)
 		}
+		this.eventBus.emit("splash_close")
 	}
 
 	__init_session = async () => {
