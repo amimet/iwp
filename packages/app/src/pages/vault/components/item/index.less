@@ -1,0 +1,47 @@
+@import "theme/vars.less";
+
+.vaultItem {
+	width: 100%;
+
+	display: flex;
+	flex-direction: column;
+
+	.nameInput {
+		margin-bottom: 10px;
+		font-size: 20px;
+		padding: 0;
+		transition: all 150ms ease-in-out;
+		border-bottom: 2px solid transparent;
+		outline: none;
+		border-radius: 0;
+
+		&.eventDisabled {
+			pointer-events: none;
+		}
+	}
+	.nameInput:focus {
+		color: rgb(70, 70, 70);	
+		border-color: @primary-color;
+	}
+
+	.tags {
+		display: flex;
+		flex-direction: row;
+
+		.tag {
+			.ant-tag  {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+			}
+
+			h4 {
+				margin: 0;
+			}
+
+			h4:first-letter {
+				text-transform: capitalize;
+			}
+		}
+	}
+}
