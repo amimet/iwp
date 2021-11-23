@@ -1,30 +1,67 @@
 import { FabricObject } from '../../models'
-import { Schematized } from '../../lib'
+import { Schematized, selectValues } from '../../lib'
+import _ from "lodash"
+
+const mutableKeys = ["type", "name", "properties"]
+
+function overrideObjects(origin, to, keys) {
+    keys.forEach(key => {
+        if (typeof to[key] !== "undefined") {
+            if (typeof to[key] === "object" && typeof origin[key] === "object") {
+                origin[key] = _.merge(origin[key], to[key])
+            } else {
+                origin[key] = to[key]
+            }
+        }
+    })
+
+    return origin
+}
 
 export const FabricController = {
-    get: async (req, res) => {
-        const obj = await FabricObject.findOne({ ...req.query })
+    // TODO: Allow to filter by properties
+    get: selectValues(["type", "name", "_id"], async (req, res) => {
+        let objects = (await FabricObject.find({ ...req.selectedValues })).map(object => {
+            if (Array.isArray(object.properties)) {
+                let processedProperties = {}
 
-        return res.json(obj)
-    },
-    getAll: async (req, res) => {
-        const objects = await FabricObject.find({ ...req.query })
+                object.properties.forEach(property => {
+                    processedProperties[property.type] = property.value
+                })
 
-        return res.json(objects)
-    },
-    create: Schematized(["id", "title"], async (req, res) => {
-        const { id, title, description, img, props, cost, timeSpend } = req.body
-
-        let craft = { id, title, description, img, props, cost, timeSpend }
-
-        try {
-            const objects = await FabricObject.find({ id })
-
-            if (objects.length > 0) {
-                return res.status(409).send("Item already exists!")
+                object.properties = processedProperties
             }
 
+            return object
+        })
+        console.log(objects)
+
+        return res.json(objects)
+    }),
+    update: selectValues(["_id", "mutation"], async (req, res) => {
+        const { _id, mutation } = req.selectedValues
+
+        let obj = await FabricObject.findOne({ _id })
+
+        if (!obj) {
+            return res.status(404).json({
+                error: "Object not found"
+            })
+        }
+
+        obj = overrideObjects(obj, mutation, mutableKeys)
+
+        await FabricObject.findByIdAndUpdate(_id, obj)
+
+        return res.json(obj)
+    }),
+    create: Schematized(["type", "name", "properties"], async (req, res) => {
+        const { type, name, properties } = req.body
+
+        try {
+            const craft = { type, name, properties }
             const obj = new FabricObject(craft)
+
             obj.save()
 
             return res.json(obj)
