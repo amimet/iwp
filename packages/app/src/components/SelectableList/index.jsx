@@ -19,21 +19,15 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
-	onClickKey = (key) => {
-		if (typeof this.props.selectionEnabled !== "undefined") {
-			if (!Boolean(this.props.selectionEnabled)) {
-				return false
-			}
-		}
-
+	selectKey = (key) => {
 		let list = this.state.selectedKeys ?? []
+		list.push(key)
+		return this.setState({ selectedKeys: list })
+	}
 
-		if (!list.includes(key)) {
-			list.push(key)
-		} else {
-			list = list.filter((_key) => key !== _key)
-		}
-
+	unselectKey = (key) => {
+		let list = this.state.selectedKeys ?? []
+		list = list.filter((_key) => key !== _key)
 		return this.setState({ selectedKeys: list })
 	}
 
@@ -41,7 +35,7 @@ export default class SelectableList extends React.Component {
 		if (typeof this.props.onDone === "function") {
 			this.props.onDone(this.state.selectedKeys)
 		}
-		
+
 		this.setState({
 			selectedKeys: [],
 		})
@@ -55,6 +49,16 @@ export default class SelectableList extends React.Component {
 		this.setState({
 			selectedKeys: [],
 		})
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (typeof this.props.selectionEnabled !== "undefined") {
+			if (!Boolean(this.props.selectionEnabled) && this.state.selectedKeys.length > 0) {
+				this.setState({
+					selectedKeys: [],
+				})
+			}
+		}
 	}
 
 	renderActions = () => {
@@ -138,20 +142,50 @@ export default class SelectableList extends React.Component {
 	}
 
 	render() {
+		const validSelectionMethods = ["onClick", "onDoubleClick"]
+
 		const renderMethod = (item) => {
+			const selectionMethod = validSelectionMethods.includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
+
 			if (typeof this.props.renderItem === "function") {
 				const _key = item.key ?? item.id ?? item._id
+				const list = this.state.selectedKeys
+				const isSelected = list.includes(_key)
+
+				let props = {
+					key: _key,
+					id: _key,
+					className: classnames("selectableList_item", this.props.itemClassName, {
+						selection: this.state.selectionEnabled,
+						selected: this.state.selectedKeys.includes(_key),
+					}),
+					[selectionMethod]: () => {
+						if (typeof this.props.selectionEnabled !== "undefined") {
+							if (!Boolean(this.props.selectionEnabled)) {
+								return false
+							}
+						}
+
+						if (isSelected) {
+							this.unselectKey(_key)
+						} else {
+							this.selectKey(_key)
+						}
+					}
+				}
+
+				if (selectionMethod == "onDoubleClick") {
+					props.onClick = () => {
+						if (list.length > 0) {
+							if (isSelected) {
+								this.unselectKey(_key)
+							}
+						}
+					}
+				}
 
 				return (
-					<div
-						key={_key}
-						id={_key}
-						onClick={() => this.onClickKey(_key)}
-						className={classnames("selectableList_item", this.props.itemClassName, {
-							selection: this.state.selectionEnabled,
-							selected: this.state.selectedKeys.includes(_key),
-						})}
-					>
+					<div {...props}>
 						{this.props.renderItem(item)}
 					</div>
 				)
