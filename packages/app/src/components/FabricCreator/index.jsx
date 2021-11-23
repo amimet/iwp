@@ -3,12 +3,12 @@ import * as antd from 'antd'
 import { Icons as FIcons, createIconRender } from "components/Icons"
 import * as MDIcons from "react-icons/md"
 
+import "./index.less"
+
 const Icons = {
     ...FIcons,
     ...MDIcons
 }
-
-import "./index.less"
 
 const FormComponents = {
     "input": antd.Input,
@@ -170,18 +170,32 @@ const FabricItemTypes = ["product", "operation", "phase", "task", "vaultItem"]
 export default class FabricCreator extends React.Component {
     state = {
         loading: true,
-        values: {},
-
-        fields: [],
-
+        submitting: false,
+        error: null,
+        
         name: null,
         type: null,
-        uuid: null,
+        fields: [],
+        values: {},
     }
 
     componentDidMount = async () => {
-        await this.setItemType("product")
+        await this.setItemType(this.props.defaultType ?? "product")
         this.setState({ loading: false })
+    }
+
+    toogleLoading = (to) => {
+        this.setState({ loading: to ?? !this.state.loading })
+    }
+
+    toogleSubmitting = (to) => {
+        this.setState({ submitting: to ?? !this.state.submitting })
+    }
+
+    clearError = () => {
+        if (this.state.error != null) {
+            this.setState({ error: null })
+        }
     }
 
     clearValues = async () => {
@@ -205,24 +219,42 @@ export default class FabricCreator extends React.Component {
                 this.appendFieldByType(field)
             })
 
-            this.setState({ type: type, name: "New item" })
+            await this.setState({ type: type, name: "New item" })
         } else {
             console.error(`Cannot load default fields from formula with type ${type}`)
         }
     }
 
     appendFieldByType = (fieldType) => {
-        const form = FieldsForms[fieldType]
+        const field = FieldsForms[fieldType]
 
-        if (typeof form === "undefined") {
+        if (typeof field === "undefined") {
             console.error(`No form available for field [${fieldType}]`)
             return null
         }
 
         const fields = this.state.fields
-        fields.push(this.generateFieldRender({ type: fieldType, ...form }))
+
+        if (this.fieldsHasTypeKey(fieldType) && !field.allowMultiple) {
+            console.error(`Field [${fieldType}] already exists, and only can exists 1`)
+            return false
+        }
+
+        fields.push(this.generateFieldRender({ type: fieldType, ...field }))
 
         this.setState({ fields: fields })
+    }
+
+    fieldsHasTypeKey = (key) => {
+        let isOnFields = false
+
+        const fields = this.state.fields
+
+        fields.forEach(field => {
+            field.props.type === key ? isOnFields = true : null
+        })
+
+        return isOnFields
     }
 
     renderFieldSelectorMenu = () => {
@@ -231,13 +263,14 @@ export default class FabricCreator extends React.Component {
                 this.appendFieldByType(e.key)
             }}
         >
-            {Object.keys(FieldsForms).map((field) => {
-                const form = FieldsForms[field]
-                const icon = form.icon && createIconRender(form.icon)
+            {Object.keys(FieldsForms).map((key) => {
+                const field = FieldsForms[key]
+                const icon = field.icon && createIconRender(field.icon)
+                const disabled = this.fieldsHasTypeKey(key) && !field.allowMultiple
 
-                return <antd.Menu.Item key={field}>
+                return <antd.Menu.Item disabled={disabled} key={key}>
                     {icon ?? null}
-                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
                 </antd.Menu.Item>
             })}
         </antd.Menu>
@@ -260,8 +293,41 @@ export default class FabricCreator extends React.Component {
         </antd.Menu>
     }
 
-    onDone = () => {
-        console.log(this.getValues())
+    onDone = async () => {
+        this.clearError()
+        this.toogleSubmitting(true)
+
+        const api = window.app.request
+        let properties = {}
+
+        this.getProperties().forEach((property) => {
+            if (typeof properties[property.type] !== "undefined") {
+                return properties[property.id] = property.value
+            }
+
+            return properties[property.type] = property.value
+        })
+        
+        await api.put.fabric({
+            type: this.state.type,
+            name: this.state.name,
+            properties: properties,
+        }).catch((response) => {
+            console.error(response)
+            this.setState({ error: response })
+
+            return null
+        })
+
+        this.toogleSubmitting(false)
+
+        if (!this.state.error && typeof this.props.close === "function") {
+            this.props.close()
+        }
+    }
+
+    onChangeName = (event) => {
+        this.setState({ name: event.target.value })
     }
 
     onUpdateValue = (event, value) => {
@@ -282,25 +348,40 @@ export default class FabricCreator extends React.Component {
         this.setState({ fields: fields, values: values })
     }
 
-    getValues = () => {
+    getProperties = () => {
         return this.state.fields.map((field) => {
             return {
                 type: field.props.type,
+                id: field.props.id,
                 value: this.state.values[field.key],
             }
         })
+    }
+
+    getKeyFromLatestFieldType = (type) => {
+        let latestByType = 0
+
+        this.state.fields.forEach((field) => {
+            field.props.type === type ? latestByType++ : null
+        })
+
+        return `${type}-${latestByType}`
     }
 
     generateFieldRender = (field) => {
         let { key, style, type, icon, component, label, updateEvent, props, onUpdate } = field
 
         if (!key) {
-            key = this.state.fields.length
+            key = this.getKeyFromLatestFieldType(type)
         }
 
         if (typeof FormComponents[component] === "undefined") {
             console.error(`No component type available for field [${key}]`)
             return null
+        }
+
+        const getSubmittingState = () => {
+            return this.state.submitting
         }
 
         return <div key={key} id={`${type}-${key}`} type={type} className="field" style={style}>
@@ -310,6 +391,7 @@ export default class FabricCreator extends React.Component {
                 {React.createElement(FormComponents[component], {
                     ...props,
                     value: this.state.values[key],
+                    disabled: getSubmittingState(),
                     [updateEvent]: (...args) => {
                         if (typeof onUpdate === "function") {
                             return this.onUpdateValue({ updateEvent, key }, onUpdate(...args))
@@ -326,9 +408,8 @@ export default class FabricCreator extends React.Component {
         if (this.state.loading) {
             return <antd.Skeleton active />
         }
-
         const TypeIcon = FabricItemTypesIcons[this.state.type] && createIconRender(FabricItemTypesIcons[this.state.type])
-
+        
         return <div className="fabric_creator">
             <div key="name" className="name">
                 <div className="type">
@@ -336,18 +417,23 @@ export default class FabricCreator extends React.Component {
                         {TypeIcon ?? <Icons.HelpCircle />}
                     </antd.Dropdown>
                 </div>
-                <antd.Input defaultValue={this.state.name} />
+                <antd.Input defaultValue={this.state.name} onChange={this.onChangeName} />
             </div>
+
             <div className="fields">
                 <div className="wrap">
-                    {this.state.fields}
+                    {this.state.submitting ? <antd.Skeleton active /> : this.state.fields}
                 </div>
                 <div className="bottom_actions">
                     <antd.Dropdown trigger={['click']} placement="topCenter" overlay={this.renderFieldSelectorMenu}>
                         <Icons.Plus />
                     </antd.Dropdown>
-                    <antd.Button onClick={this.onDone}>Done</antd.Button>
+
+                    <antd.Button loading={this.state.submitting} onClick={this.onDone}>Done</antd.Button>
                 </div>
+                {this.state.error && <div className="error">
+                    {this.state.error}    
+                </div>}
             </div>
         </div>
     }
