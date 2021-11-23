@@ -143,10 +143,13 @@ class App {
 
 	static windowContext() {
 		return {
-			openFabric: () => {
+			openFabric: (defaultType) => {
 				window.app.DrawerController.open("FabricCreator", FabricCreator, {
 					props: {
 						width: "70%",
+					},
+					componentProps: {
+						defaultType,
 					}
 				})
 			},
