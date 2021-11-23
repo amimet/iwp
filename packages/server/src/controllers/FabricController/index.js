@@ -69,8 +69,8 @@ export const FabricController = {
             return res.status(500).json(error.message)
         }
     }),
-    remove: (req, res) => {
-
+    delete: (req, res) => {
+        // TODO: Implement deletion method
     },
 }
 
