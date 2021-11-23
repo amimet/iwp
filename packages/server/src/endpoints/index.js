@@ -58,24 +58,26 @@ module.exports = [
         middleware: "ensureAuthenticated",
         fn: "VaultController.set",
     },
+    // FABRIC
     {
-        route: "/fabric_item",
+        route: "/fabric",
         method: "PUT",
         middleware: ["ensureAuthenticated", "privileged"],
         fn: "FabricController.create",
     },
     {
-        route: "/fabric_items",
-        method: "GET",
-        middleware: ["ensureAuthenticated"],
-        fn: "FabricController.getAll",
+        route: "/fabric",
+        method: "POST",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "FabricController.update",
     },
     {
-        route: "/fabric_item",
+        route: "/fabric",
         method: "GET",
         middleware: ["ensureAuthenticated"],
         fn: "FabricController.get",
     },
+    // WORKLOADS
     {
         route: "/workloads",
         method: "GET",
