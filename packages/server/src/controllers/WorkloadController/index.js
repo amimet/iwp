@@ -6,12 +6,19 @@ const format = "DD-MM-YYYY hh:mm"
 
 export const WorkloadController = {
     getAll: selectValues(["region", "_id", "name"], async (req, res) => {
-        const workloads = await Workload.find({ ...req.selectedValues })
+        let workloads = []
+
+        if (req.selectedValues.region === "all") {
+            delete req.selectedValues.region
+            workloads = await Workload.find(req.selectedValues)
+        }else {
+            workloads = await Workload.find(req.selectedValues)
+        }
 
         return res.json(workloads)
     }),
     get: selectValues(["region", "_id", "name"], async (req, res, next) => {
-        let workload = await Workload.findOne({ ...req.selectedValues })
+        let workload = await Workload.findOne(req.selectedValues)
         
         // parse expiration status
         if (typeof workload.expired !== "undefined") {
