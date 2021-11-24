@@ -2,6 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import { Icons as FIcons, createIconRender } from "components/Icons"
 import * as MDIcons from "react-icons/md"
+import loadable from "@loadable/component"
 
 import "./index.less"
 
@@ -45,12 +46,16 @@ const FieldsForms = {
         label: "Location",
         component: "select",
         updateEvent: "onChange",
+        children: async () => {
+            const api = window.app.request
+            const regions = await api.get.regions()
+
+            return regions.map(region => {
+                return <antd.Select.Option value={region.name}>{region.name}</antd.Select.Option>
+            })
+        },
         props: {
             placeholder: "Select a location",
-            children: [
-                // TODO: Fetch locations from api
-                <antd.Select.Option value="none">None</antd.Select.Option>,
-            ]
         }
     },
     vaultItemTypeSelector: {
@@ -145,6 +150,7 @@ const VaultItemFormula = {
         "vaultItemSerial",
         "vaultItemManufacturer",
         "vaultItemManufacturedYear",
+        "location",
     ]
 }
 
@@ -172,7 +178,7 @@ export default class FabricCreator extends React.Component {
         loading: true,
         submitting: false,
         error: null,
-        
+
         name: null,
         type: null,
         fields: [],
@@ -307,7 +313,7 @@ export default class FabricCreator extends React.Component {
 
             return properties[property.type] = property.value
         })
-        
+
         await api.put.fabric({
             type: this.state.type,
             name: this.state.name,
@@ -369,14 +375,12 @@ export default class FabricCreator extends React.Component {
     }
 
     generateFieldRender = (field) => {
-        let { key, style, type, icon, component, label, updateEvent, props, onUpdate } = field
-
-        if (!key) {
-            key = this.getKeyFromLatestFieldType(type)
+        if (!field.key) {
+            field.key = this.getKeyFromLatestFieldType(field.type)
         }
 
-        if (typeof FormComponents[component] === "undefined") {
-            console.error(`No component type available for field [${key}]`)
+        if (typeof FormComponents[field.component] === "undefined") {
+            console.error(`No component type available for field [${field.key}]`)
             return null
         }
 
@@ -384,23 +388,39 @@ export default class FabricCreator extends React.Component {
             return this.state.submitting
         }
 
-        return <div key={key} id={`${type}-${key}`} type={type} className="field" style={style}>
-            <div className="close" onClick={() => { this.removeField(key) }}><Icons.X /></div>
-            <h4>{icon && createIconRender(icon)}{label}</h4>
-            <div className="fieldContent">
-                {React.createElement(FormComponents[component], {
-                    ...props,
-                    value: this.state.values[key],
-                    disabled: getSubmittingState(),
-                    [updateEvent]: (...args) => {
-                        if (typeof onUpdate === "function") {
-                            return this.onUpdateValue({ updateEvent, key }, onUpdate(...args))
-                        }
-                        return this.onUpdateValue({ updateEvent, key }, ...args)
-                    },
-                })}
-            </div>
+        let fieldComponentProps = {
+            ...field.props,
+            value: this.state.values[field.key],
+            disabled: getSubmittingState(),
+            [field.updateEvent]: (...args) => {
+                if (typeof field.onUpdate === "function") {
+                    return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, field.onUpdate(...args))
+                }
+                return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, ...args)
+            },
+        }
+        let Component = () => React.createElement(FormComponents[field.component], fieldComponentProps)
 
+        if (typeof field.children === "function") {
+            const DynamicComponent = loadable(async () => {
+                let returnedChildren = await field.children()
+                console.log(returnedChildren)
+                fieldComponentProps.children = returnedChildren
+
+                return () => React.createElement(FormComponents[field.component], fieldComponentProps)
+            })
+
+            Component = () => <React.Suspense fallback={<div>Loading</div>}>
+                <DynamicComponent />
+            </React.Suspense>
+        }
+
+        return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
+            <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
+            <h4>{field.icon && createIconRender(field.icon)}{field.label}</h4>
+            <div className="fieldContent">
+               <Component />
+            </div>
         </div>
     }
 
@@ -409,7 +429,7 @@ export default class FabricCreator extends React.Component {
             return <antd.Skeleton active />
         }
         const TypeIcon = FabricItemTypesIcons[this.state.type] && createIconRender(FabricItemTypesIcons[this.state.type])
-        
+
         return <div className="fabric_creator">
             <div key="name" className="name">
                 <div className="type">
@@ -432,7 +452,7 @@ export default class FabricCreator extends React.Component {
                     <antd.Button loading={this.state.submitting} onClick={this.onDone}>Done</antd.Button>
                 </div>
                 {this.state.error && <div className="error">
-                    {this.state.error}    
+                    {this.state.error}
                 </div>}
             </div>
         </div>
