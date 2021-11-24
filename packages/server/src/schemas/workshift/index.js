@@ -1,5 +1,5 @@
 export default {
-    regionId: { type: Number, default: 0 },
+    region: { type: String, default: 0 },
     name: { type: String, required: true },
     start: { type: String, required: true },
     end: { type: String, required: true },
