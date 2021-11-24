@@ -34,6 +34,10 @@ export default class Vault extends React.Component {
         this.setState({ compactView: to ?? !this.state.compactView })
     }
 
+    dumpData = () => {
+
+    }
+
     onChangeProperties = async (_id, mutation) => {
         return api.post.fabric({
             _id,
@@ -75,20 +79,25 @@ export default class Vault extends React.Component {
         return (
             <div className="vaultItems">
                 <ActionsBar float={true}>
-                    <div>
+                    <div key="refresh">
                         <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.loadFabricItems} />
                     </div>
-                    <div>
+                    <div key="createNew">
                         <antd.Button icon={<Icons.Plus />} type="primary" onClick={() => { window.app.openFabric("vaultItem") }}>
                             New
                         </antd.Button>
                     </div>
-                    <div>
+                    <div key="toogleSelect">
                         <antd.Button type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
                             {this.state.selectionEnabled ? "Cancel" : "Select"}
                         </antd.Button>
                     </div>
-                    <div>
+                    <div key="exportData">
+                        <antd.Button icon={<Icons.Save />} onClick={() => this.dumpData()}>
+                            Export
+                        </antd.Button>
+                    </div>
+                    <div key="compactView">
                         <h5>Compact view</h5>
                         <antd.Switch checked={this.state.compactView} onChange={(e) => this.toogleCompactView(e)} />
                     </div>
