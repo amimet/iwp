@@ -32,12 +32,12 @@ const TagColorByStatement = {
 }
 
 const RenderItem = (props) => {
-    const [item, setItem] = React.useState(props.item)
-    const [locations, setLocations] = React.useState([])
-    const [loading, setLoading] = React.useState(false)
+    let [item, setItem] = React.useState(props.item)
+    let [locations, setLocations] = React.useState([])
+    let [loading, setLoading] = React.useState(false)
+    const nameInputRef = React.useRef(null)
 
     const statement = item.properties?.statement ?? "unknown"
-    const nameInputRef = React.useRef(null)
 
     const onChangeProperties = async (_id, mutation) => {
         if (props.eventDisable) {
@@ -69,8 +69,7 @@ const RenderItem = (props) => {
         nameInputRef.current.blur()
     }
 
-
-    React.useEffect(async() => {
+    const setLocationsFromAPI = async () => {
         const api = window.app.request
         const regions = await api.get.regions()
 
@@ -80,16 +79,16 @@ const RenderItem = (props) => {
                 label: region.name,
             }
         }))
+    }
 
-
-
+    React.useEffect(() => {
+        setLocationsFromAPI()
     },[])
     
-
     return <div
         key={item._id}
         className="vaultItem"
-    //onDoubleClick={openItemDetails}
+        //onDoubleClick={openItemDetails}
     >
         <div>
             #{item._id}
