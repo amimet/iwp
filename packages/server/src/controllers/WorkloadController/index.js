@@ -5,12 +5,12 @@ import moment from "moment"
 const format = "DD-MM-YYYY hh:mm"
 
 export const WorkloadController = {
-    getAll: selectValues(["regionId", "_id", "name"], async (req, res) => {
+    getAll: selectValues(["region", "_id", "name"], async (req, res) => {
         const workloads = await Workload.find({ ...req.selectedValues })
 
         return res.json(workloads)
     }),
-    get: selectValues(["regionId", "_id", "name"], async (req, res, next) => {
+    get: selectValues(["region", "_id", "name"], async (req, res, next) => {
         let workload = await Workload.findOne({ ...req.selectedValues })
         
         // parse expiration status
