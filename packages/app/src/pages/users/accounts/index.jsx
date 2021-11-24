@@ -1,8 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/icons"
-import { LoadingSpinner } from "components"
-import classnames from "classnames"
+import { ActionsBar, SelectableList } from "components"
 
 import "./index.less"
 
@@ -11,50 +10,21 @@ const api = window.app.request
 export default class Users extends React.Component {
 	state = {
 		data: null,
-		error: null,
-		selectedUsers: [],
 		selectionEnabled: false,
 	}
 
 	componentDidMount = async () => {
-		api.get.users()
-			.then((data) => {
-				console.log(data)
-				this.setState({ data })
-			})
-			.catch((err) => {
-				console.log(err)
-				this.setState({ error: err })
-			})
+		await this.loadData()
 	}
 
-	selectUser = (user) => {
-		if (!this.state.selectionEnabled) {
-			return false
-		}
-
-		let list = this.state.selectedUsers ?? []
-
-		if (!list.includes(user)) {
-			list.push(user)
-		} else {
-			list = list.filter((_user) => user !== _user)
-		}
-
-		this.setState({ selectedUsers: list })
+	loadData = async () => {
+		this.setState({ data: null })
+		const data = await api.get.users()
+		this.setState({ data })
 	}
 
-	toogleSelectMode = (to = !this.state.selectionEnabled) => {
-		if (!to && this.state.selectedUsers.length > 0) {
-			this.setState({ selectedUsers: [] })
-		}
-		this.setState({ selectionEnabled: to })
-	}
-
-	renderRoles(roles) {
-		return roles.map((role) => {
-			return <antd.Tag key={role}> {role} </antd.Tag>
-		})
+	toogleSelectMode = (to) => {
+		this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
 	}
 
 	openUser(username) {
@@ -65,91 +35,57 @@ export default class Users extends React.Component {
 		window.app.setLocation(`/account`, { username })
 	}
 
-	renderSelectionBulkActions = () => {
+	renderRoles(roles) {
+		return roles.map((role) => {
+			return <antd.Tag key={role}> {role} </antd.Tag>
+		})
+	}
+
+	renderItem = (item) => {
 		return (
-			<div className="horizontal_actions">
+			<div
+				key={item._id}
+				onDoubleClick={() => this.openUser(item.username)}
+				className="user_item"
+			>
 				<div>
-					<antd.Button>Delete</antd.Button>
+					<antd.Avatar shape="square" src={item.avatar} />
+				</div>
+				<div className="title">
+					<div className="line">
+						<div>
+							<h1>{item.fullName ?? item.username}</h1>
+						</div>
+						<div>
+							<h3>#{item._id}</h3>
+						</div>
+					</div>
+					<div>{this.renderRoles(item.roles)}</div>
 				</div>
 			</div>
 		)
 	}
 
 	render() {
-		if (this.state.error)
-			return (
-				<antd.Result
-					status="error"
-				>
-					<span>{this.state.error}</span>
-				</antd.Result>
-			)
-
-		if (!this.state.data) return <LoadingSpinner />
-
 		return (
 			<div>
-				<div className="users_list_wrapper">
-
-					<div className="horizontal_actions_cascade">
-						<div className="horizontal_actions">
-							<div>
-								<antd.Button
-									onClick={() => {
-										this.toogleSelectMode()
-									}}
-									style={{ padding: 0 }}
-									shape="circle"
-									icon={
-										this.state.selectionEnabled ? (
-											<Icons.X style={{ margin: 0 }} />
-										) : (
-											<Icons.Edit style={{ margin: 0 }} />
-										)
-									}
-								/>
-							</div>
-							<div>
-								<antd.Button icon={<Icons.Plus />}>New User</antd.Button>
-							</div>
-							<div>{this.state.selectedUsers}</div>
+				<div className="users_list">
+					<ActionsBar float={true}>
+						<div>
+							<antd.Button type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelectMode()}>
+								{this.state.selectionEnabled ? "Cancel" : "Select"}
+							</antd.Button>
 						</div>
-						{this.state.selectedUsers.length > 0 && this.renderSelectionBulkActions()}
-					</div>
-
-					<div>
-						<antd.List
-							dataSource={this.state.data}
-							renderItem={(item) => {
-								return (
-									<div
-										key={item._id}
-										onDoubleClick={() => this.openUser(item.username)}
-										onClick={() => this.selectUser(item.username)}
-										className={classnames("user_card", {
-											selection: this.state.selectionEnabled,
-											selected: this.state.selectedUsers.includes(item.username),
-										})}
-									>
-										<div>
-											<antd.Avatar shape="square" src={item.avatar} />
-										</div>
-										<div className="user_card_title">
-											<div className="line">
-												<div>
-													<h1>{item.fullName ?? item.username}</h1>
-												</div>
-												<div>
-													<h3>#{item._id}</h3>
-												</div>
-											</div>
-											<div>{this.renderRoles(item.roles)}</div>
-										</div>
-									</div>
-								)
-							}}
-						/>
-					</div>
+						<div>
+							<antd.Button type="primary" icon={<Icons.Plus />}>New User</antd.Button>
+						</div>
+					</ActionsBar>
+					{!this.state.data ? <antd.Skeleton active /> :
+						<SelectableList
+							selectionEnabled={this.state.selectionEnabled}
+							items={this.state.data}
+							renderItem={this.renderItem}
+						/>}
 				</div>
 			</div>
 		)
