@@ -44,11 +44,11 @@ const renderDate = (time) => {
 class Workload extends React.Component {
 	state = {
 		loading: true,
-		workloads: null,
 		regions: [],
-		selectedRegion: 0,
 		selectionEnabled: false,
+		selectedRegion: "all",
 		searchValue: null,
+		workloads: null,
 	}
 
 	componentDidMount = async () => {
@@ -62,7 +62,7 @@ class Workload extends React.Component {
 				this.setState({ error })
 			})
 
-		this.loadWorkloadsFromRegion(this.state.selectedRegion)
+		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
 
 		if (typeof window.app.debug !== "undefined") {
 			window.app.debug.bind("workload_list", this)
@@ -75,7 +75,11 @@ class Workload extends React.Component {
 		}
 	}
 
-	addWorkload = (payload) => {
+	toogleSelection = () => {
+		this.setState({ selectionEnabled: !this.state.selectionEnabled })
+	}
+
+	appendWorkloadToRender = (payload) => {
 		let query = []
 		let workloads = this.state.workloads ?? []
 
@@ -92,7 +96,7 @@ class Workload extends React.Component {
 		this.setState({ workloads })
 	}
 
-	deleteWorkload = (id) => {
+	deleteWorkloadFromRender = (id) => {
 		let query = []
 		let workloads = this.state.workloads
 
@@ -107,7 +111,7 @@ class Workload extends React.Component {
 		this.setState({ workloads })
 	}
 
-	loadWorkloadsFromRegion = async (id) => {
+	fetchWorkloadsFromRegion = async (id) => {
 		this.setState({ loading: true })
 
 		await api.get
@@ -140,17 +144,20 @@ class Workload extends React.Component {
 		})
 	}
 
-	onChangeRegion = (regionId) => {
-		this.setState({ selectedRegion: regionId }, async () => {
-			await this.loadWorkloadsFromRegion(regionId)
-		})
-	}
-
-	onCreateWorkload = () => {
+	openWorkloadCreator = () => {
 		window.app.DrawerController.open("workload_creator", WorkloadCreator, {
 			props: {
 				width: "55%",
 			},
+			onDone: (drawer, payload) => {
+				this.changeRegion(payload.region)
+			}
+		})
+	}
+
+	changeRegion = (region) => {
+		this.setState({ selectedRegion: region }, async () => {
+			await this.fetchWorkloadsFromRegion(region)
 		})
 	}
 
@@ -166,7 +173,8 @@ class Workload extends React.Component {
 					api.delete
 						.workload({ id: keys })
 						.then(() => {
-							this.deleteWorkload(keys)
+							this.deleteWorkloadFromRender(keys)
+							this.toogleSelection(false)
 							return resolve()
 						})
 						.catch((err) => {
@@ -179,7 +187,6 @@ class Workload extends React.Component {
 
 	onCheckWorkloads = (keys) => {
 		console.log(keys)
-		this.reloadWorkloads()
 	}
 
 	onSearch = (value) => {
@@ -216,24 +223,7 @@ class Workload extends React.Component {
 		})
 	}
 
-	renderAdminActions = () => {
-		if (!hasAdmin()) {
-			return null
-		}
-		return [
-			<div key="new_workload">
-				<Button type="primary" onClick={this.onCreateWorkload} icon={<Icons.Plus />}>
-					New Workload
-				</Button>
-			</div>,
-		]
-	}
-
-	toogleSelection = () => {
-		this.setState({ selectionEnabled: !this.state.selectionEnabled })
-	}
-
-	renderWorkloadItem = (item) => {
+	renderItem = (item) => {
 		if (typeof item.scheduledFinish !== "undefined") {
 			const now = moment().format(dateFormat)
 
@@ -301,7 +291,7 @@ class Workload extends React.Component {
 				onDelete={this.onDeleteWorkloads}
 				onCheck={this.onCheckWorkloads}
 				items={list}
-				renderItem={this.renderWorkloadItem}
+				renderItem={this.renderItem}
 			></SelectableList>
 		)
 	}
@@ -310,8 +300,13 @@ class Workload extends React.Component {
 		return (
 			<div>
 				<div style={{ marginBottom: "10px" }}>
-					<ActionsBar wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
-						<div>
+					<ActionsBar float={true}>
+						<div key="createNew">
+							<Button type="primary" onClick={this.openWorkloadCreator} icon={<Icons.Plus />}>
+								New
+							</Button>
+						</div>
+						<div key="toogleSelection">
 							<Button
 								onClick={this.toogleSelection}
 								icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}
@@ -319,12 +314,7 @@ class Workload extends React.Component {
 								{this.state.selectionEnabled ? "Done" : "Select"}
 							</Button>
 						</div>
-
-						<div>
-							<Button onClick={QRReader.openModal}>Scan QR</Button>
-						</div>
-
-						<div>
+						<div key="search">
 							<Input.Search
 								placeholder="Search"
 								allowClear
@@ -332,27 +322,25 @@ class Workload extends React.Component {
 								onChange={this.onSearch}
 							/>
 						</div>
-
-						{!this.state.selectionEnabled && (
-							<div>
-								<Select
-									key="region_select"
-									showSearch
-									style={{ width: 200 }}
-									placeholder="Select a region"
-									optionFilterProp="children"
-									onChange={this.onChangeRegion}
-									value={this.state.selectedRegion}
-									filterOption={(input, option) =>
-										option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-									}
-								>
-									{this.renderRegionsOptions()}
-								</Select>
-							</div>
-						)}
-
-						{!this.state.selectionEnabled && this.renderAdminActions()}
+						<div key="regionSelection">
+							<Select
+								key="region_select"
+								showSearch
+								style={{ width: 200 }}
+								placeholder="Select a region"
+								optionFilterProp="children"
+								onChange={this.changeRegion}
+								value={this.state.selectedRegion}
+								filterOption={(input, option) =>
+									option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+								}
+							>
+								<Option key="all" value="all">
+									All regions
+								</Option>
+								{this.renderRegionsOptions()}
+							</Select>
+						</div>
 					</ActionsBar>
 				</div>
 
