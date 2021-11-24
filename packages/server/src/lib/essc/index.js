@@ -1,24 +1,31 @@
 // random 5 digits number
 const random5 = () => Math.floor(Math.random() * 90000) + 10000
 
-// aa-bbbb-cccc
+// secure random 5 digits number
+const random5Secure = () => {
+    const random = random5()
+    return random.toString().padStart(5, '0')
+}
+
+// aa-bbbbb-cccc
 //* a: type (2 digits)
-//* b: serial (4 digits)
+//* b: serial (5 digits)
 //* c: manufacturer (4 digits)
 
 const typesNumber = {
-    "desktop": [1],
-    "laptop": [2],
-    "tablet": [3],
-    "smartphone": [4],
-    "network": [5],
-    "printer": [6],
-    "monitor": [7],
+    "computers-desktop": [1],
+    "computers-laptop": [2],
+    "computers-tablet": [3],
+    "computers-smartphone": [4],
+    "networking": [5],
+    "peripherals-printer": [6],
+    "peripherals-monitor": [7],
 }
 
 export function genV1(params) {
-    const { type, serial, manufacturer } = params // please in that order
-
+    let { type, serial, manufacturer } = params // please in that order
+    type = type.toLowerCase()
+    
     let str = []
 
     // Type parsing
@@ -39,8 +46,16 @@ export function genV1(params) {
     if (typeof serial === "undefined") {
         str.push(random5().toString())
     } else {
-        // push last 4 digits of serial
-        str.push(serial.slice(-4))
+        // push last 5 digits of serial, if serial is not 5 digits, pad with 0
+        let serialBuf = []
+        
+        serialBuf[0] = serial.slice(-5, -4) ?? "0"
+        serialBuf[1] = serial.slice(-4, -3) ?? "0"
+        serialBuf[2] = serial.slice(-3, -2) ?? "0"
+        serialBuf[3] = serial.slice(-2, -1) ?? "0"
+        serialBuf[4] = serial.slice(-1) ?? "0"
+
+        str.push(serialBuf.join(""))
     }
 
     // Manufacturer parsing
@@ -48,7 +63,7 @@ export function genV1(params) {
     if (typeof manufacturer === "undefined") {
         str.push("GENR")
     } else {
-        str.push(manufacturer.slice(0, 4).toLowerCase())
+        str.push(manufacturer.slice(0, 4).toUpperCase())
     }
 
     return str.join("-")
