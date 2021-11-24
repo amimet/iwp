@@ -1,13 +1,14 @@
 import React from "react"
 import * as antd from "antd"
-import GoogleMap from "components/googleMap"
 import { Icons } from "components/Icons"
-import { FormGenerator } from "components"
+import { FormGenerator, ActionsBar, SelectableList } from "components"
+import classnames from "classnames"
 
 import "./index.less"
 
 const api = window.app.request
 
+// TODO: Work on location childrens
 class NewRegionForm extends React.Component {
 	handleFinishNewRegion = async (values, ctx) => {
 		const { name, address } = values
@@ -90,6 +91,7 @@ class NewRegionForm extends React.Component {
 export default class Geo extends React.Component {
 	state = {
 		data: null,
+		selectionEnabled: false,
 	}
 
 	componentDidMount = async () => {
@@ -99,30 +101,32 @@ export default class Geo extends React.Component {
 		this.setState({ data })
 	}
 
+	toogleSelection = (to) => {
+		this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
+	}
+
 	appendRegion = (data) => {
 		let update = this.state.data
-		
+
 		update.push(data)
 
 		this.setState({ data: update })
 	}
 
 	createNewRegion = async () => {
-		window.app.DrawerController.open("new_region_form", NewRegionForm, {
+		window.app.DrawerController.open("new_region_form", NewRegionForm, {
 			onDone: (ctx, data) => {
 				this.appendRegion(data)
 			},
 		})
 	}
 
-	renderRegions(items) {
-		return items.map((item) => {
-			return (
-				<div key={item._id} className="region_card">
-					<h1><Icons.MapPin />{item.name}</h1>
-				</div>
-			)
-		})
+	renderItem = (item) => {
+		console.log(item)
+
+		return <div>
+			<h1>{item.name}</h1>
+		</div>
 	}
 
 	render() {
@@ -137,9 +141,31 @@ export default class Geo extends React.Component {
 		}
 
 		return <div className="regions_list">
-			{this.renderRegions(this.state.data)}
-			<div className="create_new" onClick={this.createNewRegion}>
-
+			<ActionsBar>
+				<div>
+					<antd.Button type="primary" onClick={this.createNewRegion}>
+						New
+					</antd.Button>
+				</div>
+				<div>
+					<antd.Button type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
+						{this.state.selectionEnabled ? "Cancel" : "Select"}
+					</antd.Button>
+				</div>
+			</ActionsBar>
+			<div className={classnames("list", (this.state.selectionEnabled ? ["selectionEnabled"] : ["selectionDisabled"]))}>
+				<SelectableList
+					selectionEnabled={this.state.selectionEnabled}
+					items={this.state.data}
+					renderItem={this.renderItem}
+					onDelete={this.onDeleteItems}
+					actions={[
+						<div key="delete" call="onDelete">
+							<Icons.Trash />
+							Delete
+						</div>,
+					]}
+				/>
 			</div>
 		</div>
 	}
