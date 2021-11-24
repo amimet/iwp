@@ -78,10 +78,16 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		this.props.events.on("create_error", (error) => {
-			this.setState({ submitting: false, submittingError: error })
-		})
+		if (typeof this.props.events !== "undefined") {
+			this.props.events.on("create_error", (error) => {
+				this.handleError(error)
+			})
+		}
 
+		await this.loadRegions()
+	}
+
+	loadRegions = async () => {
 		await api.get
 			.regions()
 			.then((data) => {
@@ -91,6 +97,10 @@ export default class WorkloadCreator extends React.Component {
 				console.log(err)
 				this.setState({ error: err })
 			})
+	}
+
+	handleError = (error) => {
+		this.setState({ submitting: false, submittingError: error })
 	}
 
 	addItem = () => {
@@ -132,16 +142,25 @@ export default class WorkloadCreator extends React.Component {
 			workload.scheduledFinish = selectedDate[1]
 		}
 
-		if (typeof this.props.onDone === "function") {
-			return this.props.onDone(workload)
+		const request = await api.put.workload(workload)
+			.catch((error) => {
+				this.handleError(error)
+			})
+
+
+		if (typeof this.props.handleDone === "function") {
+			this.props.handleDone(request)
+		}
+		if (typeof this.props.close === "function") {
+			this.props.close()
 		}
 	}
 
 	generateRegionsOption = () => {
 		return this.state.regions.map((region) => {
 			return (
-				<Option key={region.id} value={region.id}>
-					{region.data.name}
+				<Option key={region.name} value={region.name}>
+					{region.name}
 				</Option>
 			)
 		})
@@ -175,7 +194,7 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	getWorkshiftsFromRegion = async (region) => {
-		const data = await api.get.workshifts(undefined, { regionId: region })
+		const data = await api.get.workshifts(undefined, { region: region })
 		const obj = Object()
 
 		data.forEach((workshift) => {

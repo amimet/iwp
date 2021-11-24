@@ -111,7 +111,7 @@ class Workload extends React.Component {
 		this.setState({ loading: true })
 
 		await api.get
-			.workloads({ regionId: id }, { regionId: id })
+			.workloads({ region: id }, { region: id })
 			.then((data) => {
 				console.log(data)
 				this.setState({ workloads: data, loading: false })
@@ -150,21 +150,6 @@ class Workload extends React.Component {
 		window.app.DrawerController.open("workload_creator", WorkloadCreator, {
 			props: {
 				width: "55%",
-			},
-			onDone: (drawer, workload) => {
-				const request = api.put.workload(workload)
-
-				request.then((data) => {
-					if (data) {
-						this.addWorkload(data)
-						drawer.close()
-					}
-				})
-
-				request.catch((error) => {
-					console.error(error)
-					drawer.sendEvent("create_error", error)
-				})
 			},
 		})
 	}
@@ -224,8 +209,8 @@ class Workload extends React.Component {
 	renderRegionsOptions = () => {
 		return this.state.regions.map((region) => {
 			return (
-				<Option key={region.id} value={region.id}>
-					{region.data.name}
+				<Option key={region.name} value={region.name}>
+					{region.name}
 				</Option>
 			)
 		})
