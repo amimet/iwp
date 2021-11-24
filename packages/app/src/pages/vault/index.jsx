@@ -17,6 +17,11 @@ export default class Vault extends React.Component {
     }
 
     componentDidMount = async () => {
+        await this.loadFabricItems()
+    }
+
+    loadFabricItems = async () => {
+        this.setState({ data: null })
         const vault = await api.get.fabric(undefined, { type: "vaultItem" })
         this.setState({ data: vault })
     }
@@ -62,19 +67,17 @@ export default class Vault extends React.Component {
                             description: error,
                         })
                     })
-
             },
         })
     }
 
     render() {
-        if (!this.state.data) {
-            return <antd.Skeleton active />
-        }
-
         return (
             <div className="vaultItems">
-                <ActionsBar>
+                <ActionsBar float={true}>
+                    <div>
+                        <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.loadFabricItems} />
+                    </div>
                     <div>
                         <antd.Button icon={<Icons.Plus />} type="primary" onClick={() => { window.app.openFabric("vaultItem") }}>
                             New
@@ -97,18 +100,19 @@ export default class Vault extends React.Component {
                         { ["compact"]: this.state.compactView }
                     )}
                 >
-                    <SelectableList
-                        selectionEnabled={this.state.selectionEnabled}
-                        items={this.state.data}
-                        renderItem={(item) => <ItemRender compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
-                        onDelete={this.onDeleteItems}
-                        actions={[
-                            <div key="delete" call="onDelete">
-                                <Icons.Trash />
-                                Delete
-                            </div>,
-                        ]}
-                    />
+                    {!this.state.data ? <antd.Skeleton active /> :
+                        <SelectableList
+                            selectionEnabled={this.state.selectionEnabled}
+                            items={this.state.data}
+                            renderItem={(item) => <ItemRender compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
+                            onDelete={this.onDeleteItems}
+                            actions={[
+                                <div key="delete" call="onDelete">
+                                    <Icons.Trash />
+                                    Delete
+                                </div>,
+                            ]}
+                        />}
                 </div>
             </div>
         )
