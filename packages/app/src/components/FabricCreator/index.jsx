@@ -18,6 +18,12 @@ const FormComponents = {
     "datepicker": antd.DatePicker,
 }
 
+const requestModifyByType = {
+    "vaultItem": {
+        "additions": ["essc"]
+    }
+}
+
 // FIELDS
 const FieldsForms = {
     description: {
@@ -314,11 +320,20 @@ export default class FabricCreator extends React.Component {
             return properties[property.type] = property.value
         })
 
-        await api.put.fabric({
+        let payload = {
             type: this.state.type,
             name: this.state.name,
             properties: properties,
-        }).catch((response) => {
+        }
+
+        if (typeof requestModifyByType[this.state.type] !== "undefined") {
+            payload = {
+                ...payload,
+                ...requestModifyByType[this.state.type],
+            }
+        }
+
+        await api.put.fabric(payload).catch((response) => {
             console.error(response)
             this.setState({ error: response })
 
