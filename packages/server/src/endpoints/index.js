@@ -46,18 +46,6 @@ module.exports = [
         middleware: "ensureAuthenticated",
         fn: "SessionController.get",
     },
-    {
-        route: "/item_vault",
-        method: "GET",
-        middleware: "ensureAuthenticated",
-        fn: "VaultController.get",
-    },
-    {
-        route: "/item_vault",
-        method: "PUT",
-        middleware: "ensureAuthenticated",
-        fn: "VaultController.set",
-    },
     // FABRIC
     {
         route: "/fabric",
@@ -107,12 +95,6 @@ module.exports = [
         method: "DELETE",
         middleware: "ensureAuthenticated",
         fn: "WorkloadController.delete",
-    },
-    {
-        route: "/vault",
-        method: "GET",
-        middleware: "ensureAuthenticated",
-        fn: "VaultController.getAll",
     },
     {
         route: "/region",
