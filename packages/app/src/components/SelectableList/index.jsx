@@ -156,7 +156,6 @@ export default class SelectableList extends React.Component {
 					key: _key,
 					id: _key,
 					className: classnames("selectableList_item", this.props.itemClassName, {
-						selection: this.state.selectionEnabled,
 						selected: this.state.selectedKeys.includes(_key),
 					}),
 					[selectionMethod]: () => {
@@ -212,7 +211,7 @@ export default class SelectableList extends React.Component {
 		}
 
 		return (
-			<div>
+			<div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
 				{this.renderActions()}
 				<List
 					{...listProps}
