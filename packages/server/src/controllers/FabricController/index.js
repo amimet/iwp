@@ -1,5 +1,5 @@
 import { FabricObject } from '../../models'
-import { Schematized, selectValues } from '../../lib'
+import { Schematized, selectValues, additionsHandler } from '../../lib'
 import _ from "lodash"
 
 const mutableKeys = ["type", "name", "properties"]
@@ -55,11 +55,17 @@ export const FabricController = {
         return res.json(obj)
     }),
     create: Schematized(["type", "name", "properties"], async (req, res) => {
-        const { type, name, properties } = req.body
+        const { type, name, properties, additions } = req.body
 
         try {
-            const craft = { type, name, properties }
-            const obj = new FabricObject(craft)
+            let craft = { type, name, properties }
+
+            // handle additions
+            if (Array.isArray(additions)) {
+                craft.properties = await additionsHandler(additions, craft.properties)
+            }
+
+            let obj = new FabricObject(craft)
 
             obj.save()
 
