@@ -143,7 +143,7 @@ export default class Geo extends React.Component {
 		return <div className="regions_list">
 			<ActionsBar>
 				<div>
-					<antd.Button type="primary" onClick={this.createNewRegion}>
+					<antd.Button icon={<Icons.Plus />} type="primary" onClick={this.createNewRegion}>
 						New
 					</antd.Button>
 				</div>
