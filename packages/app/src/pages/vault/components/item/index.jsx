@@ -87,13 +87,11 @@ const RenderItem = (props) => {
     
     return <div
         key={item._id}
-        className="vaultItem"
+        className={classnames("vaultItem", {["compact"]: props.compact})}
         //onDoubleClick={openItemDetails}
     >
         <div>
-            #{item._id}
-        </div>
-        <div>
+            #{props.compact ? (item.properties?.essc ?? "Deserialized") : item._id}
             <antd.Input
                 prefix={loading ? <Icons.LoadingOutlined spin /> : undefined}
                 className={classnames("nameInput", { ["eventDisabled"]: props.eventDisable })}
@@ -158,6 +156,7 @@ const RenderItem = (props) => {
                     </h4>
                 </antd.Tag>
             </div>
+            {!props.compact && 
             <div key="manufacturer" className="tag">
                 <antd.Tag>
                     <Icons.Home />
@@ -165,7 +164,8 @@ const RenderItem = (props) => {
                         {item.properties?.vaultItemManufacturer ?? "Generic"}
                     </h4>
                 </antd.Tag>
-            </div>
+            </div>}
+            {!props.compact && 
             <div key="serial" className="tag">
                 <antd.Tag>
                     <Icons.Key />
@@ -173,7 +173,16 @@ const RenderItem = (props) => {
                         {item.properties?.vaultItemSerial ?? "Deserialized"}
                     </h4>
                 </antd.Tag>
-            </div>
+            </div>}
+            {!props.compact && 
+            <div key="essc" className="tag">
+                <antd.Tag>
+                    <Icons.Key />
+                    <h4>
+                        {item.properties?.essc ?? "Deserialized"}
+                    </h4>
+                </antd.Tag>
+            </div>}
         </div>
     </div>
 }

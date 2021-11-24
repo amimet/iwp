@@ -11,18 +11,22 @@ const api = window.app.request
 
 export default class Vault extends React.Component {
     state = {
+        compactView: false,
         selectionEnabled: false,
         data: null
     }
 
     componentDidMount = async () => {
         const vault = await api.get.fabric(undefined, { type: "vaultItem" })
-
         this.setState({ data: vault })
     }
 
     toogleSelection = (to) => {
         this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
+    }
+
+    toogleCompactView = (to) => {
+        this.setState({ compactView: to ?? !this.state.compactView })
     }
 
     onChangeProperties = async (_id, mutation) => {
@@ -72,7 +76,7 @@ export default class Vault extends React.Component {
             <div className="vaultItems">
                 <ActionsBar>
                     <div>
-                        <antd.Button type="primary" onClick={() => { window.app.openFabric("vaultItem") }}>
+                        <antd.Button icon={<Icons.Plus />} type="primary" onClick={() => { window.app.openFabric("vaultItem") }}>
                             New
                         </antd.Button>
                     </div>
@@ -81,12 +85,22 @@ export default class Vault extends React.Component {
                             {this.state.selectionEnabled ? "Cancel" : "Select"}
                         </antd.Button>
                     </div>
+                    <div>
+                        <h5>Compact view</h5>
+                        <antd.Switch checked={this.state.compactView} onChange={(e) => this.toogleCompactView(e)} />
+                    </div>
                 </ActionsBar>
-                <div className={classnames("list", (this.state.selectionEnabled ? ["selectionEnabled"] : ["selectionDisabled"]))}>
+                <div
+                    className={classnames(
+                        "list",
+                        (this.state.selectionEnabled ? ["selectionEnabled"] : ["selectionDisabled"]),
+                        { ["compact"]: this.state.compactView }
+                    )}
+                >
                     <SelectableList
                         selectionEnabled={this.state.selectionEnabled}
                         items={this.state.data}
-                        renderItem={(item) => <ItemRender eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
+                        renderItem={(item) => <ItemRender compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
                         onDelete={this.onDeleteItems}
                         actions={[
                             <div key="delete" call="onDelete">

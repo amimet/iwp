@@ -6,6 +6,16 @@
 	display: flex;
 	flex-direction: column;
 
+	&.compact {
+		justify-content: space-between;
+		flex-direction: row;
+		align-items: center;
+
+		.nameInput {
+			margin-bottom: 0;
+		}
+	}
+
 	.nameInput {
 		margin-bottom: 10px;
 		font-size: 20px;
@@ -19,6 +29,7 @@
 			pointer-events: none;
 		}
 	}
+
 	.nameInput:focus {
 		color: rgb(70, 70, 70);	
 		border-color: @primary-color;

@@ -4,10 +4,17 @@
 	}
 
 	.list {
+		&.compact {
+			.selectableList_item{
+				padding: 0 10px;
+			}
+		}
+
 		&.selectionDisabled{
 			.selectableList_item{
 				border: rgba(51, 51, 51, 0.3) 1px solid;
 				border-radius: 4px;
+				margin-bottom: 4px;
 			}
 			.selectableList_item:hover{
 				box-shadow: none;
@@ -16,8 +23,9 @@
 		}
 		&.selectionEnabled{
 			cursor: pointer;
+
 			.selectableList_item {
-				margin-bottom: 4px;
+				margin-bottom: 10px;
 			}
 		}
 	}
