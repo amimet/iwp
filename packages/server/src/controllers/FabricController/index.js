@@ -34,7 +34,6 @@ export const FabricController = {
 
             return object
         })
-        console.log(objects)
 
         return res.json(objects)
     }),
@@ -69,9 +68,24 @@ export const FabricController = {
             return res.status(500).json(error.message)
         }
     }),
-    delete: (req, res) => {
-        // TODO: Implement deletion method
-    },
+    delete: selectValues(["_id"], async (req, res) => {
+        let { _id } = req.selectedValues
+        let query = []
+
+        if (Array.isArray(_id)) {
+            query = _id
+        } else {
+            query.push(_id)
+        }
+
+        for await (let id of query) {
+            await FabricObject.findByIdAndDelete(id)
+        }
+
+        const result = await FabricObject.find()
+
+        return res.json(result)
+    }),
 }
 
 export default FabricController
