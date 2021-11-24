@@ -1,6 +1,7 @@
 import { GeoRegion } from '../../models'
 import { selectValues } from "../../lib"
 
+// TODO: Support for child objects
 export const RegionController = {
     new: selectValues(["name", "address"], async (req, res) => {
         const { name, address } = req.selectedValues
