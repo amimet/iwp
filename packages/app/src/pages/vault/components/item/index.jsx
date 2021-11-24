@@ -32,7 +32,8 @@ const TagColorByStatement = {
 }
 
 const RenderItem = (props) => {
-    let [item, setItem] = React.useState(props.item)
+    const [item, setItem] = React.useState(props.item)
+    const [locations, setLocations] = React.useState([])
     const [loading, setLoading] = React.useState(false)
 
     const statement = item.properties?.statement ?? "unknown"
@@ -68,11 +69,22 @@ const RenderItem = (props) => {
         nameInputRef.current.blur()
     }
 
-    const openItemDetails = () => {
-        if (typeof props.onOpenItemDetails === "function") {
-            props.onOpenItemDetails(item._id)
-        }
-    }
+
+    React.useEffect(async() => {
+        const api = window.app.request
+        const regions = await api.get.regions()
+
+        setLocations(regions.map((region) => {
+            return  {
+                value: region.name,
+                label: region.name,
+            }
+        }))
+
+
+
+    },[])
+    
 
     return <div
         key={item._id}
@@ -85,7 +97,7 @@ const RenderItem = (props) => {
         <div>
             <antd.Input
                 prefix={loading ? <Icons.LoadingOutlined spin /> : undefined}
-                className={classnames("nameInput", {["eventDisabled"]: props.eventDisable})}
+                className={classnames("nameInput", { ["eventDisabled"]: props.eventDisable })}
                 bordered={false}
                 ref={nameInputRef}
                 value={item.name}
@@ -113,7 +125,7 @@ const RenderItem = (props) => {
             <div key="statement" className="tag">
                 <antd.Cascader options={StatementsOptions} onChange={(update) => onChangeProperties(item._id, {
                     properties: {
-                        "statement": update[0]
+                        statement: update[0]
                     }
                 })} >
                     <antd.Tag color={TagColorByStatement[statement]}>
@@ -125,12 +137,19 @@ const RenderItem = (props) => {
                 </antd.Cascader>
             </div>
             <div key="location" className="tag">
-                <antd.Tag>
-                    <Icons.Map />
-                    <h4>
-                        {item.properties?.location ?? "Unlocated"}
-                    </h4>
-                </antd.Tag>
+                <antd.Cascader options={locations} onChange={(update) => onChangeProperties(item._id, {
+                    properties: {
+                        location: update[0]
+                    }
+                })} >
+                    <antd.Tag>
+                        <Icons.Map />
+                        <h4>
+                            {item.properties?.location ?? "Unlocated"}
+                        </h4>
+                    </antd.Tag>
+                </antd.Cascader>
+
             </div>
             <div key="type" className="tag">
                 <antd.Tag>
@@ -145,14 +164,6 @@ const RenderItem = (props) => {
                     <Icons.Home />
                     <h4>
                         {item.properties?.vaultItemManufacturer ?? "Generic"}
-                    </h4>
-                </antd.Tag>
-            </div>
-            <div key="manufacturedYear" className="tag">
-                <antd.Tag>
-                    <Icons.Calendar />
-                    <h4>
-                        {item.properties?.vaultItemManufacturedYear ?? "Unknown"}
                     </h4>
                 </antd.Tag>
             </div>
