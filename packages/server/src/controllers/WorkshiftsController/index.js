@@ -5,7 +5,7 @@ import moment from 'moment'
 const workableDays = ["M", "TU", "W", "TH", "F", "SU", "SA"]
 
 export const WorkshiftsController = {
-    get: selectValues(["name", "regionId", "start", "end", "periodicity", "_id"], async (req, res) => {
+    get: selectValues(["name", "region", "start", "end", "periodicity", "_id"], async (req, res) => {
         let result = Array()
 
         if (typeof req.selectedValues._id === "undefined") {
