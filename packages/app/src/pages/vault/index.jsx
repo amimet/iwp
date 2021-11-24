@@ -43,8 +43,24 @@ export default class Vault extends React.Component {
     }
 
     onDeleteItems = async (items) => {
-        // TODO: Deletion of items
-        console.log(items)
+        antd.Modal.confirm({
+            content: `Are you sure you want to delete ${items.length} item(s)?`,
+            onOk: async () => {
+                await api.delete.fabric({ _id: items })
+                    .then((data) => {
+                        this.setState({ data: data })
+                        this.toogleSelection(false)
+                    })
+                    .catch(error => {
+                        console.error("Cannot delete items: ", error)
+                        antd.notification.error({
+                            message: "Cannot delete items",
+                            description: error,
+                        })
+                    })
+
+            },
+        })
     }
 
     render() {
