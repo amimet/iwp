@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import { Icons } from 'components/icons'
 
-import { LoadingSpinner, FormGenerator } from 'components'
+import { ActionsBar, FormGenerator } from 'components'
 
 const api = window.app.request
 
@@ -110,29 +110,28 @@ export default class Roles extends React.Component {
     }
 
     render() {
-        if (!this.state.data) return <LoadingSpinner />
-
         return <div className="users_list_wrapper" >
-            <antd.Card style={{ marginBottom: "18px" }}>
-                <antd.Button onClick={() => { this.openRoleCreator() }} icon={<Icons.PlusOutlined />} type="primary">Create new</antd.Button>
-            </antd.Card>
-            <antd.List
-                dataSource={this.state.data}
-                renderItem={(item) => {
-                    return <div key={item._id}>
-                        <antd.List.Item
-                            actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">apply</a>]}
-                        >
-                            <antd.List.Item.Meta
-                                avatar={<Icons.Box />}
-                                title={item.name}
-                                description={item.description}
-                            />
-                        </antd.List.Item>
-                    </div>
-                }}
-            />
-        </div>
+            <ActionsBar float={true}>
+                <antd.Button onClick={() => { this.openRoleCreator() }} icon={<Icons.PlusOutlined />} type="primary">New</antd.Button>
+            </ActionsBar>
 
+            {!this.state.data ? <antd.Skeleton active /> :
+                <antd.List
+                    dataSource={this.state.data}
+                    renderItem={(item) => {
+                        return <div key={item._id}>
+                            <antd.List.Item
+                                actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">apply</a>]}
+                            >
+                                <antd.List.Item.Meta
+                                    avatar={<Icons.Box />}
+                                    title={item.name}
+                                    description={item.description}
+                                />
+                            </antd.List.Item>
+                        </div>
+                    }}
+                />}
+        </div>
     }
 }
