@@ -1,21 +1,17 @@
 import React from "react"
+import { CreateEviteApp, BindPropsProvider } from "evite"
 import { Helmet } from "react-helmet"
-import progressBar from "nprogress"
 import * as antd from "antd"
+import progressBar from "nprogress"
 import classnames from "classnames"
 
-import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
-import { NotFound, RenderError, FabricCreator } from "components"
-import { Icons } from "components/Icons"
-
-import config from "config"
-import { Session, User } from "models"
-
-import SidebarController from "core/models/sidebar"
-import SettingsController from "core/models/settings"
-
-import { CreateEviteApp, BindPropsProvider } from "evite"
+import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Debug, theme, Sound } from "extensions"
+import config from "config"
+
+import { NotFound, RenderError, FabricCreator } from "components"
+import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
+import { Icons } from "components/Icons"
 
 import "theme/index.less"
 
