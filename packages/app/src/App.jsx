@@ -1,3 +1,15 @@
+// Patch global prototypes
+Array.prototype.move = function (from, to) {
+	this.splice(to, 0, this.splice(from, 1)[0])
+	return this
+}
+
+String.prototype.toTitleCase = function () {
+	return this.replace(/\w\S*/g, function (txt) {
+		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+	})
+}
+
 import React from "react"
 import { CreateEviteApp, BindPropsProvider } from "evite"
 import { Helmet } from "react-helmet"
@@ -14,12 +26,6 @@ import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
 import { Icons } from "components/Icons"
 
 import "theme/index.less"
-
-// append method to array prototype
-Array.prototype.move = function (from, to) {
-	this.splice(to, 0, this.splice(from, 1)[0])
-	return this
-}
 
 const SplashExtension = Splash.extension({
 	logo: config.logo.alt,
