@@ -69,7 +69,7 @@ export default class SelectableList extends React.Component {
 			return false
 		}
 
-		const renderExtraActions = () => {
+		const renderProvidedActions = () => {
 			if (Array.isArray(this.props.actions)) {
 				return this.props.actions.map((action) => {
 					return (
@@ -118,24 +118,15 @@ export default class SelectableList extends React.Component {
 					<div key="discard">
 						<Button
 							style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-							shape="circle"
+							shape="round"
 							onClick={this.onDiscard}
 							{...this.props.onDiscardProps}
 						>
-							{this.props.onDiscardRender ?? <Icons.X style={{ margin: 0, padding: 0 }} />}
+							{this.props.onDiscardRender ?? <Icons.X />}
+							Discard
 						</Button>
 					</div>
-					<div key="done">
-						<Button type="primary" onClick={this.onDone} {...this.props.onDoneProps}>
-							{this.props.onDoneRender ?? (
-								<>
-									<Icons.Check /> Done
-								</>
-							)}
-						</Button>
-					</div>
-
-					{renderExtraActions()}
+					{renderProvidedActions()}
 				</ActionsBar>
 			</div>
 		)
@@ -212,7 +203,6 @@ export default class SelectableList extends React.Component {
 
 		return (
 			<div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
-				{this.renderActions()}
 				<List
 					{...listProps}
 					dataSource={[
@@ -220,7 +210,8 @@ export default class SelectableList extends React.Component {
 						...(Array.isArray(this.props.children) ? this.props.children : []),
 					]}
 					renderItem={renderMethod}
-				/>
+					/>
+					{this.renderActions()}
 			</div>
 		)
 	}
