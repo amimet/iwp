@@ -23,7 +23,7 @@ export default class Users extends React.Component {
 		this.setState({ data })
 	}
 
-	toogleSelectMode = (to) => {
+	toogleSelection = (to) => {
 		this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
 	}
 
@@ -72,8 +72,8 @@ export default class Users extends React.Component {
 				<div className="users_list">
 					<ActionsBar float={true}>
 						<div>
-							<antd.Button type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelectMode()}>
-								{this.state.selectionEnabled ? "Cancel" : "Select"}
+							<antd.Button shape="round" icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />} type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
+								{this.state.selectionEnabled ? "Done" : "Select"}
 							</antd.Button>
 						</div>
 						<div>

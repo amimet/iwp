@@ -35,7 +35,7 @@ export default class Vault extends React.Component {
     }
 
     dumpData = () => {
-
+        // TODO: Implement dump data form api method
     }
 
     onChangeProperties = async (_id, mutation) => {
@@ -82,14 +82,14 @@ export default class Vault extends React.Component {
                     <div key="refresh">
                         <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.loadFabricItems} />
                     </div>
+                    <div key="toogleSelect">
+                        <antd.Button shape="round" icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />} type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
+                            {this.state.selectionEnabled ? "Done" : "Select"}
+                        </antd.Button>
+                    </div>
                     <div key="createNew">
                         <antd.Button icon={<Icons.Plus />} type="primary" onClick={() => { window.app.openFabric("vaultItem") }}>
                             New
-                        </antd.Button>
-                    </div>
-                    <div key="toogleSelect">
-                        <antd.Button type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
-                            {this.state.selectionEnabled ? "Cancel" : "Select"}
                         </antd.Button>
                     </div>
                     <div key="exportData">
