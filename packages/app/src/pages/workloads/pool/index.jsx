@@ -1,7 +1,6 @@
 import React from "react"
 import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList, QRReader } from "components"
-import { hasAdmin } from "core/permissions"
 import moment from "moment"
 import classnames from "classnames"
 import fuse from "fuse.js"
@@ -263,14 +262,13 @@ class Workload extends React.Component {
 	renderWorkloads = (list) => {
 		const actions = []
 
-		if (hasAdmin()) {
-			actions.push(
-				<div key="delete" call="onDelete">
-					<Icons.Trash />
-					Delete
-				</div>,
-			)
-		}
+		// TODO: Fetch user permissions and check if user has permission to delete
+		actions.push(
+			<div key="delete" call="onDelete">
+				<Icons.Trash />
+				Delete
+			</div>,
+		)
 
 		if (list.length === 0) {
 			return <Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
