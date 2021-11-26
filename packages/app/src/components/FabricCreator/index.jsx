@@ -6,6 +6,9 @@ import loadable from "@loadable/component"
 
 import "./index.less"
 
+// TODO: Better error display on catch error fields dynamic children render
+
+
 const Icons = {
     ...FIcons,
     ...MDIcons
@@ -68,21 +71,25 @@ const FieldsForms = {
         label: "Type",
         component: "select",
         updateEvent: "onChange",
+        children: async () => {
+            try {
+                let types = await import("schemas/vaultItemsTypes.json")
+
+                types = types.default || types
+
+                return Object.keys(types).map((group) => {
+                    return <antd.Select.OptGroup key={group} label={String(group).toTitleCase()}>
+                        {types[group].map((type) => {
+                            return <antd.Select.Option key={type} value={`${group}-${type}`}>{String(type).toTitleCase()}</antd.Select.Option>
+                        })}
+                    </antd.Select.OptGroup>
+                })
+            } catch (error) {
+                return <div>Failed to load</div>
+            }
+        },
         props: {
             placeholder: "Select a type",
-            children: [
-                <antd.Select.OptGroup label="Computers">
-                    <antd.Select.Option value="computers-desktop">Desktop</antd.Select.Option>
-                    <antd.Select.Option value="computers-laptop">Laptop</antd.Select.Option>
-                    <antd.Select.Option value="computers-phone">Phone</antd.Select.Option>
-                    <antd.Select.Option value="computers-tablet">Tablet</antd.Select.Option>
-                    <antd.Select.Option value="computers-other">Other</antd.Select.Option>
-                </antd.Select.OptGroup>,
-                <antd.Select.OptGroup label="Peripherals">
-                    <antd.Select.Option value="peripherals-monitor">Monitor</antd.Select.Option>
-                    <antd.Select.Option value="peripherals-printer">Printer</antd.Select.Option>
-                </antd.Select.OptGroup>,
-            ]
         }
     },
     vaultItemSerial: {
@@ -434,7 +441,7 @@ export default class FabricCreator extends React.Component {
             <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
             <h4>{field.icon && createIconRender(field.icon)}{field.label}</h4>
             <div className="fieldContent">
-               <Component />
+                <Component />
             </div>
         </div>
     }
