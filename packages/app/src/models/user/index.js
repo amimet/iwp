@@ -36,4 +36,14 @@ export default class User {
 
         return request.response.data
     }
+
+    hasAdmin = async () => {
+        const roles = await User.roles
+
+        if (!roles) {
+            return false
+        }
+    
+        return Array.isArray(roles) && roles.includes("admin")
+    }
 }
