@@ -34,8 +34,27 @@ export default class Vault extends React.Component {
         this.setState({ compactView: to ?? !this.state.compactView })
     }
 
-    dumpData = () => {
-        // TODO: Implement dump data form api method
+    dumpData = async () => {
+        let vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
+        let parsed = vault.map(item => {
+            return {
+                _id: item._id,
+                name: item.name,
+                ...item.properties,
+                serial: item.properties.serial ?? null,
+                manufacturer: item.properties.manufacturer ?? null,
+                type: item.properties.type ?? null,
+            }
+        })
+
+        let data = JSON.stringify(parsed, null, 2)
+        let blob = new Blob([data], { type: "application/json" })
+        let url = URL.createObjectURL(blob)
+        let a = document.createElement("a")
+
+        a.href = url
+        a.download = `vault_export-${new Date().getTime()}.json`
+        a.click()
     }
 
     onChangeProperties = async (_id, mutation) => {
@@ -95,7 +114,7 @@ export default class Vault extends React.Component {
                         </antd.Button>
                     </div>
                     <div key="exportData">
-                        <antd.Button icon={<Icons.Save />} onClick={() => this.dumpData()}>
+                        <antd.Button icon={<Icons.Save />} onClick={this.dumpData}>
                             Export
                         </antd.Button>
                     </div>
