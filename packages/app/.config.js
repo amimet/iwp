@@ -2,8 +2,8 @@ const path = require('path')
 
 const aliases = {
     "@": path.resolve(__dirname, 'src'),
-    schemas: path.resolve(__dirname, './schemas'),
-    extensions: path.resolve(__dirname, './src/extensions'),
+    schemas: path.resolve(__dirname, 'constants'),
+    extensions: path.resolve(__dirname, 'src/extensions'),
     theme: path.join(__dirname, 'src/theme'),
     locales: path.join(__dirname, 'src/locales'),
     core: path.join(__dirname, 'src/core'),
