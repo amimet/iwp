@@ -29,7 +29,6 @@ export default (props) => {
         setLoading(true)
         await props.onChangeProperties(_id, mutation)
             .then((data) => {
-                console.log(data)
                 setItem(data)
             })
             .catch(error => {
@@ -61,6 +60,25 @@ export default (props) => {
             return {
                 value: region.name,
                 label: region.name,
+            }
+        })
+    }
+
+    const fetchTypes = async () => {
+        let types = await import("schemas/vaultItemsTypes.json")
+
+        types = types.default || types
+
+        return Object.keys(types).map((group) => {
+            return {
+                value: group,
+                label: String(group).toTitleCase(),
+                children: types[group].map((type) => {
+                    return {
+                        value: type,
+                        label: String(type).toTitleCase(),
+                    }
+                }),
             }
         })
     }
@@ -104,7 +122,7 @@ export default (props) => {
                     icon="Activity"
                     onChangeProperties={(value) => onChangeProperties(item._id, {
                         properties: {
-                            statement: value,
+                            statement: value.join("-"),
                         }
                     })}
                     colors={Object.fromEntries(Object.keys(Statements).map((key) => {
@@ -119,7 +137,7 @@ export default (props) => {
                     icon="Map"
                     onChangeProperties={(value) => onChangeProperties(item._id, {
                         properties: {
-                            location: value,
+                            location: value.join("-"),
                         }
                     })}
                     options={fetchLocations}
@@ -127,12 +145,16 @@ export default (props) => {
                 />
             </div>
             <div key="type" className="tag">
-                <antd.Tag>
-                    <Icons.Tag />
-                    <h4>
-                        {item.properties?.type ?? "Other"}
-                    </h4>
-                </antd.Tag>
+                <ModifierTag
+                    icon="Disc"
+                    onChangeProperties={(value) => onChangeProperties(item._id, {
+                        properties: {
+                            vaultItemTypeSelector: value.join("-"),
+                        }
+                    })}
+                    options={fetchTypes}
+                    defaultValue={item.properties?.type ?? "Other"}
+                />
             </div>
             {!props.compact &&
                 <div key="manufacturer" className="tag">

@@ -31,11 +31,8 @@ export default (props) => {
             setError(err)
         })
 
-        console.log(data)
-
         if (typeof data[0] !== "undefined") {
             setItem(data[0])
-            console.log(data[0])
         }
     }
 
@@ -49,6 +46,25 @@ export default (props) => {
             return {
                 value: region.name,
                 label: region.name,
+            }
+        })
+    }
+
+    const fetchTypes = async () => {
+        let types = await import("schemas/vaultItemsTypes.json")
+
+        types = types.default || types
+
+        return Object.keys(types).map((group) => {
+            return {
+                value: group,
+                label: String(group).toTitleCase(),
+                children: types[group].map((type) => {
+                    return {
+                        value: type,
+                        label: String(type).toTitleCase(),
+                    }
+                }),
             }
         })
     }
@@ -96,6 +112,18 @@ export default (props) => {
                         })}
                         options={fetchLocations}
                         defaultValue={item.properties?.location ?? "unknown"}
+                    />
+                </div>
+                <div key="type" className="tag">
+                    <ModifierTag
+                        icon="Disc"
+                        onChangeProperties={(value) => props.onChangeProperties(item._id, {
+                            properties: {
+                                vaultItemTypeSelector: value.join("-"),
+                            }
+                        })}
+                        options={fetchTypes}
+                        defaultValue={item.properties?.type ?? "Other"}
                     />
                 </div>
             </div>
