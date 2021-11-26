@@ -3,15 +3,13 @@
         "desktop",
         "laptop",
         "phone",
-        "tablet",
-        "other"
+        "tablet"
     ],
     "peripherals": [
         "keyboard",
         "mouse",
         "monitor",
         "printer",
-        "scanner",
-        "other"
+        "scanner"
     ]
 }
