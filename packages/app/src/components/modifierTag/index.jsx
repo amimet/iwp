@@ -14,9 +14,9 @@ export default (props) => {
 
         setLoading(true)
 
-        await props.onChangeProperties(update[0])
+        await props.onChangeProperties(update)
             .then((data) => {
-                return setValue(update[0])
+                return setValue(update.join("-"))
             })
             .catch((error) => {
                 return
