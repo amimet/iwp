@@ -21,7 +21,10 @@ function overrideObjects(origin, to, keys) {
 export const FabricController = {
     // TODO: Allow to filter by properties
     get: selectValues(["type", "name", "_id"], async (req, res) => {
-        let objects = (await FabricObject.find({ ...req.selectedValues })).map(object => {
+        let objects = await FabricObject.find(req.selectedValues)
+        let additions = req.body?.additions ?? req.query?.additions
+
+        for await (let object of objects) {
             if (Array.isArray(object.properties)) {
                 let processedProperties = {}
 
@@ -32,8 +35,10 @@ export const FabricController = {
                 object.properties = processedProperties
             }
 
-            return object
-        })
+            if (Array.isArray(additions)) {
+                object.properties = await additionsHandler(additions, object.properties)
+            }
+        }
 
         return res.json(objects)
     }),
