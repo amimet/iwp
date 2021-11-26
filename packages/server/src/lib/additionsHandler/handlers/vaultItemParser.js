@@ -2,7 +2,8 @@ export default (obj) => {
     const fixedKeys = {
         vaultItemManufacturer: "manufacturer",
         vaultItemSerial: "serial",
-        vaultItemTypeSelector: "type"
+        vaultItemTypeSelector: "type",
+        vaultItemManufacturedYear: "manufacturedYear",
     }
 
     Object.keys(obj).forEach(key => {
