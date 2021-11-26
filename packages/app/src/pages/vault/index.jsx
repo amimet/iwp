@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList } from 'components'
-import { ItemRender, ItemDetails } from './components'
+import { ItemRender, ItemDetails, ImportTool } from './components'
 import classnames from 'classnames'
 
 import "./index.less"
@@ -55,6 +55,14 @@ export default class Vault extends React.Component {
         a.href = url
         a.download = `vault_export-${new Date().getTime()}.json`
         a.click()
+    }
+
+    importData = async () => {
+        window.app.DrawerController.open("ImportTool", ImportTool, {
+            props: {
+                width: "50%",
+            }
+        })
     }
 
     onChangeProperties = async (_id, mutation) => {
@@ -116,6 +124,11 @@ export default class Vault extends React.Component {
                     <div key="exportData">
                         <antd.Button icon={<Icons.Save />} onClick={this.dumpData}>
                             Export
+                        </antd.Button>
+                    </div>
+                    <div key="importData">
+                        <antd.Button icon={<Icons.Upload />} onClick={this.importData}>
+                            Import
                         </antd.Button>
                     </div>
                     <div key="compactView">
