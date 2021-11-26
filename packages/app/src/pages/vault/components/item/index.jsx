@@ -130,7 +130,7 @@ export default (props) => {
                 <antd.Tag>
                     <Icons.Tag />
                     <h4>
-                        {item.properties?.vaultItemTypeSelector ?? "Other"}
+                        {item.properties?.type ?? "Other"}
                     </h4>
                 </antd.Tag>
             </div>
@@ -139,7 +139,7 @@ export default (props) => {
                     <antd.Tag>
                         <Icons.Home />
                         <h4>
-                            {item.properties?.vaultItemManufacturer ?? "Generic"}
+                            {item.properties?.manufacturer ?? "Generic"}
                         </h4>
                     </antd.Tag>
                 </div>}
@@ -148,7 +148,7 @@ export default (props) => {
                     <antd.Tag>
                         <Icons.Key />
                         <h4>
-                            {item.properties?.vaultItemSerial ?? "Deserialized"}
+                            {item.properties?.serial ?? "Deserialized"}
                         </h4>
                     </antd.Tag>
                 </div>}

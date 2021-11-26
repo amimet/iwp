@@ -25,11 +25,13 @@ export default (props) => {
     const [item, setItem] = React.useState(null)
     const [error, setError] = React.useState(null)
 
-    const fetchItemDetails = async () => {
+    const fetchItemData = async () => {
         const api = window.app.request
-        const data = await api.get.fabric({ _id: itemId }, { _id: itemId }).catch(err => {
+        const data = await api.get.fabric(undefined, { _id: itemId, additions: ["vaultItemParser"] }).catch(err => {
             setError(err)
         })
+
+        console.log(data)
 
         if (typeof data[0] !== "undefined") {
             setItem(data[0])
@@ -52,7 +54,7 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        fetchItemDetails()
+        fetchItemData()
     }, [])
 
     if (error) {
@@ -63,8 +65,6 @@ export default (props) => {
     if (!item) {
         return <antd.Skeleton active />
     }
-
-    const statement = item.properties?.statement ?? "unknown"
 
     return <div className="itemDetails">
         <div className="header">
@@ -83,7 +83,7 @@ export default (props) => {
                             return [key, Statements[key].tagColor]
                         }))}
                         options={StatementsOptions}
-                        defaultValue={statement}
+                        defaultValue={item.properties?.statement}
                     />
                 </div>
                 <div key="location" className="tag">
@@ -116,6 +116,19 @@ export default (props) => {
                 </div>
                 <div className="content">
                     <h2>{item.properties?.essc}</h2>
+                </div>
+            </div>
+            <div key="serial" className="entry">
+                <div className="title">
+                    <div>
+                        <h2>
+                            <Icons.Key />
+                            Serial
+                        </h2>
+                    </div>
+                </div>
+                <div className="content">
+                    <h2>{item.properties?.serial}</h2>
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@ export default class Vault extends React.Component {
 
     loadFabricItems = async () => {
         this.setState({ data: null })
-        const vault = await api.get.fabric(undefined, { type: "vaultItem" })
+        const vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
         this.setState({ data: vault })
     }
 
@@ -46,8 +46,6 @@ export default class Vault extends React.Component {
     }
 
     onOpenItemDetails = (_id) => {
-        // TODO: Create a detailed view for vault items
-        console.log("Open item details: ", _id)
         app.DrawerController.open("ItemDetails", ItemDetails, {
             props: {
                 width: "50%",
