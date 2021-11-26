@@ -2,8 +2,7 @@ import store from 'store'
 import EventEmitter from "@foxify/events"
 import { objectToArrayMap } from '@corenode/utils'
 import handlers from 'core/handlers'
-
-const defaultKeys = import('schemas/defaultSettings.json')
+import defaultKeys from "schemas/defaultSettings.json"
 
 class SettingsController {
     constructor() {
