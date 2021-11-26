@@ -1,39 +1,21 @@
 import React from 'react'
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
+import { ModifierTag } from "components"
 import classnames from "classnames"
+import Statements from "schemas/vaultItemStatements.json"
 
 import "./index.less"
 
-const StatementsOptions = [
-    {
-        value: 'active',
-        label: 'Active',
-    },
-    {
-        value: 'retired',
-        label: 'Retired',
-    },
-    {
-        value: 'unknown',
-        label: 'Unknown',
-    },
-    {
-        value: 'storaged',
-        label: 'Storaged',
-    },
-]
+const StatementsOptions = Object.keys(Statements).map((key) => {
+    return {
+        value: Statements[key].value,
+        label: Statements[key].label,
+    }
+})
 
-const TagColorByStatement = {
-    active: 'green',
-    retired: 'red',
-    unknown: 'orange',
-    storaged: 'blue',
-}
-
-const RenderItem = (props) => {
+export default (props) => {
     let [item, setItem] = React.useState(props.item)
-    let [locations, setLocations] = React.useState([])
     let [loading, setLoading] = React.useState(false)
     const nameInputRef = React.useRef(null)
 
@@ -69,26 +51,24 @@ const RenderItem = (props) => {
         nameInputRef.current.blur()
     }
 
-    const setLocationsFromAPI = async () => {
+    const fetchLocations = async () => {
         const api = window.app.request
-        const regions = await api.get.regions()
+        const regions = await api.get.regions().catch(err => {
+            setError(err)
+        })
 
-        setLocations(regions.map((region) => {
-            return  {
+        return regions.map((region) => {
+            return {
                 value: region.name,
                 label: region.name,
             }
-        }))
+        })
     }
 
-    React.useEffect(() => {
-        setLocationsFromAPI()
-    },[])
-    
     return <div
         key={item._id}
-        className={classnames("vaultItem", {["compact"]: props.compact})}
-        //onDoubleClick={openItemDetails}
+        className={classnames("vaultItem", { ["compact"]: props.compact })}
+        onDoubleClick={props.onDoubleClick}
     >
         <div>
             #{props.compact ? (item.properties?.essc ?? "Deserialized") : item._id}
@@ -120,33 +100,31 @@ const RenderItem = (props) => {
 
         <div className="tags">
             <div key="statement" className="tag">
-                <antd.Cascader options={StatementsOptions} onChange={(update) => onChangeProperties(item._id, {
-                    properties: {
-                        statement: update[0]
-                    }
-                })} >
-                    <antd.Tag color={TagColorByStatement[statement]}>
-                        <Icons.Activity />
-                        <h4>
-                            {statement}
-                        </h4>
-                    </antd.Tag>
-                </antd.Cascader>
+                <ModifierTag
+                    icon="Activity"
+                    onChangeProperties={(value) => onChangeProperties(item._id, {
+                        properties: {
+                            statement: value,
+                        }
+                    })}
+                    colors={Object.fromEntries(Object.keys(Statements).map((key) => {
+                        return [key, Statements[key].tagColor]
+                    }))}
+                    options={StatementsOptions}
+                    defaultValue={statement}
+                />
             </div>
             <div key="location" className="tag">
-                <antd.Cascader options={locations} onChange={(update) => onChangeProperties(item._id, {
-                    properties: {
-                        location: update[0]
-                    }
-                })} >
-                    <antd.Tag>
-                        <Icons.Map />
-                        <h4>
-                            {item.properties?.location ?? "Unlocated"}
-                        </h4>
-                    </antd.Tag>
-                </antd.Cascader>
-
+                <ModifierTag
+                    icon="Map"
+                    onChangeProperties={(value) => onChangeProperties(item._id, {
+                        properties: {
+                            location: value,
+                        }
+                    })}
+                    options={fetchLocations}
+                    defaultValue={item.properties?.location ?? "unknown"}
+                />
             </div>
             <div key="type" className="tag">
                 <antd.Tag>
@@ -156,35 +134,33 @@ const RenderItem = (props) => {
                     </h4>
                 </antd.Tag>
             </div>
-            {!props.compact && 
-            <div key="manufacturer" className="tag">
-                <antd.Tag>
-                    <Icons.Home />
-                    <h4>
-                        {item.properties?.vaultItemManufacturer ?? "Generic"}
-                    </h4>
-                </antd.Tag>
-            </div>}
-            {!props.compact && 
-            <div key="serial" className="tag">
-                <antd.Tag>
-                    <Icons.Key />
-                    <h4>
-                        {item.properties?.vaultItemSerial ?? "Deserialized"}
-                    </h4>
-                </antd.Tag>
-            </div>}
-            {!props.compact && 
-            <div key="essc" className="tag">
-                <antd.Tag>
-                    <Icons.Key />
-                    <h4>
-                        {item.properties?.essc ?? "Deserialized"}
-                    </h4>
-                </antd.Tag>
-            </div>}
+            {!props.compact &&
+                <div key="manufacturer" className="tag">
+                    <antd.Tag>
+                        <Icons.Home />
+                        <h4>
+                            {item.properties?.vaultItemManufacturer ?? "Generic"}
+                        </h4>
+                    </antd.Tag>
+                </div>}
+            {!props.compact &&
+                <div key="serial" className="tag">
+                    <antd.Tag>
+                        <Icons.Key />
+                        <h4>
+                            {item.properties?.vaultItemSerial ?? "Deserialized"}
+                        </h4>
+                    </antd.Tag>
+                </div>}
+            {!props.compact &&
+                <div key="essc" className="tag">
+                    <antd.Tag>
+                        <Icons.Key />
+                        <h4>
+                            {item.properties?.essc ?? "Deserialized"}
+                        </h4>
+                    </antd.Tag>
+                </div>}
         </div>
     </div>
 }
-
-export default RenderItem

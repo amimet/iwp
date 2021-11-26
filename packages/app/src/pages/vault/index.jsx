@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList } from 'components'
-import { ItemRender } from './components'
+import { ItemRender, ItemDetails } from './components'
 import classnames from 'classnames'
 
 import "./index.less"
@@ -49,8 +49,12 @@ export default class Vault extends React.Component {
         // TODO: Create a detailed view for vault items
         console.log("Open item details: ", _id)
         app.DrawerController.open("ItemDetails", ItemDetails, {
+            props: {
+                width: "50%",
+            },
             componentProps: {
                 id: _id,
+                onChangeProperties: this.onChangeProperties,
             }
         })
     }
@@ -113,7 +117,7 @@ export default class Vault extends React.Component {
                         <SelectableList
                             selectionEnabled={this.state.selectionEnabled}
                             items={this.state.data}
-                            renderItem={(item) => <ItemRender compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
+                            renderItem={(item) => <ItemRender onDoubleClick={() => this.onOpenItemDetails(item._id)} compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
                             onDelete={this.onDeleteItems}
                             actions={[
                                 <div key="delete" call="onDelete">
