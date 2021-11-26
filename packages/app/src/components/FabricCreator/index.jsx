@@ -6,9 +6,6 @@ import loadable from "@loadable/component"
 
 import "./index.less"
 
-// TODO: Better error display on catch error fields dynamic children render
-
-
 const Icons = {
     ...FIcons,
     ...MDIcons
@@ -72,21 +69,17 @@ const FieldsForms = {
         component: "select",
         updateEvent: "onChange",
         children: async () => {
-            try {
-                let types = await import("schemas/vaultItemsTypes.json")
+            let types = await import("schemas/vaultItemsTypes.json")
 
-                types = types.default || types
+            types = types.default || types
 
-                return Object.keys(types).map((group) => {
-                    return <antd.Select.OptGroup key={group} label={String(group).toTitleCase()}>
-                        {types[group].map((type) => {
-                            return <antd.Select.Option key={type} value={`${group}-${type}`}>{String(type).toTitleCase()}</antd.Select.Option>
-                        })}
-                    </antd.Select.OptGroup>
-                })
-            } catch (error) {
-                return <div>Failed to load</div>
-            }
+            return Object.keys(types).map((group) => {
+                return <antd.Select.OptGroup key={group} label={String(group).toTitleCase()}>
+                    {types[group].map((type) => {
+                        return <antd.Select.Option key={type} value={`${group}-${type}`}>{String(type).toTitleCase()}</antd.Select.Option>
+                    })}
+                </antd.Select.OptGroup>
+            })
         },
         props: {
             placeholder: "Select a type",
@@ -421,27 +414,32 @@ export default class FabricCreator extends React.Component {
                 return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, ...args)
             },
         }
-        let Component = () => React.createElement(FormComponents[field.component], fieldComponentProps)
+
+        let RenderComponent = null
 
         if (typeof field.children === "function") {
-            const DynamicComponent = loadable(async () => {
-                let returnedChildren = await field.children()
-                console.log(returnedChildren)
-                fieldComponentProps.children = returnedChildren
-
-                return () => React.createElement(FormComponents[field.component], fieldComponentProps)
+            RenderComponent = loadable(async () => {
+                try {
+                    const children = await field.children()
+                    return () => React.createElement(FormComponents[field.component], fieldComponentProps, children)
+                } catch (error) {
+                    console.log(error)
+                    return ()=> <div>
+                        <Icons.XCircle /> Load Error
+                    </div>
+                }
+            }, {
+                fallback: <div>Loading...</div>,
             })
-
-            Component = () => <React.Suspense fallback={<div>Loading</div>}>
-                <DynamicComponent />
-            </React.Suspense>
+        } else {
+            RenderComponent = () => React.createElement(FormComponents[field.component], fieldComponentProps)
         }
 
         return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
             <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
             <h4>{field.icon && createIconRender(field.icon)}{field.label}</h4>
             <div className="fieldContent">
-                <Component />
+                <RenderComponent />
             </div>
         </div>
     }
