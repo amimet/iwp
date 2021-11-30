@@ -297,7 +297,7 @@ class App {
 						<Sidebar user={this.state.user} />
 						<antd.Layout className="app_layout">
 							<Header visible={this.state.headerVisible} />
-							<antd.Layout.Content className="app_wrapper">
+							<antd.Layout.Content className="layout_page">
 								<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
 									<BindPropsProvider
 										user={this.state.user}

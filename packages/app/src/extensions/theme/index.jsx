@@ -1,49 +1,130 @@
 import config from "config"
 import store from "store"
 import { ConfigProvider } from "antd"
+import less from "less"
 
-async function GetDefaultTheme() {
-	// TODO: Use evite CONSTANTS_API
-}
+import AntdThemes from "antd/dist/theme.js"
 
 class ThemeController {
 	constructor(params) {
 		this.params = { ...params }
-		this.storageKey = "theme"
-		this.defaultTheme = this.getDefault()
+
+		this.themeManifestStorageKey = "theme"
+		this.modificationStorageKey = "themeModifications"
+		this.variantStorageKey = "themeVariation"
+
+		this.theme = null
+
+		this.mutation = null
+		this.currentVariant = null
 
 		this.init()
+
+		return this
 	}
 
 	init = () => {
-		const storagedTheme = this.getFromStorage()
+		let theme = this.getStoragedTheme()
+		const modifications = this.getStoragedModifications()
+		const variantKey = this.getStoragedVariant()
 
-		if (storagedTheme) {
-			this.set(storagedTheme)
+		if (!theme) {
+			// load default theme
+			theme = this.getDefaultTheme()
 		} else {
-			this.set(this.defaultTheme)
+			// load URL and initialize theme
 		}
+
+		// set global theme
+		this.theme = theme
+
+		// override with static vars
+		if (theme.staticVars) {
+			this.update(theme.staticVars)
+		}
+
+		// override theme with modifications
+		if (modifications) {
+			this.update(modifications)
+		}
+
+		// apply variation
+		this.applyVariant(variantKey)
 	}
 
-	getDefault = () => {
+	getRootVariables = () => {
+		let attributes = document.documentElement.getAttribute("style").trim().split(";")
+		attributes = attributes.slice(0, (attributes.length - 1))
+		attributes = attributes.map((variable) => {
+			let [key, value] = variable.split(":")
+			key = key.split("--")[1]
+
+			return [key, value]
+		})
+
+		return Object.fromEntries(attributes)
+	}
+
+	getDefaultTheme = () => {
+		// TODO: Use evite CONSTANTS_API
 		return config.defaultTheme
 	}
 
-	getFromStorage = () => {
-		return store.get(this.storageKey)
+	getStoragedTheme = () => {
+		return store.get(this.themeManifestStorageKey)
+	}
+
+	getStoragedModifications = () => {
+		return store.get(this.modificationStorageKey)
+	}
+
+	getStoragedVariant = () => {
+		return store.get(this.variantStorageKey)
+	}
+
+	setVariant = (variationKey) => {
+		return store.set(this.variantStorageKey, variationKey)
+	}
+
+	setModifications = (modifications) => {
+		return store.set(this.modificationStorageKey, modifications)
 	}
 
 	resetDefault = () => {
-		return this.update(this.defaultTheme)
+		store.remove(this.themeManifestStorageKey)
+		store.remove(this.modificationStorageKey)
+
+		return this.init()
 	}
 
-	update = (theme) => {
-		store.set(this.storageKey, theme)
-		return this.set(theme)
+	update = (update) => {
+		if (typeof update !== "object") {
+			return false
+		}
+
+		this.mutation = {
+			...this.theme.staticVars,
+			...this.mutation,
+			...update
+		}
+
+		Object.keys(this.mutation).forEach(key => {
+			document.documentElement.style.setProperty(`--${key}`, this.mutation[key])
+		})
+
+		document.documentElement.style.setProperty(`--themeVariant`, this.currentVariant)
+
+		ConfigProvider.config({ theme: this.mutation })
 	}
 
-	set = (theme = this.defaultTheme) => {
-		return ConfigProvider.config({ theme })
+	applyVariant = (variant = (this.theme.defaultVariant ?? "light")) => {
+		const values = this.theme.variants[variant]
+
+		if (values) {
+			this.currentVariant = variant
+			this.update(values)
+			this.setVariant(variant)
+		}
 	}
 }
 
@@ -55,11 +136,20 @@ export default {
 				async (app, main) => {
 					app.ThemeController = new ThemeController()
 
-					main.eventBus.on("updateTheme", (payload) => {
+					main.eventBus.on("darkMode", (payload) => {
+						if (payload.to) {
+							app.ThemeController.applyVariant("dark")
+						} else {
+							app.ThemeController.applyVariant("light")
+						}
+					})
+					main.eventBus.on("modifyTheme", (payload) => {
 						if (payload.to) {
 							app.ThemeController.update(payload.to)
-						}else {
+							app.ThemeController.setModifications(app.ThemeController.mutation)
+						} else {
 							app.ThemeController.update(payload)
+							app.ThemeController.setModifications(app.ThemeController.mutation)
 						}
 					})
 					main.eventBus.on("resetTheme", () => {

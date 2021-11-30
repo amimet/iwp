@@ -2,7 +2,6 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 
-import { Roles } from "components"
 import { AccountEditor, SessionsView, StatisticsView } from "./components"
 
 import { Session } from "models"
@@ -160,7 +159,6 @@ export default class Account extends React.Component {
 							</>
 						}
 					</div>
-					<Roles roles={user.roles} />
 					{this.state.isSelf && this.renderSelfActions()}
 				</div>
 

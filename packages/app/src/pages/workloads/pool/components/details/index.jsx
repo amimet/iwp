@@ -1,5 +1,4 @@
 import React from "react"
-import { AppLoading } from "components"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import classnames from "classnames"
@@ -123,7 +122,7 @@ export default class WorkloadDetails extends React.Component {
 		const { data } = this.state
 
 		if (data == null) {
-			return <AppLoading />
+			return <antd.Skeleton active />
 		}
 
 		const createdDate = new Date(data.created)

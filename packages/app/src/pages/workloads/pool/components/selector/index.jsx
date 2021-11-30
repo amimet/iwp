@@ -1,6 +1,6 @@
 import React from "react"
+import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { LoadingSpinner } from "components"
 import { Button, List, Checkbox, InputNumber } from "antd"
 
 import "../../index.less"
@@ -124,7 +124,7 @@ export default class WorkloadSelector extends React.Component {
 	render() {
 		const { loading, selectedItem } = this.state
 
-		if (loading) return <LoadingSpinner />
+		if (loading) return <antd.Skeleton active />
 
 		if (selectedItem) {
 			return this.renderSelectedItem(selectedItem)

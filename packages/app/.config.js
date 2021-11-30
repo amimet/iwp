@@ -1,6 +1,7 @@
 const path = require('path')
 
 const aliases = {
+    "@antd": path.resolve(__dirname, "../../node_modules/antd"),
     "@": path.resolve(__dirname, 'src'),
     schemas: path.resolve(__dirname, 'constants'),
     extensions: path.resolve(__dirname, 'src/extensions'),

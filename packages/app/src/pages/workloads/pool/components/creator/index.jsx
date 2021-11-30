@@ -1,9 +1,9 @@
 import React from "react"
+import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { nanoid } from "nanoid"
 
 import { Select, Button, List, Tag, Space, Input, DatePicker, Tabs, Row, Col } from "antd"
-import { LoadingSpinner } from "components"
 
 import { WorkloadSelector } from "../index"
 
@@ -235,7 +235,7 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	render() {
-		if (this.state.loading) return <LoadingSpinner />
+		if (this.state.loading) return <antd.Skeleton active />
 
 		return (
 			<div className="workload_creator_wrapper">

@@ -83,13 +83,14 @@ export default class SettingsMenu extends React.Component {
 				break
 			}
 			case "switch": {
-				item.props.children = item.title ?? item.id
 				item.props.checked = this.state.settings[item.id]
 				item.props.onClick = (event) => this.handleEvent(event, item)
 				break
 			}
 			default: {
-				item.props.children = item.title ?? item.id
+				if (!item.props.children) {
+					item.props.children = item.title ?? item.id
+				}
 				item.props.value = this.state.settings[item.id]
 				item.props.onClick = (event) => this.handleEvent(event, item)
 				break

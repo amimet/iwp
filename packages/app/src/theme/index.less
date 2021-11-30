@@ -1,48 +1,10 @@
-//@import "antd/dist/antd.less";
-@import "antd/dist/antd.variable.min.css";
+@import "antd/dist/antd.variable.less";
 @import "theme/vars.less";
 @import "theme/fonts.css";
 
-.ant-layout {
-	background: @app_layout_backgroundColor!important;
-	background-color: @app_layout_backgroundColor!important;
-
-	width: 100%;
-	height: 100%;
-	max-height: 100%;
-
-	overflow: hidden;
-}
-
-.app_layout {
-	background: @app_layout_backgroundColor!important;
-	background-color: @app_layout_backgroundColor!important;
-
-	position: relative;
-	-webkit-overflow-scrolling: touch;
-
-	width: 100%;
-	height: 100%;
-	max-height: 100%;
-
-	overflow: hidden;
-}
-
-.app_wrapper {
-	position: relative;
-
-	height: 100%;
-	max-height: 100%;
-
-	margin: 10px 10px 30px 16px;
-	
-	overflow-x: hidden;
-	overflow-y: overlay;
-}
-
 ::-webkit-scrollbar {
 	position: absolute;
-	
+
 	width: 14px;
 	height: 18px;
 	z-index: 200;
@@ -78,7 +40,7 @@ html {
 	position: fixed;
 	overflow: hidden;
 	-webkit-overflow-scrolling: touch;
-	background-color: @app_layout_backgroundColor!important;
+	background-color: var(--background_primary) !important;
 
 	height: 100vh;
 	max-height: 100vh;
@@ -90,7 +52,7 @@ body {
 	-webkit-app-region: no-drag;
 
 	user-select: none;
-	background-color: @app_layout_backgroundColor!important;
+	background-color: var(--background_primary) !important;
 	font-family: "Varela Round", sans-serif;
 
 	scroll-behavior: smooth;
@@ -111,7 +73,7 @@ body {
 
 	overflow-x: hidden;
 	overflow-y: hidden;
-	background-color: @app_layout_backgroundColor!important;
+	background-color: var(--background_primary) !important;
 }
 
 #nprogress {
@@ -123,6 +85,64 @@ body {
 		height: 2px;
 		background: #48acf0;
 	}
+}
+
+.ant-layout, .app_layout {
+	background: var(--background_primary) !important;
+	background-color: var(--background_primary) !important;
+
+	position: relative;
+	-webkit-overflow-scrolling: touch;
+
+	width: 100%;
+	height: 100%;
+	max-height: 100%;
+
+	overflow: hidden;
+	transition: all 150ms ease-in-out;
+}
+
+.layout_page {
+	position: relative;
+	color: var(--text_color);
+
+	height: 100%;
+	max-height: 100%;
+
+	margin: 10px 10px 30px 16px;
+
+	overflow-x: hidden;
+	overflow-y: overlay;
+}
+
+h1,h2,h3,h4,h5,h6 {
+	color: var(--header_text_color);
+}
+
+a, p, span {
+	color: var(--text_color);
+}
+
+// div {
+// 	color: var(--text_color);
+// }
+
+svg {
+	color: var(--svg_color);
+}
+
+.ant-btn {
+	background-color: var(--button_background_color);
+	color: var(--button_text_color);
+}
+
+.ant-page-header span {
+	color: var(--text_color);
+}
+
+.ant-drawer-content{
+	background: var(--background_primary);
+	background-color: var(--background_primary);
 }
 
 // @media (min-width: @screen-xs) {
@@ -145,46 +165,6 @@ body {
 
 // }
 
-.horizontal_actions_cascade {
-	> div:first-child {
-		transform: unset;
-	}
-
-	> div {
-		transform: translate(0, -10px);
-	}
-}
-
-.horizontal_actions {
-	display: flex;
-	flex-direction: row;
-
-	align-items: center;
-
-	> div {
-		padding: 0 10px;
-	}
-
-	padding: 20px 0;
-
-	border-bottom: #424242 solid 1px;
-	border-left: #424242 solid 1px;
-	border-right: #424242 solid 1px;
-
-	border-radius: 0 0 12px 12px;
-}
-
-.component_bottom_centered {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-}
 
 .fade-transverse-active {
 	transition: all 250ms;
@@ -226,7 +206,7 @@ body {
 
 	display: flex;
 	flex-direction: column;
-	
+
 	justify-content: center;
 	align-items: center;
 
@@ -249,7 +229,7 @@ body {
 	justify-content: center;
 }
 
-.ant-result-extra {
+.ant-result-extra  {
 	display: flex;
 	align-items: center;
 	justify-content: center;
