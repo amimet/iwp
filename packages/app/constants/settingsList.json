@@ -13,7 +13,7 @@
         "icon": "Edit",
         "title": "Edit Sidebar",
         "emitEvent": "edit_sidebar",
-        "noUpdate": true
+        "noStorage": true
     },
     {
         "id": "collapseOnLooseFocus",
