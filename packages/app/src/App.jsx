@@ -141,13 +141,6 @@ class App {
 			this.setState({ crash: { message, error } })
 			this.contexts.app.SoundEngine.play("crash")
 		})
-
-		this.eventBus.on("updateTheme", (theme) => {
-			return this.contexts.app.ThemeController.update(theme)
-		})
-		this.eventBus.on("defaultTheme", () => {
-			return this.contexts.app.ThemeController.resetDefault()
-		})
 	}
 
 	static windowContext() {
@@ -192,7 +185,7 @@ class App {
 
 	state = {
 		// app
-		themeConfig: {
+		themeConfig: {
 			direction: "ltr",
 		},
 		initialized: false,
