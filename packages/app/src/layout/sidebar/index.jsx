@@ -2,7 +2,6 @@ import React from "react"
 import { Icons, createIconRender } from "components/icons"
 import { Layout, Menu, Avatar } from "antd"
 
-import { Settings } from "components"
 import { SidebarEditor } from "./components"
 
 import config from "config"
@@ -16,7 +15,7 @@ const { Sider } = Layout
 
 const onClickHandlers = {
 	settings: (event) => {
-		Settings.open()
+		window.app.openSettings()
 	},
 }
 
