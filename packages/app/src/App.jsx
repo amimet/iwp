@@ -21,7 +21,7 @@ import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Debug, theme, Sound } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, FabricCreator } from "components"
+import { NotFound, RenderError, FabricCreator, Settings } from "components"
 import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
 import { Icons } from "components/Icons"
 
@@ -145,6 +145,16 @@ class App {
 
 	static windowContext() {
 		return {
+			openSettings: (goTo) => {
+				window.app.DrawerController.open("settings", Settings, {
+					props: {
+						width: "40%",
+					},
+					componentProps: {
+						goTo,
+					}
+				})
+			},
 			openFabric: (defaultType) => {
 				window.app.DrawerController.open("FabricCreator", FabricCreator, {
 					props: {
