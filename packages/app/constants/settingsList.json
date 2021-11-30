@@ -1,34 +1,38 @@
 [
     {
         "id": "expire_session",
-        "icon": "Key",
-        "title": "Expire Session",
         "group": "general",
-        "type": "Switch"
+        "type": "Switch",
+        "icon": "Key",
+        "title": "Expire Session"
     },
     {
         "id": "edit_sidebar",
         "group": "sidebar",
+        "type": "Button",
         "icon": "Edit",
         "title": "Edit Sidebar",
-        "type": "Button"
+        "emitEvent": "edit_sidebar",
+        "noUpdate": true
     },
     {
         "id": "collapseOnLooseFocus",
         "group": "sidebar",
-        "title": "Collapse when loose focus",
-        "type": "Switch"
+        "type": "Switch",
+        "title": "Collapse when loose focus"
     },
     {
         "id": "reduceAnimations",
         "group": "aspect",
-        "title": "Reduce animations",
-        "type": "Switch"
+        "type": "Switch",
+        "title": "Reduce animation"
     },
     {
-        "id": "mainColor",
+        "id": "primaryColor",
         "group": "aspect",
-        "title": "Theme color",
-        "type": "ColorPicker"
+        "type": "SliderColorPicker",
+        "title": "Primary color",
+        "emitEvent": "updateTheme",
+        "updateValueKey": "primaryColor"
     }
 ]
