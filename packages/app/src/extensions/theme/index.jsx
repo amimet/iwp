@@ -34,7 +34,7 @@ class ThemeController {
 	}
 
 	resetDefault = () => {
-		return this.set(this.defaultTheme)
+		return this.update(this.defaultTheme)
 	}
 
 	update = (theme) => {
