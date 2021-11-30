@@ -1,16 +1,16 @@
-import packagejson from '../package.json'
+import packagejson from "../package.json"
 import defaultTheme from "../constants/defaultTheme.json"
 
 export default {
-    defaultTheme,
+    defaultTheme: defaultTheme,
     logo: {
         alt: new URL(`../src/assets/logo_alt.svg`, import.meta.url).href
     },
     api: {
-        address: process.env.NODE_ENV !== 'production'? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
+        address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
     },
     ws: {
-        address: process.env.NODE_ENV !== 'production'? `ws://${window.location.hostname}:3001` : "https://ws.amimet.es",
+        address: process.env.NODE_ENV !== 'production' ? `ws://${window.location.hostname}:3001` : "https://ws.amimet.es",
     },
     app: {
         title: packagejson.name,
