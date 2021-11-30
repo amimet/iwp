@@ -1,13 +1,13 @@
 import React from "react"
 import { Icons } from "components/icons"
-import * as antd from "antd"
 import { SliderPicker } from "react-color"
-import { AboutApp } from ".."
+import * as antd from "antd"
 import config from "config"
 
 import settingList from "schemas/settingsList.json"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
-import { Session } from "models"
+
+import { AboutApp } from ".."
 
 import "./index.less"
 
@@ -22,7 +22,7 @@ const ItemTypes = {
 	SliderColorPicker: SliderPicker,
 }
 
-export class SettingsMenu extends React.Component {
+export default class SettingsMenu extends React.Component {
 	state = {
 		settings: window.app.configuration.settings.get() ?? {},
 	}
@@ -173,20 +173,3 @@ export class SettingsMenu extends React.Component {
 		)
 	}
 }
-
-const controller = {
-	open: (key) => {
-		// TODO: Scroll to content
-		window.app.DrawerController.open("settings", SettingsMenu, {
-			props: {
-				width: "45%",
-			},
-		})
-	},
-
-	close: () => {
-		window.app.DrawerController.close("settings")
-	},
-}
-
-export default controller
