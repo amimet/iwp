@@ -28,11 +28,29 @@
         "title": "Reduce animation"
     },
     {
+        "id": "darkMode",
+        "group": "aspect",
+        "type": "Switch",
+        "title": "Dark Mode",
+        "emitEvent": "darkMode"
+    },
+    {
         "id": "primaryColor",
         "group": "aspect",
         "type": "SliderColorPicker",
         "title": "Primary color",
-        "emitEvent": "updateTheme",
+        "emitEvent": "modifyTheme",
         "updateValueKey": "primaryColor"
+    },
+    {
+        "id": "resetTheme",
+        "group": "aspect",
+        "type": "Button",
+        "title": "Reset theme",
+        "props": {
+            "children": "Default Theme"
+        },
+        "emitEvent": "resetTheme",
+        "noStorage": true
     }
 ]

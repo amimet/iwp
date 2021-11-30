@@ -1,3 +1,21 @@
 {
-    "primaryColor": "#32b7bb"
+    "staticVars": {
+        "primaryColor": "#32B7BB"
+    },
+    "defaultVariant": "light",
+    "variants": {
+        "light": {
+            "background_primary": "#ffffff",
+            "background_accent": "#f0f2f5",
+            "background_contrast": "#4b4b4b"
+        },
+        "dark": {
+            "background_primary": "#262626",
+            "background_accent": "#353535",
+            "background_contrast": "#ffffff",
+            "text_color": "#d2d2d2",
+            "svg_color": "#d2d2d2",
+            "header_text_color": "#d2d2d2"
+        }
+    }
 }
