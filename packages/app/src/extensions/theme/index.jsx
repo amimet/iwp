@@ -54,6 +54,18 @@ export default {
 			initialization: [
 				async (app, main) => {
 					app.ThemeController = new ThemeController()
+
+					main.eventBus.on("updateTheme", (payload) => {
+						if (payload.to) {
+							app.ThemeController.update(payload.to)
+						}else {
+							app.ThemeController.update(payload)
+						}
+					})
+					main.eventBus.on("resetTheme", () => {
+						app.ThemeController.resetDefault()
+					})
+
 					main.setToWindowContext("ThemeController", app.ThemeController)
 				},
 			],
