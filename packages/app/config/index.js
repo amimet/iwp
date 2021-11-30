@@ -1,6 +1,8 @@
 import packagejson from '../package.json'
+import defaultTheme from "../constants/defaultTheme.json"
 
 export default {
+    defaultTheme,
     logo: {
         alt: new URL(`../src/assets/logo_alt.svg`, import.meta.url).href
     },
@@ -9,9 +11,6 @@ export default {
     },
     ws: {
         address: process.env.NODE_ENV !== 'production'? `ws://${window.location.hostname}:3001` : "https://ws.amimet.es",
-    },
-    theme: {
-        "primary-color": "#32b7bb",
     },
     app: {
         title: packagejson.name,
@@ -35,9 +34,6 @@ export default {
             to: `/@/:id`,
         }
     ],
-    defaults: {
-        avatar: "https://www.flaticon.com/svg/static/icons/svg/149/149071.svg"
-    },
     i18n: {
         languages: [
             {

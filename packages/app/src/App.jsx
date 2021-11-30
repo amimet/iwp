@@ -141,6 +141,13 @@ class App {
 			this.setState({ crash: { message, error } })
 			this.contexts.app.SoundEngine.play("crash")
 		})
+
+		this.eventBus.on("updateTheme", (theme) => {
+			return this.contexts.app.ThemeController.update(theme)
+		})
+		this.eventBus.on("defaultTheme", () => {
+			return this.contexts.app.ThemeController.resetDefault()
+		})
 	}
 
 	static windowContext() {
@@ -185,6 +192,9 @@ class App {
 
 	state = {
 		// app
+		themeConfig: {
+			direction: "ltr",
+		},
 		initialized: false,
 		isMobile: false,
 		crash: false,
@@ -278,24 +288,26 @@ class App {
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
-				<antd.Layout style={{ height: "100%" }}>
-					<Drawer />
-					<Sidebar user={this.state.user} />
-					<antd.Layout className="app_layout">
-						<Header visible={this.state.headerVisible} />
-						<antd.Layout.Content className="app_wrapper">
-							<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
-								<BindPropsProvider
-									user={this.state.user}
-									session={this.state.session}
-								>
-									<Render.RenderRouter staticRenders={App.staticRenders} />
-								</BindPropsProvider>
-							</div>
-						</antd.Layout.Content>
+				<antd.ConfigProvider {...this.state.themeConfig}>
+					<antd.Layout style={{ height: "100%" }}>
+						<Drawer />
+						<Sidebar user={this.state.user} />
+						<antd.Layout className="app_layout">
+							<Header visible={this.state.headerVisible} />
+							<antd.Layout.Content className="app_wrapper">
+								<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
+									<BindPropsProvider
+										user={this.state.user}
+										session={this.state.session}
+									>
+										<Render.RenderRouter staticRenders={App.staticRenders} />
+									</BindPropsProvider>
+								</div>
+							</antd.Layout.Content>
+						</antd.Layout>
+						<Sidedrawer />
 					</antd.Layout>
-					<Sidedrawer />
-				</antd.Layout>
+				</antd.ConfigProvider>
 			</React.Fragment>
 		)
 	}

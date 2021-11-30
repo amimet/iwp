@@ -1,41 +1,50 @@
-import React from "react"
 import config from "config"
+import store from "store"
+import { ConfigProvider } from "antd"
 
-const themeConfig = config.theme ?? {}
-
-//themeConfig["primary-color"]
-
-const BaseThemeVars = {
-    "primary-color": "#32b7bb",
+async function GetDefaultTheme() {
+	// TODO: Use evite CONSTANTS_API
 }
 
 class ThemeController {
 	constructor(params) {
 		this.params = { ...params }
-		this.vars = Object()
-		this.root = document.documentElement
+		this.storageKey = "theme"
+		this.defaultTheme = this.getDefault()
 
-		// init
-        this.init()
+		this.init()
 	}
 
-    init = () => {
-        Object.keys(BaseThemeVars).forEach(key => {
-            this.updateVar(key, BaseThemeVars[key])
-        })
-    }
+	init = () => {
+		const storagedTheme = this.getFromStorage()
 
-	updateVar = (key, value) => {
-		return this.root.style.setProperty(`--${key}`, value)
+		if (storagedTheme) {
+			this.set(storagedTheme)
+		} else {
+			this.set(this.defaultTheme)
+		}
 	}
 
-	generate = (payload = {}) => {
-		const { variables } = payload
+	getDefault = () => {
+		return config.defaultTheme
 	}
 
-	load = (payload) => {
+	getFromStorage = () => {
+		return store.get(this.storageKey)
+	}
 
-    }
+	resetDefault = () => {
+		return this.set(this.defaultTheme)
+	}
+
+	update = (theme) => {
+		store.set(this.storageKey, theme)
+		return this.set(theme)
+	}
+
+	set = (theme = this.defaultTheme) => {
+		return ConfigProvider.config({ theme })
+	}
 }
 
 export default {
@@ -44,8 +53,8 @@ export default {
 		{
 			initialization: [
 				async (app, main) => {
-					app.themeController = new ThemeController()
-					main.setToWindowContext("themeController", app.themeController)
+					app.ThemeController = new ThemeController()
+					main.setToWindowContext("ThemeController", app.ThemeController)
 				},
 			],
 		},
