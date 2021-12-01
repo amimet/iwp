@@ -25,14 +25,17 @@
         "id": "reduceAnimations",
         "group": "aspect",
         "type": "Switch",
+        "icon": "MdOutlineAnimation",
         "title": "Reduce animation"
     },
     {
         "id": "darkMode",
         "group": "aspect",
         "type": "Switch",
+        "icon": "Moon",
         "title": "Dark Mode",
-        "emitEvent": "darkMode"
+        "emitEvent": "darkMode",
+        "experimental": true
     },
     {
         "id": "primaryColor",
