@@ -18,7 +18,7 @@ import progressBar from "nprogress"
 import classnames from "classnames"
 
 import { Session, User, SidebarController, SettingsController } from "models"
-import { API, Render, Splash, Debug, theme, Sound } from "extensions"
+import { API, Render, Splash, Debug, Theme, Sound } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, FabricCreator, Settings } from "components"
@@ -195,9 +195,6 @@ class App {
 
 	state = {
 		// app
-		themeConfig: {
-			direction: "ltr",
-		},
 		initialized: false,
 		isMobile: false,
 		crash: false,
@@ -207,8 +204,6 @@ class App {
 		session: null,
 		data: null,
 	}
-
-	layoutContentRef = React.createRef()
 
 	flushState = () => {
 		this.setState({ session: null, data: null })
@@ -291,12 +286,12 @@ class App {
 				<Helmet>
 					<title>{config.app.siteName}</title>
 				</Helmet>
-				<antd.ConfigProvider {...this.state.themeConfig}>
-					<antd.Layout style={{ height: "100%" }}>
+				<antd.ConfigProvider>
+					<antd.Layout className="app_layout" style={{ height: "100%" }}>
 						<Drawer />
 						<Sidebar user={this.state.user} />
-						<antd.Layout className="app_layout">
-							<Header visible={this.state.headerVisible} />
+						<antd.Layout className="content_layout">
+							<Header />
 							<antd.Layout.Content className="layout_page">
 								<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
 									<BindPropsProvider
@@ -317,5 +312,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, theme, API, SplashExtension, Debug],
+	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension, Debug],
 })
