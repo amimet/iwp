@@ -7,7 +7,9 @@
         "light": {
             "background-color-primary": "#ffffff",
             "background-color-accent": "#f0f2f5",
-            "background-color-contrast": "#4b4b4b"
+            "background-color-contrast": "#4b4b4b",
+            "sidebar-background-color": "var(--background-color-accent)",
+            "sidedrawer-background-color": "var(--background-color-accent)"
         },
         "dark": {
             "text-color": "#d2d2d2",
