@@ -60,9 +60,42 @@ export default class Vault extends React.Component {
     importData = async () => {
         window.app.DrawerController.open("ImportTool", ImportTool, {
             props: {
-                width: "50%",
+                width: "70%",
+            },
+            onDone: async (ctx, changes) => {
+                const result = await this.onImportData(changes).catch(error => {
+                    ctx.events.emit("error", error)
+                })
+
+                if (result) {
+                    this.setState({ data: result })
+                    ctx.close()
+                }
             }
         })
+    }
+
+    onImportData = async (changes) => {
+        console.log(changes)
+        return
+        const parsedChanges = changes.map(change => {
+            // create properties object without the _id and name
+            const properties = Object.keys(change.new).reduce((acc, key) => {
+                if (key !== "_id" && key !== "name") {
+                    acc[key] = change.new[key]
+                }
+                return acc
+            }, {})
+
+            return {
+                _id: change._id,
+                name: change.new.name,
+                type: "vaultItem",
+                properties
+            }
+        })
+
+        return api.put.fabricImport({ data: parsedChanges })
     }
 
     onChangeProperties = async (_id, mutation) => {
@@ -80,7 +113,7 @@ export default class Vault extends React.Component {
             componentProps: {
                 id: _id,
                 onChangeProperties: this.onChangeProperties,
-            }
+            },
         })
     }
 
