@@ -1,11 +1,8 @@
 import config from "config"
 import store from "store"
 import { ConfigProvider } from "antd"
-import less from "less"
 
-import AntdThemes from "antd/dist/theme.js"
-
-class ThemeController {
+export class ThemeController {
 	constructor(params) {
 		this.params = { ...params }
 
@@ -21,6 +18,10 @@ class ThemeController {
 		this.init()
 
 		return this
+	}
+
+	static get currentVariant() {
+		return document.documentElement.style.getPropertyValue("--themeVariant")
 	}
 
 	init = () => {
@@ -112,6 +113,7 @@ class ThemeController {
 			document.documentElement.style.setProperty(`--${key}`, this.mutation[key])
 		})
 
+		document.documentElement.className = `theme-${this.currentVariant}`
 		document.documentElement.style.setProperty(`--themeVariant`, this.currentVariant)
 
 		ConfigProvider.config({ theme: this.mutation })
@@ -128,7 +130,7 @@ class ThemeController {
 	}
 }
 
-export default {
+export const extension = {
 	key: "theme",
 	expose: [
 		{
@@ -162,3 +164,5 @@ export default {
 		},
 	],
 }
+
+export default extension
