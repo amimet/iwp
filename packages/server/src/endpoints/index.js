@@ -71,6 +71,12 @@ module.exports = [
         middleware: ["ensureAuthenticated"],
         fn: "FabricController.delete",
     },
+    {
+        route: "/fabric_import",
+        method: "PUT",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "FabricController.import",
+    },
     // WORKLOADS
     {
         route: "/workloads",
