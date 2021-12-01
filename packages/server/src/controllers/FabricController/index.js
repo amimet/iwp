@@ -43,26 +43,30 @@ export const FabricController = {
         return res.json(objects)
     }),
     update: selectValues(["_id", "mutation"], async (req, res) => {
-        const { _id, mutation } = req.selectedValues
+        try {
+            const { _id, mutation } = req.selectedValues
+            let obj = await FabricObject.findOne({ _id })
 
-        let obj = await FabricObject.findOne({ _id })
+            if (!obj) {
+                return res.status(404).json({
+                    error: "Object not found"
+                })
+            }
 
-        if (!obj) {
-            return res.status(404).json({
-                error: "Object not found"
+            obj = overrideObjects(obj, mutation, mutableKeys)
+
+            await FabricObject.findByIdAndUpdate(_id, obj)
+
+            return res.json(obj)
+        } catch (error) {
+            return res.status(500).json({
+                error: error.message
             })
         }
-
-        obj = overrideObjects(obj, mutation, mutableKeys)
-
-        await FabricObject.findByIdAndUpdate(_id, obj)
-
-        return res.json(obj)
     }),
     create: Schematized(["type", "name", "properties"], async (req, res) => {
-        const { type, name, properties, additions } = req.body
-
         try {
+            const { type, name, properties, additions } = req.body
             let craft = { type, name, properties }
 
             // handle additions
@@ -75,6 +79,36 @@ export const FabricController = {
             obj.save()
 
             return res.json(obj)
+        } catch (error) {
+            return res.status(500).json(error.message)
+        }
+    }),
+    import: Schematized(["data"], async (req, res) => {
+        try {
+            const { data } = req.body
+
+            data.forEach(async (item) => {
+                let obj = FabricObject.findById(item._id)
+
+                if (obj) {
+                    obj = overrideObjects(obj, item, mutableKeys)
+        
+                    return await FabricObject.findByIdAndUpdate(item._id, obj)
+                } else {
+                    let craft = {
+                        type: item.type,
+                        name: item.name,
+                        properties: item.properties
+                    }
+
+                    const newObj = await new FabricObject(craft)
+                    return await newObj.save()
+                }
+            })
+
+            const objects = await FabricObject.find()
+
+            return res.json(objects)
         } catch (error) {
             return res.status(500).json(error.message)
         }
