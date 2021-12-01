@@ -55,12 +55,12 @@ tr {
 }
 
 // BUTTONS
-.ant-btn {
+.ant-btn:not(.ant-btn-link) {
     background-color: var(--button-background-color);
+}
 
-    span {
-        color: var(--button-text-color)!important;
-    }
+.ant-btn span{
+    color: var(--button-text-color)!important;
 }
 
 .ant-btn svg {
