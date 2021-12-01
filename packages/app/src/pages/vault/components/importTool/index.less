@@ -1,9 +1,92 @@
-.importTool {
-	.header {
-
+.import_data_wrapper {
+	> div {
+		margin-bottom: 20px;
 	}
-    .content {
-        display: flex;
-        flex-direction: row;
-    }
+
+	margin-bottom: 80px;
+
+	.conflicts {
+		.conflict  {
+			height: 100%;
+
+			> div {
+				margin-bottom: 25px;
+			}
+
+			h3 {
+				margin: 0;
+			}
+
+			.diff {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				grid-template-rows: 1fr;
+				gap: 0px 20px;
+				grid-template-areas: ". .";
+
+				h3 {
+					text-align: center;
+				}
+
+				.property {
+					.key {
+						font-weight: bold;
+						font-size: 15px;
+					}
+					.value {
+						//margin-left: 15px;
+						padding: 4px 15px;
+						background-color: var(--background-color-accent);
+						border-radius: 2px;
+					}
+				}
+
+				.state {
+					.data {
+						border: 1px solid var(--border-color);
+						border-radius: 5px;
+						padding: 10px;
+						> div {
+							margin-bottom: 10px;
+						}
+					}
+
+					&.existing {
+						//background-color: rebeccapurple;
+					}
+					&.new {
+						//background-color: aquamarine;
+					}
+				}
+			}
+		}
+	}
+
+	.changes {
+		> div {
+			margin-bottom: 10px;
+		}
+
+		.change {
+			background-color: #f5f5f5;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			padding: 10px;
+			margin-right: 10px;
+		}
+	}
+
+	.actions {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		padding: 20px;
+		backdrop-filter: blur(10px);
+
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+	}
 }
