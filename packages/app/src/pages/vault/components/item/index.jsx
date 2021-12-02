@@ -50,20 +50,6 @@ export default (props) => {
         nameInputRef.current.blur()
     }
 
-    const fetchLocations = async () => {
-        const api = window.app.request
-        const regions = await api.get.regions().catch(err => {
-            setError(err)
-        })
-
-        return regions.map((region) => {
-            return {
-                value: region.name,
-                label: region.name,
-            }
-        })
-    }
-
     const fetchTypes = async () => {
         let types = await import("schemas/vaultItemsTypes.json")
 
@@ -140,7 +126,7 @@ export default (props) => {
                             location: value.join("-"),
                         }
                     })}
-                    options={fetchLocations}
+                    options={props.locations}
                     defaultValue={item.properties?.location ?? "unknown"}
                 />
             </div>
