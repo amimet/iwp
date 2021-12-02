@@ -11,19 +11,47 @@ const api = window.app.request
 
 export default class Vault extends React.Component {
     state = {
+        locations: [],
         compactView: false,
         selectionEnabled: false,
         data: null
     }
 
+    itemListRef = React.createRef()
+
     componentDidMount = async () => {
         await this.loadFabricItems()
+        await this.loadLocations()
+    }
+
+    loadLocations = async () => {
+        const locations = await this.fetchLocations()
+        this.setState({ locations })
     }
 
     loadFabricItems = async () => {
-        this.setState({ data: null })
-        const vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
-        this.setState({ data: vault })
+        const vault = await this.fetchFabricItems()
+
+        this.setState({ data: null }, () => {
+            this.setState({ data: vault })
+        })
+    }
+
+    fetchLocations = async () => {
+        const regions = await api.get.regions().catch(err => {
+            return []
+        })
+
+        return regions.map((region) => {
+            return {
+                value: region.name,
+                label: region.name,
+            }
+        })
+    }
+
+    fetchFabricItems = async () => {
+        return await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
     }
 
     toogleSelection = (to) => {
@@ -76,26 +104,11 @@ export default class Vault extends React.Component {
     }
 
     onImportData = async (changes) => {
-        console.log(changes)
-        return
-        const parsedChanges = changes.map(change => {
-            // create properties object without the _id and name
-            const properties = Object.keys(change.new).reduce((acc, key) => {
-                if (key !== "_id" && key !== "name") {
-                    acc[key] = change.new[key]
-                }
-                return acc
-            }, {})
-
-            return {
-                _id: change._id,
-                name: change.new.name,
-                type: "vaultItem",
-                properties
-            }
+        return api.put.fabricImport({
+            data: changes.map((change) => {
+                return change.new
+            }), additions: ["essc"], type: "vaultItem"
         })
-
-        return api.put.fabricImport({ data: parsedChanges })
     }
 
     onChangeProperties = async (_id, mutation) => {
@@ -121,7 +134,7 @@ export default class Vault extends React.Component {
         antd.Modal.confirm({
             content: `Are you sure you want to delete ${items.length} item(s)?`,
             onOk: async () => {
-                await api.delete.fabric({ _id: items })
+                await api.delete.fabric({ _id: items, type: "vaultItem" })
                     .then((data) => {
                         this.setState({ data: data })
                         this.toogleSelection(false)
@@ -149,6 +162,12 @@ export default class Vault extends React.Component {
                             {this.state.selectionEnabled ? "Done" : "Select"}
                         </antd.Button>
                     </div>
+                    {this.state.selectionEnabled &&
+                        <div key="selectAll">
+                            <antd.Button shape="round" onClick={() => this.itemListRef.current.selectAll()}>
+                                Select all
+                            </antd.Button>
+                        </div>}
                     <div key="createNew">
                         <antd.Button icon={<Icons.Plus />} type="primary" onClick={() => { window.app.openFabric("vaultItem") }}>
                             New
@@ -178,9 +197,10 @@ export default class Vault extends React.Component {
                 >
                     {!this.state.data ? <antd.Skeleton active /> :
                         <SelectableList
+                            ref={this.itemListRef}
                             selectionEnabled={this.state.selectionEnabled}
                             items={this.state.data}
-                            renderItem={(item) => <ItemRender onDoubleClick={() => this.onOpenItemDetails(item._id)} compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
+                            renderItem={(item) => <ItemRender locations={this.state.locations} onDoubleClick={() => this.onOpenItemDetails(item._id)} compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
                             onDelete={this.onDeleteItems}
                             actions={[
                                 <div key="delete" call="onDelete">
