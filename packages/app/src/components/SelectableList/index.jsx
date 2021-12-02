@@ -19,6 +19,14 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
+	selectAll = () => {
+		if (this.props.items.length > 0) {
+			this.setState({
+				selectedKeys: [...this.props.items.map((item) => item.key ?? item.id ?? item._id)],
+			})
+		}
+	}
+
 	selectKey = (key) => {
 		let list = this.state.selectedKeys ?? []
 		list.push(key)
@@ -117,7 +125,6 @@ export default class SelectableList extends React.Component {
 				<ActionsBar style={{ borderRadius: "8px 8px 0 0", width: "fit-content" }}>
 					<div key="discard">
 						<Button
-							style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
 							shape="round"
 							onClick={this.onDiscard}
 							{...this.props.onDiscardProps}
@@ -210,8 +217,8 @@ export default class SelectableList extends React.Component {
 						...(Array.isArray(this.props.children) ? this.props.children : []),
 					]}
 					renderItem={renderMethod}
-					/>
-					{this.renderActions()}
+				/>
+				{this.renderActions()}
 			</div>
 		)
 	}
