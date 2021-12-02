@@ -85,36 +85,48 @@ export const FabricController = {
     }),
     import: Schematized(["data"], async (req, res) => {
         try {
-            const { data } = req.body
+            const { data, type, additions, } = req.body
 
-            data.forEach(async (item) => {
-                let obj = FabricObject.findById(item._id)
+            for await (let item of data) {
+                if (typeof item._id !== "undefined") {
+                    let obj = await FabricObject.findById(item._id).catch(() => {
+                        return null
+                    })
 
-                if (obj) {
-                    obj = overrideObjects(obj, item, mutableKeys)
-        
-                    return await FabricObject.findByIdAndUpdate(item._id, obj)
-                } else {
-                    let craft = {
-                        type: item.type,
-                        name: item.name,
-                        properties: item.properties
+                    if (obj) {
+                        obj = overrideObjects(obj, item, mutableKeys)
+
+                        await FabricObject.findByIdAndUpdate(item._id, obj)
+                        continue
                     }
-
-                    const newObj = await new FabricObject(craft)
-                    return await newObj.save()
                 }
-            })
 
-            const objects = await FabricObject.find()
+                let craft = {
+                    type: item.FabricType ?? type,
+                    name: item.name,
+                    properties: _.omit(item, ["_id", "name"]),
+                }
+
+                if (Array.isArray(additions)) {
+                    craft.properties = await additionsHandler(additions, craft.properties)
+                }
+
+                const newObj = new FabricObject(craft)
+
+                newObj.save()
+
+                continue
+            }
+
+            const objects = await FabricObject.find({ type })
 
             return res.json(objects)
         } catch (error) {
             return res.status(500).json(error.message)
         }
     }),
-    delete: selectValues(["_id"], async (req, res) => {
-        let { _id } = req.selectedValues
+    delete: selectValues(["_id", "type"], async (req, res) => {
+        let { _id, type } = req.selectedValues
         let query = []
 
         if (Array.isArray(_id)) {
@@ -127,7 +139,7 @@ export const FabricController = {
             await FabricObject.findByIdAndDelete(id)
         }
 
-        const result = await FabricObject.find()
+        const result = await FabricObject.find({ type })
 
         return res.json(result)
     }),
