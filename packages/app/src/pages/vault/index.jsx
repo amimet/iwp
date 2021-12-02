@@ -4,17 +4,21 @@ import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList } from 'components'
 import { ItemRender, ItemDetails, ImportTool } from './components'
 import classnames from 'classnames'
+import fuse from "fuse.js"
 
 import "./index.less"
 
 const api = window.app.request
+
+// TODO: Filter items by type
 
 export default class Vault extends React.Component {
     state = {
         locations: [],
         compactView: false,
         selectionEnabled: false,
-        data: null
+        data: null,
+        searchValue: null,
     }
 
     itemListRef = React.createRef()
@@ -103,6 +107,30 @@ export default class Vault extends React.Component {
         })
     }
 
+    onSearch = (value) => {
+        if (typeof value !== "string") {
+            if (typeof value.target?.value === "string") {
+                value = value.target.value
+            }
+        }
+
+        if (value === "") {
+            return this.setState({ searchValue: null })
+        }
+
+        const searcher = new fuse(this.state.data, {
+            includeScore: false,
+            keys: ["_id", "type", "manufacturer", "location", "serial", "essc", "name",],
+        })
+        const result = searcher.search(value)
+
+        this.setState({
+            searchValue: result.map((entry) => {
+                return entry.item
+            }),
+        })
+    }
+
     onImportData = async (changes) => {
         return api.put.fabricImport({
             data: changes.map((change) => {
@@ -187,6 +215,14 @@ export default class Vault extends React.Component {
                         <h5>Compact view</h5>
                         <antd.Switch checked={this.state.compactView} onChange={(e) => this.toogleCompactView(e)} />
                     </div>
+                    <div key="search">
+                        <antd.Input.Search
+                            placeholder="Search"
+                            allowClear
+                            onSearch={this.onSearch}
+                            onChange={this.onSearch}
+                        />
+                    </div>
                 </ActionsBar>
                 <div
                     className={classnames(
@@ -199,7 +235,7 @@ export default class Vault extends React.Component {
                         <SelectableList
                             ref={this.itemListRef}
                             selectionEnabled={this.state.selectionEnabled}
-                            items={this.state.data}
+                            items={this.state.searchValue ?? this.state.data}
                             renderItem={(item) => <ItemRender locations={this.state.locations} onDoubleClick={() => this.onOpenItemDetails(item._id)} compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
                             onDelete={this.onDeleteItems}
                             actions={[
