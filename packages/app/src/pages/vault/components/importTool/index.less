@@ -1,53 +1,63 @@
-.import_data_wrapper {
+.import_data {
 	> div {
-		margin-bottom: 20px;
+		margin-bottom: 30px;
 	}
 
 	margin-bottom: 80px;
 
 	.conflicts {
 		.conflict  {
-			height: 100%;
+			.header {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
 
-			> div {
-				margin-bottom: 25px;
-			}
-
-			h3 {
-				margin: 0;
+				> div {
+					margin-bottom: 10px;
+				}
 			}
 
 			.diff {
 				display: grid;
-				grid-template-columns: 1fr 1fr;
-				grid-template-rows: 1fr;
-				gap: 0px 20px;
-				grid-template-areas: ". .";
+				grid-template-columns: 1fr 0.1fr 1fr; 
+				grid-template-rows: 1fr; 
+				gap: 0px 20px; 
+				grid-template-areas: ". . ."; 
 
 				h3 {
 					text-align: center;
 				}
 
 				.property {
+					font-family: "Roboto Mono", monospace;
+					
 					.key {
 						font-weight: bold;
 						font-size: 15px;
 					}
 					.value {
-						//margin-left: 15px;
 						padding: 4px 15px;
 						background-color: var(--background-color-accent);
 						border-radius: 2px;
 					}
 				}
 
+				.toIcon {
+					display: flex;
+					height: 100%;
+					align-items: center;
+					svg {
+						font-size: 30px;
+					}
+				}
+
 				.state {
 					.data {
-						border: 1px solid var(--border-color);
-						border-radius: 5px;
 						padding: 10px;
+
 						> div {
-							margin-bottom: 10px;
+							margin-bottom: 4px;
 						}
 					}
 
@@ -64,15 +74,59 @@
 
 	.changes {
 		> div {
-			margin-bottom: 10px;
+			font-family: "Roboto Mono", monospace;
 		}
 
 		.change {
-			background-color: #f5f5f5;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			padding: 10px;
-			margin-right: 10px;
+			display: flex;
+			flex-direction: row;
+
+			&.creation {
+				.content {
+					background-color: rgba(70, 149, 74, 0.15);
+				}
+
+				.indicator {
+					background-color: rgba(87, 171, 90, 0.3);
+				}
+			}
+
+			&.modification {
+				.content {
+					background-color: rgba(24, 144, 255, 0.15);
+				}
+				.indicator {
+					background-color: rgba(24, 143, 255, 0.3);
+				}
+			}
+
+			.indicator {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+
+				width: 40px;
+				padding: 0 6px;
+
+				svg {
+					margin: 0 !important;
+					color: var(--background-color-contrast);
+				}
+			}
+
+			.content {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+
+				width: 100%;
+				padding: 0 20px;
+
+				> div {
+					margin-right: 10px;
+				}
+			}
 		}
 	}
 

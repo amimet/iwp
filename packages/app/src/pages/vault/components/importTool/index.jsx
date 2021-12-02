@@ -1,6 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
+import classnames from 'classnames'
 
 import "./index.less"
 
@@ -10,13 +11,24 @@ const api = window.app.request
 
 const ChangeItem = (props) => {
     const change = props.change
-    console.log(change)
-    return <div className="change" key={change?._id}>
-        <div className="name">
-            {change?.name}
+
+    return <div className={classnames("change", (change.existing ? "modification" : "creation"))} key={change?.new._id}>
+        <div className="indicator">
+            {change.existing ? <Icons.Edit2 /> : <Icons.FilePlus />}
         </div>
-        <div className="id">
-            {change?._id}
+        <div className="content">
+            <div className="name">
+                <antd.Tag><Icons.Tag />{change?.new.name}</antd.Tag>
+            </div>
+            {change?.new._id &&
+                <div className="id">
+                    <antd.Tag><Icons.Key />{change?.new._id}</antd.Tag>
+                </div>}
+            {change?.differences?.length > 0 &&
+                <div className="differences">
+                    <antd.Tag>{change?.differences?.length} Changes</antd.Tag>
+                </div>
+            }
         </div>
     </div>
 }
@@ -42,16 +54,23 @@ const ConflictItem = (props) => {
     }
 
     return <div className="conflict" id={conflict._id} key={conflict._id}>
-        <div>
-            <h3>#{conflict._id}</h3>
-            <strong>[{conflict.differences.length} differences]</strong>
+        <div class="header">
+            <div>
+                <antd.Tag><Icons.Key />{conflict._id}</antd.Tag>
+            </div>
+            <div>
+                <strong>[{conflict.differences.length} differences]</strong>
+            </div>
         </div>
         <div className="diff">
             <div className="state existing">
-                <h3>Before </h3>
+                <h3>Before</h3>
                 <div className="data">
                     {renderProperties(conflict.existing)}
                 </div>
+            </div>
+            <div className="toIcon">
+                <Icons.ChevronsRight />
             </div>
             <div className="state new">
                 <h3>After</h3>
@@ -111,36 +130,17 @@ export default (props) => {
         props.handleDone(changes)
     }
 
-    const pushChange = (change) => {
-        let query = []
-
-        if (Array.isArray(change)) {
-            query = change
-        }else {
-            query.push(change)
-        }
-        
-        query.forEach((change) => {
-            const newChanges = [...changes, {
-                _id: change._id,
-                data: change
-            }]
-
-            setChanges(newChanges)
-        })
-    }
-
     const resolveConflictById = (id) => {
-        pushChange(conflicts.find(conflict => conflict._id === id))
+        setChanges([...changes, conflicts.find(conflict => conflict._id === id)])
         setConflicts(conflicts.filter(conflict => conflict._id !== id))
     }
 
     const resolveAllConflicts = () => {
-        pushChange(conflicts)
+        setChanges([...changes, ...conflicts])
         setConflicts([])
     }
 
-    const skipConflict = (id) => {
+    const skipConflictById = (id) => {
         setConflicts(conflicts.filter(conflict => conflict._id !== id))
     }
 
@@ -150,23 +150,23 @@ export default (props) => {
 
     const computeDifferences = (oldData, newData) => {
         // map differences of object properties values between conflict.existing and conflict.new
+
+        // TODO: Fix, this is not looking for undefined or null values, resulting is not noticing if a property gonna be removed
         return Object.keys(newData).map(key => {
             // determine if the property has been deleted, created or changed
-            const existing = oldData[key]
-            const newValue = newData[key]
+            const beforeValue = oldData[key]
+            const afterValue = newData[key]
 
-            const isDeleted = existing === undefined
-            const isCreated = newValue === undefined
-            const isChanged = existing !== newValue
+            if (beforeValue !== afterValue) {
+                const isCreated = !beforeValue
+                const isDeleted = isCreated && !afterValue
 
-            if (oldData[key] !== newData[key]) {
                 return {
                     key,
-                    isDeleted,
                     isCreated,
-                    isChanged,
-                    existing,
-                    newValue
+                    isDeleted,
+                    beforeValue,
+                    afterValue,
                 }
             }
         }).filter(diff => diff)
@@ -177,8 +177,8 @@ export default (props) => {
 
         const vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
 
-        let changesBuf = []
-        let conflictsBuf = []
+        const conflictsBuf = []
+        const changesBuf = []
 
         for await (let item of items) {
             // remove null, undefined and empty values of all object properties
@@ -194,29 +194,41 @@ export default (props) => {
                 continue
             }
 
-            let existing = vault.find(i => i._id === item._id)
-
-            if (existing) {
-                // flatten existing properties
-                existing = {
-                    _id: existing._id,
-                    name: existing.name,
-                    ...existing.properties,
-                }
-
-                conflictsBuf.push({
-                    _id: item._id,
-                    differences: computeDifferences(existing, item),
-                    existing: existing,
-                    new: item,
+            if (typeof item._id !== "undefined") {
+                let existing = vault.find(vaultItem => {
+                    const idConflict = vaultItem._id === item._id
+                    return idConflict
                 })
-            } else {
-                pushChange(item)
+
+                if (existing) {
+                    existing = {
+                        _id: existing._id,
+                        name: existing.name,
+                        ...existing.properties
+                    }
+
+                    const conflict = {
+                        _id: item._id,
+                        differences: await computeDifferences(existing, item),
+                        existing,
+                        new: item,
+                    }
+
+                    conflictsBuf.push(conflict)
+                    continue
+                }
             }
+
+            const change = {
+                _id: item._id,
+                new: item,
+            }
+
+            changesBuf.push(change)
         }
 
-        setChanges(changesBuf)
-        setConflicts(conflictsBuf)
+        setConflicts([...conflicts, ...conflictsBuf])
+        setChanges([...changes, ...changesBuf])
 
         setLoading(false)
     }
@@ -290,36 +302,40 @@ export default (props) => {
         />
     }
 
-    return <div className="import_data_wrapper">
+    return <div className="import_data">
         {conflicts.length > 0 ?
-            <div className="conflicts">
-                <h1><Icons.AlertTriangle /> Conflicts [{conflicts.length}]</h1>
-                <h3>These items already exist, before continue, select the items for overwrite the current existing item.</h3>
-                <div>
-                    <ConflictItem
-                        conflict={conflicts[0]}
-                        overwrite={() => {
-                            resolveConflictById(conflicts[0]._id)
-                        }}
-                        skip={() => {
-                            skipConflict(conflicts[0]._id)
-                        }}
-                        overwriteAll={() => {
-                            resolveAllConflicts()
-                        }}
-                        skipAll={() => {
-                            skipAllConflicts()
-                        }}
-                    />
-                </div>
+            <div>
+                <h1>[{conflicts.length}] Conflicts</h1>
+                <h4>This item appears to conflict with the existing data, before continuing, please choose what action you want to take to resolve this conflict.</h4>
             </div> :
             <div>
-                <h2>Changes [{changes.length}]</h2>
-                <div className="changes">
-                    {changes.map((change) => {
-                        return <ChangeItem change={change} />
-                    })}
-                </div>
+                <h1>[{changes.length}] Changes</h1>
+                <h3>Please review and confirm the following changes to be made.</h3>
+                <antd.Alert banner message="This actions cannot be reverted" type="warning" />
+            </div>}
+
+        {conflicts.length > 0 ?
+            <div className="conflicts">
+                <ConflictItem
+                    conflict={conflicts[0]}
+                    overwrite={() => {
+                        resolveConflictById(conflicts[0]._id)
+                    }}
+                    skip={() => {
+                        skipConflictById(conflicts[0]._id)
+                    }}
+                    overwriteAll={() => {
+                        resolveAllConflicts()
+                    }}
+                    skipAll={() => {
+                        skipAllConflicts()
+                    }}
+                />
+            </div> :
+            <div className="changes">
+                {changes.map((change) => {
+                    return <ChangeItem change={change} />
+                })}
 
                 <div className="actions">
                     <antd.Button disabled={submitting} onClick={() => props.close()}>
