@@ -5,7 +5,7 @@ import { Layout, Menu, Avatar } from "antd"
 import { SidebarEditor } from "./components"
 
 import config from "config"
-import sidebarItems from "schemas/sidebar.json"
+import sidebarItems from "schemas/routes.json"
 import defaultSidebarItems from "schemas/defaultSidebar.json"
 import classnames from "classnames"
 

@@ -1,5 +1,5 @@
 import React from "react"
-import Items from "schemas/sidebar.json"
+import Items from "schemas/routes.json"
 import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
