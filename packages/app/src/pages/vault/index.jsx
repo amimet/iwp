@@ -4,6 +4,7 @@ import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList } from 'components'
 import { ItemRender, ItemDetails, ImportTool } from './components'
 import classnames from 'classnames'
+import { debounce } from 'lodash'
 import fuse from "fuse.js"
 
 import "./index.less"
@@ -107,7 +108,7 @@ export default class Vault extends React.Component {
         })
     }
 
-    onSearch = (value) => {
+    search = (value) => {
         if (typeof value !== "string") {
             if (typeof value.target?.value === "string") {
                 value = value.target.value
@@ -119,9 +120,10 @@ export default class Vault extends React.Component {
         }
 
         const searcher = new fuse(this.state.data, {
-            includeScore: false,
-            keys: ["_id", "type", "manufacturer", "location", "serial", "essc", "name",],
+            includeScore: true,
+            keys: ["_id", "essc", "name",],
         })
+
         const result = searcher.search(value)
 
         this.setState({
@@ -129,6 +131,12 @@ export default class Vault extends React.Component {
                 return entry.item
             }),
         })
+    }
+
+    debouncedSearch = debounce((value) => this.search(value), 500)
+
+    onSearch = (event) => {
+        this.debouncedSearch(event.target.value)
     }
 
     onImportData = async (changes) => {
