@@ -101,7 +101,7 @@ export default class Vault extends React.Component {
                 })
 
                 if (result) {
-                    this.setState({ data: result })
+                    this.setState({ searchValue: null, data: result })
                     ctx.close()
                 }
             }
@@ -136,6 +136,10 @@ export default class Vault extends React.Component {
     debouncedSearch = debounce((value) => this.search(value), 500)
 
     onSearch = (event) => {
+        if (event === "" && this.state.searchValue) {
+            return this.setState({ searchValue: null })
+        }
+
         this.debouncedSearch(event.target.value)
     }
 
