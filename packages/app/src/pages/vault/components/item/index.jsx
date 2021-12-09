@@ -75,7 +75,7 @@ export default (props) => {
         onDoubleClick={props.onDoubleClick}
     >
         <div>
-            #{props.compact ? (item.properties?.essc ?? "Deserialized") : item._id}
+            <span className="selectable">#{props.compact ? (item.properties?.essc ?? "Deserialized") : item._id}</span>
             <antd.Input
                 prefix={loading ? <Icons.LoadingOutlined spin /> : undefined}
                 className={classnames("nameInput", { ["eventDisabled"]: props.eventDisable })}

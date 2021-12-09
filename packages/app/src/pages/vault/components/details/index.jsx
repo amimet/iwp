@@ -84,8 +84,8 @@ export default (props) => {
 
     return <div className="itemDetails">
         <div className="header">
-            <h1>{item.name}</h1>
-            <h4>#{item._id}</h4>
+            <h1 style={{ userSelect: "all" }}>{item.name}</h1>
+            <h4 style={{ userSelect: "all" }}>#{item._id}</h4>
             <div className="tags">
                 <div key="statement" className="tag">
                     <ModifierTag
@@ -143,7 +143,7 @@ export default (props) => {
                     </div>
                 </div>
                 <div className="content">
-                    <h2>{item.properties?.essc}</h2>
+                    <h2 style={{ userSelect: "all" }}>{item.properties?.essc}</h2>
                 </div>
             </div>
             <div key="serial" className="entry">
@@ -156,7 +156,7 @@ export default (props) => {
                     </div>
                 </div>
                 <div className="content">
-                    <h2>{item.properties?.serial}</h2>
+                    <h2 style={{ userSelect: "all" }}>{item.properties?.serial}</h2>
                 </div>
             </div>
         </div>
