@@ -5,7 +5,6 @@ import { Icons, createIconRender } from "components/Icons"
 import "./index.less"
 
 // TODO: Support childrens
-
 export default class Home extends React.Component {
     onClick = (id) => {
         window.app.setLocation(id)
