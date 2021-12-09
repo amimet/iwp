@@ -87,6 +87,10 @@ export default class SettingsMenu extends React.Component {
 				item.props.onClick = (event) => this.handleEvent(event, item)
 				break
 			}
+			case "select": {
+				item.props.onChange = (event) => this.handleEvent(event, item)
+				break
+			}
 			default: {
 				if (!item.props.children) {
 					item.props.children = item.title ?? item.id
