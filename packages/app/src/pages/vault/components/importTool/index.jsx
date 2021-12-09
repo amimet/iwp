@@ -2,6 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
 import classnames from 'classnames'
+import _ from "lodash"
 
 import "./index.less"
 
@@ -20,9 +21,9 @@ const ChangeItem = (props) => {
             <div className="name">
                 <antd.Tag><Icons.Tag />{change?.new.name}</antd.Tag>
             </div>
-            {change?.new._id &&
+            {change?._id &&
                 <div className="id">
-                    <antd.Tag><Icons.Key />{change?.new._id}</antd.Tag>
+                    <antd.Tag><Icons.Key />{change?._id}</antd.Tag>
                 </div>}
             {change?.differences?.length > 0 &&
                 <div className="differences">
@@ -54,7 +55,7 @@ const ConflictItem = (props) => {
     }
 
     return <div className="conflict" id={conflict._id} key={conflict._id}>
-        <div class="header">
+        <div className="header">
             <div>
                 <antd.Tag><Icons.Key />{conflict._id}</antd.Tag>
             </div>
@@ -153,6 +154,11 @@ export default (props) => {
 
         // TODO: Fix, this is not looking for undefined or null values, resulting is not noticing if a property gonna be removed
         return Object.keys(newData).map(key => {
+            // ignore _id
+            if (key === "_id") {
+                return null
+            }
+
             // determine if the property has been deleted, created or changed
             const beforeValue = oldData[key]
             const afterValue = newData[key]
@@ -175,12 +181,24 @@ export default (props) => {
     const computeChanges = async (items) => {
         setLoading(true)
 
-        const vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
+        let vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
+
+        // flatten properties
+        vault = vault.map((item) => {
+            return {
+                _id: item._id,
+                name: item.name,
+                ...item.properties
+            }
+        })
 
         const conflictsBuf = []
         const changesBuf = []
 
         for await (let item of items) {
+            // skip _id
+            item = _.omit(item, ["_id"])
+
             // remove null, undefined and empty values of all object properties
             item = Object.keys(item).reduce((acc, key) => {
                 if (item[key] !== null && item[key] !== undefined && item[key] !== "") {
@@ -194,33 +212,33 @@ export default (props) => {
                 continue
             }
 
-            if (typeof item._id !== "undefined") {
-                let existing = vault.find(vaultItem => {
-                    const idConflict = vaultItem._id === item._id
-                    return idConflict
+            const checkProperties = ["name", "serial"]
+            // check if any of the item properties is conflicted with any of the vault items, if so, return the conflict
+            const conflicted = vault.find(vaultItem => {
+                return checkProperties.some(key => {
+                    // if key is nullish or undefined, skip it
+                    if (item[key] === null || item[key] === undefined) {
+                        return false
+                    }
+                    return vaultItem[key] === item[key]
                 })
+            })
 
-                if (existing) {
-                    existing = {
-                        _id: existing._id,
-                        name: existing.name,
-                        ...existing.properties
-                    }
-
-                    const conflict = {
-                        _id: item._id,
-                        differences: await computeDifferences(existing, item),
-                        existing,
-                        new: item,
-                    }
-
-                    conflictsBuf.push(conflict)
-                    continue
+            if (conflicted) {
+                const conflict = {
+                    _id: conflicted._id,
+                    differences: await computeDifferences(conflicted, item),
+                    existing: conflicted,
+                    new: item,
                 }
+
+                conflictsBuf.push(conflict)
+                continue
             }
 
             const change = {
-                _id: item._id,
+                differences: null,
+                existing: false,
                 new: item,
             }
 

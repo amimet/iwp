@@ -142,7 +142,10 @@ export default class Vault extends React.Component {
     onImportData = async (changes) => {
         return api.put.fabricImport({
             data: changes.map((change) => {
-                return change.new
+                return {
+                    ...change.new,
+                    _id: change._id,
+                }
             }), additions: ["essc"], type: "vaultItem"
         })
     }

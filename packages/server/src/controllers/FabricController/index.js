@@ -86,19 +86,23 @@ export const FabricController = {
     import: Schematized(["data"], async (req, res) => {
         try {
             const { data, type, additions, } = req.body
-
+            
             for await (let item of data) {
-                if (typeof item._id !== "undefined") {
-                    let obj = await FabricObject.findById(item._id).catch(() => {
-                        return null
+                let existentObj = item._id && await FabricObject.findById(item._id).catch(() => {
+                    return false
+                })
+
+                if (existentObj) {
+                    console.log(`[${item._id}] Existent: \n`, existentObj)
+                    existentObj = overrideObjects(existentObj, item, mutableKeys)
+
+                    await FabricObject.findByIdAndUpdate(item._id, {
+                        name: item.name,
+                        type: item.FabricType ?? type,
+                        properties: _.omit(item, ["_id", "name"]),
                     })
 
-                    if (obj) {
-                        obj = overrideObjects(obj, item, mutableKeys)
-
-                        await FabricObject.findByIdAndUpdate(item._id, obj)
-                        continue
-                    }
+                    continue
                 }
 
                 let craft = {
