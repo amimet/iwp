@@ -22,7 +22,7 @@ import { API, Render, Splash, Debug, Theme, Sound } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, FabricCreator, Settings } from "components"
-import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
+import Layout from "./layout"
 import { Icons } from "components/Icons"
 
 import "theme/index.less"
@@ -127,12 +127,14 @@ class App {
 
 		this.eventBus.on("setLocation", () => {
 			this.eventBus.emit("top_loadBar_start")
-			this.setState({ isOnTransition: true })
 		})
 		this.eventBus.on("setLocationDone", () => {
 			this.eventBus.emit("top_loadBar_stop")
-			this.setState({ isOnTransition: false })
+
+			// render controller needs an better method for update render, this is a temporary solution
+			this.forceUpdate()
 		})
+
 		this.eventBus.on("cleanAll", () => {
 			window.app.DrawerController.closeAll()
 		})
@@ -148,7 +150,7 @@ class App {
 			openSettings: (goTo) => {
 				window.app.DrawerController.open("settings", Settings, {
 					props: {
-						width: "40%",
+						width: "fit-content",
 					},
 					componentProps: {
 						goTo,
@@ -196,9 +198,7 @@ class App {
 	state = {
 		// app
 		initialized: false,
-		isMobile: false,
 		crash: false,
-		isOnTransition: false,
 
 		// app session
 		session: null,
@@ -287,24 +287,14 @@ class App {
 					<title>{config.app.siteName}</title>
 				</Helmet>
 				<antd.ConfigProvider>
-					<antd.Layout className="app_layout" style={{ height: "100%" }}>
-						<Drawer />
-						<Sidebar user={this.state.user} />
-						<antd.Layout className="content_layout">
-							<Header />
-							<antd.Layout.Content className="layout_page">
-								<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
-									<BindPropsProvider
-										user={this.state.user}
-										session={this.state.session}
-									>
-										<Render.RenderRouter staticRenders={App.staticRenders} />
-									</BindPropsProvider>
-								</div>
-							</antd.Layout.Content>
-						</antd.Layout>
-						<Sidedrawer />
-					</antd.Layout>
+					<Layout user={this.state.user} >
+						<BindPropsProvider
+							user={this.state.user}
+							session={this.state.session}
+						>
+							<Render.RenderRouter staticRenders={App.staticRenders} />
+						</BindPropsProvider>
+					</Layout>
 				</antd.ConfigProvider>
 			</React.Fragment>
 		)

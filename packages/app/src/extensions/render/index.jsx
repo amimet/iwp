@@ -23,7 +23,6 @@ export const LazyRouteRender = (props) => {
 		}
 
 		const src = resolve(path)
-		console.log(src)
 
 		let module = await import(src).catch((err) => {
 			console.error(err)

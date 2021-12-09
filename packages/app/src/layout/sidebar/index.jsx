@@ -1,5 +1,5 @@
 import React from "react"
-import { Icons, createIconRender } from "components/icons"
+import { Icons, createIconRender } from "components/Icons"
 import { Layout, Menu, Avatar } from "antd"
 
 import { SidebarEditor } from "./components"

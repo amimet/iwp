@@ -111,6 +111,10 @@ body {
 
 	overflow: hidden;
 	transition: all 150ms ease-in-out;
+
+	&.mobile {
+		
+	}
 }
 
 .layout_page {
@@ -125,25 +129,11 @@ body {
 	overflow-y: overlay;
 }
 
-// @media (min-width: @screen-xs) {
-
-// }
-
-// @media (min-width: @screen-md) {
-
-// }
-
-// @media (min-width: @screen-lg) {
-
-// }
-
-// @media (min-width: @screen-xl) {
-
-// }
-
-// @media (min-width: @screen-xxl) {
-
-// }
+@media (max-width: 768px) {
+	.layout_page {
+		margin: 10px;
+	}
+}
 
 .fade-transverse-active {
 	transition: all 250ms;
