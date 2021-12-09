@@ -155,6 +155,10 @@ export default class Vault extends React.Component {
     }
 
     onOpenItemDetails = (_id) => {
+        if (this.state.selectionEnabled) {
+            return false
+        }
+        
         app.DrawerController.open("ItemDetails", ItemDetails, {
             props: {
                 width: "50%",
