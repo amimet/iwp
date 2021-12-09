@@ -296,7 +296,7 @@ class Workload extends React.Component {
 
 	render() {
 		return (
-			<div>
+			<div style={{ height: "100%" }}>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar float={true}>
 						<div key="createNew">
