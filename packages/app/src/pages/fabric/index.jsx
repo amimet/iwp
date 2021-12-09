@@ -68,7 +68,7 @@ export default class FabricList extends React.Component {
 
     render() {
         return <div className="fabric">
-            <ActionsBar wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
+            <ActionsBar float={true} wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
                 <div>
                     <antd.Button onClick={() => this.toogleSelection()} type={this.state.selectionEnabled ? "default" : "primary"}>
                         {this.state.selectionEnabled ? "Cancel" : "Select"}
