@@ -143,7 +143,7 @@ export default (props) => {
                 />
             </div>
             {!props.compact &&
-                <div key="manufacturer" className="tag">
+                <div key="manufacturer" className="tag selectable">
                     <antd.Tag>
                         <Icons.Home />
                         <h4>
@@ -152,7 +152,7 @@ export default (props) => {
                     </antd.Tag>
                 </div>}
             {!props.compact &&
-                <div key="serial" className="tag">
+                <div key="serial" className="tag selectable">
                     <antd.Tag>
                         <Icons.Key />
                         <h4>
@@ -161,7 +161,7 @@ export default (props) => {
                     </antd.Tag>
                 </div>}
             {!props.compact &&
-                <div key="essc" className="tag">
+                <div key="essc" className="tag selectable">
                     <antd.Tag>
                         <Icons.Key />
                         <h4>
