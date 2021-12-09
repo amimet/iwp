@@ -102,7 +102,7 @@ export default class SettingsMenu extends React.Component {
 				<div className="header">
 					<div>
 						<h5>
-							{item.icon ? React.createElement(Icons[item.icon]) : null}
+							{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
 							{item.title ?? item.id}
 						</h5>
 					</div>
