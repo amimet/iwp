@@ -7,6 +7,13 @@
         "title": "Expire Session"
     },
     {
+        "id": "language",
+        "group": "general",
+        "type": "Select",
+        "icon": "MdTranslate",
+        "title": "Language"
+    },
+    {
         "id": "edit_sidebar",
         "group": "sidebar",
         "type": "Button",
