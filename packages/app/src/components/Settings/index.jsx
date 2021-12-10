@@ -155,7 +155,7 @@ export default class SettingsMenu extends React.Component {
 	}
 
 	render() {
-		const isDevMode = window.__evite.env.NODE_ENV !== "production"
+		const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
 
 		return (
 			<div className="settings">
@@ -165,7 +165,7 @@ export default class SettingsMenu extends React.Component {
 						<div>{config.app?.siteName}</div>
 						<div>
 							<antd.Tag>
-								<Icons.Tag />v{window.__evite.projectVersion}
+								<Icons.Tag />v{window.__evite?.projectVersion}
 							</antd.Tag>
 						</div>
 						<div>
