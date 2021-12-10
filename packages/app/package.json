@@ -3,30 +3,12 @@
   "version": "0.11.24",
   "license": "MIT",
   "scripts": {
-    "dev": "evite dev",
-    "build": "evite build",
+    "dev:ssr": "vite-ssr",
+    "dev": "vite",
+    "preview": "vite preview",
+    "build": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
+    "dev:evite": "evite dev",
     "capacitor": "capacitor"
-  },
-  "lingui": {
-    "locales": [
-      "en",
-      "es"
-    ],
-    "catalogs": [
-      {
-        "path": "src/locales/{locales}",
-        "include": [
-          "src/"
-        ]
-      }
-    ],
-    "localeDir": "src/locales/",
-    "srcPathDirs": [
-      "src/"
-    ],
-    "fallbackLocale": "en",
-    "sourceLocale": "en",
-    "format": "minimal"
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
@@ -35,24 +17,23 @@
     "antd": "^4.17.3",
     "chart.js": "^3.5.1",
     "classnames": "^2.3.1",
-    "corenode": "^0.28.26",
     "dicebar_lib": "^1.0.0",
     "enquire-js": "^0.2.1",
-    "evite": "^0.8.8",
+    "evite-react-lib": "^0.9.0",
     "faye": "^1.4.0",
     "feather-reactjs": "^2.0.13",
     "fuse.js": "^6.4.6",
     "hls.js": "^1.0.12",
     "howler": "^2.2.3",
-    "html2pdf.js": "^0.10.1",
     "js-cookie": "^2.2.1",
     "less": "^4.1.2",
-    "less-vars-to-js": "^1.3.0",
     "linebridge": "^0.8.4",
     "moment": "^2.29.1",
     "mpegts.js": "^1.6.10",
     "plyr": "^3.6.9",
     "qrcode": "^1.4.4",
+    "socket.io-client": "^4.2.0",
+    "i18next": "^20.3.5",
     "react-beautiful-dnd": "^13.1.0",
     "react-chartjs-2": "^3.2.0",
     "react-color": "^2.19.3",
@@ -63,13 +44,29 @@
     "react-qr-reader": "^2.2.1",
     "react-reveal": "^1.2.2",
     "react-rnd": "^10.3.5",
-    "socket.io-client": "^4.2.0"
+    "react-helmet-async": "^1.0.9",
+    "react-i18next": "^11.11.4",
+    "react-router": "^5.2.0",
+    "react-router-config": "^5.1.1",
+    "react-router-dom": "^5.2.0",
+    "vite-ssr": "^0.14.3"
   },
   "devDependencies": {
+    "corenode": "^0.28.26",
+    "evite": "^0.8.8",
     "@capacitor/cli": "^3.2.2",
     "@capacitor/core": "^3.2.2",
     "@capacitor/ios": "^3.0.2",
-    "@types/babel__core": "^7.1.14",
-    "@types/node": "^14.14.36"
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.4.10",
+    "@types/react": "^17.0.15",
+    "@types/react-dom": "^17.0.9",
+    "@types/react-router-config": "^5.0.3",
+    "@types/react-router-dom": "^5.1.8",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@vitejs/plugin-react-refresh": "^1.3.6",
+    "typescript": "^4.3.5",
+    "vite-plugin-pages": "0.12.x",
+    "vite": "^2.7.1"
   }
 }
