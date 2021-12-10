@@ -1,4 +1,6 @@
 {
+    "appId": "com.amimet.app",
+    "appName": "Amimet APP",
     "bundledWebRuntime": true,
     "webDir": "dist"
 }
