@@ -33,7 +33,7 @@ export default class Header extends React.Component {
 	}
 
 	onClickHome = () => {
-		window.app.setLocation("/home")
+		window.app.goMain()
 	}
 
 	render() {
