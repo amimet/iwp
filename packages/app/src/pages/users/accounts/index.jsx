@@ -5,13 +5,13 @@ import { ActionsBar, SelectableList } from "components"
 
 import "./index.less"
 
-const api = window.app.request
-
 export default class Users extends React.Component {
 	state = {
 		data: null,
 		selectionEnabled: false,
 	}
+
+	api = window.app.request
 
 	componentDidMount = async () => {
 		await this.loadData()
@@ -19,7 +19,7 @@ export default class Users extends React.Component {
 
 	loadData = async () => {
 		this.setState({ data: null })
-		const data = await api.get.users()
+		const data = await this.api.get.users()
 		this.setState({ data })
 	}
 

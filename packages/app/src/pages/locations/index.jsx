@@ -6,17 +6,19 @@ import classnames from "classnames"
 
 import "./index.less"
 
-const api = window.app.request
 
 // TODO: Work on location childrens
 class NewRegionForm extends React.Component {
+	api = window.app.request
+
 	handleFinishNewRegion = async (values, ctx) => {
 		const { name, address } = values
 
 		ctx.toogleValidation(true)
 		ctx.clearErrors()
+	
 
-		api.put.region({ name, address })
+		this.api.put.region({ name, address })
 			.then((data) => {
 				this.props.handleDone(data)
 				this.props.close()
@@ -93,9 +95,10 @@ export default class Geo extends React.Component {
 		data: null,
 		selectionEnabled: false,
 	}
+	api = window.app.request
 
 	componentDidMount = async () => {
-		const data = await api.get.regions()
+		const data = await this.api.get.regions()
 		console.log(data)
 
 		this.setState({ data })

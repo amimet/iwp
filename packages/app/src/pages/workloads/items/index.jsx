@@ -6,16 +6,16 @@ import fuse from "fuse.js"
 
 import "./index.less"
 
-const api = window.app.request
-
 export default class WorkloadsItems extends React.Component {
 	state = {
 		items: [],
 		searchValue: null,
 	}
 
+	api = window.app.request
+
 	componentDidMount = async () => {
-		const items = await api.get.fabricItems().catch((error) => {
+		const items = await this.api.get.fabricItems().catch((error) => {
 			console.error(error)
 			return []
 		})

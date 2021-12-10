@@ -3,15 +3,15 @@ import { ActionsBar, SelectableList } from "components"
 import * as antd from 'antd'
 import { Icons } from "components/Icons"
 
-const api = window.app.request
-
 export default class Reports extends React.Component {
     state = {
         data: []
     }
+    
+	api = window.app.request
 
     componentDidMount = async () => {
-        const data = await api.get.reports()
+        const data = await this.api.get.reports()
         this.setState({ data })
     }
 

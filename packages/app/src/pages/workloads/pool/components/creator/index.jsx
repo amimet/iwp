@@ -11,8 +11,6 @@ import "../../index.less"
 
 const { Option } = Select
 
-const api = window.app.request
-
 function craftFabricObject({ obj, props, quantity = 1 }) {
 	const defaultKeys = {
 		cost: 0,
@@ -77,6 +75,8 @@ export default class WorkloadCreator extends React.Component {
 		workshifts: {},
 	}
 
+	api = window.app.request
+
 	componentDidMount = async () => {
 		if (typeof this.props.events !== "undefined") {
 			this.props.events.on("create_error", (error) => {
@@ -88,7 +88,7 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	loadRegions = async () => {
-		await api.get
+		await this.api.get
 			.regions()
 			.then((data) => {
 				this.setState({ regions: data })
@@ -142,7 +142,7 @@ export default class WorkloadCreator extends React.Component {
 			workload.scheduledFinish = selectedDate[1]
 		}
 
-		const request = await api.put.workload(workload)
+		const request = await this.api.put.workload(workload)
 			.catch((error) => {
 				this.handleError(error)
 			})
@@ -194,7 +194,7 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	getWorkshiftsFromRegion = async (region) => {
-		const data = await api.get.workshifts(undefined, { region: region })
+		const data = await this.api.get.workshifts(undefined, { region: region })
 		const obj = Object()
 
 		data.forEach((workshift) => {

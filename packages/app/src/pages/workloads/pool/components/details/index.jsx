@@ -4,11 +4,9 @@ import { Icons } from "components/Icons"
 import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
-import html2pdf from "html2pdf.js"
 
 import "./index.less"
 
-const api = window.app.request
 const dateFormat = "DD-MM-YYYY hh:mm"
 
 export default class WorkloadDetails extends React.Component {
@@ -18,12 +16,14 @@ export default class WorkloadDetails extends React.Component {
 		qrCanvas: null,
 	}
 
+	api = window.app.request
+
 	componentDidMount = async () => {
 		if (typeof this.props.id === "string") {
 			this.id = this.props.id
 		}
 
-		const data = await api.get.workload(undefined, { _id: this.id })
+		const data = await this.api.get.workload(undefined, { _id: this.id })
 		const qr = await this.createQR()
 
 		this.setState({ data, qrCanvas: qr })
@@ -49,7 +49,7 @@ export default class WorkloadDetails extends React.Component {
 		const result = moment(date, dateFormat).isSameOrBefore(moment(now, dateFormat))
 
 		//console.log(`[${date}] is before [${now}] => ${result}`)
-		
+
 		return result
 	}
 

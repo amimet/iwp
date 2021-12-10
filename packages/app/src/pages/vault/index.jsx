@@ -9,8 +9,6 @@ import fuse from "fuse.js"
 
 import "./index.less"
 
-const api = window.app.request
-
 // TODO: Filter items by type
 
 export default class Vault extends React.Component {
@@ -21,6 +19,8 @@ export default class Vault extends React.Component {
         data: null,
         searchValue: null,
     }
+
+    api = window.app.request
 
     itemListRef = React.createRef()
 
@@ -43,7 +43,7 @@ export default class Vault extends React.Component {
     }
 
     fetchLocations = async () => {
-        const regions = await api.get.regions().catch(err => {
+        const regions = await this.api.get.regions().catch(err => {
             return []
         })
 
@@ -56,7 +56,7 @@ export default class Vault extends React.Component {
     }
 
     fetchFabricItems = async () => {
-        return await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
+        return await this.api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
     }
 
     toogleSelection = (to) => {
@@ -68,7 +68,7 @@ export default class Vault extends React.Component {
     }
 
     dumpData = async () => {
-        let vault = await api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
+        let vault = await this.api.get.fabric(undefined, { type: "vaultItem", additions: ["vaultItemParser"] })
         let parsed = vault.map(item => {
             return {
                 _id: item._id,
@@ -144,7 +144,7 @@ export default class Vault extends React.Component {
     }
 
     onImportData = async (changes) => {
-        return api.put.fabricImport({
+        return this.api.put.fabricImport({
             data: changes.map((change) => {
                 return {
                     ...change.new,
@@ -155,7 +155,7 @@ export default class Vault extends React.Component {
     }
 
     onChangeProperties = async (_id, mutation) => {
-        return api.post.fabric({
+        return this.api.post.fabric({
             _id,
             mutation,
         })
@@ -165,7 +165,7 @@ export default class Vault extends React.Component {
         if (this.state.selectionEnabled) {
             return false
         }
-        
+
         app.DrawerController.open("ItemDetails", ItemDetails, {
             props: {
                 width: "50%",
@@ -181,7 +181,7 @@ export default class Vault extends React.Component {
         antd.Modal.confirm({
             content: `Are you sure you want to delete ${items.length} item(s)?`,
             onOk: async () => {
-                await api.delete.fabric({ _id: items, type: "vaultItem" })
+                await this.api.delete.fabric({ _id: items, type: "vaultItem" })
                     .then((data) => {
                         this.setState({ data: data })
                         this.toogleSelection(false)

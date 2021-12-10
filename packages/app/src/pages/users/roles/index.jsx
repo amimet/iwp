@@ -4,8 +4,6 @@ import { Icons } from 'components/icons'
 
 import { ActionsBar, FormGenerator } from 'components'
 
-const api = window.app.request
-
 class ModifyRole extends React.Component {
     handleSubmit(context) {
         console.log(context)
@@ -63,8 +61,10 @@ export default class Roles extends React.Component {
         data: null,
     }
 
+    api = window.app.request
+
     componentDidMount = async () => {
-        await api.get
+        await this.api.get
             .roles()
             .then((data) => {
                 this.setState({ data })

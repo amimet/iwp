@@ -8,8 +8,6 @@ import "./index.less"
 
 // TODO: Extended Diff mode
 
-const api = window.app.request
-
 const ChangeItem = (props) => {
     const change = props.change
 
@@ -112,6 +110,8 @@ export default (props) => {
 
     const [conflicts, setConflicts] = React.useState([])
     const [changes, setChanges] = React.useState([])
+
+    const api = window.app.request
 
     props.events.on("error", (error) => {
         setError(error)

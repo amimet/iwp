@@ -15,8 +15,6 @@ const { Option } = Select
 
 const dateFormat = "DD-MM-YYYY hh:mm"
 
-const api = window.app.request
-
 const renderDate = (time) => {
 	const dateNumber = Number(time)
 
@@ -50,8 +48,10 @@ class Workload extends React.Component {
 		workloads: null,
 	}
 
+	api = window.app.request
+
 	componentDidMount = async () => {
-		await api.get
+		await this.api.get
 			.regions()
 			.then((data) => {
 				this.setState({ regions: data })
@@ -113,7 +113,7 @@ class Workload extends React.Component {
 	fetchWorkloadsFromRegion = async (id) => {
 		this.setState({ loading: true })
 
-		await api.get
+		await this.api.get
 			.workloads({ region: id }, { region: id })
 			.then((data) => {
 				console.log(data)
@@ -169,7 +169,7 @@ class Workload extends React.Component {
 			}),
 			onOk: () => {
 				return new Promise((resolve, reject) => {
-					api.delete
+					this.api.delete
 						.workload({ id: keys })
 						.then(() => {
 							this.deleteWorkloadFromRender(keys)

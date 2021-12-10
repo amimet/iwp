@@ -5,8 +5,6 @@ import { Button, List, Checkbox, InputNumber } from "antd"
 
 import "../../index.less"
 
-const api = window.app.request
-
 export default class WorkloadSelector extends React.Component {
 	state = {
 		error: false,
@@ -15,23 +13,25 @@ export default class WorkloadSelector extends React.Component {
 		selectedItem: false,
 	}
 
+	api = window.app.request
+
 	componentDidMount = async () => {
 		this.setItemsFromDB()
 	}
 
 	setItemsFromDB = async () => {
-		api.get.fabricItems()
-		.then((items) => {
-			this.setState({
-				items: [...this.state.items, ...items],
-				loading: false,
+		this.api.get.fabricItems()
+			.then((items) => {
+				this.setState({
+					items: [...this.state.items, ...items],
+					loading: false,
+				})
 			})
-		})
-		.catch((err) => {
-			this.setState({
-				error: err
+			.catch((err) => {
+				this.setState({
+					error: err
+				})
 			})
-		})
 	}
 
 	handleDone = (obj, props, quantity) => {
@@ -85,7 +85,7 @@ export default class WorkloadSelector extends React.Component {
 				</div>
 				<div className="workload_item_selection_wrapper">
 					<div className="workload_item_selection_header">
-						{item.img && <img src={item.img} />} 
+						{item.img && <img src={item.img} />}
 						<h3>{item.title}</h3>
 						<p>{item.description}</p>
 					</div>

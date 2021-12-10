@@ -5,8 +5,6 @@ import { Icons } from "components/Icons"
 
 import "./index.less"
 
-const api = window.app.request
-
 const FabricItemTypesIcons = {
     "product": "Box",
     "operation": "Settings",
@@ -21,9 +19,11 @@ export default class FabricList extends React.Component {
         data: [],
     }
 
+    api = window.app.request
+
     componentDidMount = async () => {
-        const data = await api.get.fabric()
-        
+        const data = await this.api.get.fabric()
+
         console.log(data)
 
         this.setState({ data })
