@@ -1,10 +1,13 @@
 import packagejson from "../package.json"
 import defaultTheme from "../constants/defaultTheme.json"
+import defaultSoundPack from "../constants/defaultSoundPack.json"
 
 export default {
+    package: packagejson,
     defaultTheme: defaultTheme,
+    defaultSoundPack: defaultSoundPack,
     logo: {
-        alt: new URL(`../src/assets/logo_alt.svg`, import.meta.url).href
+        alt: "public/logo_alt.svg"
     },
     api: {
         address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
@@ -24,16 +27,6 @@ export default {
             settings: "app_settings"
         },
     },
-    indexer: [
-        {
-            match: '/s;:id',
-            to: `/settings?key=:id`,
-        },
-        {
-            match: '/@:id',
-            to: `/@/:id`,
-        }
-    ],
     i18n: {
         languages: [
             {
