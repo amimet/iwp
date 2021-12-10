@@ -33,7 +33,7 @@ export default class Header extends React.Component {
 	}
 
 	onClickHome = () => {
-		window.app.setLocation("home")
+		window.app.setLocation("/home")
 	}
 
 	render() {
@@ -55,9 +55,10 @@ export default class Header extends React.Component {
 						icon={<Icons.Plus style={{ margin: 0 }} />}
 					/>
 				</div>
-				<div>
-					<AppSearcher />
-				</div>
+				{!window.isMobile &&
+					<div>
+						<AppSearcher />
+					</div>}
 			</antd.Layout.Header>
 		)
 	}
