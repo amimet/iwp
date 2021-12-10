@@ -10,10 +10,18 @@ export default class Session {
     static tokenKey = config.app?.storage?.token ?? "token"
 
     static get token() {
+        if (navigator.userAgent === "capacitor") {
+            // FIXME: sorry about that 
+            return sessionStorage.getItem(this.tokenKey)
+        }
         return cookies.get(this.tokenKey)
     }
 
     static set token(token) {
+        if (navigator.userAgent === "capacitor") {
+            // FIXME: sorry about that 
+            return sessionStorage.setItem(this.tokenKey, token)
+        }
         return cookies.set(this.tokenKey, token)
     }
 
@@ -87,7 +95,11 @@ export default class Session {
     }
 
     forgetLocalSession = () => {
-        cookies.remove(this.tokenKey)
+        if (navigator.userAgent === "capacitor") {
+            // FIXME: sorry about that 
+            return sessionStorage.removeItem(Session.tokenKey)
+        }
+        return cookies.remove(Session.tokenKey)
     }
 
     destroyAllSessions = async () => {
