@@ -6,8 +6,31 @@ import "./index.less"
 
 // TODO: Support childrens
 export default class Home extends React.Component {
+    componentDidMount() {
+        window.app.eventBus.on("desktop_mode", () => {
+            window.app.setLocation("/main")
+        })
+    }
+
     onClick = (id) => {
-        window.app.setLocation(id)
+        window.app.setLocation(`/${id}`)
+    }
+
+    generateItems = () => {
+        // flatten items.children as new items
+        const items = []
+
+        Items.forEach((item) => {
+            if (item.children) {
+                item.children.forEach((child) => {
+                    items.push({ ...child, parent: item.id })
+                })
+            } else {
+                items.push(item)
+            }
+        })
+
+        return items
     }
 
     renderItem = (item, index) => {
@@ -26,12 +49,6 @@ export default class Home extends React.Component {
         </div>
     }
 
-    componentDidMount() {
-        window.app.eventBus.on("desktop_mode", () => {
-            window.app.setLocation("/main")
-        })
-    }
-
     render() {
         if (!window.isMobile) {
             window.app.setLocation("/main")
@@ -40,7 +57,7 @@ export default class Home extends React.Component {
 
         return <div className="buttons_menu">
             {
-                Items.map((item, index) => {
+                this.generateItems().map((item, index) => {
                     return this.renderItem(item, index)
                 })
             }
