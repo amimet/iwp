@@ -1,34 +1,45 @@
 import React from "react"
 import loadable from "@loadable/component"
-import resolve from "pages"
+import routes from "virtual:generated-pages"
+
+import NotFound from "./statics/404"
 
 export const ConnectWithApp = (component) => {
 	return window.app.bindContexts(component)
 }
 
 export function GetRoutesMap() {
-	const jsxFiles = import.meta.glob('/src/pages/**/**.jsx')
-	const tsxFiles = import.meta.glob('/src/pages/**/**.tsx')
+	return routes.map((route) => {
+		const { path } = route
+		route.name =
+			path
+				.replace(/^\//, "")
+				.replace(/:/, "")
+				.replace(/\//, "-")
+				.replace("all(.*)", "not-found") || "home"
 
-	return { ...jsxFiles, ...tsxFiles }
+		route.path = route.path.includes("*") ? "*" : route.path
+
+		return route
+	})
 }
+
+const routesComponentMap = routes.reduce((acc, route) => {
+	const { path, component } = route
+
+	acc[path] = component
+
+	return acc
+}, {})
 
 export const LazyRouteRender = (props) => {
 	const component = loadable(async () => {
 		const location = window.location
+
 		let path = props.path ?? location.pathname
+		let componentModule = routesComponentMap[path] ?? props.staticRenders.NotFound ?? NotFound
 
-		if (path.startsWith("/")) {
-			path = path.substring(1)
-		}
-
-		const src = resolve(path)
-
-		let module = await import(src).catch((err) => {
-			console.error(err)
-			return props.staticRenders?.NotFound ?? import("./statics/404")
-		})
-		module = module.default || module
+		// TODO: Support evite async component initializations
 
 		return class extends React.PureComponent {
 			state = {
@@ -48,7 +59,7 @@ export const LazyRouteRender = (props) => {
 					return JSON.stringify(this.state.error)
 				}
 
-				return React.createElement(ConnectWithApp(module), props)
+				return React.createElement(ConnectWithApp(componentModule), props)
 			}
 		}
 	})
@@ -57,21 +68,7 @@ export const LazyRouteRender = (props) => {
 }
 
 export class RenderRouter extends React.Component {
-	lastPathname = null
-	lastHistoryState = null
-
-	shouldComponentUpdate() {
-		if (this.lastPathname !== window.location.pathname || this.lastHistoryState !== window.app.history.location.state) {
-			return true
-		}
-
-		return false
-	}
-
 	render() {
-		this.lastPathname = window.location.pathname
-		this.lastHistoryState = window.app.history.location.state
-
 		return LazyRouteRender({ ...this.props, path: this.lastPathname })
 	}
 }
