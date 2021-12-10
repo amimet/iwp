@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 import EventEmitter from "@foxify/events"
 
 import "./index.less"
@@ -83,8 +84,13 @@ export class Drawer extends React.Component {
 			handleFail: this.handleFail,
 		}
 
+		if (window.isMobile) {
+			drawerProps.height = "100%"
+			drawerProps.placement = "bottom"
+		}
+
 		return (
-			<antd.Drawer className="drawer" {...drawerProps}>
+			<antd.Drawer className={classnames("drawer", { ["mobile"]: window.isMobile })} {...drawerProps}>
 				<div className="header">
 					<antd.PageHeader
 						onBack={this.onClose}
