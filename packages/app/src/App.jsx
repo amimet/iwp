@@ -166,8 +166,11 @@ class App {
 					}
 				})
 			},
+			goMain: () => {
+				window.app.setLocation(config.app.mainPath)
+			},
 			configuration: this.configuration,
-			isValidSession: this.isValidSession,
+			isValidSession: this.sessionController.isCurrentTokenValid(),
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
 		}
 	}
@@ -208,29 +211,25 @@ class App {
 		this.setState({ session: null, data: null })
 	}
 
-	isValidSession = async () => {
-		return await this.sessionController.isCurrentTokenValid()
-	}
-
 	componentDidMount = async () => {
+		this.eventBus.emit("splash_show")
 		await this.initialization()
+
+		this.eventBus.emit("app_ready")
+		this.eventBus.emit("splash_close")
 	}
 
 	initialization = async () => {
 		try {
-			this.eventBus.emit("splash_show")
 			await this.contexts.app.initializeDefaultBridge()
-			await this.__init_session()
-			await this.__init_user()
-			this.eventBus.emit("app_ready")
+			await this.__SessionInit()
+			await this.__UserInit()
 		} catch (error) {
-			this.eventBus.emit("splash_close")
 			throw new ThrowCrash(error.message, error.description)
 		}
-		this.eventBus.emit("splash_close")
 	}
 
-	__init_session = async () => {
+	__SessionInit = async () => {
 		if (typeof Session.token === "undefined") {
 			window.app.eventBus.emit("forceToLogin")
 		} else {
@@ -250,7 +249,7 @@ class App {
 		this.setState({ session: this.session })
 	}
 
-	__init_user = async () => {
+	__UserInit = async () => {
 		if (!this.session || !this.session.valid) {
 			return false
 		}
