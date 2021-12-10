@@ -11,14 +11,13 @@ String.prototype.toTitleCase = function () {
 }
 
 import React from "react"
-import { CreateEviteApp, BindPropsProvider } from "evite"
+import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import progressBar from "nprogress"
-import classnames from "classnames"
 
 import { Session, User, SidebarController, SettingsController } from "models"
-import { API, Render, Splash, Debug, Theme, Sound } from "extensions"
+import { API, Render, Splash, Theme, Sound } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, FabricCreator, Settings } from "components"
@@ -301,6 +300,8 @@ class App {
 	}
 }
 
+//
+
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension, Debug],
+	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
 })
