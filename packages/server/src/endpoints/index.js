@@ -79,6 +79,18 @@ module.exports = [
     },
     // WORKLOADS
     {
+        route: "/workload_operators",
+        method: "PUT",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "WorkloadController.appendOperators",
+    },
+    {
+        route: "/update_workload",
+        method: "PUT",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "WorkloadController.update",
+    },
+    {
         route: "/workloads",
         method: "GET",
         middleware: "ensureAuthenticated",
