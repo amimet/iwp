@@ -1,6 +1,5 @@
 import React from "react"
 import { Icons } from "components/Icons"
-import { ActionsBar } from "components"
 import { List, Button } from "antd"
 import classnames from "classnames"
 
@@ -71,80 +70,82 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
-	renderActions = () => {
-		if (typeof this.props.renderActions !== "undefined" && !this.props.renderActions) {
-			return false
-		}
-		if (this.state.selectedKeys.length === 0) {
-			return false
-		}
+	renderProvidedActions = () => {
+		return this.props.actions.map((action) => {
+			return (
+				<div key={action.key}>
+					<Button
+						style={{
+							...action.props.style,
+						}}
+						onClick={() => {
+							if (typeof action.onClick === "function") {
+								action.onClick(this.state.selectedKeys)
+							}
 
-		const renderProvidedActions = () => {
-			if (Array.isArray(this.props.actions)) {
-				return this.props.actions.map((action) => {
-					return (
-						<div key={action.key}>
-							<Button
-								style={{
-									...action.props.style,
-								}}
-								onClick={() => {
-									if (typeof action.onClick === "function") {
-										action.onClick(this.state.selectedKeys)
-									}
+							if (typeof this.props[action.props.call] !== "undefined") {
+								if (typeof this.props[action.props.call] === "function") {
+									let data = this.state.selectedKeys // by default send selectedKeys
 
-									if (typeof this.props[action.props.call] !== "undefined") {
-										if (typeof this.props[action.props.call] === "function") {
-											let data = this.state.selectedKeys // by default send selectedKeys
-
-											if (typeof action.props.sendData === "string") {
-												switch (action.props.sendData) {
-													case "keys": {
-														data = this.state.selectedKeys
-													}
-													default: {
-														data = this.state.selectedKeys
-													}
-												}
+									if (typeof action.props.sendData === "string") {
+										switch (action.props.sendData) {
+											case "keys": {
+												data = this.state.selectedKeys
 											}
-
-											this.props[action.props.call](data)
+											default: {
+												data = this.state.selectedKeys
+											}
 										}
 									}
-								}}
-							>
-								{action}
-							</Button>
-						</div>
-					)
-				})
+
+									this.props[action.props.call](data)
+								}
+							}
+						}}
+					>
+						{action}
+					</Button>
+				</div>
+			)
+		})
+	}
+
+	renderActions = () => {
+		const component = <div className={classnames("selectableList_bottomActions", { ["mobile"]: window.isMobile })}>
+			<div key="discard">
+				<Button
+					shape="round"
+					onClick={this.onDiscard}
+					{...this.props.onDiscardProps}
+				>
+					{this.props.onDiscardRender ?? <Icons.X />}
+					Discard
+				</Button>
+			</div>
+			{this.renderProvidedActions()}
+		</div>
+
+		if (this.state.selectedKeys.length === 0) {
+			if (window.isMobile) {
+				window.app.BottomBarController.clear()
 			}
+
 			return null
 		}
 
-		return (
-			<div className="bottomActions_wrapper">
-				<ActionsBar style={{ borderRadius: "8px 8px 0 0", width: "fit-content" }}>
-					<div key="discard">
-						<Button
-							shape="round"
-							onClick={this.onDiscard}
-							{...this.props.onDiscardProps}
-						>
-							{this.props.onDiscardRender ?? <Icons.X />}
-							Discard
-						</Button>
-					</div>
-					{renderProvidedActions()}
-				</ActionsBar>
-			</div>
-		)
+		if (window.isMobile) {
+			window.app.BottomBarController.render(component)
+
+			return null
+		}
+
+		return component
 	}
 
 	isKeySelected = (key) => {
 		return this.state.selectedKeys.includes(key)
 	}
-	
+
 	render() {
 		const validSelectionMethods = ["onClick", "onDoubleClick"]
 
@@ -223,7 +224,9 @@ export default class SelectableList extends React.Component {
 					]}
 					renderItem={renderMethod}
 				/>
-				{this.renderActions()}
+				<div className="selectableList_bottomActions_wrapper">
+					{this.renderActions()}
+				</div>
 			</div>
 		)
 	}
