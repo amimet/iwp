@@ -20,7 +20,7 @@ const LayoutRenders = {
 					</div>
 				</antd.Layout.Content>
 			</antd.Layout>
-			<BottomBar />
+			<BottomBar user={props.user} />
 		</antd.Layout>
 	},
 	default: (props) => {
