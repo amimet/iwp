@@ -1,13 +1,9 @@
 .workload_details {
-	width: 70vw;
-	min-width: 650px;
-	max-width: 1200px;
-
 	> div {
 		margin-bottom: 20px;
 	}
 
-	.header {
+	.details_header {
 		display: flex;
 		justify-content: space-between;
 
@@ -26,6 +22,36 @@
 		.matrix:hover {
 			filter: contrast(0.3);
 		}
+	}
+
+	.info {
+		display: flex;
+		flex-direction: column;
+
+		> div {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: space-between;
+
+			background-color: var(--background-color-accent);
+			margin: 5px 0;
+			padding: 5px;
+			border-radius: 2px;
+			
+			.name {
+				font-size: 18px;
+			}
+			.value {
+				font-size: 14px;
+				color:  var(--background-color-contrast);
+			}
+		}
+	}
+
+	.details_collapseList {
+		background-color: transparent;
 	}
 
 	.scheduled_progress {
@@ -96,10 +122,16 @@
 			background-color: var(--primary-color);
 		}
 	}
-}
 
-.content {
-	  > div {
-		margin-bottom: 10px;
+	&.mobile {
+		.details_header {
+			.content {
+				width: 100%;
+			}
+
+			flex-direction: column-reverse;
+			align-items: center;
+			justify-content: center;
+		}
 	}
 }

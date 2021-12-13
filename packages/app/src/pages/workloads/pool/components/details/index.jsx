@@ -3,11 +3,31 @@ import * as antd from "antd"
 import { Icons } from "components/Icons"
 import classnames from "classnames"
 import moment from "moment"
+import { UserSelector } from "components"
 import QRCode from "qrcode"
 
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
+
+const Assignments = (props) => {
+	const onClickAddAssign = () => {
+		window.app.DrawerController.open("OperatorAssignment", UserSelector, {
+			componentProps: {
+				filter: { roles: ["operator"] }
+			}
+		})
+	}
+
+	return <div>
+		<antd.List
+			dataSource={props.assigned}
+		/>
+		<div>
+			<antd.Button type="primary" onClick={onClickAddAssign}>Add</antd.Button>
+		</div>
+	</div>
+}
 
 export default class WorkloadDetails extends React.Component {
 	ref = React.createRef()
@@ -132,6 +152,8 @@ export default class WorkloadDetails extends React.Component {
 		const datesDiff = this.getDiffBetweenDates(data.scheduledStart, data.scheduledFinish)
 		const isExpired = this.isExpired(finishReached, data.status)
 
+		console.log(data)
+
 		const getSchedulerProgressStatus = () => {
 			let status = "normal"
 
@@ -154,8 +176,8 @@ export default class WorkloadDetails extends React.Component {
 		}
 
 		return (
-			<div className="workload_details" id={this.id} ref={this.ref} >
-				<div className="header">
+			<div className={classnames("workload_details", { ["mobile"]: window.isMobile })} id={this.id} ref={this.ref} >
+				<div className="details_header">
 					<div className="content">
 						<h1>
 							<antd.Badge.Ribbon
@@ -165,24 +187,7 @@ export default class WorkloadDetails extends React.Component {
 								<Icons.Box /> {data.name}
 							</antd.Badge.Ribbon>
 						</h1>
-						<div>
-							<antd.Tag>
-								<Icons.Tag />
-								ID {this.id}
-							</antd.Tag>
-							<antd.Tag>
-								<Icons.User />
-								NOF {data.nof}
-							</antd.Tag>
-							<antd.Tag>
-								<Icons.GitBranch />
-								Phase {data.phase}
-							</antd.Tag>
-							<antd.Tag>
-								<Icons.Activity />
-								{data.status}
-							</antd.Tag>
-						</div>
+
 						<div>
 							<antd.Button icon={<Icons.Save />}>
 								Export
@@ -197,68 +202,86 @@ export default class WorkloadDetails extends React.Component {
 					</div>
 				</div>
 
-				<div key="scheduled">
-					<h2>
-						<Icons.Calendar /> Scheduled
-					</h2>
-					<div className="scheduled_progress">
-						<div className={classnames("point", "left", { reached: startReached })}>
-							{data.scheduledStart}
+				<div className="info">
+					<div key="id">
+						<div className="name">
+							<Icons.Tag />
+							ID
 						</div>
-						<antd.Progress
-							size="small"
-							percent={datesDiff.percentage}
-							showInfo={false}
-							className={classnames("ant-progress", {
-								startReached: startReached,
-								finishReached: finishReached,
-							})}
-							type="line"
-							status={getSchedulerProgressStatus()}
-						/>
-						<div className={classnames("point", "right", { reached: finishReached })}>
-							{data.scheduledFinish}
+						<div className="value">
+							{this.id}
+						</div>
+					</div>
+					<div key="nof">
+						<div className="name">
+							<Icons.User />
+							NOF
+						</div>
+						<div className="value">
+							{data.nof}
+						</div>
+					</div>
+					<div key="phase">
+						<div className="name">
+							<Icons.GitBranch />
+							Phase
+						</div>
+						<div className="value">
+							{data.phase}
+						</div>
+					</div>
+					<div key="state">
+						<div className="name">
+							<Icons.Activity />
+							State
+						</div>
+						<div className="value">
+							{data.status}
 						</div>
 					</div>
 				</div>
 
-				<div>
-					<antd.Row gutter={[16, 16]}>
-						<antd.Col span={12}>
-							<div>
-								<h2>
-									<Icons.Watch /> Timeline
-								</h2>
-								<antd.Timeline mode="left">
-									<antd.Timeline.Item label={createdDate.toLocaleString()}>
-										Workload was created
-									</antd.Timeline.Item>
-								</antd.Timeline>
+				<antd.Collapse
+					bordered={false}
+					accordion={true}
+					expandIconPosition={"right"}
+					className="details_collapseList"
+				>
+					<antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
+						<div className="scheduled_progress">
+							<div className={classnames("point", "left", { reached: startReached })}>
+								{data.scheduledStart}
 							</div>
-						</antd.Col>
+							<antd.Progress
+								size="small"
+								percent={datesDiff.percentage}
+								showInfo={false}
+								className={classnames("ant-progress", {
+									startReached: startReached,
+									finishReached: finishReached,
+								})}
+								type="line"
+								status={getSchedulerProgressStatus()}
+							/>
+							<div className={classnames("point", "right", { reached: finishReached })}>
+								{data.scheduledFinish}
+							</div>
+						</div>
+					</antd.Collapse.Panel>
 
-						<antd.Col span={12}>
-							<div>
-								<h2>
-									<Icons.Users /> Operators
-								</h2>
-								<antd.List
-									dataSource={data.assigned}
-									renderItem={(operator) => (
-										<List.Item key={operator._id}>
-											<List.Item.Meta
-												avatar={<Avatar src={operator.avatar} />}
-												title={<a>{operator.fullName}</a>}
-												description={operator.email}
-											/>
-										</List.Item>
-									)}
-								/>
-							</div>
-						</antd.Col>
-					</antd.Row>
-				</div>
-				<div key="assigned"></div>
+					<antd.Collapse.Panel key="timeline" header={<h2><Icons.Watch /> Timeline</h2>}>
+						<antd.Timeline mode="left">
+							<antd.Timeline.Item label={createdDate.toLocaleString()}>
+								Workload was created
+							</antd.Timeline.Item>
+						</antd.Timeline>
+					</antd.Collapse.Panel>
+
+					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
+						<Assignments assigned={data.assigned} />
+					</antd.Collapse.Panel>
+				</antd.Collapse>
+
 				<div key="items">
 					<h2>
 						<Icons.Archive /> Order

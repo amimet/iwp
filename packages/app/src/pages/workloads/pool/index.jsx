@@ -51,6 +51,11 @@ class Workload extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
+		this.loadRegions()
+		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
+	}
+
+	loadRegions = async () => {
 		await this.api.get
 			.regions()
 			.then((data) => {
@@ -60,18 +65,6 @@ class Workload extends React.Component {
 				console.error(error)
 				this.setState({ error })
 			})
-
-		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
-
-		if (typeof window.app.debug !== "undefined") {
-			window.app.debug.bind("workload_list", this)
-		}
-	}
-
-	componentWillUnmount = () => {
-		if (typeof window.app.debug !== "undefined") {
-			window.app.debug.unbind("workload_list", this)
-		}
 	}
 
 	toogleSelection = () => {
@@ -299,17 +292,22 @@ class Workload extends React.Component {
 			<div style={{ height: "100%" }}>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar float={true}>
-						<div key="createNew">
-							<Button type="primary" onClick={this.openWorkloadCreator} icon={<Icons.Plus />}>
-								New
-							</Button>
+						<div key="refresh">
+							<Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
 						</div>
 						<div key="toogleSelection">
 							<Button
-								onClick={this.toogleSelection}
+								shape="round"
 								icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}
+								type={this.state.selectionEnabled ? "default" : "primary"}
+								onClick={() => this.toogleSelection()}
 							>
 								{this.state.selectionEnabled ? "Done" : "Select"}
+							</Button>
+						</div>
+						<div key="createNew">
+							<Button type="primary" onClick={this.openWorkloadCreator} icon={<Icons.Plus />}>
+								New
 							</Button>
 						</div>
 						<div key="search">
