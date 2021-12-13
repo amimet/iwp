@@ -204,7 +204,7 @@ export default class Vault extends React.Component {
                     <div key="refresh">
                         <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.loadFabricItems} />
                     </div>
-                    <div key="toogleSelect">
+                    <div key="toogleSelection">
                         <antd.Button shape="round" icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />} type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
                             {this.state.selectionEnabled ? "Done" : "Select"}
                         </antd.Button>
