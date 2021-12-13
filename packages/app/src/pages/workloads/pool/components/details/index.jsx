@@ -13,6 +13,13 @@ const dateFormat = "DD-MM-YYYY hh:mm"
 const Assignments = (props) => {
 	const onClickAddAssign = () => {
 		window.app.DrawerController.open("OperatorAssignment", UserSelector, {
+			onDone: async (ctx, data) => {
+				if (typeof props.onAssignOperators === "function") {
+					await props.onAssignOperators(ctx, data)					
+				}else {
+					ctx.close()
+				}
+			},
 			componentProps: {
 				filter: { roles: ["operator"] }
 			}
@@ -116,6 +123,22 @@ export default class WorkloadDetails extends React.Component {
 		console.log(`Opening item details with UUID[${uuid}]`)
 	}
 
+	onAssignOperators = async (ctx, data) => {
+		const result = await this.api.put.appendOperators({
+			_id: this.state.data._id,
+			operators: data,
+		}).catch((err) => {
+			ctx.handleFail(err)
+
+			return false
+		})
+
+		if (result) {
+			ctx.close()
+			this.setState({ data: result })
+		}
+	}
+
 	parseWorkloadItems = (items) => {
 		return items.map((item) => {
 			const obj = {
@@ -151,8 +174,6 @@ export default class WorkloadDetails extends React.Component {
 
 		const datesDiff = this.getDiffBetweenDates(data.scheduledStart, data.scheduledFinish)
 		const isExpired = this.isExpired(finishReached, data.status)
-
-		console.log(data)
 
 		const getSchedulerProgressStatus = () => {
 			let status = "normal"
@@ -278,7 +299,7 @@ export default class WorkloadDetails extends React.Component {
 					</antd.Collapse.Panel>
 
 					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
-						<Assignments assigned={data.assigned} />
+						<Assignments onAssignOperators={this.onAssignOperators} assigned={data.assigned} />
 					</antd.Collapse.Panel>
 				</antd.Collapse>
 
