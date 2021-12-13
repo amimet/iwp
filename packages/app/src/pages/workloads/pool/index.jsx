@@ -290,7 +290,7 @@ class Workload extends React.Component {
 				onCheck={this.onCheckWorkloads}
 				items={list}
 				renderItem={this.renderItem}
-			></SelectableList>
+			/>
 		)
 	}
 
