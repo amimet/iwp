@@ -12,7 +12,6 @@ import BottomBar from "./bottombar"
 const LayoutRenders = {
 	mobile: (props) => {
 		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
-			<Drawer />
 			<antd.Layout className="content_layout">
 				<antd.Layout.Content className="layout_page">
 					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
@@ -21,6 +20,7 @@ const LayoutRenders = {
 				</antd.Layout.Content>
 			</antd.Layout>
 			<BottomBar user={props.user} />
+			<Drawer />
 		</antd.Layout>
 	},
 	default: (props) => {
