@@ -1,0 +1,42 @@
+@bottomBar_height: 80px;
+
+.bottomBar {
+	z-index: 200;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+
+	width: 100vw;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: center;
+
+	background-color: var(--background-color-accent);
+	border-radius: 12px 12px 0 0;
+
+	height: @bottomBar_height;
+
+	padding: 10px;
+
+	.items {
+		display: inline-block;
+		white-space: nowrap;
+		overflow-x: overlay;
+
+		> div {
+			margin: 0 17px;
+		}
+
+		.item {
+			display: inline-block;
+
+			.icon {
+				color: var(--background-color-contrast);
+				font-size: 37px;
+			}
+		}
+	}
+}
