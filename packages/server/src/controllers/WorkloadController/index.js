@@ -11,15 +11,28 @@ export const WorkloadController = {
         if (req.selectedValues.region === "all") {
             delete req.selectedValues.region
             workloads = await Workload.find(req.selectedValues)
-        }else {
+        } else {
             workloads = await Workload.find(req.selectedValues)
         }
 
         return res.json(workloads)
     }),
+    appendOperators: Schematized(["_id"], selectValues(["_id"], async (req, res) => {
+        let workload = await Workload.findById(req.selectedValues._id)
+
+        console.log(workload)
+
+        return res.json(workload)
+    })),
+    // TODO: Update method
+    update: Schematized(["_id"], selectValues(["_id"], async (req, res) => {
+        let workload = await Workload.findById(req.selectedValues._id)
+
+        return res.json(workload)
+    })),
     get: selectValues(["region", "_id", "name"], async (req, res, next) => {
         let workload = await Workload.findOne(req.selectedValues)
-        
+
         // parse expiration status
         if (typeof workload.expired !== "undefined") {
             // check if is expired
