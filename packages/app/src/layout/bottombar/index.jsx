@@ -5,11 +5,32 @@ import { createIconRender } from "components/Icons"
 import "./index.less"
 
 export default class BottomBar extends React.Component {
+    state = {
+        render: null
+    }
+
+    componentDidMount = () => {
+        window.app.BottomBarController = {
+            render: (fragment) => {
+                this.setState({ render: fragment })
+            },
+            clear: () => {
+                this.setState({ render: null })
+            },
+        }
+    }
+
     onClickItemId = (id) => {
         window.app.setLocation(`/${id}`)
     }
 
     render() {
+        if (this.state.render) {
+            return <div className="bottomBar">
+                {this.state.render}
+            </div>
+        }
+
         return <div className="bottomBar">
             <div className="items">
                 <div onClick={() => window.app.goMain()} key="main" id="main" className="item">
