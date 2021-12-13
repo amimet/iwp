@@ -122,7 +122,7 @@ export default class SelectableList extends React.Component {
 					Discard
 				</Button>
 			</div>
-			{Array.isArray(this.props.actions) && this.renderProvidedActions()}
+			{!this.props.actionsDisabled && Array.isArray(this.props.actions) && this.renderProvidedActions()}
 		</div>
 
 		if (this.state.selectedKeys.length === 0) {
