@@ -111,6 +111,10 @@ export default class SelectableList extends React.Component {
 	}
 
 	renderActions = () => {
+		if (this.props.actionsDisabled) {
+			return null
+		}
+
 		const component = <div className={classnames("selectableList_bottomActions", { ["mobile"]: window.isMobile })}>
 			<div key="discard">
 				<Button
@@ -122,24 +126,24 @@ export default class SelectableList extends React.Component {
 					Discard
 				</Button>
 			</div>
-			{!this.props.actionsDisabled && Array.isArray(this.props.actions) && this.renderProvidedActions()}
+			{Array.isArray(this.props.actions) && this.renderProvidedActions()}
 		</div>
 
 		if (this.state.selectedKeys.length === 0) {
-			if (window.isMobile) {
+			if (window.isMobile && !this.props.notUseBottomBar) {
 				window.app.BottomBarController.clear()
 			}
 
 			return null
+		}else {
+			if (window.isMobile && !this.props.notUseBottomBar) {
+				window.app.BottomBarController.render(component)
+	
+				return null
+			}
+	
+			return component
 		}
-
-		if (window.isMobile) {
-			window.app.BottomBarController.render(component)
-
-			return null
-		}
-
-		return component
 	}
 
 	isKeySelected = (key) => {
