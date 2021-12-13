@@ -7,7 +7,7 @@ export default {
     defaultTheme: defaultTheme,
     defaultSoundPack: defaultSoundPack,
     logo: {
-        alt: "logo_alt.svg"
+        alt: "/logo_alt.svg"
     },
     api: {
         address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
