@@ -169,6 +169,9 @@ class App {
 			goMain: () => {
 				window.app.setLocation(config.app.mainPath)
 			},
+			goToAccount: (username = this.user.username) => {
+				return window.app.setLocation(`/account`, { username })
+			},
 			configuration: this.configuration,
 			isValidSession: this.sessionController.isCurrentTokenValid(),
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
