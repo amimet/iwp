@@ -113,7 +113,14 @@ body {
 	transition: all 150ms ease-in-out;
 
 	&.mobile {
-		
+		::-webkit-scrollbar {
+			position: absolute;
+			display: none;
+			
+			width: 0;
+			height: 0;
+			z-index: 0;
+		}
 	}
 }
 
