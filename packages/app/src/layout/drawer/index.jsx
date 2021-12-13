@@ -185,7 +185,7 @@ export class Drawer extends React.Component {
 
 		return (
 			<antd.Drawer className={classnames("drawer", { ["mobile"]: window.isMobile })} {...drawerProps}>
-				{!this.props.headerDisabled && <div className="header">
+				{!this.props.headerDisabled && <div className="pageTitle">
 					<antd.PageHeader
 						onBack={this.onClose}
 						title={this.props.title ?? "Close"}
