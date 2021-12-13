@@ -51,6 +51,7 @@ export default class OperatorsSelector extends React.Component {
 
         return <div>
             <SelectableList
+                notUseBottomBar
                 ref={this.listRef}
                 items={this.state.data}
                 renderItem={this.renderItem}
