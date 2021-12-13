@@ -6,6 +6,8 @@ import SessionController from '../SessionController'
 import { Token, selectValues } from '../../lib'
 import AvatarController from 'dicebar_lib'
 
+import _ from 'lodash'
+
 export const UserController = {
     isAuth: (req, res) => {
         return res.json(`You look nice today 😎`)
@@ -14,13 +16,40 @@ export const UserController = {
         return res.json(req.user)
     },
     get: selectValues(["_id", "username"], async (req, res) => {
-        const user = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
+        let result = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
 
-        if (!user) {
-            return res.status(404).json({ error: "User not exists" })
+        const queryKeys = Object.keys(req.query)
+
+        if (queryKeys.length > 0) {
+            result = result.filter(user => {
+                let pass = false
+
+                queryKeys.forEach(key => {
+                    if (Array.isArray(req.query[key]) && Array.isArray(user[key])) {
+                        // check if arrays includes any of the values
+                        pass = req.query[key].some(val => user[key].includes(val))
+                    } else if (typeof req.query[key] === 'object' && typeof user[key] === 'object') {
+                        // check if objects includes any of the values
+                        Object.keys(req.query[key]).forEach(objKey => {
+                            pass = user[key][objKey] === req.query[key][objKey]
+                        })
+                    }
+
+                    // check if strings includes any of the values
+                    if (typeof req.query[key] === 'string' && typeof user[key] === 'string') {
+                        pass = req.query[key].split(',').some(val => user[key].includes(val))
+                    }
+                })
+
+                return pass
+            })
         }
 
-        return res.json(user)
+        if (!result) {
+            return res.status(404).json({ error: "Users not found" })
+        }
+
+        return res.json(result)
     }),
     getOne: selectValues(["_id", "username"], async (req, res) => {
         const user = await User.findOne(req.selectedValues)
