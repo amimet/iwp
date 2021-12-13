@@ -7,18 +7,54 @@ import Sidebar from './sidebar'
 import Header from './header'
 import Drawer from './drawer'
 import Sidedrawer from './sidedrawer'
+import BottomBar from "./bottombar"
 
-export const LayoutComponents = {
-	Drawer,
-	Sidebar,
-	Header,
-	Sidedrawer,
+const LayoutRenders = {
+	mobile: (props) => {
+		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
+			<Drawer />
+			<antd.Layout className="content_layout">
+				<antd.Layout.Content className="layout_page">
+					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
+						{props.children}
+					</div>
+				</antd.Layout.Content>
+			</antd.Layout>
+			<BottomBar />
+		</antd.Layout>
+	},
+	default: (props) => {
+		return <antd.Layout className="app_layout" style={{ height: "100%" }}>
+			<Drawer />
+			<Sidebar user={props.user} />
+			<antd.Layout className="content_layout">
+				<Header />
+				<antd.Layout.Content className="layout_page">
+					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
+						{props.children}
+					</div>
+				</antd.Layout.Content>
+			</antd.Layout>
+			<Sidedrawer />
+		</antd.Layout>
+	}
 }
 
 export default class Layout extends React.Component {
 	state = {
+		layoutType: "default",
 		isMobile: false,
 		isOnTransition: false,
+	}
+
+	setLayout = (layout) => {
+		if (typeof LayoutRenders[layout] === "function") {
+			return this.setState({
+				layoutType: layout,
+			})
+		}
+
+		return console.error("Layout type not found")
 	}
 
 	componentDidMount() {
@@ -34,8 +70,10 @@ export default class Layout extends React.Component {
 
 			if (mobile) {
 				window.app.eventBus.emit("mobile_mode")
-			}else {
+				this.setLayout("mobile")
+			} else {
 				window.app.eventBus.emit("desktop_mode")
+				this.setLayout("default")
 			}
 		})
 
@@ -52,19 +90,15 @@ export default class Layout extends React.Component {
 	}
 
 	render() {
-		return <antd.Layout className={classnames("app_layout", { ["mobile"]: this.state.isMobile })} style={{ height: "100%" }}>
-			<Drawer />
-			{!this.state.isMobile &&< Sidebar user={this.props.user} />}
-			<antd.Layout className="content_layout">
-				
-				<Header />
-				<antd.Layout.Content className="layout_page">
-					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": this.state.isOnTransition })}>
-						{this.props.children}
-					</div>
-				</antd.Layout.Content>
-			</antd.Layout>
-			<Sidedrawer />
-		</antd.Layout>
+		const layoutComponentProps = {
+			...this.props,
+			...this.state,
+		}
+
+		if (LayoutRenders[this.state.layoutType]) {
+			return LayoutRenders[this.state.layoutType](layoutComponentProps)
+		}
+
+		return LayoutRenders.default(layoutComponentProps)
 	}
 }
