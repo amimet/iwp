@@ -27,11 +27,15 @@ export default class BottomBar extends React.Component {
                         {createIconRender("Settings")}
                     </div>
                 </div>
-                <div onClick={() => window.app.goToAccount()} key="account" id="account" className="item">
+                {this.props.user ? <div onClick={() => window.app.goToAccount()} key="account" id="account" className="item">
                     <div className="icon">
                         <antd.Avatar src={this.props.user?.avatar} />
                     </div>
-                </div>
+                </div> : <div onClick={() => this.onClickItemId("login")} className="item">
+                    <div key="login" id="login" className="icon">
+                        {createIconRender("LogIn")}
+                    </div>
+                </div>}
             </div>
         </div>
     }
