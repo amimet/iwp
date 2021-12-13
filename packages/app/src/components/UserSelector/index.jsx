@@ -49,13 +49,13 @@ export default class OperatorsSelector extends React.Component {
             return <antd.Skeleton active />
         }
 
-        return <div>
-            <SelectableList
-                notUseBottomBar
-                ref={this.listRef}
-                items={this.state.data}
-                renderItem={this.renderItem}
-            />
+        return <div className="users_selector">
+                <SelectableList
+                    ignoreMobileActions
+                    ref={this.listRef}
+                    items={this.state.data}
+                    renderItem={this.renderItem}
+                />
         </div>
     }
 }
