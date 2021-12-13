@@ -5,15 +5,13 @@ import { SelectableList } from "components"
 
 import "./index.less"
 
-export default class OperatorsSelector extends React.Component {
+export default class UsersSelector extends React.Component {
     state = {
         loading: true,
         data: [],
     }
 
     api = window.app.request
-
-    listRef = React.createRef()
 
     componentDidMount = async () => {
         this.toogleLoading(true)
@@ -52,9 +50,14 @@ export default class OperatorsSelector extends React.Component {
         return <div className="users_selector">
                 <SelectableList
                     ignoreMobileActions
-                    ref={this.listRef}
                     items={this.state.data}
                     renderItem={this.renderItem}
+                    actions={[
+                        <div call="onDone" key="done">
+                            Done
+                        </div>
+                    ]}
+                    onDone={(keys) => this.props.handleDone(keys)}
                 />
         </div>
     }
