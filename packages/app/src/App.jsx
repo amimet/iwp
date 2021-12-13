@@ -167,9 +167,9 @@ class App {
 				})
 			},
 			goMain: () => {
-				window.app.setLocation(config.app.mainPath)
+				return window.app.setLocation(config.app.mainPath)
 			},
-			goToAccount: (username = this.user.username) => {
+			goToAccount: (username) => {
 				return window.app.setLocation(`/account`, { username })
 			},
 			configuration: this.configuration,
