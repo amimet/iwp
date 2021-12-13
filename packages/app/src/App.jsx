@@ -299,8 +299,6 @@ class App {
 	}
 }
 
-//
-
 export default CreateEviteApp(App, {
 	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
 })
