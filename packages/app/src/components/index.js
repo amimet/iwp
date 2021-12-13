@@ -11,6 +11,7 @@ export { default as ObjectInspector } from "./ObjectInspector"
 export { default as FabricCreator } from "./FabricCreator"
 export { default as ServerStatus } from "./ServerStatus"
 export { default as ModifierTag } from "./ModifierTag"
+export { default as UserSelector } from "./UserSelector"
 
 export * as AboutApp from "./AboutApp"
 export * as QRReader from "./QRReader"
