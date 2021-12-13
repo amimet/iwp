@@ -5,7 +5,6 @@ import EventEmitter from "@foxify/events"
 
 import "./index.less"
 
-
 export default class DrawerController extends React.Component {
 	constructor(props) {
 		super(props)
@@ -36,6 +35,7 @@ export default class DrawerController extends React.Component {
 
 		const instance = {
 			id,
+			key: id,
 			ref: React.createRef(),
 			children: component,
 			options,
@@ -185,14 +185,14 @@ export class Drawer extends React.Component {
 
 		return (
 			<antd.Drawer className={classnames("drawer", { ["mobile"]: window.isMobile })} {...drawerProps}>
-				<div className="header">
+				{!this.props.headerDisabled && <div className="header">
 					<antd.PageHeader
 						onBack={this.onClose}
 						title={this.props.title ?? "Close"}
 						backIcon={this.props.backIcon}
 						subTitle={this.props.subtitle}
 					/>
-				</div>
+				</div>}
 				<div className="body">
 					{React.createElement(this.props.children, componentProps)}
 				</div>
