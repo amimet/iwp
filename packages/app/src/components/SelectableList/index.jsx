@@ -151,20 +151,25 @@ export default class SelectableList extends React.Component {
 	}
 
 	renderItem = (item) => {
-		const validSelectionMethods = ["onClick", "onDoubleClick"]
-		const selectionMethod = validSelectionMethods.includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
-
-		const _key = item.key ?? item.id ?? item._id
-		const isSelected = this.isKeySelected(_key)
-
 		const renderChildren = this.props.renderItem(item)
 
+		const _key = item.key ?? item.id ?? item._id ?? renderChildren.key
+
+		const selectionMethod = ["onClick", "onDoubleClick"].includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
+		const isSelected = this.isKeySelected(_key)
+		const isDisabled = renderChildren.props.disabled
+
 		let renderProps = {
+			disabled: isDisabled,
 			children: renderChildren,
 			className: classnames("selectableList_item", {
 				["selected"]: isSelected,
+				["disabled"]: isDisabled,
 			}),
 			[selectionMethod]: () => {
+				if (isDisabled) {
+					return false
+				}
 				if (typeof this.props.selectionEnabled !== "undefined") {
 					if (!Boolean(this.props.selectionEnabled)) {
 						return false
