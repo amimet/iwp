@@ -135,13 +135,13 @@ export default class SelectableList extends React.Component {
 			}
 
 			return null
-		}else {
+		} else {
 			if (window.isMobile && !this.props.ignoreMobileActions) {
 				window.app.BottomBarController.render(component)
-	
+
 				return null
 			}
-	
+
 			return component
 		}
 	}
@@ -150,60 +150,50 @@ export default class SelectableList extends React.Component {
 		return this.state.selectedKeys.includes(key)
 	}
 
-	render() {
+	renderItem = (item) => {
 		const validSelectionMethods = ["onClick", "onDoubleClick"]
+		const selectionMethod = validSelectionMethods.includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
 
-		const renderMethod = (item) => {
-			const selectionMethod = validSelectionMethods.includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
+		const _key = item.key ?? item.id ?? item._id
+		const isSelected = this.isKeySelected(_key)
 
-			if (typeof this.props.renderItem === "function") {
-				const _key = item.key ?? item.id ?? item._id
-				const isSelected = this.isKeySelected(_key)
+		const renderChildren = this.props.renderItem(item)
 
-				let props = {
-					key: _key,
-					id: _key,
-					className: classnames("selectableList_item", this.props.itemClassName, {
-						selected: isSelected,
-					}),
-					[selectionMethod]: () => {
-						if (typeof this.props.selectionEnabled !== "undefined") {
-							if (!Boolean(this.props.selectionEnabled)) {
-								return false
-							}
-						}
-
-						if (isSelected) {
-							this.unselectKey(_key)
-						} else {
-							this.selectKey(_key)
-						}
+		let renderProps = {
+			children: renderChildren,
+			className: classnames("selectableList_item", {
+				["selected"]: isSelected,
+			}),
+			[selectionMethod]: () => {
+				if (typeof this.props.selectionEnabled !== "undefined") {
+					if (!Boolean(this.props.selectionEnabled)) {
+						return false
 					}
 				}
 
-				if (selectionMethod == "onDoubleClick") {
-					props.onClick = () => {
-						if (this.state.selectedKeys.length > 0) {
-							if (isSelected) {
-								this.unselectKey(_key)
-							}
-						}
-					}
+				if (isSelected) {
+					this.unselectKey(_key)
+				} else {
+					this.selectKey(_key)
 				}
-
-				return (
-					<div {...props}>
-						{this.props.renderItem(item)}
-					</div>
-				)
 			}
-
-			console.warn("renderItem method is not defined!")
-			return null
 		}
 
-		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } =
-			this.props
+		if (selectionMethod == "onDoubleClick") {
+			renderProps.onClick = () => {
+				if (this.state.selectedKeys.length > 0) {
+					if (isSelected) {
+						this.unselectKey(_key)
+					}
+				}
+			}
+		}
+
+		return <div key={_key} {...renderProps} />
+	}
+
+	render() {
+		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } = this.props
 		const listProps = {
 			borderer,
 			grid,
@@ -218,20 +208,15 @@ export default class SelectableList extends React.Component {
 			loading,
 		}
 
-		return (
-			<div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
-				<List
-					{...listProps}
-					dataSource={[
-						...(Array.isArray(this.props.items) ? this.props.items : []),
-						...(Array.isArray(this.props.children) ? this.props.children : []),
-					]}
-					renderItem={renderMethod}
-				/>
-				<div className="selectableList_bottomActions_wrapper">
-					{this.renderActions()}
-				</div>
+		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
+			<List
+				{...listProps}
+				dataSource={this.props.items}
+				renderItem={this.renderItem}
+			/>
+			<div className="selectableList_bottomActions_wrapper">
+				{this.renderActions()}
 			</div>
-		)
+		</div>
 	}
 }
