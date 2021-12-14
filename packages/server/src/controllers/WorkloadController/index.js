@@ -31,7 +31,7 @@ export const WorkloadController = {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
             }
 
-            workload = await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
+            await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
         }
 
         return res.json(workload)
@@ -50,7 +50,7 @@ export const WorkloadController = {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
             }
 
-            workload = await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
+            await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
         }
 
         return res.json(workload)
