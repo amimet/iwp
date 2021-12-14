@@ -1,40 +1,14 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
 import classnames from "classnames"
 import moment from "moment"
-import { UserSelector } from "components"
 import QRCode from "qrcode"
+import { Icons } from "components/Icons"
+import { OperatorsAssignments } from "components"
 
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
-
-const Assignments = (props) => {
-	const onClickAddAssign = () => {
-		window.app.DrawerController.open("OperatorAssignment", UserSelector, {
-			onDone: async (ctx, data) => {
-				if (typeof props.onAssignOperators === "function") {
-					await props.onAssignOperators(ctx, data)					
-				}else {
-					ctx.close()
-				}
-			},
-			componentProps: {
-				filter: { roles: ["operator"] }
-			}
-		})
-	}
-
-	return <div>
-		<antd.List
-			dataSource={props.assigned}
-		/>
-		<div>
-			<antd.Button type="primary" onClick={onClickAddAssign}>Add</antd.Button>
-		</div>
-	</div>
-}
 
 export default class WorkloadDetails extends React.Component {
 	ref = React.createRef()
@@ -124,18 +98,18 @@ export default class WorkloadDetails extends React.Component {
 	}
 
 	onAssignOperators = async (ctx, data) => {
-		const result = await this.api.put.appendOperators({
+		const result = await this.api.put.workloadOperators({
 			_id: this.state.data._id,
 			operators: data,
 		}).catch((err) => {
 			ctx.handleFail(err)
-
 			return false
 		})
 
 		if (result) {
 			ctx.close()
 			this.setState({ data: result })
+			this.forceUpdate()
 		}
 	}
 
@@ -299,7 +273,7 @@ export default class WorkloadDetails extends React.Component {
 					</antd.Collapse.Panel>
 
 					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
-						<Assignments onAssignOperators={this.onAssignOperators} assigned={data.assigned} />
+						<OperatorsAssignments onAssignOperators={this.onAssignOperators} assigned={data.assigned} />
 					</antd.Collapse.Panel>
 				</antd.Collapse>
 
