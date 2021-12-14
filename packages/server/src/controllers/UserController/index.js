@@ -16,28 +16,51 @@ export const UserController = {
         return res.json(req.user)
     },
     get: selectValues(["_id", "username"], async (req, res) => {
-        let result = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
+        let result = []
+        let selectQueryKeys = []
 
-        const queryKeys = Object.keys(req.query)
+        if (Array.isArray(req.selectedValues._id)) {
+            for await (let _id of req.selectedValues._id) {
+                const user = await User.findById(_id).catch(err => {
+                    return false
+                })
+                if (user) {
+                    result.push(user)
+                }
+            }
+        } else {
+            result = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
+        }
 
-        if (queryKeys.length > 0) {
+        if (req.query.select) {
+            try {
+                req.query.select = JSON.parse(req.query.select)
+            } catch (error) {
+                req.query.select = {}
+            }
+
+            selectQueryKeys = Object.keys(req.query.select)
+        }
+
+        if (selectQueryKeys.length > 0) {
             result = result.filter(user => {
                 let pass = false
+                const selectFilter = req.query.select
 
-                queryKeys.forEach(key => {
-                    if (Array.isArray(req.query[key]) && Array.isArray(user[key])) {
+                selectQueryKeys.forEach(key => {
+                    if (Array.isArray(selectFilter[key]) && Array.isArray(user[key])) {
                         // check if arrays includes any of the values
-                        pass = req.query[key].some(val => user[key].includes(val))
-                    } else if (typeof req.query[key] === 'object' && typeof user[key] === 'object') {
+                        pass = selectFilter[key].some(val => user[key].includes(val))
+                    } else if (typeof selectFilter[key] === 'object' && typeof user[key] === 'object') {
                         // check if objects includes any of the values
-                        Object.keys(req.query[key]).forEach(objKey => {
-                            pass = user[key][objKey] === req.query[key][objKey]
+                        Object.keys(selectFilter[key]).forEach(objKey => {
+                            pass = user[key][objKey] === selectFilter[key][objKey]
                         })
                     }
 
                     // check if strings includes any of the values
-                    if (typeof req.query[key] === 'string' && typeof user[key] === 'string') {
-                        pass = req.query[key].split(',').some(val => user[key].includes(val))
+                    if (typeof selectFilter[key] === 'string' && typeof user[key] === 'string') {
+                        pass = selectFilter[key].split(',').some(val => user[key].includes(val))
                     }
                 })
 
