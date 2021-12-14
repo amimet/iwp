@@ -3,6 +3,7 @@ import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList, QRReader } from "components"
 import moment from "moment"
 import classnames from "classnames"
+import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import { Select, Result, Button, Modal, Tag, Skeleton, Input } from "antd"
@@ -114,7 +115,7 @@ class Workload extends React.Component {
 			})
 			.catch((err) => {
 				console.log(err)
-				this.setState({ error: err })
+				this.setState({ error: err, loading: false })
 			})
 	}
 
@@ -181,7 +182,7 @@ class Workload extends React.Component {
 		console.log(keys)
 	}
 
-	onSearch = (value) => {
+	search = (value) => {
 		if (typeof value !== "string") {
 			if (typeof value.target?.value === "string") {
 				value = value.target.value
@@ -203,6 +204,16 @@ class Workload extends React.Component {
 				return entry.item
 			}),
 		})
+	}
+
+	debouncedSearch = debounce((value) => this.search(value), 500)
+
+	onSearch = (event) => {
+		if (event === "" && this.state.searchValue) {
+			return this.setState({ searchValue: null })
+		}
+
+		this.debouncedSearch(event.target.value)
 	}
 
 	renderRegionsOptions = () => {
@@ -281,8 +292,8 @@ class Workload extends React.Component {
 				}}
 				onDelete={this.onDeleteWorkloads}
 				onCheck={this.onCheckWorkloads}
-				items={list}
 				renderItem={this.renderItem}
+				items={list}
 			/>
 		)
 	}
