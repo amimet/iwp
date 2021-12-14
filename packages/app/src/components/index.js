@@ -12,6 +12,7 @@ export { default as FabricCreator } from "./FabricCreator"
 export { default as ServerStatus } from "./ServerStatus"
 export { default as ModifierTag } from "./ModifierTag"
 export { default as UserSelector } from "./UserSelector"
+export { default as OperatorsAssignments } from "./OperatorsAssignments"
 
 export * as AboutApp from "./AboutApp"
 export * as QRReader from "./QRReader"
