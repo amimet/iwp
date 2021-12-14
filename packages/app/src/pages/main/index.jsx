@@ -20,15 +20,15 @@ export const Clock = () => {
 }
 
 export default class Main extends React.Component {
-	componentWillUnmount() {
-		if (!window.app?.HeaderController?.isVisible()) {
-			window.app.HeaderController.toogleVisible(true)
-		}
-	}
-
 	componentDidMount() {
 		if (window.app?.HeaderController?.isVisible()) {
 			window.app.HeaderController.toogleVisible(false)
+		}
+	}
+
+	componentWillUnmount() {
+		if (!window.app?.HeaderController?.isVisible()) {
+			window.app.HeaderController.toogleVisible(true)
 		}
 	}
 
