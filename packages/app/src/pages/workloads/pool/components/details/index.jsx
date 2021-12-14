@@ -97,10 +97,10 @@ export default class WorkloadDetails extends React.Component {
 		console.log(`Opening item details with UUID[${uuid}]`)
 	}
 
-	onAssignOperators = async (ctx, data) => {
+	onAssignOperators = async (ctx, operators) => {
 		const result = await this.api.put.workloadOperators({
 			_id: this.state.data._id,
-			operators: data,
+			operators,
 		}).catch((err) => {
 			ctx.handleFail(err)
 			return false
@@ -108,8 +108,21 @@ export default class WorkloadDetails extends React.Component {
 
 		if (result) {
 			ctx.close()
-			this.setState({ data: result })
-			this.forceUpdate()
+			await this.setState({ data: result })
+		}
+	}
+
+	onRemoveOperator = async (operator) => {
+		const result = await this.api.delete.workloadOperators({
+			_id: this.state.data._id,
+			operators: [operator],
+		}).catch((err) => {
+			console.log(err)
+			return false
+		})
+
+		if (result) {
+			await this.setState({ data: result })
 		}
 	}
 
@@ -273,7 +286,7 @@ export default class WorkloadDetails extends React.Component {
 					</antd.Collapse.Panel>
 
 					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
-						<OperatorsAssignments onAssignOperators={this.onAssignOperators} assigned={data.assigned} />
+						<OperatorsAssignments onRemoveOperator={this.onRemoveOperator} onAssignOperators={this.onAssignOperators} assigned={data.assigned} />
 					</antd.Collapse.Panel>
 				</antd.Collapse>
 

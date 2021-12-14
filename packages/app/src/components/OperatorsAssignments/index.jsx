@@ -25,9 +25,15 @@ export default (props) => {
         })
     }
 
+    const onClickRemoveOperator = (_id) => {
+        if (typeof props.onRemoveOperator === "function") {
+            props.onRemoveOperator(_id)
+        }
+    }
+
     const fetchOperatorsData = async () => {
         if (!Array.isArray(props.assigned) || props.assigned.length <= 0) {
-            return false
+            return setOperatorsData([])
         }
 
         const data = await api.get.users(null, { _id: props.assigned }).catch((err) => {
@@ -39,15 +45,9 @@ export default (props) => {
         setOperatorsData(data)
     }
 
-    const onClickRemoveOperator = (_id) => {
-        if (typeof props.onRemoveOperator === "function") {
-            props.onRemoveOperator(_id)
-        }
-    }
-
     React.useEffect(() => {
         fetchOperatorsData()
-    }, [])
+    })
 
     return <div className="operators_assignments">
         <div>
