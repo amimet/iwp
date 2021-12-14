@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { SelectableList } from "components"
-import { debounce } from 'lodash'
+import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import "./index.less"

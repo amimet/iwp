@@ -1,10 +1,10 @@
-import React from 'react'
-import * as antd from 'antd'
+import React from "react"
+import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList } from 'components'
-import { ItemRender, ItemDetails, ImportTool } from './components'
-import classnames from 'classnames'
-import { debounce } from 'lodash'
+import { ActionsBar, SelectableList } from "components"
+import { ItemRender, ItemDetails, ImportTool } from "./components"
+import classnames from "classnames"
+import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import "./index.less"
