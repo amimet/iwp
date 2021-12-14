@@ -17,10 +17,22 @@ export const WorkloadController = {
 
         return res.json(workloads)
     }),
-    appendOperators: Schematized(["_id"], selectValues(["_id"], async (req, res) => {
+    appendOperators: Schematized(["_id", "operators"], selectValues(["_id", "operators"], async (req, res) => {
         let workload = await Workload.findById(req.selectedValues._id)
+        
+        if (workload) {
+            if (Array.isArray(req.selectedValues.operators) && Array.isArray(workload.assigned)) {
+                req.selectedValues.operators.forEach(operator => {
+                    if (!workload.assigned.includes(operator)) {
+                        workload.assigned.push(operator)
+                    }
+                })
+            } else {
+                return res.status(400).json({ error: "Invalid operators type. Must be an array." })
+            }
 
-        console.log(workload)
+            workload = await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
+        }
 
         return res.json(workload)
     })),
