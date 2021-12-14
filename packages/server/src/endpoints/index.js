@@ -85,6 +85,12 @@ module.exports = [
         fn: "WorkloadController.appendOperators",
     },
     {
+        route: "/workload_operators",
+        method: "DELETE",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "WorkloadController.removeOperators",
+    },
+    {
         route: "/update_workload",
         method: "PUT",
         middleware: ["ensureAuthenticated", "privileged"],
