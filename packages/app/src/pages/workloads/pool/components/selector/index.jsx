@@ -16,22 +16,38 @@ export default class WorkloadSelector extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
-		this.setItemsFromDB()
+		this.fetchWorkloads()
 	}
 
-	setItemsFromDB = async () => {
-		this.api.get.fabricItems()
-			.then((items) => {
-				this.setState({
-					items: [...this.state.items, ...items],
-					loading: false,
-				})
-			})
-			.catch((err) => {
-				this.setState({
-					error: err
-				})
-			})
+	parseFabricObjectsAsGroups = (objects) => {
+		objects = objects.reduce((acc, obj) => {
+			if (typeof acc[obj.type] !== "object") {
+				acc[obj.type] = []
+			}
+
+			acc[obj.type].push(obj)
+
+			return acc
+		}, {})
+
+		// return as array
+		return Object.keys(objects).map((type) => {
+			return {
+				type,
+				items: objects[type],
+			}
+		})
+	}
+
+	fetchWorkloads = async () => {
+		const data = await this.api.get.fabric(undefined, { select: { type: ["product", "operation", "task"] } }).catch((err) => {
+			console.error(err)
+			return false
+		})
+
+		if (data) {
+			this.setState({ items: data, loading: false })
+		}
 	}
 
 	handleDone = (obj, props, quantity) => {
@@ -121,6 +137,23 @@ export default class WorkloadSelector extends React.Component {
 		)
 	}
 
+	renderItems = (group) => {
+		return <div>
+			<div>{group.type}</div>
+			{group.items.map((item) => {
+				return <List.Item
+					key={item._id}
+					className="workload_fabric_item"
+					onClick={() => this.handleSelectItem(item)}
+					extra={item.properties.previewImage && <img width={272} alt="item_view" src={item.properties.previewImage} />}
+				>
+					<List.Item.Meta title={item.name} description={item.properties.description} />
+				</List.Item>
+			})}
+
+		</div>
+	}
+
 	render() {
 		const { loading, selectedItem } = this.state
 
@@ -136,24 +169,16 @@ export default class WorkloadSelector extends React.Component {
 				<List
 					itemLayout="vertical"
 					size="large"
+					dataSource={this.parseFabricObjectsAsGroups(this.state.items)}
 					pagination={{
 						onChange: (page) => {
 							console.log(page)
 						},
-						pageSize: 3,
+						pageSize: 10,
 					}}
-					dataSource={this.state.items}
-					renderItem={(item) => (
-						<List.Item
-							onClick={() => this.handleSelectItem(item)}
-							className="workload_fabric_item"
-							key={item.title}
-							extra={<img width={272} alt="item_view" src={item.img} />}
-						>
-							<List.Item.Meta title={item.title} description={item.description} />
-						</List.Item>
-					)}
+					renderItem={this.renderItems}
 				/>
+
 			</div>
 		)
 	}
