@@ -1,27 +1,32 @@
 import { Workshift } from "../../models"
-import { selectValues, Schematized } from "../../lib"
+import { Schematized } from "../../lib"
 import moment from 'moment'
 
 const workableDays = ["M", "TU", "W", "TH", "F", "SU", "SA"]
 
-export const WorkshiftsController = {
-    get: selectValues(["name", "region", "start", "end", "periodicity", "_id"], async (req, res) => {
+export default {
+    get: Schematized({
+        select: ["name", "region", "start", "end", "periodicity", "_id"],
+    }, async (req, res) => {
         let result = Array()
 
-        if (typeof req.selectedValues._id === "undefined") {
-            result = await Workshift.find(req.selectedValues)
+        if (typeof req.selection._id === "undefined") {
+            result = await Workshift.find(req.selection)
         } else {
-            result = await Workshift.findById(req.selectedValues._id)
+            result = await Workshift.findById(req.selection._id)
         }
 
         return res.json(result)
     }),
-    set: Schematized(["name", "start", "end"], selectValues(["name", "regionId", "start", "end", "periodicity"], async (req, res) => {
-        if (await Workshift.findOne({name: req.selectedValues.name, start: req.selectedValues.start, end: req.selectedValues.end})) {
+    set: Schematized({
+        required: ["name", "start", "end"],
+        select: ["name", "regionId", "start", "end", "periodicity"],
+    }, async (req, res) => {
+        if (await Workshift.findOne({ name: req.selection.name, start: req.selection.start, end: req.selection.end })) {
             return res.status(400).json({ message: "Workshift already exists" })
         }
         // validate
-        let { start, end, periodicity } = req.selectedValues
+        let { start, end, periodicity } = req.selection
 
         const startMoment = moment(start, "hh:mm")
         const endMoment = moment(end, "hh:mm")
@@ -45,11 +50,11 @@ export const WorkshiftsController = {
             days = [0, 1, 2, 3, 4, 5, 6]
         }
 
-        const workshift = new Workshift({ ...req.selectedValues, workableHours, periodicity: days })
+        const workshift = new Workshift({ ...req.selection, workableHours, periodicity: days })
         await workshift.save()
 
         return res.json({ message: "Done" })
-    })),
+    }),
     del: async (req, res) => {
         const { _id } = req.body
 
@@ -69,5 +74,3 @@ export const WorkshiftsController = {
         return res.json({ message: "Done" })
     }
 }
-
-export default WorkshiftsController

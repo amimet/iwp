@@ -1,14 +1,16 @@
 import { Report } from "../../models"
-import { selectValues } from "../../lib"
+import { Schematized } from "../../lib"
 
 // TODO: Get reports from date range
 // TODO: Get reports from assignments
 
 export default {
-    get: selectValues(["_id", "name", "location", "status"], async (req, res) => {
-        console.log(req.selectedValues)
-        
-        const reports = await Report.find({ ...req.selectedValues })
+    get: Schematized({
+        select: ["_id", "name", "location", "status"],
+    }, async (req, res) => {
+        console.log(req.selection)
+
+        const reports = await Report.find({ ...req.selection })
 
         return res.json(reports)
     }),

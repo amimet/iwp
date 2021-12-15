@@ -1,12 +1,10 @@
 import { Workload } from '../../models'
-import { Schematized, selectValues } from '../../lib'
+import { Schematized } from '../../lib'
 
-const StatisticsController = {
-    getMonthlyCompletedWorkloads: selectValues(["region", "user_id", "section"], async (req, res) => {
-        const { selectedValues } = req
+export default {
+    getMonthlyCompletedWorkloads: Schematized({
+        select: ["region", "user_id", "section"],
+    }, async (req, res) => {
 
-        const {  } = selectedValues
     })
 }
-
-export default StatisticsController

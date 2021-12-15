@@ -3,24 +3,26 @@ import bcrypt from 'bcrypt'
 
 import { User } from '../../models'
 import SessionController from '../SessionController'
-import { Token, selectValues } from '../../lib'
+import { Token, Schematized } from '../../lib'
 import AvatarController from 'dicebar_lib'
 
 import _ from 'lodash'
 
-export const UserController = {
+export default {
     isAuth: (req, res) => {
         return res.json(`You look nice today 😎`)
     },
     getSelf: (req, res) => {
         return res.json(req.user)
     },
-    get: selectValues(["_id", "username"], async (req, res) => {
+    get: Schematized({
+        select: ["_id", "username"],
+    }, async (req, res) => {
         let result = []
         let selectQueryKeys = []
 
-        if (Array.isArray(req.selectedValues._id)) {
-            for await (let _id of req.selectedValues._id) {
+        if (Array.isArray(req.selection._id)) {
+            for await (let _id of req.selection._id) {
                 const user = await User.findById(_id).catch(err => {
                     return false
                 })
@@ -29,7 +31,7 @@ export const UserController = {
                 }
             }
         } else {
-            result = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
+            result = await User.find(req.selection, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
         }
 
         if (req.query.select) {
@@ -74,8 +76,10 @@ export const UserController = {
 
         return res.json(result)
     }),
-    getOne: selectValues(["_id", "username"], async (req, res) => {
-        const user = await User.findOne(req.selectedValues)
+    getOne: Schematized({
+        select: ["_id", "username"],
+    }, async (req, res) => {
+        const user = await User.findOne(req.selection)
 
         if (!user) {
             return res.status(404).json({ error: "User not exists" })
@@ -257,5 +261,3 @@ export const UserController = {
         return SessionController.delete(req, res, next)
     },
 }
-
-export default UserController

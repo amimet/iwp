@@ -1,28 +1,33 @@
 import { Workload } from '../../models'
-import { Schematized, selectValues } from '../../lib'
+import { Schematized } from '../../lib'
 import moment from "moment"
 
 const format = "DD-MM-YYYY hh:mm"
 
-export const WorkloadController = {
-    getAll: selectValues(["region", "_id", "name"], async (req, res) => {
+export default {
+    getAll: Schematized({
+        select: ["region", "_id", "name"],
+    }, async (req, res) => {
         let workloads = []
 
-        if (req.selectedValues.region === "all") {
-            delete req.selectedValues.region
-            workloads = await Workload.find(req.selectedValues)
+        if (req.selection.region === "all") {
+            delete req.selection.region
+            workloads = await Workload.find(req.selection)
         } else {
-            workloads = await Workload.find(req.selectedValues)
+            workloads = await Workload.find(req.selection)
         }
 
         return res.json(workloads)
     }),
-    appendOperators: Schematized(["_id", "operators"], selectValues(["_id", "operators"], async (req, res) => {
-        let workload = await Workload.findById(req.selectedValues._id)
+    appendOperators: Schematized({
+        required: ["_id", "operators"],
+        select: ["_id", "operators"],
+    }, async (req, res) => {
+        let workload = await Workload.findById(req.selection._id)
 
         if (workload) {
-            if (Array.isArray(req.selectedValues.operators) && Array.isArray(workload.assigned)) {
-                req.selectedValues.operators.forEach(operator => {
+            if (Array.isArray(req.selection.operators) && Array.isArray(workload.assigned)) {
+                req.selection.operators.forEach(operator => {
                     if (!workload.assigned.includes(operator)) {
                         workload.assigned.push(operator)
                     }
@@ -31,17 +36,20 @@ export const WorkloadController = {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
             }
 
-            await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
+            await Workload.findByIdAndUpdate(req.selection._id, workload)
         }
 
         return res.json(workload)
-    })),
-    removeOperators: Schematized(["_id", "operators"], selectValues(["_id", "operators"], async (req, res) => {
-        let workload = await Workload.findById(req.selectedValues._id)
+    }),
+    removeOperators: Schematized({
+        required: ["_id", "operators"],
+        select: ["_id", "operators"],
+    }, async (req, res) => {
+        let workload = await Workload.findById(req.selection._id)
 
         if (workload) {
-            if (Array.isArray(req.selectedValues.operators) && Array.isArray(workload.assigned)) {
-                req.selectedValues.operators.forEach(operator => {
+            if (Array.isArray(req.selection.operators) && Array.isArray(workload.assigned)) {
+                req.selection.operators.forEach(operator => {
                     if (workload.assigned.includes(operator)) {
                         workload.assigned.splice(workload.assigned.indexOf(operator), 1)
                     }
@@ -50,19 +58,24 @@ export const WorkloadController = {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
             }
 
-            await Workload.findByIdAndUpdate(req.selectedValues._id, workload)
+            await Workload.findByIdAndUpdate(req.selection._id, workload)
         }
 
         return res.json(workload)
-    })),
-    // TODO: Update method
-    update: Schematized(["_id"], selectValues(["_id"], async (req, res) => {
-        let workload = await Workload.findById(req.selectedValues._id)
+    }),
+    update: Schematized({
+        required: ["_id"],
+        select: ["_id"],
+    }, async (req, res) => {
+        // TODO: Update method
+        let workload = await Workload.findById(req.selection._id)
 
         return res.json(workload)
-    })),
-    get: selectValues(["region", "_id", "name"], async (req, res, next) => {
-        let workload = await Workload.findOne(req.selectedValues)
+    }),
+    get: Schematized({
+        select: ["region", "_id", "name"],
+    }, async (req, res, next) => {
+        let workload = await Workload.findOne(req.selection)
 
         // parse expiration status
         if (typeof workload.expired !== "undefined") {
@@ -77,7 +90,9 @@ export const WorkloadController = {
 
         return res.json(workload)
     }),
-    set: Schematized(["items", "region", "name"], async (req, res) => {
+    set: Schematized({
+        required: ["items", "region", "name"],
+    }, async (req, res) => {
         const { items, region, name, scheduledStart, scheduledFinish, workshift } = req.body
 
         const obj = {
@@ -94,7 +109,9 @@ export const WorkloadController = {
 
         return res.json(result)
     }),
-    delete: Schematized(["id"], async (req, res) => {
+    delete: Schematized({
+        required: ["id"],
+    }, async (req, res) => {
         let deleted = []
         let queue = []
 
@@ -116,5 +133,3 @@ export const WorkloadController = {
         return res.json({ deleted })
     }),
 }
-
-export default WorkloadController

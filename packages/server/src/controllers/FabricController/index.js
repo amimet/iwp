@@ -1,5 +1,5 @@
 import { FabricObject } from '../../models'
-import { Schematized, selectValues, additionsHandler } from '../../lib'
+import { Schematized, additionsHandler } from '../../lib'
 import _ from "lodash"
 
 const mutableKeys = ["type", "name", "properties"]
@@ -18,11 +18,14 @@ function overrideObjects(origin, to, keys) {
     return origin
 }
 
-export const FabricController = {
-    // TODO: Allow to filter by properties
-    get: selectValues(["type", "name", "_id"], async (req, res) => {
-        let objects = await FabricObject.find(req.selectedValues)
-        let additions = req.body?.additions ?? req.query?.additions
+export default {
+    get: Schematized({
+        select: ["type", "name", "_id"],
+    }, async (req, res) => {
+        // TODO: Allow to filter by properties
+        let objects = await FabricObject.find(req.selection)
+
+        const additions = req.query?.additions
 
         for await (let object of objects) {
             if (Array.isArray(object.properties)) {
@@ -40,11 +43,27 @@ export const FabricController = {
             }
         }
 
+        if (req.query.select) {
+            req.query.select = JSON.parse(req.query.select)
+
+            Object.keys(req.query.select).forEach(selectionQueryKey => {
+                const query = req.query.select[selectionQueryKey]
+
+                if (Array.isArray(query)) {
+                    objects = objects.filter(object => {
+                        return query.includes(object[selectionQueryKey])
+                    })
+                }
+            })
+        }
+
         return res.json(objects)
     }),
-    update: selectValues(["_id", "mutation"], async (req, res) => {
+    update: Schematized({
+        select: ["_id", "mutation"],
+    }, async (req, res) => {
         try {
-            const { _id, mutation } = req.selectedValues
+            const { _id, mutation } = req.selection
             let obj = await FabricObject.findOne({ _id })
 
             if (!obj) {
@@ -64,7 +83,10 @@ export const FabricController = {
             })
         }
     }),
-    create: Schematized(["type", "name", "properties"], async (req, res) => {
+    create: Schematized({
+        required: ["type", "name", "properties"],
+        select: ["type", "name", "properties"],
+    }, async (req, res) => {
         try {
             const { type, name, properties, additions } = req.body
             let craft = { type, name, properties }
@@ -83,10 +105,12 @@ export const FabricController = {
             return res.status(500).json(error.message)
         }
     }),
-    import: Schematized(["data"], async (req, res) => {
+    import: Schematized({
+        required: ["data"]
+    }, async (req, res) => {
         try {
             const { data, type, additions, } = req.body
-            
+
             for await (let item of data) {
                 let existentObj = item._id && await FabricObject.findById(item._id).catch(() => {
                     return false
@@ -129,8 +153,10 @@ export const FabricController = {
             return res.status(500).json(error.message)
         }
     }),
-    delete: selectValues(["_id", "type"], async (req, res) => {
-        let { _id, type } = req.selectedValues
+    delete: Schematized({
+        selectValues: ["_id", "type"],
+    }, async (req, res) => {
+        let { _id, type } = req.selection
         let query = []
 
         if (Array.isArray(_id)) {
@@ -148,5 +174,3 @@ export const FabricController = {
         return res.json(result)
     }),
 }
-
-export default FabricController
