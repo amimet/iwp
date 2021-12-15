@@ -154,7 +154,7 @@ export default {
         }
     }),
     delete: Schematized({
-        selectValues: ["_id", "type"],
+        select: ["_id", "type"],
     }, async (req, res) => {
         let { _id, type } = req.selection
         let query = []
