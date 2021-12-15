@@ -4,7 +4,7 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { OperatorsAssignments } from "components"
+import { OperatorsAssignments, UserSelector } from "components"
 
 import "./index.less"
 
@@ -97,33 +97,49 @@ export default class WorkloadDetails extends React.Component {
 		console.log(`Opening item details with UUID[${uuid}]`)
 	}
 
-	onAssignOperators = async (ctx, operators) => {
-		const result = await this.api.put.workloadOperators({
-			_id: this.state.data._id,
-			operators,
-		}).catch((err) => {
-			ctx.handleFail(err)
-			return false
-		})
+	onAssignOperator = () => {
+		return new Promise((resolve, reject) => {
+			window.app.DrawerController.open("OperatorAssignment", UserSelector, {
+				onDone: async (ctx, data) => {
+					const result = await this.api.put.workloadOperators({
+						_id: this.state.data._id,
+						operators: data,
+					}).catch((err) => {
+						ctx.handleFail(err)
+						return reject(err)
+					})
 
-		if (result) {
-			ctx.close()
-			await this.setState({ data: result })
-		}
+					if (result) {
+						ctx.close()
+						await this.setState({ data: result })
+
+						return resolve(result)
+					}
+				},
+				componentProps: {
+					select: { roles: ["operator"] },
+					excludedIds: this.state.data.assigned,
+				}
+			})
+		})
 	}
 
 	onRemoveOperator = async (operator) => {
-		const result = await this.api.delete.workloadOperators({
-			_id: this.state.data._id,
-			operators: [operator],
-		}).catch((err) => {
-			console.log(err)
-			return false
-		})
+		// TODO: Use modal to confirm
+		return new Promise(async (resolve, reject) => {
+			const result = await this.api.delete.workloadOperators({
+				_id: this.state.data._id,
+				operators: [operator],
+			}).catch((err) => {
+				console.log(err)
+				return reject(err)
+			})
 
-		if (result) {
-			await this.setState({ data: result })
-		}
+			if (result) {
+				await this.setState({ data: result })
+				return resolve(result)
+			}
+		})
 	}
 
 	parseWorkloadItems = (items) => {
@@ -286,7 +302,7 @@ export default class WorkloadDetails extends React.Component {
 					</antd.Collapse.Panel>
 
 					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
-						<OperatorsAssignments onRemoveOperator={this.onRemoveOperator} onAssignOperators={this.onAssignOperators} assigned={data.assigned} />
+						<OperatorsAssignments onRemoveOperator={this.onRemoveOperator} onAssignOperator={this.onAssignOperator} assigned={data.assigned} />
 					</antd.Collapse.Panel>
 				</antd.Collapse>
 
