@@ -33,6 +33,11 @@ export default class BottomBar extends React.Component {
 
         return <div className="bottomBar">
             <div className="items">
+                <div onClick={() => window.app.openFabric()} key="fabric" id="fabric" className="item">
+                    <div className="icon">
+                        {createIconRender("PlusCircle")}
+                    </div>
+                </div>
                 <div onClick={() => window.app.goMain()} key="main" id="main" className="item">
                     <div className="icon">
                         {createIconRender("Home")}
