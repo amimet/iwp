@@ -115,7 +115,7 @@ export default class SelectableList extends React.Component {
 			return null
 		}
 
-		const component = <div className={classnames("selectableList_bottomActions", { ["mobile"]: window.isMobile && !this.props.ignoreMobileActions })}>
+		return <div className={classnames("selectableList_bottomActions", { ["mobile"]: window.isMobile && !this.props.ignoreMobileActions })}>
 			<div key="discard">
 				<Button
 					shape="round"
@@ -128,22 +128,6 @@ export default class SelectableList extends React.Component {
 			</div>
 			{Array.isArray(this.props.actions) && this.renderProvidedActions()}
 		</div>
-
-		if (this.state.selectedKeys.length === 0) {
-			if (window.isMobile && !this.props.ignoreMobileActions) {
-				window.app.BottomBarController.clear()
-			}
-
-			return null
-		} else {
-			if (window.isMobile && !this.props.ignoreMobileActions) {
-				window.app.BottomBarController.render(component)
-
-				return null
-			}
-
-			return component
-		}
 	}
 
 	isKeySelected = (key) => {
@@ -213,6 +197,16 @@ export default class SelectableList extends React.Component {
 			loading,
 		}
 
+		if (this.state.selectedKeys.length === 0) {
+			if (window.isMobile && !this.props.ignoreMobileActions) {
+				window.app.BottomBarController.clear()
+			}
+		} else {
+			if (window.isMobile && !this.props.ignoreMobileActions) {
+				window.app.BottomBarController.render(this.renderActions())
+			}
+		}
+
 		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
 			<List
 				{...listProps}
@@ -220,7 +214,7 @@ export default class SelectableList extends React.Component {
 				renderItem={this.renderItem}
 			/>
 			<div className="selectableList_bottomActions_wrapper">
-				{this.renderActions()}
+				{this.props.ignoreMobileActions && this.renderActions()}
 			</div>
 		</div>
 	}
