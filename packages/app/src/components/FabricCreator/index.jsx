@@ -138,7 +138,7 @@ const FORMULAS = {
         icon: "GitCommit",
         defaultFields: [
             "description",
-            "task",
+            "tasks",
         ],
     },
     task: {
