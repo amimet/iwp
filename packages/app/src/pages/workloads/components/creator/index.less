@@ -1,0 +1,63 @@
+.workload_creator {
+	.ant-btn {
+		line-height: 0 !important;
+	}
+
+	> div {
+		margin-bottom: 20px;
+
+		.body {
+			padding-left: 20px;
+			width: 100%;
+			> div {
+				width: 100%;
+			}
+		}
+	}
+
+	.workshift {
+		align-items: center;
+		justify-content: space-between;
+
+		display: grid;
+
+		grid-template-columns: 1fr 3fr;
+		grid-template-rows: 1fr;
+		gap: 0px 20px;
+		grid-template-areas: ". .";
+
+		.ant-select {
+			width: fit-content;
+		}
+
+		> div {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.info {
+			> div {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 10px;
+			}
+		}
+	}
+
+	.actions {
+		position: sticky;
+		width: 100%;
+		bottom: 0;
+		left: 0;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		  
+		> div {
+			margin-right: 20px;
+		}
+	}
+}
