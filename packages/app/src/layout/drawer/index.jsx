@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import EventEmitter from "@foxify/events"
+import { Icons } from "components/Icons"
 
 import "./index.less"
 
@@ -189,7 +190,7 @@ export class Drawer extends React.Component {
 					<antd.PageHeader
 						onBack={this.onClose}
 						title={this.props.title ?? "Close"}
-						backIcon={this.props.backIcon}
+						backIcon={this.props.backIcon ?? <Icons.X />}
 						subTitle={this.props.subtitle}
 					/>
 				</div>}
