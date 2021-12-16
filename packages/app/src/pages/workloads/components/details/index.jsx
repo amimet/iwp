@@ -4,7 +4,7 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { OperatorsAssignments, UserSelector } from "components"
+import { OperatorsAssignments, UserSelector, Fabric } from "components"
 
 import { OrderItems } from ".."
 
@@ -115,8 +115,16 @@ export default class WorkloadDetails extends React.Component {
 	}
 
 	openOrderItemDetails = (item) => {
-		console.log(`Opening order item details`)
-		console.log(item)
+		window.app.DrawerController.open("FabricInspector", Fabric.Inspector, {
+			onDone: (ctx, data) => {
+				ctx.close()
+				// TODO: Handle if exists any updates on data
+			},
+			componentProps: {
+				// TODO: Pass order item UUID for fetching data from API
+				item: item,
+			}
+		})
 	}
 
 	onAssignOperator = () => {
