@@ -20,7 +20,7 @@ import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, FabricCreator, Settings } from "components"
+import { NotFound, RenderError, Fabric, Settings } from "components"
 import Layout from "./layout"
 import { Icons } from "components/Icons"
 
@@ -157,7 +157,7 @@ class App {
 				})
 			},
 			openFabric: (defaultType) => {
-				window.app.DrawerController.open("FabricCreator", FabricCreator, {
+				window.app.DrawerController.open("FabricCreator", Fabric.Creator, {
 					props: {
 						width: "70%",
 					},

@@ -3,6 +3,9 @@ import * as antd from 'antd'
 import { Icons, createIconRender } from "components/Icons"
 import loadable from "@loadable/component"
 
+import FORMULAS from "schemas/fabricFormulas"
+import FIELDS from "schemas/fabricFields"
+
 import "./index.less"
 
 const FieldsComponents = {
@@ -10,158 +13,6 @@ const FieldsComponents = {
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
     "datepicker": antd.DatePicker,
-}
-
-// FIELDS
-const FIELDS = {
-    description: {
-        label: "Description",
-        component: "input",
-        updateEvent: "onChange",
-        onUpdate: (update) => {
-            return update.target.value
-        },
-        style: {
-            minWidth: "300px",
-        },
-        props: {
-            placeholder: "Describe something...",
-        }
-    },
-    operations: {
-        label: "Operations",
-        component: "select",
-        updateEvent: "onChange",
-        props: {
-            placeholder: "Select operations",
-        },
-    },
-    tasks: {
-        label: "Tasks",
-        component: "select",
-        updateEvent: "onChange",
-        props: {
-            placeholder: "Select tasks",
-        },
-    },
-    location: {
-        label: "Location",
-        component: "select",
-        updateEvent: "onChange",
-        children: async () => {
-            const api = window.app.request
-            const regions = await api.get.regions()
-
-            return regions.map(region => {
-                return <antd.Select.Option value={region.name}>{region.name}</antd.Select.Option>
-            })
-        },
-        props: {
-            placeholder: "Select a location",
-        },
-    },
-    vaultItemTypeSelector: {
-        label: "Type",
-        component: "select",
-        updateEvent: "onChange",
-        children: async () => {
-            let types = await import("schemas/vaultItemsTypes.json")
-
-            types = types.default || types
-
-            return Object.keys(types).map((group) => {
-                return <antd.Select.OptGroup key={group} label={String(group).toTitleCase()}>
-                    {types[group].map((type) => {
-                        return <antd.Select.Option key={type} value={`${group}-${type}`}>{String(type).toTitleCase()}</antd.Select.Option>
-                    })}
-                </antd.Select.OptGroup>
-            })
-        },
-        props: {
-            placeholder: "Select a type",
-        }
-    },
-    vaultItemSerial: {
-        label: "Serial number",
-        component: "input",
-        updateEvent: "onChange",
-        onUpdate: (update) => {
-            return update.target.value
-        },
-        props: {
-            placeholder: "S/N 00000000X",
-        }
-    },
-    vaultItemManufacturer: {
-        label: "Manufacturer",
-        component: "input",
-        updateEvent: "onChange",
-        onUpdate: (update) => {
-            return update.target.value
-        },
-        props: {
-            placeholder: "e.g. Hewlett Packard",
-        }
-    },
-    vaultItemManufacturedYear: {
-        label: "Manufactured Year",
-        component: "datepicker",
-        updateEvent: "onChange",
-        onUpdate: (update) => {
-            return update.year()
-        },
-        props: {
-            picker: "year"
-        }
-    },
-}
-
-const FORMULAS = {
-    workload: {
-        icon: "MdWorkOutline",
-    },
-    product: {
-        icon: "Box",
-        defaultFields: [
-            "description",
-            "operations",
-        ],
-    },
-    operation: {
-        icon: "Settings",
-        defaultFields: [
-            "description",
-            "operations",
-        ],
-    },
-    phase: {
-        icon: "GitCommit",
-        defaultFields: [
-            "description",
-            "tasks",
-        ],
-    },
-    task: {
-        icon: "Tool",
-        defaultFields: [
-            "description",
-            "tasks",
-        ],
-    },
-    vaultItem: {
-        icon: "Archive",
-        label: "Vault item",
-        submitPayload: {
-            "additions": ["essc"]
-        },
-        defaultFields: [
-            "vaultItemTypeSelector",
-            "vaultItemSerial",
-            "vaultItemManufacturer",
-            "vaultItemManufacturedYear",
-            "location",
-        ],
-    },
 }
 
 export default class FabricCreator extends React.Component {
@@ -355,8 +206,6 @@ export default class FabricCreator extends React.Component {
                 }
             }
         }
-
-        console.log(payload)
 
         // send to api
         await this.api.put.fabric(payload).catch((response) => {
