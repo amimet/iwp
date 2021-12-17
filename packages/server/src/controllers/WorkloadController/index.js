@@ -1,5 +1,6 @@
-import { Workload } from '../../models'
-import { Schematized } from '../../lib'
+import { Workload } from "../../models"
+import { Schematized } from "../../lib"
+import { nanoid } from "nanoid"
 import moment from "moment"
 
 const format = "DD-MM-YYYY hh:mm"
@@ -90,6 +91,24 @@ export default {
 
         return res.json(workload)
     }),
+    regeneratesUUID: async (req, res) => {
+        let workloads = await Workload.find()
+
+        workloads.forEach(async (workload) => {
+            if (workload.items.length > 0) {
+
+                workload.items.forEach((item) => {
+                    if (typeof item.uuid === "undefined") {
+                        item.uuid = nanoid()  
+                    }
+                })
+
+                await Workload.findByIdAndUpdate(workload._id, workload)
+            }
+        })
+
+        return res.json(workloads)
+    },
     set: Schematized({
         required: ["items", "region", "name"],
     }, async (req, res) => {
@@ -104,6 +123,11 @@ export default {
             workshift,
             region,
         }
+
+        // create on each item an UUID property
+        items.forEach(item => {
+            item.uuid = nanoid()
+        })
 
         const result = await Workload.create(obj)
 

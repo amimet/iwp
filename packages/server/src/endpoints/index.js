@@ -79,6 +79,12 @@ module.exports = [
     },
     // WORKLOADS
     {
+        route: "/regenerates_uuid",
+        method: "POST",
+        middleware: ["ensureAuthenticated", "privileged"],
+        fn: "WorkloadController.regeneratesUUID",
+    },
+    {
         route: "/workload_operators",
         method: "PUT",
         middleware: ["ensureAuthenticated", "privileged"],
