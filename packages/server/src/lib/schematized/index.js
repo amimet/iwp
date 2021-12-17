@@ -29,15 +29,19 @@ export default (schema = {}, fn) => {
                 if (typeof req.body === "undefined") {
                     req.body = {}
                 }
-                if (req.query === "undefined") {
+                if (typeof req.query === "undefined") {
                     req.query = {}
                 }
 
                 for await (let key of schema.select) {
-                    if (typeof req.body[key] !== "undefined") {
+                    if (req.body && typeof req.body[key] !== "undefined") {
                         req.selection[key] = req.body[key]
-                    } else if (typeof req.query[key] !== "undefined") {
+                        continue
+                    } 
+
+                    if (req.query && typeof req.query[key] !== "undefined") {
                         req.selection[key] = req.query[key]
+                        continue
                     }
                 }
             } else {
