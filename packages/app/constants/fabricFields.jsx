@@ -1,15 +1,17 @@
+import React from "react"
+import * as antd from "antd"
+
 export default {
     description: {
         label: "Description",
-        component: "input",
+        component: "textarea",
         updateEvent: "onChange",
         onUpdate: (update) => {
+            console.log(update)
             return update.target.value
         },
-        style: {
-            minWidth: "300px",
-        },
         props: {
+            autoSize: { minRows: 1, maxRows: 7 },
             placeholder: "Describe something...",
         }
     },
@@ -55,7 +57,9 @@ export default {
         },
         // TODO: Fetch global variants from API
         props: {
+            style: { width: "100%" },
             mode: "tags",
+            placeholder: "Create variants",
             tokenSeparators: [','],
         },
     },

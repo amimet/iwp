@@ -1,5 +1,5 @@
-import React from 'react'
-import * as antd from 'antd'
+import React from "react"
+import * as antd from "antd"
 import { Icons, createIconRender } from "components/Icons"
 import loadable from "@loadable/component"
 
@@ -137,7 +137,7 @@ export default class FabricCreator extends React.Component {
         } else {
             antd.notification.warning({
                 message: "Missing formula",
-                description: "The type you selected can't be found in the formulas. No defaults fields will be added.",
+                description: "The type you selected cant be found in the formulas. No defaults fields will be added.",
             })
 
             console.error(`[MISSING_FORMULA] Cannot load default fields from formula with type ${type}`)
@@ -152,7 +152,7 @@ export default class FabricCreator extends React.Component {
         if (typeof field === "undefined") {
             antd.notification.warning({
                 message: "Missing field",
-                description: `The field you selected can't be found in the fields. No field will be added.`,
+                description: `The field you selected can"t be found in the fields. No field will be added.`,
             })
             console.error(`No form available for field [${type}]`)
             return null
@@ -306,11 +306,13 @@ export default class FabricCreator extends React.Component {
         }
 
         return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
-            <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
-            <h4>{field.icon && createIconRender(field.icon)}{field.label}</h4>
-            <div className="fieldContent">
-                <RenderComponent />
+            <div className="content">
+                <h3>{field.icon && createIconRender(field.icon)}{field.label}</h3>
+                <div className="component">
+                    <RenderComponent />
+                </div>
             </div>
+            <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
         </div>
     }
 
@@ -324,7 +326,7 @@ export default class FabricCreator extends React.Component {
         return <div className="fabric_creator">
             <div key="name" className="name">
                 <div className="type">
-                    <antd.Dropdown trigger={['click']} overlay={this.renderTypesSelector}>
+                    <antd.Dropdown trigger={["click"]} overlay={this.renderTypesSelector}>
                         {TypeIcon ?? <Icons.HelpCircle />}
                     </antd.Dropdown>
                 </div>
@@ -332,20 +334,22 @@ export default class FabricCreator extends React.Component {
             </div>
 
             <div className="fields">
-                <div className="wrap">
-                    {this.state.submitting ? <antd.Skeleton active /> : this.state.fields}
-                </div>
-                <div className="bottom_actions">
-                    <antd.Dropdown trigger={['click']} placement="topCenter" overlay={this.renderFieldsSelector}>
-                        <Icons.Plus />
-                    </antd.Dropdown>
-
-                    <antd.Button loading={this.state.submitting} onClick={this.submit}>Done</antd.Button>
-                </div>
-                {this.state.error && <div className="error">
-                    {this.state.error}
-                </div>}
+                {this.state.submitting ? <antd.Skeleton active /> : this.state.fields}
             </div>
+
+            <div className="bottom_actions">
+                <antd.Dropdown trigger={["click"]} placement="topCenter" overlay={this.renderFieldsSelector}>
+                    <antd.Button type="primary" shape="round">
+                        <Icons.Plus />
+                    </antd.Button>
+                </antd.Dropdown>
+
+                <antd.Button loading={this.state.submitting} onClick={this.submit}>Done</antd.Button>
+            </div>
+
+            {this.state.error && <div className="error">
+                {this.state.error}
+            </div>}
         </div>
     }
 }
