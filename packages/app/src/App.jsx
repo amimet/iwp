@@ -20,7 +20,7 @@ import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, Fabric, Settings } from "components"
+import { NotFound, RenderError, Settings, Workload, Fabric, } from "components"
 import Layout from "./layout"
 import { Icons } from "components/Icons"
 
@@ -169,6 +169,19 @@ class App {
 
 	static windowContext() {
 		return {
+			openWorkloadDetails: (id) => {
+				window.app.DrawerController.open("workload_details", Workload.Details, {
+					componentProps: {
+						id,
+					},
+					props: {
+						width: "fit-content",
+					},
+					onDone: (drawer) => {
+						drawer.close()
+					},
+				})
+			},
 			openSettings: (goTo) => {
 				window.app.DrawerController.open("settings", Settings, {
 					props: {
