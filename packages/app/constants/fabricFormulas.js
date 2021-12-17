@@ -1,7 +1,4 @@
 export default {
-    workload: {
-        icon: "MdWorkOutline",
-    },
     product: {
         icon: "Box",
         defaultFields: [
