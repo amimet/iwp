@@ -14,7 +14,6 @@ import React from "react"
 import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-import progressBar from "nprogress"
 
 import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
@@ -79,11 +78,6 @@ const __renderTest = () => {
 
 class App {
 	static initialize() {
-		this.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
-
-		this.sessionController = new Session()
-		this.userController = new User()
-
 		this.configuration = {
 			settings: new SettingsController(),
 			sidebar: new SidebarController(),
@@ -91,45 +85,41 @@ class App {
 
 		this.eventBus = this.contexts.main.eventBus
 
-		this.eventBus.on("app_ready", () => {
-			this.setState({ initialized: true })
-		})
-		this.eventBus.on("top_loadBar_start", () => {
-			this.progressBar.start()
-		})
-		this.eventBus.on("top_loadBar_stop", () => {
-			this.progressBar.done()
+		this.eventBus.on("app_loading", async () => {
+			await this.setState({ initialized: false })
+			this.eventBus.emit("splash_show")
 		})
 
-		this.eventBus.on("forceInitialize", async () => {
-			await this.initialization()
+		this.eventBus.on("app_ready", async () => {
+			await this.setState({ initialized: true })
+			this.eventBus.emit("splash_close")
 		})
-		this.eventBus.on("forceReloadUser", async () => {
-			await this.__init_user()
+
+		this.eventBus.on("reinitializeSession", async () => {
+			await this.__SessionInit()
 		})
-		this.eventBus.on("forceReloadSession", async () => {
-			await this.__init_session()
+		this.eventBus.on("reinitializeUser", async () => {
+			await this.__UserInit()
 		})
+
 		this.eventBus.on("forceToLogin", () => {
 			if (window.location.pathname !== "/login") {
 				this.beforeLoginLocation = window.location.pathname
 			}
+
 			window.app.setLocation("/login")
 		})
 
-		this.eventBus.on("destroyAllSessions", async () => {
-			await this.sessionController.destroyAllSessions()
-		})
-		this.eventBus.on("new_session", () => {
-			this.eventBus.emit("forceInitialize")
+		this.eventBus.on("new_session", async () => {
+			await this.initialization()
 
 			if (window.location.pathname == "/login") {
 				window.app.setLocation(this.beforeLoginLocation ?? "/main")
 				this.beforeLoginLocation = null
 			}
 		})
-		this.eventBus.on("destroyed_session", () => {
-			this.flushState()
+		this.eventBus.on("destroyed_session", async () => {
+			await this.flushState()
 			this.eventBus.emit("forceToLogin")
 		})
 
@@ -147,21 +137,13 @@ class App {
 			}
 		})
 
-		this.eventBus.on("setLocation", () => {
-			this.eventBus.emit("top_loadBar_start")
-		})
-		this.eventBus.on("setLocationDone", () => {
-			this.eventBus.emit("top_loadBar_stop")
-
-			// render controller needs an better method for update render, this is a temporary solution
-			this.forceUpdate()
-		})
-
 		this.eventBus.on("cleanAll", () => {
 			window.app.DrawerController.closeAll()
 		})
 
 		this.eventBus.on("crash", (message, error) => {
+			console.debug("[App] crash detecting, returning crash...")
+
 			this.setState({ crash: { message, error } })
 			this.contexts.app.SoundEngine.play("crash")
 		})
@@ -209,7 +191,6 @@ class App {
 				return window.app.setLocation(`/account`, { username })
 			},
 			configuration: this.configuration,
-			isValidSession: this.sessionController.isCurrentTokenValid(),
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
 		}
 	}
@@ -220,7 +201,6 @@ class App {
 			sessionController: this.sessionController,
 			userController: this.userController,
 			configuration: this.configuration,
-			progressBar: this.progressBar,
 		}
 	}
 
@@ -236,6 +216,10 @@ class App {
 		}
 	}
 
+	sessionController = new Session()
+
+	userController = new User()
+
 	state = {
 		// app
 		initialized: false,
@@ -246,21 +230,21 @@ class App {
 		data: null,
 	}
 
-	flushState = () => {
-		this.setState({ session: null, data: null })
+	flushState = async () => {
+		await this.setState({ session: null, data: null })
 	}
 
 	componentDidMount = async () => {
-		this.eventBus.emit("splash_show")
+		this.eventBus.emit("app_loading")
+
+		await this.contexts.app.initializeDefaultBridge()
 		await this.initialization()
 
 		this.eventBus.emit("app_ready")
-		this.eventBus.emit("splash_close")
 	}
 
 	initialization = async () => {
 		try {
-			await this.contexts.app.initializeDefaultBridge()
 			await this.__SessionInit()
 			await this.__UserInit()
 		} catch (error) {
@@ -303,6 +287,10 @@ class App {
 	}
 
 	render() {
+		if (!this.state.initialized) {
+			return null
+		}
+
 		if (this.state.crash) {
 			return <div className="app_crash">
 				<div className="header">
@@ -311,11 +299,10 @@ class App {
 				</div>
 				<h2>{this.state.crash.message}</h2>
 				<pre>{this.state.crash.error}</pre>
+				<div className="actions">
+					<antd.Button onClick={() => window.location.reload()}>Reload</antd.Button>
+				</div>
 			</div>
-		}
-
-		if (!this.state.initialized) {
-			return null
 		}
 
 		return (
@@ -329,7 +316,7 @@ class App {
 							user={this.state.user}
 							session={this.state.session}
 						>
-							<Render.RenderRouter staticRenders={App.staticRenders} />
+							<Render.RouteRender staticRenders={App.staticRenders} />
 						</BindPropsProvider>
 					</Layout>
 				</antd.ConfigProvider>
