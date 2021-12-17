@@ -77,10 +77,10 @@ export default class Layout extends React.Component {
 			}
 		})
 
-		window.app.eventBus.on("setLocation", () => {
+		window.app.eventBus.on("transitionStart", () => {
 			this.setState({ isOnTransition: true })
 		})
-		window.app.eventBus.on("setLocationDone", () => {
+		window.app.eventBus.on("transitionDone", () => {
 			this.setState({ isOnTransition: false })
 		})
 	}
