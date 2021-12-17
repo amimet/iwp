@@ -88,7 +88,7 @@ export default class Selector extends React.Component {
 					<h3><Icons.Triangle /> Variants</h3>
 					<div className="fabric_selector inspector properties variants options">
 						{Array.isArray(item.properties?.variants) ?
-							<antd.Select mode="tags" style={{ width: '100%' }} placeholder="Select available variants" onChange={this.handleSelectVariant}>
+							<antd.Select mode="tags" style={{ width: '100%' }} placeholder={`${item.properties.variants.length} variants available`} onChange={this.handleSelectVariant}>
 								{item.properties.variants.map((variant) => {
 									return <antd.Select.Option key={variant}>
 										{variant}
