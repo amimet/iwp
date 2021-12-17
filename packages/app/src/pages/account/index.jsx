@@ -107,7 +107,11 @@ export default class Account extends React.Component {
 				callback(true, err)
 			})
 
-		window.app.eventBus.emit("forceReloadUser")
+		window.app.eventBus.emit("reinitializeUser")
+	}
+
+	handleSignOutAll = () => {
+		return this.props.contexts.app.sessionController.destroyAllSessions()
 	}
 
 	openUserEdit = () => {
@@ -172,6 +176,7 @@ export default class Account extends React.Component {
 							sessions: this.state.sessions,
 							user: this.state.user,
 							decodedToken: Session.decodedToken,
+							handleSignOutAll: this.handleSignOutAll,
 						}}
 					/>
 				)}
