@@ -232,9 +232,9 @@ export default class Workloads extends React.Component {
 					<div>
 						<h1>{item.name ?? "Unnamed workload"}</h1>
 					</div>
-					<div>
+					{!window.isMobile && <div>
 						<antd.Tag>{item._id}</antd.Tag>
-					</div>
+					</div>}
 				</div>
 				<div className="info">
 					{renderDate(item.created)}
