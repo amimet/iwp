@@ -6,9 +6,7 @@ import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList } from "components"
-
-import { WorkloadCreator, WorkloadDetails } from "./components"
+import { ActionsBar, SelectableList, Workload } from "components"
 
 import "./index.less"
 
@@ -120,21 +118,11 @@ export default class Workloads extends React.Component {
 			return false
 		}
 
-		window.app.DrawerController.open("workload_details", WorkloadDetails, {
-			componentProps: {
-				id,
-			},
-			props: {
-				width: "fit-content",
-			},
-			onDone: (drawer) => {
-				drawer.close()
-			},
-		})
+		window.app.openWorkloadDetails(id)
 	}
 
 	openWorkloadCreator = () => {
-		window.app.DrawerController.open("workload_creator", WorkloadCreator, {
+		window.app.DrawerController.open("workload_creator", Workload.Creator, {
 			props: {
 				width: "55%",
 			},

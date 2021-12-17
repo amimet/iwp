@@ -15,6 +15,7 @@ export { default as OperatorsAssignments } from "./OperatorsAssignments"
 export { default as AssignedWorkload } from "./AssignedWorkload"
 export { default as Clock } from "./Clock"
 
+export * as Workload from "./Workload"
 export * as Fabric from "./Fabric"
 export * as AboutApp from "./AboutApp"
 export * as QRReader from "./QRReader"
