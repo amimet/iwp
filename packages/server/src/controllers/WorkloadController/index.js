@@ -73,6 +73,15 @@ export default {
 
         return res.json(workload)
     }),
+    getWorkloadAssignedToUserID: Schematized({
+        select: ["_id"],
+    }, async (req, res) => {
+        let workloads = await Workload.find()
+        
+        workloads = workloads.filter(workload => workload.assigned.includes(req.selection._id ?? req.user._id))
+
+        return res.json(workloads)
+    }),
     get: Schematized({
         select: ["region", "_id", "name"],
     }, async (req, res, next) => {

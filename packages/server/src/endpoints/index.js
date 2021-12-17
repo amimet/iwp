@@ -85,6 +85,12 @@ module.exports = [
         fn: "WorkloadController.regeneratesUUID",
     },
     {
+        route: "/assigned_workloads",
+        method: "GET",
+        middleware: ["ensureAuthenticated"],
+        fn: "WorkloadController.getWorkloadAssignedToUserID",
+    },
+    {
         route: "/workload_operators",
         method: "PUT",
         middleware: ["ensureAuthenticated", "privileged"],
