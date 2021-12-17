@@ -54,6 +54,29 @@ class ThrowCrash {
 	}
 }
 
+const __renderTest = () => {
+	const [position, setPosition] = React.useState(0)
+
+	// create a 300ms interval to move randomly inside window screen
+	React.useEffect(() => {
+		setInterval(() => {
+			const x = Math.random() * window.innerWidth
+			const y = Math.random() * window.innerHeight
+
+			setPosition({ x, y })
+		}, 50)
+	}, [])
+
+	// clear interval when component unmount
+	React.useEffect(() => {
+		return () => {
+			clearInterval()
+		}
+	}, [])
+
+	return <div style={{ top: position.y, left: position.x }} className="__render_box_test" />
+}
+
 class App {
 	static initialize() {
 		this.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
