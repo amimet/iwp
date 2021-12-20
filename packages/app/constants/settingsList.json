@@ -42,7 +42,8 @@
         "type": "Switch",
         "icon": "MdOutlineAnimation",
         "title": "Reduce animation",
-        "title_i18n": "settings_aspect_reduceAnimation"
+        "title_i18n": "settings_aspect_reduceAnimation",
+        "experimental": true
     },
     {
         "id": "darkMode",
