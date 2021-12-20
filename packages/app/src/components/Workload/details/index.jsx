@@ -121,6 +121,8 @@ export default class WorkloadDetails extends React.Component {
 			},
 			componentProps: {
 				// TODO: Pass order item UUID for fetching data from API
+				runnable: true, // this enable to run the fabric task inspector process
+				resolvable: true, // this enable to resolve the fabric order task status
 				item: item,
 			}
 		})
@@ -246,7 +248,7 @@ export default class WorkloadDetails extends React.Component {
 					className="workload_details list"
 				>
 					<antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
-						<ScheduledProgress start={data.scheduledStart} finish={data.scheduledFinish}/>
+						<ScheduledProgress start={data.scheduledStart} finish={data.scheduledFinish} />
 					</antd.Collapse.Panel>
 
 					<antd.Collapse.Panel key="timeline" header={<h2><Icons.Watch /> Timeline</h2>}>
