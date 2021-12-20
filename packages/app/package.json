@@ -15,7 +15,7 @@
     "@ant-design/icons": "^4.7.0",
     "@corenode/utils": "^0.28.26",
     "@react-pdf/renderer": "^1.6.17",
-    "antd": "^4.17.3",
+    "antd": "^4.17.4",
     "chart.js": "^3.5.1",
     "classnames": "^2.3.1",
     "dicebar_lib": "^1.0.0",
