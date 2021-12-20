@@ -1,4 +1,16 @@
 .fabric_creator {
+	&.mobile {
+		.fields {
+			.field {
+				border: 0;
+
+				.close {
+					opacity: 1;
+				}
+			}
+		}
+	}
+
 	.name {
 		display: flex;
 		align-items: center;
@@ -47,26 +59,28 @@
 		width: 100%;
 
 		.field {
+			display: flex;
 			padding: 10px;
 
 			width: 100%;
 			height: fit-content;
 			
-			border-radius: 12px;
 			border: transparent dashed 1px;
+			border-radius: 4px;
 
 			transition: all 150ms ease-out;
 
 			.content {
 				position: relative;
-				float: left;
-
-				display: inline-flex;
-				flex-direction: column;
 				width: 100%;
 				
+				display: inline-flex;
+				flex-direction: column;
+				
+				margin: 0 10px;
+
 				.component {
-					padding-left: 20px;
+					padding-left: 15px;
 
 					> div {
 						min-width: 200px;
@@ -78,16 +92,23 @@
 				cursor: pointer;
 
 				position: relative;
-				float: right;
+				width: 30px;
 
-				width: 40px;
-				height: 100%;
-
-				//transform: translate(0, -100%);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
 
 				background-color: #fc0000ab;
 				opacity: 0;
 				transition: all 150ms ease-out;
+				
+				border-radius: 4px;
+
+				svg {
+					color: var(--background-color-primary);
+					margin: 0!important;
+				}
 			}
 		}
 

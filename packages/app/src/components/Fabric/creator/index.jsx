@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons, createIconRender } from "components/Icons"
 import loadable from "@loadable/component"
+import classnames from "classnames"
 
 import FORMULAS from "schemas/fabricFormulas"
 import FIELDS from "schemas/fabricFields"
@@ -323,7 +324,7 @@ export default class FabricCreator extends React.Component {
 
         const TypeIcon = FORMULAS[this.state.type].icon && createIconRender(FORMULAS[this.state.type].icon)
 
-        return <div className="fabric_creator">
+        return <div className={classnames("fabric_creator", { ["mobile"]: window.isMobile })}>
             <div key="name" className="name">
                 <div className="type">
                     <antd.Dropdown trigger={["click"]} overlay={this.renderTypesSelector}>
