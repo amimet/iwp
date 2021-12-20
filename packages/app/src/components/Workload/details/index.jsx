@@ -203,14 +203,14 @@ export default class WorkloadDetails extends React.Component {
 						</antd.Tooltip>
 					</div>
 					<div className="workload_details header content">
-						<h1>
+						{data.scheduledFinish ? <h1>
 							<antd.Badge.Ribbon
 								text={isExpired ? "expired" : `${datesDiff.daysLeft} days left`}
 								color={isExpired ? "red" : undefined}
-							>
-								<Icons.Box /> {data.name}
+							><Icons.Box /> {data.name}
+
 							</antd.Badge.Ribbon>
-						</h1>
+						</h1> : <h1><Icons.Box /> {data.name}</h1>}
 
 						<div>
 							<antd.Button icon={<Icons.Save />}>
@@ -247,9 +247,9 @@ export default class WorkloadDetails extends React.Component {
 					expandIconPosition={"right"}
 					className="workload_details list"
 				>
-					<antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
+					{data.scheduledFinish && <antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
 						<ScheduledProgress start={data.scheduledStart} finish={data.scheduledFinish} />
-					</antd.Collapse.Panel>
+					</antd.Collapse.Panel>}
 
 					<antd.Collapse.Panel key="timeline" header={<h2><Icons.Watch /> Timeline</h2>}>
 						<antd.Timeline mode="left">
