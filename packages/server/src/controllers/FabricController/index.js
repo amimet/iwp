@@ -26,6 +26,7 @@ export default {
         let objects = await FabricObject.find(req.selection)
 
         const additions = req.query?.additions
+        const selections = req.query?.select
 
         for await (let object of objects) {
             if (Array.isArray(object.properties)) {
@@ -43,7 +44,7 @@ export default {
             }
         }
 
-        if (req.query.select) {
+        if (selections) {
             req.query.select = JSON.parse(req.query.select)
 
             Object.keys(req.query.select).forEach(selectionQueryKey => {
