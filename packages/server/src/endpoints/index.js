@@ -66,6 +66,12 @@ module.exports = [
         fn: "FabricController.get",
     },
     {
+        route: "/fabric_by_id",
+        method: "GET",
+        middleware: ["ensureAuthenticated"],
+        fn: "FabricController.getById",
+    },
+    {
         route: "/fabric",
         method: "DELETE",
         middleware: ["ensureAuthenticated"],

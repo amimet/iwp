@@ -60,6 +60,22 @@ export default {
 
         return res.json(objects)
     }),
+    getById: Schematized({
+        required: ["_id"],
+        select: ["_id"],
+    }, async (req, res) => {
+        console.log(req.selection._id)
+        
+        let object = await FabricObject.findById(req.selection._id).catch(err => {
+            return res.status(404).json({
+                message: "Object not found",
+            })
+        })
+
+        if (object) {
+            return res.json(object)
+        }
+    }),
     update: Schematized({
         select: ["_id", "mutation"],
     }, async (req, res) => {
