@@ -135,6 +135,17 @@ export default class SelectableList extends React.Component {
 	}
 
 	renderItem = (item) => {
+		if (item.children) {
+			return <div className="selectableList_group">
+				{item.label}
+				<div className="selectableList_subItems">
+					{item.children.map((subItem) => {
+						return this.renderItem(subItem)
+					})}
+				</div>
+			</div>
+		}
+
 		const renderChildren = this.props.renderItem(item)
 
 		const _key = item.key ?? item.id ?? item._id ?? renderChildren.key
@@ -142,16 +153,17 @@ export default class SelectableList extends React.Component {
 		const selectionMethod = ["onClick", "onDoubleClick"].includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
 		const isSelected = this.isKeySelected(_key)
 		const isDisabled = renderChildren.props.disabled
+		const isNotSelectable = renderChildren.props.notSelectable
 
 		let renderProps = {
 			disabled: isDisabled,
 			children: renderChildren,
 			className: classnames("selectableList_item", {
-				["selected"]: isSelected,
-				["disabled"]: isDisabled,
+				["selected"]: isSelected && !isNotSelectable,
+				["disabled"]: isDisabled && !isNotSelectable,
 			}),
 			[selectionMethod]: () => {
-				if (isDisabled) {
+				if (isDisabled && isNotSelectable) {
 					return false
 				}
 				if (typeof this.props.selectionEnabled !== "undefined") {
