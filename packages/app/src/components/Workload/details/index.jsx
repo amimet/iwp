@@ -228,24 +228,6 @@ export default class WorkloadDetails extends React.Component {
 							{this.id}
 						</div>
 					</div>
-					<div key="nof">
-						<div className="name">
-							<Icons.User />
-							NOF
-						</div>
-						<div className="value">
-							{data.nof}
-						</div>
-					</div>
-					<div key="phase">
-						<div className="name">
-							<Icons.GitBranch />
-							Phase
-						</div>
-						<div className="value">
-							{data.phase}
-						</div>
-					</div>
 					<div key="state">
 						<div className="name">
 							<Icons.Activity />
