@@ -52,6 +52,20 @@ export default class Workloads extends React.Component {
 		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
 	}
 
+	fetchWorkloadsFromRegion = async (id) => {
+		this.setState({ loading: true })
+
+		await this.api.get.workloads(undefined, { region: id })
+			.then((data) => {
+				console.log(data)
+				this.setState({ workloads: data, loading: false })
+			})
+			.catch((err) => {
+				console.log(err)
+				this.setState({ error: err, loading: false })
+			})
+	}
+
 	loadRegions = async () => {
 		await this.api.get.regions()
 			.then((data) => {
@@ -97,20 +111,6 @@ export default class Workloads extends React.Component {
 		workloads = workloads.filter((workload) => !id.includes(workload._id))
 
 		this.setState({ workloads })
-	}
-
-	fetchWorkloadsFromRegion = async (id) => {
-		this.setState({ loading: true })
-
-		await this.api.get.workloads(undefined, { region: id })
-			.then((data) => {
-				console.log(data)
-				this.setState({ workloads: data, loading: false })
-			})
-			.catch((err) => {
-				console.log(err)
-				this.setState({ error: err, loading: false })
-			})
 	}
 
 	openWorkloadDetails = (id) => {
