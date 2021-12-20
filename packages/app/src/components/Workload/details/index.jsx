@@ -4,7 +4,7 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { OperatorsAssignments, UserSelector, Fabric } from "components"
+import { OperatorsAssignments, UserSelector, Fabric, ScheduledProgress } from "components"
 
 import { OrdersRender } from ".."
 
@@ -75,7 +75,6 @@ export default class WorkloadDetails extends React.Component {
 
 	getDiffBetweenDates = (start, end) => {
 		// THIS IS NOT COUNTING WITH THE YEAR
-
 		const format = "DD-MM-YYYY"
 
 		const startDate = moment(start, format)
@@ -193,31 +192,15 @@ export default class WorkloadDetails extends React.Component {
 		const datesDiff = this.getDiffBetweenDates(data.scheduledStart, data.scheduledFinish)
 		const isExpired = this.isExpired(finishReached, data.status)
 
-		const getSchedulerProgressStatus = () => {
-			let status = "normal"
-
-			if (isExpired && data.status !== "completed") {
-				return "exception"
-			} else {
-				switch (data.status) {
-					case "complete": {
-						status = undefined
-						break
-					}
-					default: {
-						status = "active"
-						break
-					}
-				}
-			}
-
-			return status
-		}
-
 		return (
 			<div className={classnames("workload_details", { ["mobile"]: window.isMobile })} id={this.id} ref={this.ref} >
-				<div className="details_header">
-					<div className="content">
+				<div className="workload_details header">
+					<div className="workload_details header matrix">
+						<antd.Tooltip placement="bottom" title="Download">
+							<img onClick={this.downloadQR} src={this.state.qrCanvas?.toDataURL()} />
+						</antd.Tooltip>
+					</div>
+					<div className="workload_details header content">
 						<h1>
 							<antd.Badge.Ribbon
 								text={isExpired ? "expired" : `${datesDiff.daysLeft} days left`}
@@ -233,15 +216,9 @@ export default class WorkloadDetails extends React.Component {
 							</antd.Button>
 						</div>
 					</div>
-
-					<div className="matrix">
-						<antd.Tooltip placement="bottom" title="Download">
-							<img onClick={this.downloadQR} src={this.state.qrCanvas?.toDataURL()} />
-						</antd.Tooltip>
-					</div>
 				</div>
 
-				<div className="info">
+				<div className="workload_details info">
 					<div key="id">
 						<div className="name">
 							<Icons.Tag />
@@ -284,28 +261,10 @@ export default class WorkloadDetails extends React.Component {
 					bordered={false}
 					accordion={true}
 					expandIconPosition={"right"}
-					className="details_collapseList"
+					className="workload_details list"
 				>
 					<antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
-						<div className="scheduled_progress">
-							<div className={classnames("point", "left", { reached: startReached })}>
-								{data.scheduledStart}
-							</div>
-							<antd.Progress
-								size="small"
-								percent={datesDiff.percentage}
-								showInfo={false}
-								className={classnames("ant-progress", {
-									startReached: startReached,
-									finishReached: finishReached,
-								})}
-								type="line"
-								status={getSchedulerProgressStatus()}
-							/>
-							<div className={classnames("point", "right", { reached: finishReached })}>
-								{data.scheduledFinish}
-							</div>
-						</div>
+						<ScheduledProgress start={data.scheduledStart} finish={data.scheduledFinish}/>
 					</antd.Collapse.Panel>
 
 					<antd.Collapse.Panel key="timeline" header={<h2><Icons.Watch /> Timeline</h2>}>
@@ -324,6 +283,24 @@ export default class WorkloadDetails extends React.Component {
 						<OrdersRender onClickItem={(item) => this.openOrderItemDetails(item)} orders={this.state.data.orders} />
 					</antd.Collapse.Panel>
 				</antd.Collapse>
+
+				<div className="workload_details actions">
+					<div>
+						<antd.Button type="primary" icon={<Icons.MdOutlinePendingActions />}>
+							Run
+						</antd.Button>
+					</div>
+					<div>
+						<antd.Button icon={<Icons.Edit />}>
+							Edit
+						</antd.Button>
+					</div>
+					<div>
+						<antd.Button icon={<Icons.CheckCircle />}>
+							Mark as done
+						</antd.Button>
+					</div>
+				</div>
 			</div>
 		)
 	}

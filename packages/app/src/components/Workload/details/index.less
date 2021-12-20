@@ -1,17 +1,21 @@
 .workload_details {
-	> div {
-		margin-bottom: 20px;
-	}
-
-	.details_header {
+	.header {
 		display: flex;
 		justify-content: space-between;
+		flex-direction: column;
+
+		.content {
+			width: 100%;
+		}
 
 		.matrix {
 			cursor: pointer;
 			transition: all 150ms ease-in-out;
 			width: fit-content;
 			height: fit-content;
+
+			align-self: center;
+			justify-self: center;
 
 			img {
 				width: 120px;
@@ -22,6 +26,8 @@
 		.matrix:hover {
 			filter: contrast(0.3);
 		}
+
+		margin-bottom: 20px;
 	}
 
 	.info {
@@ -39,100 +45,33 @@
 			margin: 5px 0;
 			padding: 5px;
 			border-radius: 2px;
-			
+
 			.name {
 				font-size: 18px;
 			}
 			.value {
 				font-size: 14px;
-				color:  var(--background-color-contrast);
+				color: var(--background-color-contrast);
 			}
 		}
 	}
 
-	.details_collapseList {
+	.list {
 		background-color: transparent;
+		margin-bottom: 20px;
 	}
 
-	.scheduled_progress {
+	.actions {
 		display: flex;
 		flex-direction: row;
-		justify-content: center;
+		justify-content: space-between;
+		align-items: center;
 
-		.point {
-			height: 40px;
-			text-align: center;
-			align-items: end;
-			white-space: nowrap;
-			display: flex;
-			width: 72px;
-			justify-content: center;
-
-			&.right {
-				transform: translate(-50%, 0);
-			}
-
-			&.left {
-				transform: translate(50%, 0);
-			}
-
-			&.reached {
-				color: rgba(0, 0, 0, 0.45);
-			}
-		}
-
-		.ant-progress::before {
-			content: "";
-			width: 8px;
-			height: 8px;
-			border-radius: 24px;
-			transform: translateX(-10px);
-			background-color: rgb(128, 128, 128);
-		}
-
-		.ant-progress::after {
-			content: "";
-			width: 8px;
-			height: 8px;
-			border-radius: 24px;
-			transform: translateX(10px);
-			background-color: rgb(128, 128, 128);
-		}
-
-		.ant-progress {
-			font-size: 0;
-			display: flex;
-			align-items: center;
-			height: fit-content;
-
-			&.startReached {
-				&::before {
-					background-color: var(--primary-color) !important;
-				}
-			}
-
-			&.finishReached {
-				&::after {
-					background-color: var(--primary-color) !important;
-				}
-			}
-		}
-
-		.ant-progress-bg {
-			background-color: var(--primary-color);
-		}
-	}
-
-	&.mobile {
-		.details_header {
-			.content {
-				width: 100%;
-			}
-
-			flex-direction: column-reverse;
-			align-items: center;
-			justify-content: center;
-		}
+		position: sticky;
+		width: 100%;
+		bottom: 0;
+		padding: 10px;
+		border-radius: 8px;
+		background-color: var(--background-color-accent);
 	}
 }
-
