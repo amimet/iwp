@@ -286,8 +286,8 @@ export default class WorkloadDetails extends React.Component {
 
 				<div className="workload_details actions">
 					<div>
-						<antd.Button type="primary" icon={<Icons.MdOutlinePendingActions />}>
-							Run
+						<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
+							Add token
 						</antd.Button>
 					</div>
 					<div>
