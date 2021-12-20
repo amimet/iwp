@@ -47,14 +47,31 @@ export default {
             placeholder: "Select a location",
         },
     },
+    sections: {
+        label: "Sections",
+        component: "select",
+        updateEvent: "onChange",
+        props: {
+            mode: "tags",
+            placeholder: "Select sections",
+            tokenSeparators: [','],
+        },
+    },
+    monetary_value: {
+        label: "Monetary Value",
+        component: "inputNumber",
+        updateEvent: "onChange",
+        onChange: (value) => {
+            return value
+        },
+        props: {
+            placeholder: "Enter monetary value",
+        }
+    },
     variants: {
         label: "Variants",
         component: "select",
         updateEvent: "onChange",
-        onUpdate: (update) => {
-            console.log(update)
-            return update
-        },
         // TODO: Fetch global variants from API
         props: {
             style: { width: "100%" },

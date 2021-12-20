@@ -12,7 +12,8 @@ export default {
         icon: "Settings",
         defaultFields: [
             "description",
-            "operations",
+            "sections",
+            "monetary_value",
         ],
     },
     phase: {
