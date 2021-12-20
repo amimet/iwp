@@ -105,10 +105,11 @@ export default class SettingsMenu extends React.Component {
 			<div key={item.id} className="settingItem">
 				<div className="header">
 					<div>
-						<h5>
+						<h4>
 							{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
 							{item.title ?? item.id}
-						</h5>
+						</h4>
+						<p>{item.description}</p>
 					</div>
 					<div>
 						{item.experimental && <antd.Tag> Experimental </antd.Tag>}
