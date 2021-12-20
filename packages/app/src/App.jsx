@@ -184,6 +184,16 @@ class App {
 					}
 				})
 			},
+			openFabricInspector: (id) => {
+				window.app.DrawerController.open("FabricCreator", Fabric.Inspector, {
+					props: {
+						width: "70%",
+					},
+					componentProps: {
+						id,
+					}
+				})
+			},
 			goMain: () => {
 				return window.app.setLocation(config.app.mainPath)
 			},
