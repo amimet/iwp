@@ -1,6 +1,6 @@
 export default {
     name: { type: String },
-    items: { type: Object, required: true },
+    orders: { type: Object, required: true },
     region: { type: String, default: 0 },
     workshift: { type: String },
     created: { type: Number, required: true },

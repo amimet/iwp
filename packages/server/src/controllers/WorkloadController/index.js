@@ -6,6 +6,33 @@ import moment from "moment"
 const format = "DD-MM-YYYY hh:mm"
 
 export default {
+    action: Schematized({
+        required: ["_id", "event"],
+        select: ["_id"], 
+    }, async (req, res) => {
+        const workload = await Workload.findById(req.selection._id)
+
+        if (!workload) {
+            return res.status(404).json({
+                message: "Workload not found",
+            })
+        }
+
+        const { user_id, action } = req.selection.event
+
+        switch (action) {
+            case "commit": {
+                const { orderId } = req.selection.event
+                const order = await workload.orders.findById(orderId)
+            }
+            default: {
+                return res.status(400).json({
+                    message: "Invalid action",
+                })
+            }
+        }
+       
+    }),
     getAll: Schematized({
         select: ["region", "_id", "name"],
     }, async (req, res) => {
@@ -104,9 +131,9 @@ export default {
         let workloads = await Workload.find()
 
         workloads.forEach(async (workload) => {
-            if (workload.items.length > 0) {
+            if (workload.orders.length > 0) {
 
-                workload.items.forEach((item) => {
+                workload.orders.forEach((item) => {
                     if (typeof item.uuid === "undefined") {
                         item.uuid = nanoid()  
                     }
@@ -119,13 +146,13 @@ export default {
         return res.json(workloads)
     },
     set: Schematized({
-        required: ["items", "region", "name"],
+        required: ["orders", "region", "name"],
     }, async (req, res) => {
-        const { items, region, name, scheduledStart, scheduledFinish, workshift } = req.body
+        const { orders, region, name, scheduledStart, scheduledFinish, workshift } = req.body
 
         const obj = {
             created: new Date().getTime(),
-            items,
+            orders,
             name,
             scheduledStart,
             scheduledFinish,
@@ -134,7 +161,7 @@ export default {
         }
 
         // create on each item an UUID property
-        items.forEach(item => {
+        orders.forEach(item => {
             item.uuid = nanoid()
         })
 
