@@ -10,8 +10,14 @@ export default (props) => {
 		}
 	}
 
+	const onClickDelete = (item) => {
+		if (typeof props.onDeleteItem === "function") {
+			props.onDeleteItem(item._id)
+		}
+	}
+
 	return <antd.List
-		dataSource={props.items}
+		dataSource={props.orders}
 		renderItem={(item) => {
 			return <antd.List.Item onClick={() => {onClickItem(item)}} className="workload_orderItem">
 				<antd.List.Item.Meta
@@ -24,6 +30,9 @@ export default (props) => {
 						<div>{item.selectedVariants.length} Variants</div>
 					</div>}
 				</div>
+				{props.onDeleteItem && <antd.Button onClick={() => onClickDelete(item)} type="link">
+					Delete
+				</antd.Button>}
 			</antd.List.Item>
 		}}
 	/>

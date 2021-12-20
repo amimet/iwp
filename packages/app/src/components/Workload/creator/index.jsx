@@ -4,7 +4,7 @@ import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { Fabric } from "components"
 
-import { OrderItems } from ".."
+import { OrdersRender } from ".."
 
 import "./index.less"
 
@@ -15,7 +15,7 @@ export default class WorkloadCreator extends React.Component {
 		selectedRegion: null,
 		selectedWorkshift: null,
 		regions: [],
-		items: [],
+		orders: [],
 		workshifts: {},
 	}
 
@@ -57,13 +57,13 @@ export default class WorkloadCreator extends React.Component {
 	submit = async () => {
 		this.setState({ submitting: true, submittingError: null })
 
-		const { selectedRegion, selectedWorkshift, selectedDate, items, name } = this.state
+		const { selectedRegion, selectedWorkshift, selectedDate, orders, name } = this.state
 
 		const workload = {
 			region: selectedRegion,
 			workshift: selectedWorkshift,
 			name,
-			items,
+			orders,
 		}
 
 		if (selectedDate != null) {
@@ -101,22 +101,22 @@ export default class WorkloadCreator extends React.Component {
 		})
 	}
 
-	appendOrderItem = (item) => {
-		const { items } = this.state
+	appendOrderItem = (order) => {
+		const { orders } = this.state
 
-		items.push(item)
+		orders.push(order)
 
-		this.setState({ items })
+		this.setState({ orders })
 	}
 
-	removeItem = (id) => {
-		this.setState({ items: this.state.items.filter((item) => item._id !== id) })
+	removeOrderItem = (id) => {
+		this.setState({ orders: this.state.orders.filter((order) => order._id !== id) })
 	}
 
 	canSubmit = () => {
 		const isRegionSet = this.state.selectedRegion !== null
 		const isNameSet = this.state.name !== null
-		const hasOrderItems = this.state.items.length > 0
+		const hasOrderItems = this.state.orders.length > 0
 
 		return isRegionSet && isNameSet && hasOrderItems
 	}
@@ -242,11 +242,11 @@ export default class WorkloadCreator extends React.Component {
 					</div>
 				</div>
 
-				<div key="orderItems">
-					<h4><Icons.List /> Items [{this.state.items.length}]</h4>
+				<div key="orders">
+					<h4><Icons.List /> Orders [{this.state.orders.length}]</h4>
 
-					<div className="workload_creator orderItems">
-						<OrderItems items={this.state.items} />
+					<div className="workload_creator orders">
+						<OrdersRender onDeleteItem={this.removeOrderItem} orders={this.state.orders} />
 					</div>
 				</div>
 

@@ -6,7 +6,7 @@ import QRCode from "qrcode"
 import { Icons } from "components/Icons"
 import { OperatorsAssignments, UserSelector, Fabric } from "components"
 
-import { OrderItems } from ".."
+import { OrdersRender } from ".."
 
 import "./index.less"
 
@@ -172,21 +172,6 @@ export default class WorkloadDetails extends React.Component {
 		})
 	}
 
-	parseWorkloadItems = (items) => {
-		return items.map((item) => {
-			const obj = {
-				uuid: item.uuid,
-				quantity: item.quantity,
-				item: {
-					item_id: item.id,
-					name: item.title,
-				},
-			}
-
-			return obj
-		})
-	}
-
 	isExpired = (isFinishReached, status) => {
 		if (status !== "completed" && isFinishReached) {
 			return true
@@ -335,8 +320,8 @@ export default class WorkloadDetails extends React.Component {
 						<OperatorsAssignments onRemoveOperator={this.onRemoveOperator} onAssignOperator={this.onAssignOperator} assigned={data.assigned} />
 					</antd.Collapse.Panel>
 
-					<antd.Collapse.Panel key="items" header={<h2><Icons.Archive /> Order</h2>}>
-						<OrderItems onClickItem={(item) => this.openOrderItemDetails(item)} items={this.state.data.items} />
+					<antd.Collapse.Panel key="orders" header={<h2><Icons.Archive /> Order</h2>}>
+						<OrdersRender onClickItem={(item) => this.openOrderItemDetails(item)} orders={this.state.data.orders} />
 					</antd.Collapse.Panel>
 				</antd.Collapse>
 			</div>
