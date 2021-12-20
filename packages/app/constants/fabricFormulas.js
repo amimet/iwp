@@ -1,5 +1,6 @@
 export default {
     product: {
+        label: "Product",
         icon: "Box",
         defaultFields: [
             "description",
@@ -7,6 +8,7 @@ export default {
         ],
     },
     operation: {
+        label: "Operation",
         icon: "Settings",
         defaultFields: [
             "description",
@@ -14,6 +16,7 @@ export default {
         ],
     },
     phase: {
+        label: "Phase",
         icon: "GitCommit",
         defaultFields: [
             "description",
@@ -21,6 +24,7 @@ export default {
         ],
     },
     task: {
+        label: "Task",
         icon: "Tool",
         defaultFields: [
             "description",
