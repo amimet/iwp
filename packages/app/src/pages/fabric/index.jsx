@@ -116,6 +116,7 @@ export default class FabricManager extends React.Component {
         }
 
         console.debug(`Opening Fabric.Inspector with id [${_id}]`)
+        window.app.openFabricInspector(_id)
     }
 
     renderTypesOptions = () => {
@@ -153,8 +154,7 @@ export default class FabricManager extends React.Component {
     }
 
     renderItem = (item) => {
-        const { _id, name, type } = item
-        const formula = FORMULAS[type]
+        const { _id, name } = item
 
         return <div onClick={() => this.onClickItem(_id)} className="item" key={_id}>
             <div className="title">
