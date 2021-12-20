@@ -240,7 +240,7 @@ export default class Workloads extends React.Component {
 					{renderDate(item.created)}
 					<div>
 						<Icons.Box />
-						{item.items?.length} items
+						{item.orders?.length ?? 0} orders
 					</div>
 				</div>
 			</div>
