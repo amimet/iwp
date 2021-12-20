@@ -14,6 +14,7 @@ const FieldsComponents = {
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
     "datepicker": antd.DatePicker,
+    "inputNumber": antd.InputNumber,
 }
 
 export default class FabricCreator extends React.Component {
