@@ -21,7 +21,7 @@ export default (props) => {
 		renderItem={(item) => {
 			return <antd.List.Item onClick={() => {onClickItem(item)}} className="workload_orderItem">
 				<antd.List.Item.Meta
-					avatar={<div className="workload_orderItem quantity">x{item.quantity}</div>}
+					avatar={<div className="workload_orderItem quantity">x{item.properties?.quantity ?? item.quantity ?? "0"}</div>}
 					title={item.name}
 					description={item.properties?.description}
 				/>
