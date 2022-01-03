@@ -44,6 +44,19 @@ export default class Main extends React.Component {
 		window.app.openWorkloadDetails(_id)
 	}
 
+	renderAssignedWorkloads = () => {
+		if (!this.state.assignedWorkloads) {
+			return null
+		}
+		if (this.state.assignedWorkloads.length === 0) {
+			return <>No assigned workloads</>
+		}
+
+		return this.state.assignedWorkloads.map((workload) => {
+			return <AssignedWorkload workload={workload} onClick={this.onClickAssignedWorkload} />
+		})
+	}
+
 	render() {
 		const user = this.props.user ?? {}
 
@@ -83,9 +96,7 @@ export default class Main extends React.Component {
 				<div className="assigned">
 					<h2><Icons.MdPendingActions /> Assigned for you</h2>
 					<div>
-						{this.state.assignedWorkloads ? this.state.assignedWorkloads.map((workload) => {
-							return <AssignedWorkload workload={workload} onClick={this.onClickAssignedWorkload} />
-						}) : <antd.Skeleton active />}
+						{this.state.assignedWorkloads ? this.renderAssignedWorkloads() : <antd.Skeleton active />}
 					</div>
 				</div>
 			</div>
