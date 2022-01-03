@@ -128,31 +128,19 @@ export default class WorkloadDetails extends React.Component {
 		})
 	}
 
-	onAssignOperator = () => {
-		return new Promise((resolve, reject) => {
-			window.app.DrawerController.open("OperatorAssignment", UserSelector, {
-				onDone: async (ctx, data) => {
-					const result = await this.api.put.workloadOperators({
-						_id: this.state.data._id,
-						operators: data,
-					}).catch((err) => {
-						ctx.handleFail(err)
-						return reject(err)
-					})
-
-					if (result) {
-						ctx.close()
-						await this.setState({ data: result })
-
-						return resolve(result)
-					}
-				},
-				componentProps: {
-					select: { roles: ["operator"] },
-					excludedIds: this.state.data.assigned,
-				}
-			})
+	onAssignOperator = async (data) => {
+		const result = await this.api.put.workloadOperators({
+			_id: this.state.data._id,
+			operators: data,
+		}).catch((err) => {
+			antd.message.error(err)
+			console.error(err)
+			return false
 		})
+
+		if (result) {
+			await this.setState({ data: result })
+		}
 	}
 
 	onRemoveOperator = async (operator) => {
