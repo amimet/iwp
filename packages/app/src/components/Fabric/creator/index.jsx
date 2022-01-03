@@ -19,6 +19,7 @@ const FieldsComponents = {
 
 export default class FabricCreator extends React.Component {
     state = {
+        submitToCatalog: this.props.submitToCatalog ?? false,
         loading: true,
         submitting: false,
         error: null,
@@ -123,6 +124,10 @@ export default class FabricCreator extends React.Component {
         this.setState(state)
     }
 
+    onChangeCatalogMode = (to) => {
+        this.setState({ submitToCatalog: to.target.checked })
+    }
+
     //* MAIN METHODS
     loadType = async (type) => {
         const formula = this.getFormula(type)
@@ -167,12 +172,28 @@ export default class FabricCreator extends React.Component {
             return false
         }
 
-        currentFields.push(this.renderField({ type: type, ...field }))
+        const fieldRender = this.renderField({ type: type, ...field })
 
-        this.setState({ fields: currentFields })
+        if (fieldRender) {
+            currentFields.push(fieldRender)
+            this.setState({ fields: currentFields })
+        }
+    }
+
+    canSubmit = () => {
+        return Boolean(this.state.name && this.state.fields.length > 0)
     }
 
     submit = async () => {
+        if (!this.canSubmit()) {
+            antd.notification.warning({
+                message: "Missing fields",
+                description: "You need to fill the name and at least one field to submit.",
+            })
+
+            return false
+        }
+
         this.clearError()
         this.toogleSubmitting(true)
 
@@ -209,14 +230,20 @@ export default class FabricCreator extends React.Component {
             }
         }
 
-        // send to api
-        await this.api.put.fabric(payload).catch((response) => {
-            console.error(response)
-            return this.setState({ error: response })
-        })
+        if (this.state.submitToCatalog) {
+            // send to api
+            await this.api.put.fabric(payload).catch((response) => {
+                console.error(response)
+                return this.setState({ error: response })
+            })
+        }
 
         // handle results
         this.toogleSubmitting(false)
+
+        if (typeof this.props.handleDone === "function") {
+			this.props.handleDone(payload)
+		}
 
         if (!this.state.error && typeof this.props.close === "function") {
             this.props.close()
@@ -254,11 +281,17 @@ export default class FabricCreator extends React.Component {
     }
 
     renderField = (field) => {
-        if (!field.key) {
-            field.key = this.getKeyFromLatestFieldType(field.type)
-        }
-
         let FieldComponent = field.component
+
+        if (FieldComponent == null) {
+            console.error(`This field not have a component defined: ${field.type}`)
+            antd.notification.error({
+                message: "Missing component",
+                description: `This field not have a component defined: ${field.type}`,
+            })
+
+            return null
+        }
 
         if (typeof FieldComponent === "string") {
             if (typeof FieldsComponents[FieldComponent] === "undefined") {
@@ -267,6 +300,10 @@ export default class FabricCreator extends React.Component {
             }
 
             FieldComponent = FieldsComponents[FieldComponent]
+        }
+
+        if (!field.key) {
+            field.key = this.getKeyFromLatestFieldType(field.type)
         }
 
         let ComponentProps = {
@@ -287,7 +324,7 @@ export default class FabricCreator extends React.Component {
             RenderComponent = loadable(async () => {
                 try {
                     const children = await field.children()
-                    return () => React.createElement(FieldsComponents[field.component], ComponentProps, children)
+                    return () => React.createElement(FieldComponent, ComponentProps, children)
                 } catch (error) {
                     console.log(error)
 
@@ -304,7 +341,7 @@ export default class FabricCreator extends React.Component {
                 fallback: <div>Loading...</div>,
             })
         } else {
-            RenderComponent = () => React.createElement(FieldsComponents[field.component], ComponentProps)
+            RenderComponent = () => React.createElement(FieldComponent, ComponentProps)
         }
 
         return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
@@ -323,6 +360,7 @@ export default class FabricCreator extends React.Component {
             return <antd.Skeleton active />
         }
 
+        const canSubmit = this.canSubmit()
         const TypeIcon = FORMULAS[this.state.type].icon && createIconRender(FORMULAS[this.state.type].icon)
 
         return <div className={classnames("fabric_creator", { ["mobile"]: window.isMobile })}>
@@ -346,7 +384,9 @@ export default class FabricCreator extends React.Component {
                     </antd.Button>
                 </antd.Dropdown>
 
-                <antd.Button loading={this.state.submitting} onClick={this.submit}>Done</antd.Button>
+                <antd.Button disabled={!canSubmit} loading={this.state.submitting} onClick={this.submit}>Done</antd.Button>
+
+                <antd.Checkbox checked={this.state.submitToCatalog} onChange={this.onChangeCatalogMode}>Add to catalog</antd.Checkbox>
             </div>
 
             {this.state.error && <div className="error">
