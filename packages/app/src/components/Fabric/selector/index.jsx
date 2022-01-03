@@ -1,11 +1,12 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons, createIconRender } from "components/Icons"
+import { Fabric } from "components"
 
 import FORMULAS from "schemas/fabricFormulas"
 import "./index.less"
 
-export default class Selector extends React.Component {
+export class BrowserSelector extends React.Component {
 	state = {
 		error: false,
 		loading: true,
@@ -55,9 +56,9 @@ export default class Selector extends React.Component {
 
 	handleDone = () => {
 		if (typeof this.props.handleDone === "function") {
-			this.props.handleDone({ 
-				...this.state.selectedItem, 
-				selectedVariants: this.state.selectedVariants, 
+			this.props.handleDone({
+				...this.state.selectedItem,
+				selectedVariants: this.state.selectedVariants,
 				quantity: this.state.quantity
 			})
 		}
@@ -152,20 +153,20 @@ export default class Selector extends React.Component {
 	}
 
 	render() {
-		const { loading, selectedItem } = this.state
+		if (this.state.loading) {
+			return <antd.Skeleton active />
+		}
 
-		if (loading) return <antd.Skeleton active />
-
-		if (selectedItem) {
+		if (this.state.selectedItem) {
 			return <div className="fabric_selector">
-				{this.renderSelectedItem(selectedItem)}
+				{this.renderSelectedItem(this.state.selectedItem)}
 			</div>
 		}
 
 		return (
 			<div className="fabric_selector">
 				<h1><Icons.Globe /> Browse</h1>
-
+				<antd.Input.Search />
 				<div className="fabric_selector groups">
 					<antd.List
 						itemLayout="vertical"
@@ -181,3 +182,27 @@ export default class Selector extends React.Component {
 		)
 	}
 }
+
+export const SelectorSwitcher = (props) => {
+	const [mode, setMode] = React.useState(null)
+
+	if (mode && mode === "browse") {
+		return <BrowserSelector {...props} />
+	}
+	if (mode && mode === "custom") {
+		return <Fabric.Creator {...props} />
+	}
+
+	return <div className="fabric_selector_switcher">
+		<div className="fabric_selector_switcher mode" onClick={() => setMode("custom")}>
+			<h1><Icons.Edit2 />Create custom</h1>
+			<p>Create a custom order from a blank template</p>
+		</div>
+		<div className="fabric_selector_switcher mode" onClick={() => setMode("browse")}>
+			<h1><Icons.Globe />Browse fabric</h1>
+			<p>Browse fabric orders from the storaged catalog</p>
+		</div>
+	</div>
+}
+
+export default SelectorSwitcher
