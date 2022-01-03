@@ -2,12 +2,47 @@ import React from "react"
 import * as antd from "antd"
 
 export default {
+    quantity: {
+        label: "Quantity",
+        component: "inputNumber",
+        updateEvent: "onChange",
+        props: {
+            min: 0,
+            defaultValue: 1,
+        },
+    },
+    operators: {
+        label: "Operators",
+        component: "select",
+        updateEvent: "onChange",
+        children: async () => {
+            const api = window.app.request
+
+            const operators = await api.get.users(undefined, { select: { roles: ["operator"] } }).catch((err) => {
+                console.error(err)
+                antd.message.error("Error fetching operators")
+                return false
+            })
+
+            if (operators) {
+                return operators.map(operator => {
+                    return <antd.Select.Option value={operator._id}>{operator.fullName ?? operator.username}</antd.Select.Option>
+                })
+            }
+            
+            return null
+        },
+        props: {
+            style: { width: "100%" },
+            mode: "multiple",
+            placeholder: "Select operators",
+        },
+    },
     description: {
         label: "Description",
         component: "textarea",
         updateEvent: "onChange",
         onUpdate: (update) => {
-            console.log(update)
             return update.target.value
         },
         props: {
