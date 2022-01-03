@@ -200,7 +200,7 @@ export default class Vault extends React.Component {
     render() {
         return (
             <div className="vaultItems">
-                <ActionsBar float={true}>
+                <ActionsBar mode="float">
                     <div key="refresh">
                         <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.loadFabricItems} />
                     </div>

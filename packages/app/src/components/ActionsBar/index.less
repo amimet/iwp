@@ -31,9 +31,30 @@
 	&.float {
 		z-index: 1000;
 		position: sticky;
+		bottom: 0;
 		top: 0;
 		right: 0;
 		width: 100%;
+	}
+
+	&.fixedBottom {
+		z-index: 1000;
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		width: 100%;
+		margin-bottom: 10px;
+	}
+
+	&.fixedTop {
+		z-index: 1000;
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: 0;
+		width: 100%;
+		margin-bottom: 10px;
 	}
 }
 

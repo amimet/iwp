@@ -32,7 +32,7 @@ export default class Reports extends React.Component {
 
     render() {
         return <div>
-            <ActionsBar>
+            <ActionsBar mode="float">
                 <div>
                     <antd.Button
                         type="primary"

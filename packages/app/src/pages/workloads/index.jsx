@@ -286,7 +286,7 @@ export default class Workloads extends React.Component {
 		return (
 			<div style={{ height: "100%" }}>
 				<div style={{ marginBottom: "10px" }}>
-					<ActionsBar float={true}>
+					<ActionsBar mode="float">
 						<div key="refresh">
 							<antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
 						</div>

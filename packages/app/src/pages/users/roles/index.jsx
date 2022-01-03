@@ -111,7 +111,7 @@ export default class Roles extends React.Component {
 
     render() {
         return <div className="users_list_wrapper" >
-            <ActionsBar float={true}>
+            <ActionsBar mode="float">
                 <antd.Button onClick={() => { this.openRoleCreator() }} icon={<Icons.PlusOutlined />} type="primary">New</antd.Button>
             </ActionsBar>
 

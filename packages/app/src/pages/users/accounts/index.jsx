@@ -70,7 +70,7 @@ export default class Users extends React.Component {
 		return (
 			<div>
 				<div className="users_list">
-					<ActionsBar float={true}>
+					<ActionsBar mode="float">
 						<div>
 							<antd.Button shape="round" icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />} type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
 								{this.state.selectionEnabled ? "Done" : "Select"}

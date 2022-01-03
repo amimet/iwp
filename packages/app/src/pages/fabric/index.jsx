@@ -166,7 +166,7 @@ export default class FabricManager extends React.Component {
 
     render() {
         return <div className="fabric_manager">
-            <ActionsBar float={true} wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
+            <ActionsBar mode="float" wrapperStyle={this.state.selectionEnabled ? { justifyContent: "center" } : null}>
                 <div key="refresh">
                     <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
                 </div>
