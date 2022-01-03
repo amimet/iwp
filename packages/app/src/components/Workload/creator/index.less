@@ -1,16 +1,70 @@
 .workload_creator {
-	.ant-btn {
-		line-height: 0 !important;
+	.ant-steps-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+		height: 100%;
+
+		svg {
+			margin: 0;
+		}
 	}
 
-	> div {
-		margin-bottom: 20px;
+	.steps {
+		display: flex;
+		flex-direction: row;
+		width: 100%;
 
-		.body {
-			padding-left: 20px;
+		.header {
+			//position: fixed;
+			width: fit-content;
+			height: fit-content;
+			flex-direction: column;
+		}
+
+		.ant-select{
 			width: 100%;
-			> div {
+		}
+
+		.step {
+			padding: 0 10px;
+			display: inline-flex;
+			flex-direction: column;
+	
+			width: 100%;
+			height: 100%;
+	
+			align-items: flex-start;
+			
+			h1 {
+				margin: 0;
+			}
+
+			.body {
+				padding: 10px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+
 				width: 100%;
+
+				.ant-list {
+					width: 100%;
+				}
+			}
+
+			.actions {
+				display: inline-flex;
+				flex-direction: row;
+				
+				align-items: center;
+				justify-content: center;
+
+				> div {
+					margin-right: 10px;
+				}
 			}
 		}
 	}
@@ -43,21 +97,6 @@
 				justify-content: center;
 				margin-right: 10px;
 			}
-		}
-	}
-
-	.actions {
-		position: sticky;
-		width: 100%;
-		bottom: 0;
-		left: 0;
-
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		  
-		> div {
-			margin-right: 20px;
 		}
 	}
 }

@@ -1,19 +1,100 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons } from "components/Icons"
-import { Fabric } from "components"
+import { Icons, createIconRender } from "components/Icons"
+import { Fabric, ActionsBar, OperatorsAssignments } from "components"
 
 import { OrdersRender } from ".."
 
 import "./index.less"
 
+const steps = [
+	{
+		title: "Name",
+		icon: "Edit",
+		content: (props) => {
+			return <div className="workload_creator steps step body">
+				<antd.Input placeholder="Input an name" onChange={props.onChangeName} />
+			</div>
+		},
+	},
+	{
+		title: "Region",
+		icon: "Globe",
+		content: (props) => {
+			return <div className="workload_creator steps step body">
+				{props.renderRegionsSelector()}
+			</div>
+		},
+	},
+	{
+		title: "Schedule",
+		icon: "Calendar",
+		content: (props) => {
+			return <div className="workload_creator steps step body">
+				<antd.DatePicker.RangePicker
+					showTime={{ format: "HH:mm" }}
+					format="DD-MM-YYYY HH:mm"
+					onChange={props.onSetSchedule}
+				/>
+			</div>
+		}
+	},
+	{
+		title: "Workshift",
+		icon: "Clock",
+		content: (props) => {
+			return <div className="workload_creator steps step body">
+				{Object.keys(props.state.workshifts).length > 0 ? (
+					<div className="workload_creator workshift">
+						<antd.Select onChange={props.onSelectWorkshift} placeholder="Select an workshift">
+							{props.renderWorkshiftsOptions()}
+						</antd.Select>
+						{props.state.selectedWorkshift && props.renderWorkshiftInfo(props.state.selectedWorkshift)}
+					</div>
+				) : (
+					<div style={{ textAlign: "center" }}>No workshifts available for this region</div>
+				)}
+			</div>
+		},
+	},
+	{
+		title: "Operators",
+		icon: "User",
+		content: (props) => {
+			return <div className="workload_creator steps step body">
+				<OperatorsAssignments onAssignOperators={props.onAssignOperators} assigned={props.state.assigned} />
+			</div>
+		}
+	},
+	{
+		title: "Orders",
+		icon: "Box",
+		content: (props) => {
+			return <div className="workload_creator steps step body">
+				<OrdersRender onDeleteItem={props.removeOrderItem} orders={props.state.orders} />
+
+				<div key="actions" className="workload_creator steps step actions">
+					<div>
+						<antd.Button onClick={props.onClickAddOrderItem} shape="round" icon={<Icons.PlusCircle />}>
+							Add item
+						</antd.Button>
+					</div>
+				</div>
+			</div>
+		}
+	},
+]
+
 export default class WorkloadCreator extends React.Component {
 	state = {
+		step: 0,
+
 		name: null,
 		selectedDate: null,
 		selectedRegion: null,
 		selectedWorkshift: null,
+		assigned: [],
 		regions: [],
 		orders: [],
 		workshifts: {},
@@ -29,6 +110,14 @@ export default class WorkloadCreator extends React.Component {
 		}
 
 		await this.fetchRegions()
+	}
+
+	nextStep = () => {
+		this.setState({ step: this.state.step + 1 })
+	}
+
+	prevStep = () => {
+		this.setState({ step: this.state.step - 1 })
 	}
 
 	fetchRegions = async () => {
@@ -57,11 +146,12 @@ export default class WorkloadCreator extends React.Component {
 	submit = async () => {
 		this.setState({ submitting: true, submittingError: null })
 
-		const { selectedRegion, selectedWorkshift, selectedDate, orders, name } = this.state
+		const { assigned, selectedRegion, selectedWorkshift, selectedDate, orders, name } = this.state
 
 		const workload = {
 			region: selectedRegion,
 			workshift: selectedWorkshift,
+			assigned: assigned,
 			name,
 			orders,
 		}
@@ -75,7 +165,6 @@ export default class WorkloadCreator extends React.Component {
 			.catch((error) => {
 				this.handleError(error)
 			})
-
 
 		if (typeof this.props.handleDone === "function") {
 			this.props.handleDone(request)
@@ -144,6 +233,12 @@ export default class WorkloadCreator extends React.Component {
 		}
 	}
 
+	onAssignOperators = (operators) => {
+		let assigned = this.state.assigned
+		assigned = [...assigned, ...operators]
+		this.setState({ assigned })
+	}
+
 	renderRegionsSelector = () => {
 		return <antd.Select
 			showSearch
@@ -190,77 +285,32 @@ export default class WorkloadCreator extends React.Component {
 		)
 	}
 
+	renderStep = (step) => {
+		const current = step ?? this.state.step
+		let Element = steps[current].content
+
+		if (React.isValidElement(Element)) {
+			return <Element {...this} />
+		}
+
+		return React.createElement(Element, this)
+	}
+
 	render() {
 		if (this.state.loading) return <antd.Skeleton active />
-
+		const current = steps[this.state.step]
 		return (
 			<div className="workload_creator">
-				<div><h2><Icons.GitCommit /> New Workload</h2></div>
+				<div className="workload_creator steps">
+					<antd.Steps direction="vertical" className="workload_creator steps header" size="small" current={this.state.step}>
+						{steps.map(item => (
+							<antd.Steps.Step key={item.title} />
+						))}
+					</antd.Steps>
 
-				<div key="name">
-					<h4><Icons.Tag /> Name</h4>
-
-					<div className="body">
-						<antd.Input placeholder="Order name" onChange={this.onChangeName} />
-					</div>
-				</div>
-
-				<div key="region">
-					<h4><Icons.Globe /> Region</h4>
-
-					<div className="body">
-						{this.renderRegionsSelector()}
-					</div>
-				</div>
-
-				<div key="workshift">
-					<h4><Icons.Clock /> Select a workshift</h4>
-
-					<div className="body">
-						{Object.keys(this.state.workshifts).length > 0 ? (
-							<div className="workload_creator workshift">
-								<antd.Select onChange={this.onSelectWorkshift} placeholder="Select an workshift">
-									{this.renderWorkshiftsOptions()}
-								</antd.Select>
-								{this.state.selectedWorkshift && this.renderWorkshiftInfo(this.state.selectedWorkshift)}
-							</div>
-						) : (
-							<div style={{ textAlign: "center" }}>No workshifts available for this region</div>
-						)}
-					</div>
-				</div>
-
-				<div key="schedule">
-					<h4><Icons.Calendar /> Schedule</h4>
-
-					<div className="body">
-						<antd.DatePicker.RangePicker
-							showTime={{ format: "HH:mm" }}
-							format="DD-MM-YYYY HH:mm"
-							onChange={this.onSetSchedule}
-						/>
-					</div>
-				</div>
-
-				<div key="orders">
-					<h4><Icons.List /> Orders [{this.state.orders.length}]</h4>
-
-					<div className="workload_creator orders">
-						<OrdersRender onDeleteItem={this.removeOrderItem} orders={this.state.orders} />
-					</div>
-				</div>
-
-				<div key="actions" className="workload_creator actions">
-					<div>
-						<antd.Button onClick={this.onClickAddOrderItem} shape="round" icon={<Icons.PlusCircle />}>
-							Add item
-						</antd.Button>
-					</div>
-					<div>
-						<antd.Button disabled={this.state.submitting || !this.canSubmit()} type="primary" onClick={this.submit}>
-							{this.state.submitting && <Icons.LoadingOutlined spin />}
-							Create
-						</antd.Button>
+					<div className="workload_creator steps step">
+						<h1>{current.icon && createIconRender(current.icon)}{current.title}</h1>
+						{this.renderStep()}
 					</div>
 				</div>
 
@@ -269,6 +319,25 @@ export default class WorkloadCreator extends React.Component {
 						{this.state.submittingError}
 					</div>
 				)}
+
+				<ActionsBar mode="float">
+					{this.state.step > 0 && (
+						<antd.Button style={{ margin: '0 8px' }} onClick={() => this.prevStep()}>
+							<Icons.ChevronLeft />Previous
+						</antd.Button>
+					)}
+					{this.state.step < steps.length - 1 && (
+						<antd.Button type="primary" onClick={() => this.nextStep()}>
+							<Icons.ChevronRight />Next
+						</antd.Button>
+					)}
+					{this.state.step === steps.length - 1 && (
+						<antd.Button disabled={this.state.submitting || !this.canSubmit()} type="primary" onClick={this.submit}>
+							{this.state.submitting && <Icons.LoadingOutlined spin />}
+							Create
+						</antd.Button>
+					)}
+				</ActionsBar>
 			</div>
 		)
 	}
