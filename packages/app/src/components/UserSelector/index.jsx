@@ -7,7 +7,7 @@ import fuse from "fuse.js"
 
 import "./index.less"
 
-export default class UsersSelector extends React.Component {
+export default class UserSelector extends React.Component {
     state = {
         loading: true,
         data: [],
