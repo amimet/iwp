@@ -29,11 +29,12 @@ export default {
                     window.app.request = this.apiBridge.endpoints
                 },
                 createBridge: async () => {
-                    const getSessionContext = () => {
+                    const getSessionContext = async () => {
                         const obj = {}
-                        const token = Session.token
+                        const token = await Session.token
 
                         if (typeof token !== "undefined") {
+                            // append token to context
                             obj.headers = {
                                 Authorization: `Bearer ${token ?? null}`,
                             }
@@ -44,7 +45,7 @@ export default {
 
                     const bridge = new Bridge({
                         origin: config.api.address,
-                        onRequestContext: getSessionContext,
+                        onRequest: getSessionContext,
                     })
 
                     await bridge.initialize().catch((err) => {
