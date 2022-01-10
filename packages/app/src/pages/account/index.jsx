@@ -8,7 +8,6 @@ import { Session } from "models"
 
 import "./index.less"
 
-
 const SelfViewComponents = {
 	sessionsView: SessionsView,
 	statisticsView: StatisticsView,
@@ -70,7 +69,7 @@ export default class Account extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
-		const token = Session.decodedToken
+		const token = await Session.decodedToken()
 		const location = window.app.history.location
 		const query = new URLSearchParams(location.search)
 
@@ -175,7 +174,6 @@ export default class Account extends React.Component {
 						componentProps={{
 							sessions: this.state.sessions,
 							user: this.state.user,
-							decodedToken: Session.decodedToken,
 							handleSignOutAll: this.handleSignOutAll,
 						}}
 					/>

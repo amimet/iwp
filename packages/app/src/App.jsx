@@ -15,6 +15,8 @@ import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
 
+import { StatusBar, Style } from '@capacitor/status-bar'
+
 import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
 import config from "config"
@@ -51,29 +53,6 @@ class ThrowCrash {
 
 		window.app.eventBus.emit("crash", this.message, this.description)
 	}
-}
-
-const __renderTest = () => {
-	const [position, setPosition] = React.useState(0)
-
-	// create a 300ms interval to move randomly inside window screen
-	React.useEffect(() => {
-		setInterval(() => {
-			const x = Math.random() * window.innerWidth
-			const y = Math.random() * window.innerHeight
-
-			setPosition({ x, y })
-		}, 50)
-	}, [])
-
-	// clear interval when component unmount
-	React.useEffect(() => {
-		return () => {
-			clearInterval()
-		}
-	}, [])
-
-	return <div style={{ top: position.y, left: position.x }} className="__render_box_test" />
 }
 
 class App {
@@ -142,11 +121,14 @@ class App {
 		})
 
 		this.eventBus.on("crash", (message, error) => {
-			console.debug("[App] crash detecting, returning crash...")
+			console.error(`[Crash] ${message}\n`, error)
+			this.eventBus.emit("splash_close")
 
 			this.setState({ crash: { message, error } })
 			this.contexts.app.SoundEngine.play("crash")
 		})
+
+		this.isAppCapacitor = () => navigator.userAgent === "capacitor"
 	}
 
 	static windowContext() {
@@ -200,7 +182,36 @@ class App {
 			goToAccount: (username) => {
 				return window.app.setLocation(`/account`, { username })
 			},
+			setStatusBarStyleDark: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] setStatusBarStyleDark is only available on capacitor")
+					return false
+				}
+				return await StatusBar.setStyle({ style: Style.Dark })
+			},
+			setStatusBarStyleLight: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] setStatusBarStyleLight is not supported on this platform")
+					return false
+				}
+				return await StatusBar.setStyle({ style: Style.Light })
+			},
+			hideStatusBar: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] hideStatusBar is not supported on this platform")
+					return false
+				}
+				return await StatusBar.hide()
+			},
+			showStatusBar: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] showStatusBar is not supported on this platform")
+					return false
+				}
+				return await StatusBar.show()
+			},
 			configuration: this.configuration,
+			isAppCapacitor: this.isAppCapacitor,
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
 		}
 	}
@@ -257,13 +268,24 @@ class App {
 		try {
 			await this.__SessionInit()
 			await this.__UserInit()
+
+			if (this.isAppCapacitor()) {
+				window.addEventListener("statusTap", () => {
+					this.eventBus.emit("statusTap")
+				})
+	
+				StatusBar.setOverlaysWebView({ overlay: true })
+				window.app.hideStatusBar()
+			}
 		} catch (error) {
 			throw new ThrowCrash(error.message, error.description)
 		}
 	}
 
 	__SessionInit = async () => {
-		if (typeof Session.token === "undefined") {
+		const token = await Session.token
+		
+		if (typeof token === "undefined") {
 			window.app.eventBus.emit("forceToLogin")
 		} else {
 			this.session = await this.sessionController.getTokenInfo().catch((error) => {
@@ -288,7 +310,7 @@ class App {
 		}
 
 		try {
-			this.user = await User.data
+			this.user = await User.data()
 			this.setState({ user: this.user })
 		} catch (error) {
 			console.error(error)
@@ -297,10 +319,6 @@ class App {
 	}
 
 	render() {
-		if (!this.state.initialized) {
-			return null
-		}
-
 		if (this.state.crash) {
 			return <div className="app_crash">
 				<div className="header">
@@ -313,6 +331,10 @@ class App {
 					<antd.Button onClick={() => window.location.reload()}>Reload</antd.Button>
 				</div>
 			</div>
+		}
+
+		if (!this.state.initialized) {
+			return null
 		}
 
 		return (

@@ -1,8 +1,19 @@
 import React from "react"
 import * as antd from "antd"
 import { Sessions } from "components"
+import { Session } from "models"
 
 export default class SessionsView extends React.Component {
+	state = {
+		currentSessionUUID: null,
+	}
+
+	componentDidMount = async () => {
+		const currentSession = await Session.decodedToken()
+
+		this.setState({ currentSessionUUID: currentSession?.uuid })
+	}
+
 	signOutAll = () => {
 		antd.Modal.warning({
 			title: "Caution",
@@ -20,7 +31,7 @@ export default class SessionsView extends React.Component {
 	}
 
 	render() {
-		const { sessions, decodedToken } = this.props
+		const { sessions } = this.props
 
 		if (!sessions) {
 			return <antd.Skeleton active />
@@ -28,7 +39,7 @@ export default class SessionsView extends React.Component {
 
 		return (
 			<div className="session_wrapper">
-				<Sessions current={decodedToken?.uuid} sessions={this.props.sessions} />
+				<Sessions current={this.state.currentSessionUUID} sessions={this.props.sessions} />
 				{sessions && (
 					<antd.Button onClick={this.signOutAll} type="danger">
 						Destroy all sessions

@@ -5,8 +5,8 @@ export default class User {
         return window.app?.request
     }
 
-    static get data() {
-        const token = Session.decodedToken
+    static async data() {
+        const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
@@ -15,8 +15,8 @@ export default class User {
         return User.bridge.get.user(undefined, { username: token.username, _id: token.user_id })
     }
 
-    static get roles() {
-        const token = Session.decodedToken
+    static async roles() {
+        const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
@@ -26,7 +26,7 @@ export default class User {
     }
 
     getAssignedWorkloads = async () => {
-        const token = Session.decodedToken
+        const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
@@ -48,7 +48,7 @@ export default class User {
     }
 
     hasAdmin = async () => {
-        const roles = await User.roles
+        const roles = await User.roles()
 
         if (!roles) {
             return false
