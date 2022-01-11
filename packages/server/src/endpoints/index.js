@@ -13,7 +13,7 @@ module.exports = [
     },
     {
         route: "/role",
-        method: 'DELETE',
+        method: "DELETE",
         middleware: ["withAuthentication", "roles"],
         fn: "UserController.denyRole"
     },
@@ -24,13 +24,13 @@ module.exports = [
     },
     {
         route: "/session",
-        method: 'DELETE',
+        method: "DELETE",
         middleware: "withAuthentication",
         fn: "SessionController.delete",
     },
     {
         route: "/sessions",
-        method: 'DELETE',
+        method: "DELETE",
         middleware: "withAuthentication",
         fn: "SessionController.deleteAll",
     },
