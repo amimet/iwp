@@ -31,7 +31,7 @@ export default (req, res, next) => {
             req.user = user
             req.jwtToken = token
             req.decodedToken = decodedToken
-
+            
             return next()
         })(req, res, next)
     } else {

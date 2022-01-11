@@ -2,19 +2,19 @@ module.exports = [
     {
         route: "/regenerate",
         method: "POST",
-        middleware: ["ensureAuthenticated", "useJwtStrategy"],
+        middleware: ["withAuthentication", "useJwtStrategy"],
         fn: "SessionController.regenerate"
     },
     {
         route: "/role",
         method: 'PUT',
-        middleware: ["ensureAuthenticated", "roles"],
+        middleware: ["withAuthentication", "roles"],
         fn: "UserController.grantRole"
     },
     {
         route: "/role",
         method: 'DELETE',
-        middleware: ["ensureAuthenticated", "roles"],
+        middleware: ["withAuthentication", "roles"],
         fn: "UserController.denyRole"
     },
     {
@@ -25,13 +25,13 @@ module.exports = [
     {
         route: "/session",
         method: 'DELETE',
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "SessionController.delete",
     },
     {
         route: "/sessions",
         method: 'DELETE',
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "SessionController.deleteAll",
     },
     {
@@ -43,99 +43,99 @@ module.exports = [
     {
         route: "/sessions",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "SessionController.get",
     },
     // FABRIC
     {
         route: "/fabric",
         method: "PUT",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "FabricController.create",
     },
     {
         route: "/fabric",
         method: "POST",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "FabricController.update",
     },
     {
         route: "/fabric",
         method: "GET",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "FabricController.get",
     },
     {
         route: "/fabric_by_id",
         method: "GET",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "FabricController.getById",
     },
     {
         route: "/fabric",
         method: "DELETE",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "FabricController.delete",
     },
     {
         route: "/fabric_import",
         method: "PUT",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "FabricController.import",
     },
     // WORKLOADS
     {
         route: "/regenerates_uuid",
         method: "POST",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "WorkloadController.regeneratesUUID",
     },
     {
         route: "/assigned_workloads",
         method: "GET",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "WorkloadController.getWorkloadAssignedToUserID",
     },
     {
         route: "/workload_operators",
         method: "PUT",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "WorkloadController.appendOperators",
     },
     {
         route: "/workload_operators",
         method: "DELETE",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "WorkloadController.removeOperators",
     },
     {
         route: "/update_workload",
         method: "PUT",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "WorkloadController.update",
     },
     {
         route: "/workloads",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "WorkloadController.getAll",
     },
     {
         route: "/workload",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "WorkloadController.get",
     },
     {
         route: "/workload",
         method: "PUT",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "WorkloadController.set",
     },
     {
         route: "/workload",
         method: "DELETE",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "WorkloadController.delete",
     },
     {
@@ -151,45 +151,45 @@ module.exports = [
     {
         route: "/region",
         method: "PUT",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "RegionController.new",
     },
     {
         route: "/has_permissions",
         method: "POST",
         middleware: [
-            "ensureAuthenticated",
+            "withAuthentication",
             "hasPermissions"
         ]
     },
     {
         route: "/self",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "UserController.getSelf",
     },
     {
         route: "/users",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "UserController.get",
     },
     {
         route: "/user",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "UserController.getOne",
     },
     {
         route: "/self_user",
         method: "PUT",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "UserController.updateSelf",
     },
     {
         route: "/user",
         method: "PUT",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "UserController.update",
     },
     {
@@ -200,7 +200,7 @@ module.exports = [
     {
         route: "/logout",
         method: "POST",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "UserController.logout",
     },
     {
@@ -211,43 +211,43 @@ module.exports = [
     {
         route: "/is_auth",
         method: "POST",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "UserController.isAuth",
     },
     {
         route: "/workshifts",
         method: "GET",
-        middleware: "ensureAuthenticated",
+        middleware: "withAuthentication",
         fn: "WorkshiftsController.get",
     },
     {
         route: "/workshift",
         method: "PUT",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "WorkshiftsController.set",
     },
     {
         route: "/workshift",
         method: "DELETE",
-        middleware: ["ensureAuthenticated", "privileged"],
+        middleware: ["withAuthentication", "privileged"],
         fn: "WorkshiftsController.del",
     },
     {
         route: "/reports",
         method: "GET",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "ReportsController.get"
     },
     {
         route: "/report",
         method: "PUT",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "ReportsController.new"
     },
     {
         route: "/report",
         method: "delete",
-        middleware: ["ensureAuthenticated"],
+        middleware: ["withAuthentication"],
         fn: "ReportsController.delete"
     },
 ]
