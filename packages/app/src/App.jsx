@@ -64,6 +64,9 @@ class App {
 
 		this.eventBus = this.contexts.main.eventBus
 
+		// Only supports once loading
+		this.loadingMessage = false
+
 		this.eventBus.on("app_loading", async () => {
 			await this.setState({ initialized: false })
 			this.eventBus.emit("splash_show")
@@ -126,6 +129,19 @@ class App {
 
 			this.setState({ crash: { message, error } })
 			this.contexts.app.SoundEngine.play("crash")
+		})
+
+		this.eventBus.on("websocket_disconnected", () => {
+			this.loadingMessage = antd.message.loading("Trying to reconnect...", 0)
+		})
+
+		this.eventBus.on("websocket_connected", () => {
+			if (typeof this.loadingMessage === "function") {
+				setTimeout(() => {
+					this.loadingMessage()
+					antd.message.success("Reconnected")
+				}, 500)
+			}
 		})
 
 		this.isAppCapacitor = () => navigator.userAgent === "capacitor"
@@ -273,7 +289,7 @@ class App {
 				window.addEventListener("statusTap", () => {
 					this.eventBus.emit("statusTap")
 				})
-	
+
 				StatusBar.setOverlaysWebView({ overlay: true })
 				window.app.hideStatusBar()
 			}
@@ -284,7 +300,7 @@ class App {
 
 	__SessionInit = async () => {
 		const token = await Session.token
-		
+
 		if (typeof token === "undefined") {
 			window.app.eventBus.emit("forceToLogin")
 		} else {
