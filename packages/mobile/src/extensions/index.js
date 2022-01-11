@@ -1,5 +1,4 @@
 export * as Render from './render'
-export * as Splash from './splash'
 export * as Sound from './sound'
 export * as Theme from './theme'
 export { default as API } from './api'
