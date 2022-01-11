@@ -57,6 +57,7 @@ export default {
     },
     validate: async (req, res) => {
         const token = req.body.session
+        
         let result = {
             expired: false,
             valid: true

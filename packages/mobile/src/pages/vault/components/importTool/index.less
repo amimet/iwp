@@ -1,0 +1,146 @@
+.import_data {
+	> div {
+		margin-bottom: 30px;
+	}
+
+	margin-bottom: 80px;
+
+	.conflicts {
+		.conflict  {
+			.header {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				> div {
+					margin-bottom: 10px;
+				}
+			}
+
+			.diff {
+				display: grid;
+				grid-template-columns: 1fr 0.1fr 1fr; 
+				grid-template-rows: 1fr; 
+				gap: 0px 20px; 
+				grid-template-areas: ". . ."; 
+
+				h3 {
+					text-align: center;
+				}
+
+				.property {
+					font-family: "Roboto Mono", monospace;
+					
+					.key {
+						font-weight: bold;
+						font-size: 15px;
+					}
+					.value {
+						padding: 4px 15px;
+						background-color: var(--background-color-accent);
+						border-radius: 2px;
+					}
+				}
+
+				.toIcon {
+					display: flex;
+					height: 100%;
+					align-items: center;
+					svg {
+						font-size: 30px;
+					}
+				}
+
+				.state {
+					.data {
+						padding: 10px;
+
+						> div {
+							margin-bottom: 4px;
+						}
+					}
+
+					&.existing {
+						//background-color: rebeccapurple;
+					}
+					&.new {
+						//background-color: aquamarine;
+					}
+				}
+			}
+		}
+	}
+
+	.changes {
+		> div {
+			font-family: "Roboto Mono", monospace;
+		}
+
+		.change {
+			display: flex;
+			flex-direction: row;
+
+			&.creation {
+				.content {
+					background-color: rgba(70, 149, 74, 0.15);
+				}
+
+				.indicator {
+					background-color: rgba(87, 171, 90, 0.3);
+				}
+			}
+
+			&.modification {
+				.content {
+					background-color: rgba(24, 144, 255, 0.15);
+				}
+				.indicator {
+					background-color: rgba(24, 143, 255, 0.3);
+				}
+			}
+
+			.indicator {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+
+				width: 40px;
+				padding: 0 6px;
+
+				svg {
+					margin: 0 !important;
+					color: var(--background-color-contrast);
+				}
+			}
+
+			.content {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+
+				width: 100%;
+				padding: 0 20px;
+
+				> div {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+
+	.actions {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		padding: 20px;
+		backdrop-filter: blur(10px);
+
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+	}
+}

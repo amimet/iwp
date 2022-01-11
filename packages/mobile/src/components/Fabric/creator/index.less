@@ -1,0 +1,151 @@
+.fabric_creator {
+	&.mobile {
+		.fields {
+			.field {
+				border: 0;
+
+				.close {
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	.name {
+		display: flex;
+		align-items: center;
+		font-size: 45px;
+
+		height: fit-content;
+		line-height: 0;
+
+		input {
+			color: unset;
+			line-height: 0;
+			font-size: 45px;
+			height: fit-content;
+			transition: all 0.2s ease-in-out;
+			border: 0;
+		}
+
+		input:focus {
+			color: #5e5e5e;
+		}
+
+		svg {
+			margin: 0 !important;
+			padding-right: 0 !important;
+		}
+
+		.type {
+			border-radius: 10px;
+			height: fit-content;
+			padding: 10px;
+			cursor: pointer;
+		}
+
+		.type:hover {
+			background-color: antiquewhite;
+		}
+
+		margin-bottom: 20px;
+	}
+
+	.fields {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+
+		width: 100%;
+
+		.field {
+			display: flex;
+			padding: 10px;
+
+			width: 100%;
+			height: fit-content;
+			
+			border: transparent dashed 1px;
+			border-radius: 4px;
+
+			transition: all 150ms ease-out;
+
+			.content {
+				position: relative;
+				width: 100%;
+				
+				display: inline-flex;
+				flex-direction: column;
+				
+				margin: 0 10px;
+
+				.component {
+					padding-left: 15px;
+
+					> div {
+						min-width: 200px;
+					}
+				}
+			}
+
+			.close {
+				cursor: pointer;
+
+				position: relative;
+				width: 30px;
+
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				background-color: #fc0000ab;
+				opacity: 0;
+				transition: all 150ms ease-out;
+				
+				border-radius: 4px;
+
+				svg {
+					color: var(--background-color-primary);
+					margin: 0!important;
+				}
+			}
+		}
+
+		.field:hover {
+			border-color: #8d8d8dc4;
+
+			.close {
+				opacity: 1;
+			}
+		}
+	}
+
+	.bottom_actions {
+		position: sticky;
+		
+		bottom: 0;
+		left: 0;
+
+		display: inline-flex;
+		justify-content: space-around;
+		align-items: center;
+
+		padding: 10px;
+		margin-top: 20px;
+		width: 100%;
+
+		font-size: 25px;
+
+		svg {
+			margin: 0!important;
+		}
+	}
+
+	.error {
+		color: red;
+		font-size: 12px;
+		margin-top: 5px;
+		transition: all 150ms ease-out;
+	}
+}

@@ -1,0 +1,102 @@
+.workload_creator {
+	.ant-steps-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+		height: 100%;
+
+		svg {
+			margin: 0;
+		}
+	}
+
+	.steps {
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+
+		.header {
+			//position: fixed;
+			width: fit-content;
+			height: fit-content;
+			flex-direction: column;
+		}
+
+		.ant-select{
+			width: 100%;
+		}
+
+		.step {
+			padding: 0 10px;
+			display: inline-flex;
+			flex-direction: column;
+	
+			width: 100%;
+			height: 100%;
+	
+			align-items: flex-start;
+			
+			h1 {
+				margin: 0;
+			}
+
+			.body {
+				padding: 10px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+
+				width: 100%;
+
+				.ant-list {
+					width: 100%;
+				}
+			}
+
+			.actions {
+				display: inline-flex;
+				flex-direction: row;
+				
+				align-items: center;
+				justify-content: center;
+
+				> div {
+					margin-right: 10px;
+				}
+			}
+		}
+	}
+
+	.workshift {
+		align-items: center;
+		justify-content: space-between;
+
+		display: grid;
+
+		grid-template-columns: 1fr 3fr;
+		grid-template-rows: 1fr;
+		gap: 0px 20px;
+		grid-template-areas: ". .";
+
+		.ant-select {
+			width: fit-content;
+		}
+
+		> div {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.info {
+			> div {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 10px;
+			}
+		}
+	}
+}
