@@ -53,8 +53,8 @@ export default class OperatorsAssignments extends React.Component {
 
                     await this.setState({ assigned })
 
-                    if (typeof this.props.onAssignOperators === "function") {
-                        await this.props.onAssignOperators(data)
+                    if (typeof this.props.onAssignOperator === "function") {
+                        await this.props.onAssignOperator(data)
                     }
 
                     await this.fetchOperatorsData()
