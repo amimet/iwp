@@ -13,6 +13,7 @@ export { default as OperatorsAssignments } from "./OperatorsAssignments"
 export { default as AssignedWorkload } from "./AssignedWorkload"
 export { default as Clock } from "./Clock"
 export { default as ScheduledProgress } from "./ScheduledProgress"
+export { default as DraggableDrawer } from "./DraggableDrawer"
 
 export * as Workload from "./Workload"
 export * as Fabric from "./Fabric"
