@@ -1,9 +1,6 @@
 import React from "react"
-import * as antd from "antd"
-import classnames from "classnames"
+import { DraggableDrawer } from "components"
 import EventEmitter from "@foxify/events"
-import { Icons } from "components/Icons"
-import DragDrawer from "react-drag-drawer"
 
 import "./index.less"
 
@@ -180,11 +177,8 @@ export class Drawer extends React.Component {
 			handleFail: this.handleFail,
 		}
 
-		return (
-			<DragDrawer
-				{...drawerProps}
-			>
-				{React.createElement(this.props.children, componentProps)}
-			</DragDrawer>)
+		return <DraggableDrawer {...drawerProps}>
+			{React.createElement(this.props.children, componentProps)}
+		</DraggableDrawer>
 	}
 }
