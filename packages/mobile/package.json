@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
+    "@corenode/utils": "^0.28.26",
     "@capacitor/status-bar": "^1.0.6",
     "@capacitor/storage": "^1.2.3",
     "@foxify/events": "^2.0.1",
@@ -25,7 +26,6 @@
     "feather-reactjs": "^2.0.13",
     "fuse.js": "^6.4.6",
     "history": "^5.0.1",
-    "howler": "^2.2.3",
     "i18next": "^20.3.5",
     "js-cookie": "^2.2.1",
     "jwt-decode": "^3.1.2",
@@ -39,7 +39,6 @@
     "react-chartjs-2": "^3.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^17.0.2",
-    "react-drag-drawer": "^3.3.4",
     "react-draggable": "^4.4.3",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.11.4",
