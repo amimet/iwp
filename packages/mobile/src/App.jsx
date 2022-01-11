@@ -14,11 +14,10 @@ import React from "react"
 import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-
 import { StatusBar, Style } from '@capacitor/status-bar'
 
 import { Session, User, SidebarController, SettingsController } from "models"
-import { API, Render, Theme, Sound } from "extensions"
+import { API, Render, Theme } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Settings, Workload, Fabric, } from "components"
@@ -111,7 +110,6 @@ class App {
 			console.error(`[Crash] ${message}\n`, error)
 
 			this.setState({ crash: { message, error } })
-			this.contexts.app.SoundEngine.play("crash")
 		})
 
 		this.eventBus.on("websocket_disconnected", () => {
@@ -333,7 +331,14 @@ class App {
 		}
 
 		if (!this.state.initialized) {
-			return null
+			return <div className="app_initialization">
+				<div>
+					<img src={config.logo.alt} />
+				</div>
+				<div>
+					<antd.Spin size="large" />
+				</div>
+			</div>
 		}
 
 		return (
@@ -357,5 +362,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, Theme.extension, API],
+	extensions: [Render.extension, Theme.extension, API],
 })
