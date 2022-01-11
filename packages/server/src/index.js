@@ -139,6 +139,10 @@ class Server {
         }))
 
         passport.use(new JwtStrategy(this.options.jwtStrategy, (token, callback) => {
+            if (!token) {
+                return callback("Invalid or missing token")
+            }
+            
             User.findOne({ _id: token.user_id })
                 .then((data) => {
                     if (data === null) {
@@ -148,7 +152,7 @@ class Server {
                     }
                 })
                 .catch((err) => {
-                    return callback(err, null)
+                    return callback(err.message, null)
                 })
         }))
 

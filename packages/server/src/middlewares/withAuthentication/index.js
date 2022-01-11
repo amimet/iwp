@@ -1,20 +1,20 @@
-import passport from 'passport'
-import { Session } from '../../models'
+import passport from "passport"
+import { Session } from "../../models"
 
 export default (req, res, next) => {
     function unauthorized() {
         console.log("Returning failed session")
-        return res.status(401).send({ error: 'Invalid session', })
+        return res.status(401).send({ error: "Invalid session" })
     }
 
-    const authHeader = req.headers?.authorization?.split(' ')
+    const authHeader = req.headers?.authorization?.split(" ")
 
-    if (authHeader && authHeader[0] === 'Bearer') {
+    if (authHeader && authHeader[0] === "Bearer") {
         const token = authHeader[1]
 
-        passport.authenticate('jwt', { session: false }, async (err, user, decodedToken) => {
+        passport.authenticate("jwt", { session: false }, async (err, user, decodedToken) => {
             if (err) {
-                return res.status(500).send({ error: err.message })
+                return res.status(401).send({ error: err })
             }
 
             if (!user) {
@@ -31,6 +31,9 @@ export default (req, res, next) => {
             req.user = user
             req.jwtToken = token
             req.decodedToken = decodedToken
+            
+            // try to regenerate jwt token if expired
+
             
             return next()
         })(req, res, next)
