@@ -18,25 +18,6 @@
         "title_i18n": "settings_general_language"
     },
     {
-        "id": "edit_sidebar",
-        "group": "sidebar",
-        "type": "Button",
-        "icon": "Edit",
-        "title": "Edit Sidebar",
-        "title_i18n": "settings_sidebar_edit",
-        "emitEvent": "edit_sidebar",
-        "noStorage": true
-    },
-    {
-        "id": "collapseOnLooseFocus",
-        "group": "sidebar",
-        "type": "Switch",
-        "title": "Auto Collapse",
-        "description": "Collapse the sidebar when loose focus",
-        "title_i18n": "settings_sidebar_autoCollapse",
-        "description_i18n": "settings_sidebar_autoCollapse_description"
-    },
-    {
         "id": "reduceAnimations",
         "group": "aspect",
         "type": "Switch",
