@@ -6,7 +6,7 @@
     "dev": "vite",
     "dev:ssr": "vite-ssr",
     "dev:evite": "evite dev",
-    "build": "cross-env NODE_ENV=production vite build && capacitor sync",
+    "build": "cross-env NODE_ENV=production vite build",
     "build:ssr": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
     "preview": "vite preview",
     "capacitor": "capacitor"
