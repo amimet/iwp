@@ -44,11 +44,6 @@ export default class Home extends React.Component {
     }
 
     render() {
-        if (!window.isMobile) {
-            window.app.setLocation("/main")
-            return null
-        }
-
         return <div>
             <div className="buttons_menu">
                 {

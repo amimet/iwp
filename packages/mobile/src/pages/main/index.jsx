@@ -1,11 +1,10 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { AppSearcher, ServerStatus, Clock, AssignedWorkload } from "components"
+import { Clock, AssignedWorkload } from "components"
 
 import "./index.less"
 
-// TODO: Customizable main menu
 export default class Main extends React.Component {
 	state = {
 		assignedWorkloads: null,
@@ -15,15 +14,6 @@ export default class Main extends React.Component {
 
 	componentDidMount() {
 		this.fetchAssignedWorkloads()
-		if (!window.isMobile && window.app?.HeaderController?.isVisible()) {
-			window.app.HeaderController.toogleVisible(false)
-		}
-	}
-
-	componentWillUnmount() {
-		if (!window.isMobile && !window.app?.HeaderController?.isVisible()) {
-			window.app.HeaderController.toogleVisible(true)
-		}
 	}
 
 	fetchAssignedWorkloads = async () => {
@@ -74,25 +64,10 @@ export default class Main extends React.Component {
 							<div>
 								<h1>Welcome back, {user.fullName ?? user.username ?? "Guest"}</h1>
 							</div>
-							{!window.isMobile && <div>
-								<ServerStatus />
-							</div>}
+						
 						</div>
 					</div>
-					{!window.isMobile && <div>
-						<AppSearcher />
-					</div>}
 				</div>
-				{!window.isMobile && <div className="content">
-					<h2><Icons.Sliders /> Quick actions</h2>
-					<div className="quick_actions">
-						<div>
-							<antd.Button type="primary" onClick={() => window.app.openFabric()}>
-								Create
-							</antd.Button>
-						</div>
-					</div>
-				</div>}
 				<div className="assigned">
 					<h2><Icons.MdPendingActions /> Assigned for you</h2>
 					<div>

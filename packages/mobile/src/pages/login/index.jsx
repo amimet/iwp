@@ -105,21 +105,6 @@ export default class Login extends React.Component {
         }
     }
 
-    componentWillUnmount() {
-        window.app.SidebarController.toogleVisible(true)
-        window.app.HeaderController.toogleVisible(true)
-    }
-
-    componentDidMount() {
-        if (window.app.SidebarController.isVisible()) {
-            window.app.SidebarController.toogleVisible(false)
-        }
-
-        if (window.app.HeaderController.isVisible()) {
-            window.app.HeaderController.toogleVisible(false)
-        }
-    }
-
     render() {
         return (
             <div className="app_login">

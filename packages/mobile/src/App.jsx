@@ -18,7 +18,7 @@ import * as antd from "antd"
 import { StatusBar, Style } from '@capacitor/status-bar'
 
 import { Session, User, SidebarController, SettingsController } from "models"
-import { API, Render, Splash, Theme, Sound } from "extensions"
+import { API, Render, Theme, Sound } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Settings, Workload, Fabric, } from "components"
@@ -26,20 +26,6 @@ import Layout from "./layout"
 import { Icons } from "components/Icons"
 
 import "theme/index.less"
-
-const SplashExtension = Splash.extension({
-	logo: config.logo.alt,
-	preset: "fadeOut",
-	velocity: 1000,
-	props: {
-		logo: {
-			style: {
-				marginBottom: "10%",
-				stroke: "black",
-			},
-		},
-	},
-})
 
 class ThrowCrash {
 	constructor(message, description) {
@@ -69,12 +55,10 @@ class App {
 
 		this.eventBus.on("app_loading", async () => {
 			await this.setState({ initialized: false })
-			this.eventBus.emit("splash_show")
 		})
 
 		this.eventBus.on("app_ready", async () => {
 			await this.setState({ initialized: true })
-			this.eventBus.emit("splash_close")
 		})
 
 		this.eventBus.on("reinitializeSession", async () => {
@@ -125,7 +109,6 @@ class App {
 
 		this.eventBus.on("crash", (message, error) => {
 			console.error(`[Crash] ${message}\n`, error)
-			this.eventBus.emit("splash_close")
 
 			this.setState({ crash: { message, error } })
 			this.contexts.app.SoundEngine.play("crash")
@@ -249,7 +232,7 @@ class App {
 			return <RenderError {...props} />
 		},
 		initialization: () => {
-			return <Splash.SplashComponent logo={config.logo.alt} />
+			return <div>Initializing...</div>
 		}
 	}
 
@@ -374,5 +357,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
+	extensions: [Sound.extension, Render.extension, Theme.extension, API],
 })
