@@ -39,11 +39,18 @@ export default {
 
         if (workload) {
             if (Array.isArray(req.selection.operators) && Array.isArray(workload.assigned)) {
-                req.selection.operators.forEach(operator => {
+                for await (const operator of req.selection.operators) {
                     if (!workload.assigned.includes(operator)) {
                         workload.assigned.push(operator)
+
+                        // send update with WS
+                        const userSocket = req.getClientSocket(operator)
+
+                        if (userSocket) {
+                            userSocket.socket.emit("workloadAssigned", workload._id)
+                        }
                     }
-                })
+                }
             } else {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
             }
@@ -61,11 +68,18 @@ export default {
 
         if (workload) {
             if (Array.isArray(req.selection.operators) && Array.isArray(workload.assigned)) {
-                req.selection.operators.forEach(operator => {
+                for await (const operator of req.selection.operators) {
                     if (workload.assigned.includes(operator)) {
                         workload.assigned.splice(workload.assigned.indexOf(operator), 1)
                     }
-                })
+
+                    // send update with WS
+                    const userSocket = req.getClientSocket(operator)
+
+                    if (userSocket) {
+                        userSocket.socket.emit("workloadUnassigned", workload._id)
+                    }
+                }
             } else {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
             }
@@ -106,11 +120,11 @@ export default {
         })
 
         const result = await Workload.create(obj)
-        
+
         if (result) {
             req.io.emit("newWorkload", result)
         }
-        
+
         return res.json(result)
     }),
     delete: Schematized({
