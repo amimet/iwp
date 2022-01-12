@@ -90,31 +90,23 @@
 }
 
 .selectableList_bottomActions {
-	width: fit-content;
+	width: 100%;
 	display: inline-flex;
 
 	align-items: center;
 	justify-content: center;
 
-	padding: 12px;
+	padding: 0;
 
-	border: 1px solid #e0e0e0;
+	border: none;
 	border-radius: 8px;
 
-	background-color: #0c0c0c15;
-	backdrop-filter: blur(10px);
+	background-color: transparent;
+	backdrop-filter: none;
 
 	transition: all 200ms ease-in-out;
 
 	> div {
 		margin: 0 5px;
-	}
-
-	&.mobile {
-		background-color: transparent;
-		backdrop-filter: none;
-		width: 100%;
-		padding: 0;
-		border: none;
 	}
 }

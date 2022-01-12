@@ -30,6 +30,7 @@ export default class SelectableList extends React.Component {
 		this.setState({
 			selectedKeys: [],
 		})
+		window.app.BottomBarController.clear()
 	}
 
 	selectKey = (key) => {
@@ -115,7 +116,7 @@ export default class SelectableList extends React.Component {
 			return null
 		}
 
-		return <div className={classnames("selectableList_bottomActions", { ["mobile"]: window.isMobile && !this.props.ignoreMobileActions })}>
+		return <div className={classnames("selectableList_bottomActions")}>
 			<div key="discard">
 				<Button
 					shape="round"
@@ -210,13 +211,9 @@ export default class SelectableList extends React.Component {
 		}
 
 		if (this.state.selectedKeys.length === 0) {
-			if (window.isMobile && !this.props.ignoreMobileActions) {
-				window.app.BottomBarController.clear()
-			}
+			window.app.BottomBarController.clear()
 		} else {
-			if (window.isMobile && !this.props.ignoreMobileActions) {
-				window.app.BottomBarController.render(this.renderActions())
-			}
+			window.app.BottomBarController.render(this.renderActions())
 		}
 
 		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
@@ -225,9 +222,6 @@ export default class SelectableList extends React.Component {
 				dataSource={this.props.items}
 				renderItem={this.renderItem}
 			/>
-			<div className="selectableList_bottomActions_wrapper">
-				{this.props.ignoreMobileActions && this.renderActions()}
-			</div>
 		</div>
 	}
 }
