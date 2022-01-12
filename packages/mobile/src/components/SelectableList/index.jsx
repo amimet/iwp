@@ -211,9 +211,13 @@ export default class SelectableList extends React.Component {
 		}
 
 		if (this.state.selectedKeys.length === 0) {
-			window.app.BottomBarController.clear()
+			if (!this.props.ignoreMobileActions) {
+				window.app.BottomBarController.clear()
+			}
 		} else {
-			window.app.BottomBarController.render(this.renderActions())
+			if (!this.props.ignoreMobileActions) {
+				window.app.BottomBarController.render(this.renderActions())
+			}
 		}
 
 		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
@@ -222,6 +226,9 @@ export default class SelectableList extends React.Component {
 				dataSource={this.props.items}
 				renderItem={this.renderItem}
 			/>
+			<div className="selectableList_bottomActions_wrapper">
+				{this.props.ignoreMobileActions && this.renderActions()}
+			</div>
 		</div>
 	}
 }
