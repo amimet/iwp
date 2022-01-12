@@ -2,8 +2,9 @@ import LinebridgeServer from 'linebridge/server'
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
 import passport from 'passport'
-import { User } from './models'
+import { User, Session } from './models'
 import socketIo from 'socket.io'
+import jwt from 'jsonwebtoken'
 
 const b64Decode = global.b64Decode = (data) => {
     return Buffer.from(data, 'base64').toString('utf-8')
@@ -17,6 +18,11 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
+
+function parseConnectionString(obj) {
+    const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
+    return `${db_driver}://${db_user}:${db_pwd}@${db_hostname}:${db_port}/${db_name}`
+}
 
 class Server {
     constructor() {
@@ -48,39 +54,24 @@ class Server {
             }
         }
 
+        this.WSClients = []
+
         this.initialize()
     }
 
     async initialize() {
         await this.connectToDB()
         await this.initPassport()
-
-        this.instance.middlewares["useJwtStrategy"] = (req, res, next) => {
-            req.jwtStrategy = this.options.jwtStrategy
-            next()
-        }
-        this.instance.middlewares["useWS"] = (req, res, next) => {
-            req.io = this.io
-            next()
-        }
-
-        this.io.on("connection", (socket) => {
-            console.log(socket.id)
-        })
+        await this.initWebsockets()
 
         await this.instance.init()
-    }
-
-    getDBConnectionString() {
-        const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = _env
-        return `${db_driver}://${db_user}:${db_pwd}@${db_hostname}:${db_port}/${db_name}`
     }
 
     connectToDB = () => {
         return new Promise((resolve, reject) => {
             try {
                 console.log("🌐 Trying to connect to DB...")
-                mongoose.connect(this.getDBConnectionString(), { useNewUrlParser: true, useFindAndModify: false })
+                mongoose.connect(parseConnectionString(this.env), { useNewUrlParser: true, useFindAndModify: false })
                     .then((res) => { return resolve(true) })
                     .catch((err) => { return reject(err) })
             } catch (err) {
@@ -98,6 +89,11 @@ class Server {
     }
 
     initPassport() {
+        this.instance.middlewares["useJwtStrategy"] = (req, res, next) => {
+            req.jwtStrategy = this.options.jwtStrategy
+            next()
+        }
+
         passport.use(new LocalStrategy({
             usernameField: "username",
             passwordField: "password",
@@ -121,7 +117,7 @@ class Server {
             if (!token) {
                 return callback("Invalid or missing token")
             }
-            
+
             User.findOne({ _id: token.user_id })
                 .then((data) => {
                     if (data === null) {
@@ -136,6 +132,89 @@ class Server {
         }))
 
         this.server.use(passport.initialize())
+    }
+
+    initWebsockets() {
+        this.instance.middlewares["useWS"] = (req, res, next) => {
+            req.io = this.io
+            req.getClientSocket = (userId) => {
+                return this.WSClients.find(c => c.userId === userId)
+            }
+            next()
+        }
+
+        this.io.on("connection", async (socket) => {
+            console.log(`[${socket.id}] connected`)
+
+            const onAuthenticated = (user_id) => {
+                this.attachClientSocket(socket, user_id)
+                socket.emit("authenticated")
+            }
+
+            const onAuthenticatedFailed = (error) => {
+                this.detachClientSocket(socket)
+                socket.emit("authenticateFailed", {
+                    error,
+                })
+            }
+
+            socket.on("authenticate", async (token) => {
+                const session = await Session.findOne({ token }).catch(err => {
+                    return false
+                })
+
+                if (!session) {
+                    return onAuthenticatedFailed("Session not found")
+                }
+
+                this.verifyJwt(token, (err, decoded) => {
+                    if (err) {
+                        return onAuthenticatedFailed(err)
+                    } else {
+                        return onAuthenticated(decoded.user_id)
+                    }
+                })
+            })
+
+            socket.on("disconnect", () => {
+                console.log(`[${socket.id}] disconnected`)
+                this.detachClientSocket(socket)
+            })
+        })
+    }
+
+    attachClientSocket = async (client, userId) => {
+        const socket = this.WSClients.find(c => c.id === client.id)
+
+        if (socket) {
+            socket.socket.disconnect()
+        }
+
+        this.WSClients.push({
+            id: client.id,
+            socket: client,
+            userId,
+        })
+    }
+
+    detachClientSocket = async (client) => {
+        const socket = this.WSClients.find(c => c.id === client.id)
+
+        if (socket) {
+            socket.socket.disconnect()
+            this.WSClients = this.WSClients.filter(c => c.id !== client.id)
+
+        }
+    }
+
+    verifyJwt = (token, callback) => {
+        jwt.verify(token, this.options.jwtStrategy.secretOrKey, async (err, decoded) => {
+            if (err) {
+                return callback(err)
+            }
+
+            return callback(null, decoded)
+        })
     }
 }
 
