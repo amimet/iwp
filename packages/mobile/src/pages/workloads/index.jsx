@@ -48,6 +48,10 @@ export default class Workloads extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
+		window.app.handleWSListener("newWorkload", (data) => {
+			this.appendWorkloadToRender(data)
+		})
+
 		this.loadRegions()
 		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
 	}
@@ -127,7 +131,10 @@ export default class Workloads extends React.Component {
 				width: "55%",
 			},
 			onDone: (drawer, payload) => {
-				this.changeRegion(payload.region)
+				console.log(payload)
+				if (this.state.selectedRegion !== payload.region) {
+					this.changeRegion(payload.region)
+				}
 			}
 		})
 	}
