@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { createIconRender } from "components/Icons"
+import classnames from "classnames"
 
 import "./index.less"
 
@@ -43,7 +44,7 @@ export default class BottomBar extends React.Component {
                         {createIconRender("Home")}
                     </div>
                 </div>
-                <div onClick={() => this.onClickItemId("nav")} key="nav" id="nav" className="item">
+                <div onClick={() => this.onClickItemId("nav")} key="nav" id="nav" className={classnames("item", ["primary"])}>
                     <div className="icon">
                         {createIconRender("Navigation")}
                     </div>
