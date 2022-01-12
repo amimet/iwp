@@ -11,45 +11,6 @@
         "icon": "GitCommit"
     },
     {
-        "id": "users",
-        "title": "Users",
-        "icon": "Users",
-        "children": [
-            {
-                "id": "users/contracts",
-                "title": "Contracts",
-                "icon": "Briefcase"
-            },
-            {
-                "id": "users/roles",
-                "title": "Roles",
-                "icon": "Link"
-            },
-            {
-                "id": "users/workshifts",
-                "title": "Workshifts",
-                "icon": "Clock"
-            },
-            {
-                "id": "users/accounts",
-                "title": "Accounts",
-                "icon": "User"          
-            }
-        ]
-    },
-    {
-        "id": "geo",
-        "title": "Geo",
-        "icon": "MapPin",
-        "children": [
-            {
-                "id": "locations",
-                "title": "Locations",
-                "icon": "Map"
-            }
-        ]
-    },
-    {
         "id": "fabric",
         "title": "Fabric",
         "icon": "Box"
@@ -63,16 +24,6 @@
         "id": "reports",
         "title": "Reports",
         "icon": "Umbrella"
-    },
-    {
-        "id": "server_manager",
-        "title": "Server",
-        "icon": "Database"
-    },
-    {
-        "id": "launchpad",
-        "title": "Launchpad",
-        "icon": "Command"
     },
     {
         "id": "statistics",
