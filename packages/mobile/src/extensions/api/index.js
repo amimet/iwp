@@ -6,13 +6,12 @@ import io from "socket.io-client"
 class WSInterface {
     constructor(params = {}) {
         this.params = params
-        this.manager = new io.Manager(this.params.origin)
+        this.manager = new io.Manager(this.params.origin, {
+            autoConnect: true,
+            ...this.params.managerOptions,
+        })
         this.sockets = {}
 
-        this.initialize()
-    }
-
-    initialize = () => {
         this.register("/", "main")
     }
 
@@ -34,9 +33,6 @@ export default {
             mutateContext: {
                 async initializeDefaultBridge() {
                     this.apiBridge = await this.createBridge()
-                    this.WSInterface = new WSInterface({
-                        origin: config.ws.address
-                    })
                     this.WSSockets = this.WSInterface.sockets
 
                     this.WSSockets.main.on("connect", () => {
@@ -109,6 +105,9 @@ export default {
 
                     return bridge
                 },
+                WSInterface: new WSInterface({
+                    origin: config.ws.address,
+                }),
             },
         },
     ],
