@@ -99,13 +99,13 @@ module.exports = [
     {
         route: "/workload_operators",
         method: "PUT",
-        middleware: ["withAuthentication", "privileged"],
+        middleware: ["withAuthentication", "privileged", "useWS"],
         fn: "WorkloadController.appendOperators",
     },
     {
         route: "/workload_operators",
         method: "DELETE",
-        middleware: ["withAuthentication", "privileged"],
+        middleware: ["withAuthentication", "privileged", "useWS"],
         fn: "WorkloadController.removeOperators",
     },
     {
