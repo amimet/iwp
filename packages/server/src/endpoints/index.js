@@ -129,7 +129,7 @@ module.exports = [
     {
         route: "/workload",
         method: "PUT",
-        middleware: "withAuthentication",
+        middleware: ["withAuthentication", "useWS"],
         fn: "WorkloadController.set",
     },
     {

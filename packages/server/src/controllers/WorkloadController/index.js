@@ -106,7 +106,11 @@ export default {
         })
 
         const result = await Workload.create(obj)
-
+        
+        if (result) {
+            req.io.emit("newWorkload", result)
+        }
+        
         return res.json(result)
     }),
     delete: Schematized({
