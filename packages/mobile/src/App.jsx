@@ -16,7 +16,7 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { StatusBar, Style } from "@capacitor/status-bar"
 
-import { Session, User, SidebarController, SettingsController } from "models"
+import { Session, User, SettingsController } from "models"
 import { API, Render, Theme } from "extensions"
 import config from "config"
 
@@ -44,7 +44,6 @@ class App {
 	static initialize() {
 		this.configuration = {
 			settings: new SettingsController(),
-			sidebar: new SidebarController(),
 		}
 
 		this.eventBus = this.contexts.main.eventBus
