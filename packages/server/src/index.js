@@ -36,18 +36,7 @@ class Server {
         })
 
         this.server = this.instance.httpServer
-        this.io = new socketIo.Server(3001, {
-            maxHttpBufferSize: 100000000,
-            connectTimeout: 5000,
-            transports: ['websocket', 'polling'],
-            pingInterval: 25 * 1000,
-            pingTimeout: 5000,
-            allowEIO3: true,
-            cors: {
-                origin: "http://localhost:8000",
-                methods: ["GET", "POST"],
-            }
-        }).of("/main")
+        this.io = new socketIo.Server(3001,)
 
         this.options = {
             jwtStrategy: {
@@ -66,9 +55,12 @@ class Server {
         await this.connectToDB()
         await this.initPassport()
 
-        // register middlewares
         this.instance.middlewares["useJwtStrategy"] = (req, res, next) => {
             req.jwtStrategy = this.options.jwtStrategy
+            next()
+        }
+        this.instance.middlewares["useWS"] = (req, res, next) => {
+            req.io = this.io
             next()
         }
 
@@ -103,19 +95,6 @@ class Server {
                 this.connectToDB()
             }, 1000)
         })
-    }
-
-    setWebsocketRooms = () => {
-        this.ws.register("/test", {
-            onOpen: (socket) => {
-                console.log(socket)
-                setInterval(() => {
-                    socket.send("Hello")
-                }, 1000)
-            }
-        })
-
-        this.ws.listen()
     }
 
     initPassport() {
