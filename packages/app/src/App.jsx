@@ -63,18 +63,17 @@ class App {
 		}
 
 		this.eventBus = this.contexts.main.eventBus
+		this.mainSocket = this.contexts.app.WSInterface.sockets.main
 
 		// Only supports once loading
 		this.loadingMessage = false
 
 		this.eventBus.on("app_loading", async () => {
 			await this.setState({ initialized: false })
-			this.eventBus.emit("splash_show")
 		})
 
 		this.eventBus.on("app_ready", async () => {
 			await this.setState({ initialized: true })
-			this.eventBus.emit("splash_close")
 		})
 
 		this.eventBus.on("reinitializeSession", async () => {
@@ -125,17 +124,26 @@ class App {
 
 		this.eventBus.on("crash", (message, error) => {
 			console.error(`[Crash] ${message}\n`, error)
-			this.eventBus.emit("splash_close")
 
 			this.setState({ crash: { message, error } })
-			this.contexts.app.SoundEngine.play("crash")
 		})
 
 		this.eventBus.on("websocket_disconnected", () => {
 			this.loadingMessage = antd.message.loading("Trying to reconnect...", 0)
 		})
 
-		this.eventBus.on("websocket_connected", () => {
+		this.eventBus.on("websocket_connected", async () => {
+			const token = await Session.token
+
+			this.mainSocket.emit("authenticate", token)
+
+			this.mainSocket.on("authenticated", () => {
+				console.log("[WS] Authenticated")
+			})
+			this.mainSocket.on("authenticatedFailed", (error) => {
+				console.error("[WS] Authenticated Failed", error)
+			})
+
 			if (typeof this.loadingMessage === "function") {
 				setTimeout(() => {
 					this.loadingMessage()
@@ -314,6 +322,7 @@ class App {
 				//console.log(regeneration)
 
 				window.app.eventBus.emit("invalid_session", this.session.error)
+				return false
 			}
 		}
 
