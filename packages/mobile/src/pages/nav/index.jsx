@@ -6,7 +6,6 @@ import "./index.less"
 
 export default class Home extends React.Component {
     onClick = (id) => {
-        return false
         window.app.setLocation(`/${id}`)
     }
 
