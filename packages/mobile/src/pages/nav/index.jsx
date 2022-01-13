@@ -7,6 +7,7 @@ import "./index.less"
 // TODO: Support childrens
 export default class Home extends React.Component {
     onClick = (id) => {
+        return false
         window.app.setLocation(`/${id}`)
     }
 
@@ -44,8 +45,8 @@ export default class Home extends React.Component {
     }
 
     render() {
-        return <div>
-            <div className="buttons_menu">
+        return <div className="navigation">
+            <div className="buttons">
                 {
                     this.generateItems().map((item, index) => {
                         return this.renderItem(item, index)
