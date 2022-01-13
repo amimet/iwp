@@ -3,6 +3,8 @@ import * as antd from "antd"
 
 export default {
     quantity: {
+        mutability: true,
+        mutabilityDefault: true,
         label: "Quantity",
         component: "inputNumber",
         updateEvent: "onChange",

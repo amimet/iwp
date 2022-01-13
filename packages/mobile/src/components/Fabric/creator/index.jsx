@@ -27,7 +27,9 @@ export default class FabricCreator extends React.Component {
         name: null,
         type: null,
         fields: [],
+
         values: {},
+        mutability: {},
     }
 
     api = window.app.request
@@ -54,6 +56,7 @@ export default class FabricCreator extends React.Component {
                 id: field.props.id,
                 type: field.props.type,
                 value: this.state.values[field.key],
+                mutability: this.state.mutability[field.key] ?? false,
             }
         })
     }
@@ -126,6 +129,10 @@ export default class FabricCreator extends React.Component {
 
     onChangeCatalogMode = (to) => {
         this.setState({ submitToCatalog: to.target.checked })
+    }
+    
+    onChangeMutability = (key, to) => {
+        this.setState({ mutability: { ...this.state.mutability, [key]: to ?? !statement } })
     }
 
     //* MAIN METHODS
@@ -242,8 +249,8 @@ export default class FabricCreator extends React.Component {
         this.toogleSubmitting(false)
 
         if (typeof this.props.handleDone === "function") {
-			this.props.handleDone(payload)
-		}
+            this.props.handleDone(payload)
+        }
 
         if (!this.state.error && typeof this.props.close === "function") {
             this.props.close()
@@ -346,10 +353,21 @@ export default class FabricCreator extends React.Component {
 
         return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
             <div className="content">
-                <h3>{field.icon && createIconRender(field.icon)}{field.label}</h3>
+                <div className="header">
+                    <div>
+                        <h3>{field.icon && createIconRender(field.icon)}{field.label}</h3>
+                    </div>
+                    {field.mutability && <div className="option">
+                        <span>Editable</span>
+                        <div>
+                            <antd.Switch onChange={(to) => this.onChangeMutability(field.key, to)} defaultChecked={field.mutabilityDefault} size="small" />
+                        </div>
+                    </div>}
+                </div>
                 <div className="component">
                     <RenderComponent />
                 </div>
+
             </div>
             <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
         </div>

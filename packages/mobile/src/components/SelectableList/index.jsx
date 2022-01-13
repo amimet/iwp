@@ -1,13 +1,63 @@
 import React from "react"
 import { Icons } from "components/Icons"
-import { List, Button } from "antd"
+import { ActionsBar } from "components"
+import { Button } from "antd"
 import classnames from "classnames"
+import { useLongPress } from "utils"
 
 import "./index.less"
+
+const ListItem = React.memo((props) => {
+	let { item } = props
+
+	if (item.children) {
+		return <div className="selectableList_group">
+			{item.label}
+			<div className="selectableList_subItems">
+				{item.children.map((subItem) => {
+					return <ListItem item={subItem} />
+				})}
+			</div>
+		</div>
+	}
+
+	const renderChildren = props.renderChildren(item)
+	const isDisabled = renderChildren.props.disabled
+
+	return React.createElement("div", {
+		id: props.id,
+		key: props.id,
+		disabled: isDisabled,
+		className: classnames("item", {
+			["selected"]: props.selected,
+			["disabled"]: isDisabled,
+		}),
+		...useLongPress(
+			() => {
+				if (isDisabled) {
+					return false
+				}
+				props.onLongPressItem(props.id)
+			},
+			() => {
+				if (isDisabled) {
+					return false
+				}
+				props.onClickItem(props.id)
+			},
+			{
+				shouldPreventDefault: true,
+				delay: 500,
+			}
+		)
+
+	}, renderChildren)
+})
 
 export default class SelectableList extends React.Component {
 	state = {
 		selectedKeys: [],
+		selectionEnabled: false,
 	}
 
 	componentDidMount() {
@@ -16,6 +66,10 @@ export default class SelectableList extends React.Component {
 				selectedKeys: [...this.props.defaultSelected],
 			})
 		}
+	}
+
+	isKeySelected = (key) => {
+		return this.state.selectedKeys.includes(key)
 	}
 
 	selectAll = () => {
@@ -30,7 +84,6 @@ export default class SelectableList extends React.Component {
 		this.setState({
 			selectedKeys: [],
 		})
-		window.app.BottomBarController.clear()
 	}
 
 	selectKey = (key) => {
@@ -49,7 +102,6 @@ export default class SelectableList extends React.Component {
 		if (typeof this.props.onDone === "function") {
 			this.props.onDone(this.state.selectedKeys)
 		}
-
 		this.unselectAll()
 	}
 
@@ -57,17 +109,23 @@ export default class SelectableList extends React.Component {
 		if (typeof this.props.onDiscard === "function") {
 			this.props.onDiscard(this.state.selectedKeys)
 		}
-
 		this.unselectAll()
 	}
 
-	componentDidUpdate(prevProps, prevState) {
-		if (typeof this.props.selectionEnabled !== "undefined") {
-			if (!Boolean(this.props.selectionEnabled) && this.state.selectedKeys.length > 0) {
-				this.setState({
-					selectedKeys: [],
-				})
+	onClickItem = (key) => {
+		if (this.state.selectionEnabled) {
+			if (this.isKeySelected(key)) {
+				this.unselectKey(key)
+			} else {
+				this.selectKey(key)
 			}
+		}
+	}
+
+	onLongPressItem = (key) => {
+		if (!this.state.selectionEnabled) {
+			this.selectKey(key)
+			this.setState({ selectionEnabled: true })
 		}
 	}
 
@@ -111,124 +169,54 @@ export default class SelectableList extends React.Component {
 		})
 	}
 
-	renderActions = () => {
-		if (this.props.actionsDisabled) {
-			return null
-		}
-
-		return <div className={classnames("selectableList_bottomActions")}>
-			<div key="discard">
-				<Button
-					shape="round"
-					onClick={this.onDiscard}
-					{...this.props.onDiscardProps}
-				>
-					{this.props.onDiscardRender ?? <Icons.X />}
-					Discard
-				</Button>
-			</div>
-			{Array.isArray(this.props.actions) && this.renderProvidedActions()}
-		</div>
-	}
-
-	isKeySelected = (key) => {
-		return this.state.selectedKeys.includes(key)
-	}
-
-	renderItem = (item) => {
-		if (item.children) {
-			return <div className="selectableList_group">
-				{item.label}
-				<div className="selectableList_subItems">
-					{item.children.map((subItem) => {
-						return this.renderItem(subItem)
-					})}
-				</div>
-			</div>
-		}
-
-		const renderChildren = this.props.renderItem(item)
-
-		const _key = item.key ?? item.id ?? item._id ?? renderChildren.key
-
-		const selectionMethod = ["onClick", "onDoubleClick"].includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
-		const isSelected = this.isKeySelected(_key)
-		const isDisabled = renderChildren.props.disabled
-		const isNotSelectable = renderChildren.props.notSelectable
-
-		let renderProps = {
-			disabled: isDisabled,
-			children: renderChildren,
-			className: classnames("selectableList_item", {
-				["selected"]: isSelected && !isNotSelectable,
-				["disabled"]: isDisabled && !isNotSelectable,
-			}),
-			[selectionMethod]: () => {
-				if (isDisabled && isNotSelectable) {
-					return false
-				}
-				if (typeof this.props.selectionEnabled !== "undefined") {
-					if (!Boolean(this.props.selectionEnabled)) {
-						return false
-					}
-				}
-
-				if (isSelected) {
-					this.unselectKey(_key)
-				} else {
-					this.selectKey(_key)
-				}
-			}
-		}
-
-		if (selectionMethod == "onDoubleClick") {
-			renderProps.onClick = () => {
-				if (this.state.selectedKeys.length > 0) {
-					if (isSelected) {
-						this.unselectKey(_key)
-					}
-				}
-			}
-		}
-
-		return <div key={_key} {...renderProps} />
-	}
-
 	render() {
-		const { borderer, grid, header, loadMore, locale, pagination, rowKey, size, split, itemLayout, loading } = this.props
-		const listProps = {
-			borderer,
-			grid,
-			header,
-			loadMore,
-			locale,
-			pagination,
-			rowKey,
-			size,
-			split,
-			itemLayout,
-			loading,
+		if (this.state.selectionEnabled && this.state.selectedKeys.length === 0) {
+			this.setState({ selectionEnabled: false })
+			this.unselectAll()
 		}
 
-		if (this.state.selectedKeys.length === 0) {
-			if (!this.props.ignoreMobileActions) {
-				window.app.BottomBarController.clear()
-			}
-		} else {
-			if (!this.props.ignoreMobileActions) {
-				window.app.BottomBarController.render(this.renderActions())
-			}
-		}
+		let items = this.props.items.map((item, index) => {
+			item.key = item.key ?? item.id ?? item._id
 
-		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
-			<List
-				{...listProps}
-				dataSource={this.props.items}
-				renderItem={this.renderItem}
+			let selected = this.isKeySelected(item.key)
+
+			return <ListItem
+				item={item}
+				key={item.key}
+				id={item.key}
+				selected={selected}
+				onClickItem={this.onClickItem}
+				onLongPressItem={this.onLongPressItem}
+				renderChildren={this.props.renderItem}
 			/>
-			<div className="selectableList_bottomActions_wrapper">
-				{this.props.ignoreMobileActions && this.renderActions()}
+		})
+
+		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.state.selectionEnabled })}>
+			<div className="content">
+				{items}
 			</div>
+			{this.state.selectionEnabled && !this.props.actionsDisabled &&
+				<ActionsBar mode="float">
+					<div key="discard">
+						<Button
+							shape="round"
+							onClick={this.onDiscard}
+							{...this.props.onDiscardProps}
+						>
+							{this.props.onDiscardRender ?? <Icons.X />}
+							Discard
+						</Button>
+					</div>
+					<div key="allSelection">
+
+						<Button
+							shape="round"
+							onClick={this.selectAll}
+						>All</Button>
+					</div>
+					{Array.isArray(this.props.actions) && this.renderProvidedActions()}
+				</ActionsBar>
+			}
 		</div>
 	}
 }

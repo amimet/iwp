@@ -4,7 +4,7 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { OperatorsAssignments, UserSelector, Fabric, ScheduledProgress } from "components"
+import { OperatorsAssignments, UserSelector, Fabric, ActionsBar } from "components"
 
 import { OrdersRender } from ".."
 
@@ -199,12 +199,6 @@ export default class WorkloadDetails extends React.Component {
 
 							</antd.Badge.Ribbon>
 						</h1> : <h1><Icons.Box /> {data.name}</h1>}
-
-						<div>
-							<antd.Button icon={<Icons.Save />}>
-								Export
-							</antd.Button>
-						</div>
 					</div>
 				</div>
 
@@ -215,7 +209,7 @@ export default class WorkloadDetails extends React.Component {
 							ID
 						</div>
 						<div className="value">
-							{this.id}
+							{String(this.id).toUpperCase()}
 						</div>
 					</div>
 					<div key="state">
@@ -229,34 +223,14 @@ export default class WorkloadDetails extends React.Component {
 					</div>
 				</div>
 
-				<antd.Collapse
-					bordered={false}
-					accordion={true}
-					expandIconPosition={"right"}
-					className="workload_details list"
-				>
-					{data.scheduledFinish && <antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
-						<ScheduledProgress start={data.scheduledStart} finish={data.scheduledFinish} />
-					</antd.Collapse.Panel>}
-
-					<antd.Collapse.Panel key="timeline" header={<h2><Icons.Watch /> Timeline</h2>}>
-						<antd.Timeline mode="left">
-							<antd.Timeline.Item label={createdDate.toLocaleString()}>
-								Workload was created
-							</antd.Timeline.Item>
-						</antd.Timeline>
-					</antd.Collapse.Panel>
-
-					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
-						<OperatorsAssignments onRemoveOperator={this.onRemoveOperator} onAssignOperator={this.onAssignOperator} assigned={data.assigned} />
-					</antd.Collapse.Panel>
-
-					<antd.Collapse.Panel key="orders" header={<h2><Icons.Archive /> Order</h2>}>
+				<div className="workload_details tokens">
+					<div className="workload_details tokens orders">
+						<h1><Icons.Inbox /> Orders</h1>
 						<OrdersRender onClickItem={(item) => this.openOrderItemDetails(item)} orders={this.state.data.orders} />
-					</antd.Collapse.Panel>
-				</antd.Collapse>
+					</div>
+				</div>
 
-				<div className="workload_details actions">
+				<ActionsBar mode="float">
 					<div>
 						<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
 							Add token
@@ -272,7 +246,7 @@ export default class WorkloadDetails extends React.Component {
 							Mark as done
 						</antd.Button>
 					</div>
-				</div>
+				</ActionsBar>
 			</div>
 		)
 	}

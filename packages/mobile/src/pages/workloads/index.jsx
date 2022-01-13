@@ -81,10 +81,6 @@ export default class Workloads extends React.Component {
 			})
 	}
 
-	toogleSelection = () => {
-		this.setState({ selectionEnabled: !this.state.selectionEnabled })
-	}
-
 	appendWorkloadToRender = (payload) => {
 		let query = []
 		let workloads = this.state.workloads ?? []
@@ -158,7 +154,6 @@ export default class Workloads extends React.Component {
 						.workload({ id: keys })
 						.then(() => {
 							this.deleteWorkloadFromRender(keys)
-							this.toogleSelection(false)
 							return resolve()
 						})
 						.catch((err) => {
@@ -171,6 +166,18 @@ export default class Workloads extends React.Component {
 
 	onCheckWorkloads = (keys) => {
 		console.log(keys)
+	}
+
+	onClickItem = (item) => {
+		this.openWorkloadDetails(item._id)
+	}
+
+	onSearch = (event) => {
+		if (event === "" && this.state.searchValue) {
+			return this.setState({ searchValue: null })
+		}
+
+		this.debouncedSearch(event.target.value)
 	}
 
 	search = (value) => {
@@ -199,14 +206,6 @@ export default class Workloads extends React.Component {
 
 	debouncedSearch = debounce((value) => this.search(value), 500)
 
-	onSearch = (event) => {
-		if (event === "" && this.state.searchValue) {
-			return this.setState({ searchValue: null })
-		}
-
-		this.debouncedSearch(event.target.value)
-	}
-
 	renderRegionsOptions = () => {
 		return this.state.regions.map((region) => {
 			return (
@@ -231,7 +230,7 @@ export default class Workloads extends React.Component {
 		const indicatorStatus = item.expired ? "expired" : item.status
 
 		return (
-			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} >
+			<div className="workload_order_item">
 				<div className="header">
 					<div className={classnames("indicator", indicatorStatus)}>
 						<div className="statusText">{indicatorStatus}</div>
@@ -281,6 +280,7 @@ export default class Workloads extends React.Component {
 				onDone={(value) => {
 					console.log(value)
 				}}
+				onClickItem={this.onClickItem}
 				onDelete={this.onDeleteWorkloads}
 				onCheck={this.onCheckWorkloads}
 				renderItem={this.renderItem}
@@ -296,16 +296,6 @@ export default class Workloads extends React.Component {
 					<ActionsBar mode="float">
 						<div key="refresh">
 							<antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
-						</div>
-						<div key="toogleSelection">
-							<antd.Button
-								shape="round"
-								icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}
-								type={this.state.selectionEnabled ? "default" : "primary"}
-								onClick={() => this.toogleSelection()}
-							>
-								{this.state.selectionEnabled ? "Done" : "Select"}
-							</antd.Button>
 						</div>
 						<div key="createNew">
 							<antd.Button type="primary" onClick={this.openWorkloadCreator} icon={<Icons.Plus />}>

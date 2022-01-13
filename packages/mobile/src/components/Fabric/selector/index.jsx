@@ -76,6 +76,7 @@ export class BrowserSelector extends React.Component {
 		this.setState({ selectedVariants: values })
 	}
 
+	//TODO: Split as `bruhSomething` component
 	renderSelectedItem = (item) => {
 		return <div className="fabric_selector inspector">
 			<div className="fabric_selector inspector header">
