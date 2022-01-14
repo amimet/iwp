@@ -13,7 +13,7 @@ const steps = [
 		title: "Name",
 		icon: "Edit",
 		content: (props) => {
-			return <div className="workload_creator steps step body">
+			return <div className="workload_creator steps step content">
 				<antd.Input placeholder="Input an name" onChange={props.onChangeName} />
 			</div>
 		},
@@ -22,7 +22,7 @@ const steps = [
 		title: "Region",
 		icon: "Globe",
 		content: (props) => {
-			return <div className="workload_creator steps step body">
+			return <div className="workload_creator steps step content">
 				{props.renderRegionsSelector()}
 			</div>
 		},
@@ -31,7 +31,7 @@ const steps = [
 		title: "Schedule",
 		icon: "Calendar",
 		content: (props) => {
-			return <div className="workload_creator steps step body">
+			return <div className="workload_creator steps step content">
 				<antd.DatePicker.RangePicker
 					showTime={{ format: "HH:mm" }}
 					format="DD-MM-YYYY HH:mm"
@@ -44,7 +44,7 @@ const steps = [
 		title: "Workshift",
 		icon: "Clock",
 		content: (props) => {
-			return <div className="workload_creator steps step body">
+			return <div className="workload_creator steps step content">
 				{Object.keys(props.state.workshifts).length > 0 ? (
 					<div className="workload_creator workshift">
 						<antd.Select onChange={props.onSelectWorkshift} placeholder="Select an workshift">
@@ -62,7 +62,7 @@ const steps = [
 		title: "Operators",
 		icon: "User",
 		content: (props) => {
-			return <div className="workload_creator steps step body">
+			return <div className="workload_creator steps step content">
 				<OperatorsAssignments onAssignOperators={props.onAssignOperators} assigned={props.state.assigned} />
 			</div>
 		}
@@ -71,13 +71,13 @@ const steps = [
 		title: "Orders",
 		icon: "Box",
 		content: (props) => {
-			return <div className="workload_creator steps step body">
+			return <div className="workload_creator steps step content">
 				<OrdersRender onDeleteItem={props.removeOrderItem} orders={props.state.orders} />
 
 				<div key="actions" className="workload_creator steps step actions">
-					<div>
-						<antd.Button onClick={props.onClickAddOrderItem} shape="round" icon={<Icons.PlusCircle />}>
-							Add item
+					<div key="add">
+						<antd.Button onClick={props.onClickAddOrderItem} shape="round" icon={<Icons.Plus />}>
+							Add
 						</antd.Button>
 					</div>
 				</div>
@@ -322,7 +322,7 @@ export default class WorkloadCreator extends React.Component {
 
 				<ActionsBar mode="float">
 					{this.state.step > 0 && (
-						<antd.Button style={{ margin: '0 8px' }} onClick={() => this.prevStep()}>
+						<antd.Button style={{ margin: "0 8px" }} onClick={() => this.prevStep()}>
 							<Icons.ChevronLeft />Previous
 						</antd.Button>
 					)}

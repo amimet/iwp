@@ -112,7 +112,9 @@ export default class OperatorsAssignments extends React.Component {
                 />
             </div>
             <div className="operators_assignments actions">
-                <antd.Button icon={<Icons.Plus />} shape="round" onClick={this.onClickAddAssign}>Add</antd.Button>
+                <div key="add">
+                    <antd.Button icon={<Icons.Plus />} shape="round" onClick={this.onClickAddAssign}>Add</antd.Button>
+                </div>
             </div>
         </div>
     }
