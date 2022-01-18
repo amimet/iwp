@@ -164,6 +164,13 @@ class App {
 					}
 				})
 			},
+			openWorkloadCreator: () => {
+				window.app.DrawerController.open("workload_creator", Workload.Creator, {
+					props: {
+						width: "55%",
+					},
+				})
+			},
 			openFabric: (defaultType) => {
 				window.app.DrawerController.open("FabricCreator", Fabric.Creator, {
 					props: {
