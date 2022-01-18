@@ -4,6 +4,7 @@ import { ActionsBar } from "components"
 import { Button } from "antd"
 import classnames from "classnames"
 import { useLongPress } from "utils"
+import _ from "lodash"
 
 import "./index.less"
 
@@ -24,6 +25,28 @@ const ListItem = React.memo((props) => {
 	const renderChildren = props.renderChildren(item)
 	const isDisabled = renderChildren.props.disabled
 
+	const doubleClickSpeed = 350
+	let delayedClick = null
+	let clickedOnce = null
+
+	const onOnceClick = () => {
+		clickedOnce = null
+
+		if (isDisabled) {
+			return false
+		}
+
+		props.onClickItem(props.id)
+	}
+
+	const onDoubleClick = () => {
+		if (isDisabled) {
+			return false
+		}
+
+		props.onDoubleClick(props.id)
+	}
+
 	return React.createElement("div", {
 		id: props.id,
 		key: props.id,
@@ -40,17 +63,24 @@ const ListItem = React.memo((props) => {
 				props.onLongPressItem(props.id)
 			},
 			() => {
-				if (isDisabled) {
-					return false
+				if (!delayedClick) {
+					delayedClick = _.debounce(onOnceClick, doubleClickSpeed)
 				}
-				props.onClickItem(props.id)
+
+				if (clickedOnce) {
+					delayedClick.cancel()
+					clickedOnce = false
+					onDoubleClick()
+				} else {
+					delayedClick()
+					clickedOnce = true
+				}
 			},
 			{
 				shouldPreventDefault: true,
 				delay: 500,
 			}
-		)
-
+		),
 	}, renderChildren)
 })
 
@@ -112,17 +142,31 @@ export default class SelectableList extends React.Component {
 		this.unselectAll()
 	}
 
+	onDoubleClick = (key) => {
+		if (typeof this.props.onDoubleClick === "function") {
+			this.props.onDoubleClick(key)
+		}
+	}
+
 	onClickItem = (key) => {
-		if (this.state.selectionEnabled) {
+		if (this.props.overrideSelectionEnabled || this.state.selectionEnabled) {
 			if (this.isKeySelected(key)) {
 				this.unselectKey(key)
 			} else {
 				this.selectKey(key)
 			}
 		}
+
+		if (typeof this.props.onClickItem === "function") {
+			this.props.onClickItem(key)
+		}
 	}
 
 	onLongPressItem = (key) => {
+		if (this.props.overrideSelectionEnabled) {
+			return false
+		}
+
 		if (!this.state.selectionEnabled) {
 			this.selectKey(key)
 			this.setState({ selectionEnabled: true })
@@ -170,7 +214,7 @@ export default class SelectableList extends React.Component {
 	}
 
 	render() {
-		if (this.state.selectionEnabled && this.state.selectedKeys.length === 0) {
+		if (!this.props.overrideSelectionEnabled && this.state.selectionEnabled && this.state.selectedKeys.length === 0) {
 			this.setState({ selectionEnabled: false })
 			this.unselectAll()
 		}
@@ -185,17 +229,18 @@ export default class SelectableList extends React.Component {
 				key={item.key}
 				id={item.key}
 				selected={selected}
+				onDoubleClick={this.onDoubleClick}
 				onClickItem={this.onClickItem}
 				onLongPressItem={this.onLongPressItem}
 				renderChildren={this.props.renderItem}
 			/>
 		})
 
-		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.state.selectionEnabled })}>
+		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.overrideSelectionEnabled ?? this.state.selectionEnabled })}>
 			<div className="content">
 				{items}
 			</div>
-			{this.state.selectionEnabled && !this.props.actionsDisabled &&
+			{(this.props.overrideSelectionEnabled || this.state.selectionEnabled) && !this.props.actionsDisabled &&
 				<ActionsBar mode="float">
 					<div key="discard">
 						<Button
@@ -208,7 +253,6 @@ export default class SelectableList extends React.Component {
 						</Button>
 					</div>
 					<div key="allSelection">
-
 						<Button
 							shape="round"
 							onClick={this.selectAll}
