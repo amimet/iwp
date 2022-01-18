@@ -105,7 +105,7 @@ export default class UserSelector extends React.Component {
                 </div>
             </div>
             <SelectableList
-                ignoreMobileActions
+                overrideSelectionEnabled
                 items={this.state.searchValue ?? this.state.data}
                 renderItem={this.renderItem}
                 actions={[
