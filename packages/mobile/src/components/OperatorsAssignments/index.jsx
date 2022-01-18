@@ -29,7 +29,7 @@ export default class OperatorsAssignments extends React.Component {
     state = {
         loading: true,
         data: null,
-        assigned: (this.props?.assigned && Array.isArray(this.props?.assigned) ? this.props?.assigned : [] ) ?? [],
+        assigned: (this.props?.assigned && Array.isArray(this.props?.assigned) ? this.props?.assigned : []) ?? [],
     }
 
     api = window.app.request
@@ -53,8 +53,8 @@ export default class OperatorsAssignments extends React.Component {
 
                     await this.setState({ assigned })
 
-                    if (typeof this.props.onAssignOperator === "function") {
-                        await this.props.onAssignOperator(data)
+                    if (typeof this.props.onAssignOperators === "function") {
+                        await this.props.onAssignOperators(data)
                     }
 
                     await this.fetchOperatorsData()
@@ -102,6 +102,7 @@ export default class OperatorsAssignments extends React.Component {
         if (this.state.loading) {
             return <antd.Skeleton active />
         }
+
         return <div className="operators_assignments">
             <div>
                 <antd.List
