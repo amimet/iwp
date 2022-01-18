@@ -1,7 +1,7 @@
 export default {
     name: { type: String },
     orders: { type: Object, required: true },
-    tokens: { type: Array, default: [] },
+    commits: { type: Array, default: [] },
     assigned: { type: Array, default: [] },
     region: { type: String, default: 0 },
     status: { type: String, default: 'pending' },
