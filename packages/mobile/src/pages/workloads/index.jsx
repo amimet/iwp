@@ -224,9 +224,9 @@ export default class Workloads extends React.Component {
 					<div>
 						<h1>{item.name ?? "Unnamed workload"}</h1>
 					</div>
-					{!window.isMobile && <div>
-						<antd.Tag>{item._id}</antd.Tag>
-					</div>}
+					<div>
+						<antd.Tag>{String(item._id).toUpperCase()}</antd.Tag>
+					</div>
 				</div>
 				<div className="info">
 					{renderDate(item.created)}
