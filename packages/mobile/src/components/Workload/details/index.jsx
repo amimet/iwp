@@ -4,9 +4,9 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { Fabric, ActionsBar } from "components"
+import { ActionsBar } from "components"
 
-import { OrdersRender } from ".."
+import { OrdersRender, OrderInspector } from ".."
 
 import "./index.less"
 
@@ -114,7 +114,7 @@ export default class WorkloadDetails extends React.Component {
 	}
 
 	openOrderItemDetails = (item) => {
-		window.app.DrawerController.open("FabricInspector", Fabric.Inspector, {
+		window.app.DrawerController.open("OrderInspector", OrderInspector, {
 			onDone: (ctx, data) => {
 				ctx.close()
 				// TODO: Handle if exists any updates on data
@@ -243,7 +243,7 @@ export default class WorkloadDetails extends React.Component {
 					</div>
 					<div>
 						<antd.Button icon={<Icons.CheckCircle />}>
-							Mark as done
+							Complete
 						</antd.Button>
 					</div>
 				</ActionsBar>
