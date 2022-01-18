@@ -1,4 +1,4 @@
-import { Workload } from "../../models"
+import { Workload, } from "../../models"
 import { Schematized } from "../../lib"
 import { nanoid } from "nanoid"
 import moment from "moment"
@@ -6,30 +6,27 @@ import moment from "moment"
 const format = "DD-MM-YYYY hh:mm"
 
 export default {
-    action: Schematized({
-        required: ["_id", "event"],
+    commit: Schematized({
+        required: ["_id"],
         select: ["_id"],
     }, async (req, res) => {
-        const workload = await Workload.findById(req.selection._id)
+        let commit = {
+            _id: nanoid(),
+            user_id: req.user._id,
+            timestamp: new Date().getTime(),
+        }
 
-        if (!workload) {
-            return res.status(404).json({
-                message: "Workload not found",
+        const result = await Workload.findByIdAndUpdate(req.selection._id, {
+            $push: {
+                commits: commit,
+            },
+        }).catch(err => {
+            return res.status(500).json({
+                error: err,
             })
-        }
+        })
 
-        switch (action) {
-            case "commit": {
-                const { orderUUID } = req.selection.event
-                const order = await workload.orders.find(order => order.uuid === orderUUID)
-                console.log(order)
-            }
-            default: {
-                return res.status(400).json({
-                    message: "Invalid action",
-                })
-            }
-        }
+        return res.json(result)
     }),
     appendOperators: Schematized({
         required: ["_id", "operators"],
