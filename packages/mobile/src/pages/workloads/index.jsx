@@ -1,16 +1,24 @@
 import React from "react"
 import * as antd from "antd"
+import { PullToRefresh } from "antd-mobile"
 import moment from "moment"
 import classnames from "classnames"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList, Workload } from "components"
+import { ActionsBar, SelectableList } from "components"
 
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
+
+const statusRecord = {
+	pulling: "Slide down to refresh",
+	canRelease: "Release",
+	refreshing: <Icons.LoadingOutlined spin />,
+	complete: <Icons.Check />,
+}
 
 const renderDate = (time) => {
 	const dateNumber = Number(time)
@@ -113,28 +121,6 @@ export default class Workloads extends React.Component {
 		this.setState({ workloads })
 	}
 
-	openWorkloadDetails = (id) => {
-		if (this.state.selectionEnabled) {
-			return false
-		}
-
-		window.app.openWorkloadDetails(id)
-	}
-
-	openWorkloadCreator = () => {
-		window.app.DrawerController.open("workload_creator", Workload.Creator, {
-			props: {
-				width: "55%",
-			},
-			onDone: (drawer, payload) => {
-				console.log(payload)
-				if (this.state.selectedRegion !== payload.region) {
-					this.changeRegion(payload.region)
-				}
-			}
-		})
-	}
-
 	changeRegion = (region) => {
 		this.setState({ selectedRegion: region }, async () => {
 			await this.fetchWorkloadsFromRegion(region)
@@ -168,8 +154,8 @@ export default class Workloads extends React.Component {
 		console.log(keys)
 	}
 
-	onClickItem = (item) => {
-		this.openWorkloadDetails(item._id)
+	onDoubleClickItem = (key) => {
+		window.app.openWorkloadDetails(key)
 	}
 
 	onSearch = (event) => {
@@ -268,40 +254,30 @@ export default class Workloads extends React.Component {
 			return <antd.Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
 		}
 
-		return (
-			<SelectableList
-				selectionEnabled={this.state.selectionEnabled}
-				actions={actions}
-				onDoneRender={
-					<>
-						<Icons.Check /> Check
-					</>
-				}
-				onDone={(value) => {
-					console.log(value)
-				}}
-				onClickItem={this.onClickItem}
-				onDelete={this.onDeleteWorkloads}
-				onCheck={this.onCheckWorkloads}
-				renderItem={this.renderItem}
-				items={list}
-			/>
-		)
+		return <SelectableList
+			selectionEnabled={this.state.selectionEnabled}
+			actions={actions}
+			onDoneRender={
+				<>
+					<Icons.Check /> Check
+				</>
+			}
+			onDone={(value) => {
+				console.log(value)
+			}}
+			onDoubleClick={this.onDoubleClickItem}
+			onDelete={this.onDeleteWorkloads}
+			onCheck={this.onCheckWorkloads}
+			renderItem={this.renderItem}
+			items={list}
+		/>
 	}
 
 	render() {
 		return (
-			<div style={{ height: "100%" }}>
+			<div className="workloads_list" style={{ height: "100%" }}>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar mode="float">
-						<div key="refresh">
-							<antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
-						</div>
-						<div key="createNew">
-							<antd.Button type="primary" onClick={this.openWorkloadCreator} icon={<Icons.Plus />}>
-								New
-							</antd.Button>
-						</div>
 						<div key="search">
 							<antd.Input.Search
 								placeholder="Search"
@@ -331,8 +307,14 @@ export default class Workloads extends React.Component {
 						</div>
 					</ActionsBar>
 				</div>
-
-				{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
+				<PullToRefresh
+					renderText={status => {
+						return <div>{statusRecord[status]}</div>
+					}}
+					onRefresh={async () => await this.fetchWorkloadsFromRegion(this.state.selectedRegion)}
+				>
+					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
+				</PullToRefresh>
 			</div>
 		)
 	}
