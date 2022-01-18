@@ -4,7 +4,7 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { OperatorsAssignments, UserSelector, Fabric, ActionsBar } from "components"
+import { Fabric, ActionsBar } from "components"
 
 import { OrdersRender } from ".."
 
