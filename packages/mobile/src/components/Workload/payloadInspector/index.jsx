@@ -34,6 +34,12 @@ export default class Inspector extends React.Component {
             const data = this.state.workload.payloads.find((payload) => payload.payloadUUID === this.uuid)
             await this.setState({ data })
         }
+
+        window.app.handleWSListener("workloadCommit", (data) => {
+            if (this.uuid === data.commit.payloadUUID) {
+                this.fetchWorkloadDataWithUUID()
+            }
+        })
     }
 
     fetchWorkloadDataWithUUID = async () => {
@@ -74,23 +80,21 @@ export default class Inspector extends React.Component {
         return count
     }
 
-    countQuantityLeft = () => {
+    countQuantityLeft = (absolute) => {
         const quantity = this.state.data.properties?.quantity
         const quantityCount = this.countQuantityFromCommits()
 
         let result = quantity - quantityCount
 
-        if (result < 0) {
+        if (result < 0 && !absolute) {
             result = 0
         }
-        
+
         return result
     }
 
-    isQuantityProductionReached = () => {
-        const quantityLeft = this.countQuantityLeft()
-
-        return Boolean(quantityLeft <= 0)
+    isQuantityProductionOverreached = () => {
+        return Boolean(this.countQuantityLeft(true) < 0)
     }
 
     toogleLoading = (to) => {
@@ -102,10 +106,11 @@ export default class Inspector extends React.Component {
             workloadId: this.props.workloadId,
             payloadUUID: this.uuid,
         })
+        const quantityLeft = this.countQuantityLeft()
 
-        if (this.isQuantityProductionReached()) {
+        if (quantityLeft <= 0) {
             antd.Modal.confirm({
-                title: "Production Quantity has been reached",
+                title: "Production quantity already has been reached",
                 content: "Are you sure you want to commit for this payload?",
                 onOk: () => {
                     open()
@@ -149,9 +154,9 @@ export default class Inspector extends React.Component {
         }
 
         const formula = FORMULAS[this.state.data.type]
+
         const quantityCount = this.countQuantityFromCommits()
         const quantityLeft = this.countQuantityLeft()
-        const isQuantityProductionReached = this.isQuantityProductionReached()
 
         return <div className="payload_inspector">
             <div className="header">
@@ -183,7 +188,7 @@ export default class Inspector extends React.Component {
 
                 <div className="content">
                     <div className="counter">
-                        <div style={isQuantityProductionReached ? { color: "red" } : undefined}>
+                        <div style={this.isQuantityProductionOverreached() ? { color: "red" } : undefined} className={quantityLeft === 0 ? "completed" : undefined} >
                             {quantityCount}
                         </div>
                         <div>/</div>
