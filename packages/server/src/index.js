@@ -146,7 +146,7 @@ class Server {
                     for await (const client of this.WSClients) {
                         client.socket.emit(channel, ...args)
                     }
-                }
+                },
             }
 
             next()
