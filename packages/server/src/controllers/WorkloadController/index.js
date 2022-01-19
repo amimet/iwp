@@ -5,6 +5,25 @@ import moment from "moment"
 
 const format = "DD-MM-YYYY hh:mm"
 
+function countQuantityFromCommits(commits) {
+    return commits.reduce((acc, commit) => {
+        return acc + commit.quantity
+    }, 0)
+}
+
+function calculateWorkloadQuantityLeft(workload, payload) {
+    const quantity = payload.properties?.quantity
+    const quantityCount = countQuantityFromCommits(workload.commits.filter(commit => commit.payloadUUID === payload.uuid))
+
+    let result = quantity - quantityCount
+
+    if (result < 0) {
+        result = 0
+    }
+
+    return result
+}
+
 export default {
     pushCommit: Schematized({
         required: ["workloadId", "payloadUUID", "quantity"],
@@ -215,6 +234,16 @@ export default {
                     workload.expired = true
                 }
             }
+
+            if (workload.payloads) {
+                workload.payloads = workload.payloads.map((payload) => {
+                    payload.debtQuantity = calculateWorkloadQuantityLeft(workload, payload)
+                    payload.quantityReached = payload.debtQuantity === 0
+
+                    return payload
+                })
+            }
+
         }
 
         return res.json(req.selection._id ? workloads[0] : workloads)
