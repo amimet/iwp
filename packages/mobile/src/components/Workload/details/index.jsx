@@ -236,25 +236,22 @@ export default class WorkloadDetails extends React.Component {
 				</div>
 
 				<div className="workload_details payloads">
-					<h1><Icons.Inbox /> Payloads</h1>
+					<div className="header">
+						<div>
+							<h1><Icons.Inbox /> Payloads</h1>
+						</div>
+						<div>
+							<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
+								Add token
+							</antd.Button>
+						</div>
+					</div>
+
 					<PayloadsRender
 						onClickItem={(item) => this.openPayloadDetails(item)}
 						payloads={this.state.data.payloads}
 					/>
 				</div>
-
-				<ActionsBar mode="float" spaced>
-					<div>
-						<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
-							Add token
-						</antd.Button>
-					</div>
-					<div>
-						<antd.Button icon={<Icons.Edit />}>
-							Edit
-						</antd.Button>
-					</div>
-				</ActionsBar>
 			</div>
 		)
 	}
