@@ -26,7 +26,12 @@ export default class Main extends React.Component {
 						</div>
 					</div>
 				</div>
-				<AssignedWorkloads />
+
+				<div className="widgets">
+					<div key="assignedWorkloads">
+						<AssignedWorkloads />
+					</div>
+				</div>
 			</div>
 		)
 	}
