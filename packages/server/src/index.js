@@ -136,10 +136,19 @@ class Server {
 
     initWebsockets() {
         this.instance.middlewares["useWS"] = (req, res, next) => {
-            req.io = this.io
-            req.getClientSocket = (userId) => {
-                return this.WSClients.find(c => c.userId === userId)
+            req.ws = {
+                io: this.io,
+                clients: this.WSClients,
+                getClientSocket: (userId) => {
+                    return this.WSClients.find(c => c.userId === userId).socket
+                },
+                broadcast: async (channel, ...args) => {
+                    for await (const client of this.WSClients) {
+                        client.socket.emit(channel, ...args)
+                    }
+                }
             }
+
             next()
         }
 
