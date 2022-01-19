@@ -68,9 +68,10 @@ export default class BrowserSelector extends React.Component {
 				...this.state.selectedItem,
 				["properties"]: {
 					...this.state.selectedItem.properties,
+					// Override with custom properties
 					["quantity"]: this.state.quantity,
+					["variants"]: this.state.selectedVariants,
 				},
-				selectedVariants: this.state.selectedVariants,
 			}
 
 			this.props.handleDone(item)
