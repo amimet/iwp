@@ -243,7 +243,7 @@ export default class WorkloadDetails extends React.Component {
 					/>
 				</div>
 
-				<ActionsBar mode="float">
+				<ActionsBar mode="float" spaced>
 					<div>
 						<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
 							Add token
@@ -252,11 +252,6 @@ export default class WorkloadDetails extends React.Component {
 					<div>
 						<antd.Button icon={<Icons.Edit />}>
 							Edit
-						</antd.Button>
-					</div>
-					<div>
-						<antd.Button icon={<Icons.CheckCircle />}>
-							Complete
 						</antd.Button>
 					</div>
 				</ActionsBar>
