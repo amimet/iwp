@@ -115,16 +115,28 @@ module.exports = [
         fn: "WorkloadController.update",
     },
     {
-        route: "/workloads",
+        route: "/workload_commit",
+        method: "POST",
+        middleware: ["withAuthentication", "useWS"],
+        fn: "WorkloadController.pushCommit",
+    },
+    {
+        route: "/workload_commits",
         method: "GET",
-        middleware: "withAuthentication",
-        fn: "WorkloadController.getAll",
+        middleware: ["withAuthentication"],
+        fn: "WorkloadController.getCommits",
     },
     {
         route: "/workload",
         method: "GET",
         middleware: "withAuthentication",
         fn: "WorkloadController.get",
+    },
+    {
+        route: "/workload_payload_UUID",
+        method: "GET",
+        middleware: ["withAuthentication"],
+        fn: "WorkloadController.getWorkloadWithPayloadUUID",
     },
     {
         route: "/workload",
