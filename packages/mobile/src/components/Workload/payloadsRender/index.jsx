@@ -17,11 +17,11 @@ export default (props) => {
 	}
 
 	return <antd.List
-		dataSource={props.orders}
+		dataSource={props.payloads}
 		renderItem={(item) => {
-			return <antd.List.Item onClick={() => {onClickItem(item)}} className="workload_orderItem">
+			return <antd.List.Item onClick={() => {onClickItem(item)}} className="workload_payloadItem">
 				<antd.List.Item.Meta
-					avatar={<div className="workload_orderItem quantity">x{item.properties?.quantity ?? item.quantity ?? "0"}</div>}
+					avatar={<div className="workload_payloadItem quantity">x{item.properties?.quantity ?? item.quantity ?? "0"}</div>}
 					title={item.name}
 					description={item.properties?.description}
 				/>

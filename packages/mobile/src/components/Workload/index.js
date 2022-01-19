@@ -1,5 +1,5 @@
 export { default as Creator } from "./creator"
 export { default as Details } from "./details"
-export { default as OrdersRender } from "./ordersRender"
-export { default as OrderInspector } from "./orderInspector"
-export { default as Commit } from "./commit"
+export { default as PayloadsRender } from "./payloadsRender"
+export { default as PayloadInspector } from "./payloadInspector"
+export * as Commit from "./commit"

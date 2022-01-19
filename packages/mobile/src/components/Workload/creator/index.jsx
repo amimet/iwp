@@ -4,7 +4,7 @@ import * as antd from "antd"
 import { Icons, } from "components/Icons"
 import { Fabric, OperatorsAssignments, StepsForm } from "components"
 
-import { OrdersRender } from ".."
+import { PayloadsRender } from ".."
 
 import "./index.less"
 
@@ -105,8 +105,8 @@ const steps = [
 		}
 	},
 	{
-		key: "orders",
-		title: "Orders",
+		key: "payloads",
+		title: "Payloads",
 		icon: "Box",
 		content: (props) => {
 			let [ value, setValue ] = React.useState(props.value ?? [])
@@ -138,7 +138,7 @@ const steps = [
 			}
 
 			return <div className="workload_creator steps step content">
-				<OrdersRender orders={value} onDeleteItem={onDeleteItem} />
+				<PayloadsRender payloads={value} onDeleteItem={onDeleteItem} />
 
 				<div key="actions" className="workload_creator steps step actions">
 					<div key="add">
@@ -173,7 +173,7 @@ export default class WorkloadCreator extends React.Component {
 			workshift: data.workshift,
 			assigned: data.operators,
 			name: data.name,
-			orders: data.orders,
+			payloads: data.payloads,
 		}
 
 		if (data.schedule != null) {

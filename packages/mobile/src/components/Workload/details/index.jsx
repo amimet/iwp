@@ -6,7 +6,7 @@ import QRCode from "qrcode"
 import { Icons } from "components/Icons"
 import { ActionsBar } from "components"
 
-import { OrdersRender, OrderInspector } from ".."
+import { PayloadsRender, PayloadInspector } from ".."
 
 import "./index.less"
 
@@ -31,6 +31,12 @@ export default class WorkloadDetails extends React.Component {
 		await this.fetchData()
 
 		await this.setState({ qrCanvas: qr })
+
+		window.app.handleWSListener("workloadCommit", (data) => {
+			if (this.id === data.workloadId) {
+				this.fetchData()
+			}
+		})
 	}
 
 	fetchData = async () => {
@@ -113,17 +119,14 @@ export default class WorkloadDetails extends React.Component {
 		return { daysLeft, daysPassed, percentage }
 	}
 
-	openOrderItemDetails = (item) => {
-		window.app.DrawerController.open("OrderInspector", OrderInspector, {
+	openPayloadDetails = (item) => {
+		window.app.DrawerController.open("PayloadInspector", PayloadInspector, {
 			onDone: (ctx, data) => {
 				ctx.close()
-				// TODO: Handle if exists any updates on data
 			},
 			componentProps: {
-				// TODO: Pass order item UUID for fetching data from API
-				runnable: true, // this enable to run the fabric task inspector process
-				resolvable: true, // this enable to resolve the fabric order task status
-				item: item,
+				workloadId: this.id,
+				payload: item,
 			}
 		})
 	}
@@ -221,13 +224,23 @@ export default class WorkloadDetails extends React.Component {
 							{data.status}
 						</div>
 					</div>
+					<div key="commits">
+						<div className="name">
+							<Icons.Database />
+							Commits
+						</div>
+						<div className="value">
+							{data.commits?.length}
+						</div>
+					</div>
 				</div>
 
-				<div className="workload_details tokens">
-					<div className="workload_details tokens orders">
-						<h1><Icons.Inbox /> Orders</h1>
-						<OrdersRender onClickItem={(item) => this.openOrderItemDetails(item)} orders={this.state.data.orders} />
-					</div>
+				<div className="workload_details payloads">
+					<h1><Icons.Inbox /> Payloads</h1>
+					<PayloadsRender
+						onClickItem={(item) => this.openPayloadDetails(item)}
+						payloads={this.state.data.payloads}
+					/>
 				</div>
 
 				<ActionsBar mode="float">

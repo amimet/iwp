@@ -1,0 +1,107 @@
+.payload_inspector {
+	h1,
+	h2,
+	h3,
+	p {
+		margin: 0;
+	}
+
+	.header {
+		h3 {
+			color: var(--background-color-contrast);
+			font-family: "DM Mono", monospace;
+		}
+
+		.typeIndicator {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 18px;
+		}
+
+		margin-bottom: 5px;
+	}
+
+	.quantity {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+
+		background-color: var(--primaryColor);
+		color: var(--background-color-primary);
+
+		border-radius: 24px;
+		min-width: 24px;
+		height: 24px;
+
+		padding: 5px;
+	}
+
+	.properties {
+		background-color: var(--background-color-accent);
+		border-radius: 8px;
+		padding: 8px 15px;
+
+		.property {
+			height: fit-content;
+
+			display: flex;
+			flex-direction: column;
+			padding: 5px;
+
+			.value {
+				display: flex;
+				justify-content: space-between;
+				justify-self: center;
+				width: fit-content;
+
+				padding-left: 20px;
+
+				color: var(--background-color-contrast);
+			}
+		}
+	}
+
+	.production {
+		display: flex;
+		flex-direction: column;
+
+		.content {
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+			justify-content: center;
+		}
+
+		.counter {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+
+			width: fit-content;
+
+			font-family: "DM Mono", monospace;
+
+			> div {
+				font-size: 18px;
+				margin: 0 5px;
+			}
+
+            :first-child {
+                color: var(--background-color-contrast);
+            }
+		}
+	}
+
+	.actions {
+		position: sticky;
+		bottom: 0;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px;
+	}
+}

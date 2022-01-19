@@ -1,0 +1,216 @@
+import React from "react"
+import * as antd from "antd"
+
+import { Icons, createIconRender } from "components/Icons"
+import { ActionsBar } from "components"
+
+import FORMULAS from "schemas/fabricFormulas"
+import { Commit } from ".."
+
+import "./index.less"
+
+export default class Inspector extends React.Component {
+    state = {
+        loading: true,
+        workload: null,
+        data: null,
+    }
+
+    api = window.app.request
+
+    componentDidMount = async () => {
+        this.uuid = this.props.payload?.uuid ?? this.props.uuid
+
+        if (!this.uuid) {
+            console.error("No UUID provided")
+            return false
+        }
+
+        await this.fetchWorkloadDataWithUUID()
+
+        if (this.props.payload) {
+            await this.setState({ data: this.props.payload })
+        } else {
+            const data = this.state.workload.payloads.find((payload) => payload.payloadUUID === this.uuid)
+            await this.setState({ data })
+        }
+    }
+
+    fetchWorkloadDataWithUUID = async () => {
+        this.toogleLoading(true)
+
+        const data = await this.api.get.workloadPayloadUuid(undefined, { uuid: this.uuid }).catch((err) => {
+            console.error(err)
+            antd.message.error(`Failed to load workload: ${err}`)
+            return false
+        })
+
+        if (data) {
+            this.toogleLoading(false)
+            return await this.setState({ workload: data })
+        }
+    }
+
+    findCommitsAssociated = () => {
+        if (!this.state.workload.commits || this.state.workload.commits.length === 0) {
+            return false
+        }
+
+        return this.state.workload.commits.filter((commit) => commit.payloadUUID === this.uuid)
+    }
+
+    countQuantityFromCommits = () => {
+        let count = 0
+        const commits = this.findCommitsAssociated()
+
+        if (commits) {
+            commits.forEach(commit => {
+                if (commit.quantity) {
+                    count += commit.quantity
+                }
+            })
+        }
+
+        return count
+    }
+
+    countQuantityLeft = () => {
+        const quantity = this.state.data.properties?.quantity
+        const quantityCount = this.countQuantityFromCommits()
+
+        let result = quantity - quantityCount
+
+        if (result < 0) {
+            result = 0
+        }
+        
+        return result
+    }
+
+    isQuantityProductionReached = () => {
+        const quantityLeft = this.countQuantityLeft()
+
+        return Boolean(quantityLeft <= 0)
+    }
+
+    toogleLoading = (to) => {
+        this.setState({ loading: to ?? !this.state.loading })
+    }
+
+    onClickCommit = () => {
+        const open = () => Commit.openModal({
+            workloadId: this.props.workloadId,
+            payloadUUID: this.uuid,
+        })
+
+        if (this.isQuantityProductionReached()) {
+            antd.Modal.confirm({
+                title: "Production Quantity has been reached",
+                content: "Are you sure you want to commit for this payload?",
+                onOk: () => {
+                    open()
+                },
+            })
+        } else {
+            open()
+        }
+    }
+
+    renderProperties = (item) => {
+        if (!item.properties) {
+            return null
+        }
+
+        return Object.keys(item.properties).map(key => {
+            const PropertyRender = () => {
+                const property = item.properties[key]
+
+                if (Array.isArray(property)) {
+                    return property.map(prop => {
+                        return <antd.Tag style={{ marginBottom: "5px" }}>{prop}</antd.Tag>
+                    })
+                }
+
+                return property
+            }
+
+            return (
+                <div className="property" key={key}>
+                    <div className="name">{String(key).toTitleCase()}</div>
+                    <div className="value"><PropertyRender /></div>
+                </div>
+            )
+        })
+    }
+
+    render() {
+        if (!this.state.data || this.state.loading) {
+            return <antd.Skeleton active />
+        }
+
+        const formula = FORMULAS[this.state.data.type]
+        const quantityCount = this.countQuantityFromCommits()
+        const quantityLeft = this.countQuantityLeft()
+        const isQuantityProductionReached = this.isQuantityProductionReached()
+
+        return <div className="payload_inspector">
+            <div className="header">
+                <div className="typeIndicator">
+                    <h1>{Icons[formula.icon] && createIconRender(formula.icon)} {String(this.state.data.type).toTitleCase()}</h1>
+                </div>
+                <div>
+                    <h1>{this.state.data.name}</h1>
+                </div>
+                <div>
+                    <h3>#{String(this.state.data.uuid).toUpperCase()}</h3>
+                </div>
+            </div>
+
+            <div className="properties">
+                {this.renderProperties(this.state.data)}
+                <div className="property">
+                    <div className="name">Quantity produced</div>
+                    <div className="value">{quantityCount}</div>
+                </div>
+                <div className="property">
+                    <div className="name">Quantity left</div>
+                    <div className="value">{quantityLeft}</div>
+                </div>
+            </div>
+
+            <div className="production">
+                <h3><Icons.Disc /> Production target</h3>
+
+                <div className="content">
+                    <div className="counter">
+                        <div style={isQuantityProductionReached ? { color: "red" } : undefined}>
+                            {quantityCount}
+                        </div>
+                        <div>/</div>
+                        <div>
+                            {this.state.data.properties?.quantity ?? "?"}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ActionsBar mode="float" type="transparent" spaced>
+                <div>
+                    <antd.Button type="primary" icon={<Icons.MdOutlinePendingActions />}>
+                        Run
+                    </antd.Button>
+                </div>
+                <div>
+                    <antd.Button onClick={() => this.onClickCommit()} icon={<Icons.CheckCircle />}>
+                        Commit
+                    </antd.Button>
+                </div>
+                <div>
+                    <antd.Button icon={<Icons.Edit />}>
+                        Edit
+                    </antd.Button>
+                </div>
+            </ActionsBar>
+        </div>
+    }
+}

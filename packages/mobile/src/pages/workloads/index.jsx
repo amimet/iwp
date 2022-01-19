@@ -67,7 +67,7 @@ export default class Workloads extends React.Component {
 	fetchWorkloadsFromRegion = async (id) => {
 		this.setState({ loading: true })
 
-		await this.api.get.workloads(undefined, { region: id })
+		await this.api.get.workload(undefined, { region: id })
 			.then((data) => {
 				console.log(data)
 				this.setState({ workloads: data, loading: false })
@@ -232,7 +232,7 @@ export default class Workloads extends React.Component {
 					{renderDate(item.created)}
 					<div>
 						<Icons.Box />
-						{item.orders?.length ?? 0} orders
+						{item.payloads?.length ?? 0} payloads
 					</div>
 				</div>
 			</div>
