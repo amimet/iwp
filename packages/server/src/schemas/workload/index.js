@@ -1,6 +1,6 @@
 export default {
     name: { type: String },
-    orders: { type: Object, required: true },
+    payloads: { type: Object, required: true },
     commits: { type: Array, default: [] },
     assigned: { type: Array, default: [] },
     region: { type: String, default: 0 },
