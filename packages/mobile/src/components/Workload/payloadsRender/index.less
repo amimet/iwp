@@ -1,6 +1,11 @@
 .workload_payloadItem {
 	cursor: pointer;
+	padding: 5px!important;
 	
+	border-radius: 3px;
+	margin-bottom: 5px;
+	border: 0!important;
+
 	.quantity {
 		display: flex;
 		flex-direction: row;
@@ -15,5 +20,20 @@
 		height: 24px;
 		
 		padding: 5px;
+	}
+
+	&.reached {
+		background-color: var(--background-color-accent);
+	
+		filter: contrast(0.8);
+		
+		.ant-list-item-meta-title{
+			color: var(--background-color-contrast);
+		}
+		
+		.quantity {
+			background-color: var(--background-color-contrast);
+			color: var(--background-color-accent);
+		}
 	}
 }
