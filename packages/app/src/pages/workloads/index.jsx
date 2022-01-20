@@ -127,7 +127,7 @@ export default class Workloads extends React.Component {
 		})
 	}
 
-	onDeleteWorkloads = (keys) => {
+	onDeleteWorkloads = (ctx, keys) => {
 		antd.Modal.confirm({
 			title: "Do you want to delete these items?",
 			icon: <Icons.ExclamationCircleOutlined />,
@@ -139,6 +139,7 @@ export default class Workloads extends React.Component {
 					this.api.delete
 						.workload({ id: keys })
 						.then(() => {
+							ctx.unselectAll()
 							this.deleteWorkloadFromRender(keys)
 							return resolve()
 						})
@@ -148,10 +149,6 @@ export default class Workloads extends React.Component {
 				})
 			},
 		})
-	}
-
-	onCheckWorkloads = (keys) => {
-		console.log(keys)
 	}
 
 	onDoubleClickItem = (key) => {
@@ -255,21 +252,11 @@ export default class Workloads extends React.Component {
 		}
 
 		return <SelectableList
-			selectionEnabled={this.state.selectionEnabled}
+			items={list}
 			actions={actions}
-			onDoneRender={
-				<>
-					<Icons.Check /> Check
-				</>
-			}
-			onDone={(value) => {
-				console.log(value)
-			}}
 			onDoubleClick={this.onDoubleClickItem}
 			onDelete={this.onDeleteWorkloads}
-			onCheck={this.onCheckWorkloads}
 			renderItem={this.renderItem}
-			items={list}
 		/>
 	}
 
