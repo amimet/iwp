@@ -194,6 +194,7 @@ class App {
 					},
 					componentProps: {
 						defaultType,
+						submitToCatalog: true,
 					}
 				})
 			},
