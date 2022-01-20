@@ -14,9 +14,7 @@ export default (props) => {
     }
 
     return <div onClick={onClick} key={props.workload._id} className="assigned_workload">
-        <div>
-            #{props.workload._id}
-            <h2>{props.workload.name}</h2>
-        </div>
+        <span>#{String(props.workload._id).toUpperCase()}</span>
+        <h2>{props.workload.name}</h2>
     </div>
 }
