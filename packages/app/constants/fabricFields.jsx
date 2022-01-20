@@ -3,12 +3,43 @@ import * as antd from "antd"
 
 export default {
     quantity: {
+        mutability: true,
+        mutabilityDefault: true,
         label: "Quantity",
         component: "inputNumber",
         updateEvent: "onChange",
         props: {
             min: 0,
             defaultValue: 1,
+        },
+    },
+    stockTarget: {
+        label: "Stock Target",
+        component: "select",
+        updateEvent: "onChange",
+        props: {
+            style: { width: "100%" },
+            mode: "multiple",
+            placeholder: "Select stock items",
+        },
+        children: async () => {
+            const api = window.app.request
+
+            const data = await api.get.fabric(undefined, {
+                select: {
+                    type: ["stockItem"],
+                }
+            }).catch((err) => {
+                console.error(err)
+                return []
+            })
+
+            if (data) {
+                return data.map((stockItem) => {
+                    return <antd.Select.Option value={stockItem._id}>{stockItem.name}</antd.Select.Option>
+                })
+            }
+            return data
         },
     },
     operators: {
@@ -29,7 +60,7 @@ export default {
                     return <antd.Select.Option value={operator._id}>{operator.fullName ?? operator.username}</antd.Select.Option>
                 })
             }
-            
+
             return null
         },
         props: {

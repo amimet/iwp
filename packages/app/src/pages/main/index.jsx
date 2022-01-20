@@ -27,7 +27,11 @@ export default class Main extends React.Component {
 				<div className="top">
 					<div className="header_title">
 						<div>
-							<antd.Avatar shape="square" src={user.avatar} size={window.isMobile ? undefined : 120} />
+							<antd.Avatar
+								shape="square"
+								src={user.avatar}
+								size={window.isMobile ? undefined : 120}
+							/>
 						</div>
 						<div>
 							<div>
@@ -36,26 +40,32 @@ export default class Main extends React.Component {
 							<div>
 								<h1>Welcome back, {user.fullName ?? user.username ?? "Guest"}</h1>
 							</div>
-							<div>
+							{!window.isMobile && <div>
 								<ServerStatus />
-							</div>
+							</div>}
 						</div>
 					</div>
-					<div>
+					{!window.isMobile && <div>
 						<AppSearcher />
-					</div>
+					</div>}
 				</div>
-				<div className="content">
+
+				{!window.isMobile && <div className="content">
 					<h2><Icons.Sliders /> Quick actions</h2>
 					<div className="quick_actions">
 						<div>
-							<antd.Button type="primary" onClick={() => window.app.openFabric()}>
+							<antd.Button type="primary" onClick={() => window.app.openCreateNew()}>
 								Create
 							</antd.Button>
 						</div>
 					</div>
+				</div>}
+
+				<div className="widgets">
+					<div key="assignedWorkloads" className="widget">
+						<AssignedWorkloads />
+					</div>
 				</div>
-				<AssignedWorkloads />
 			</div>
 		)
 	}

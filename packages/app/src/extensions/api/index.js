@@ -16,7 +16,7 @@ class WSInterface {
     }
 
     register = (socket, as) => {
-        if(typeof socket !== "string") {
+        if (typeof socket !== "string") {
             console.error("socket must be string")
             return false
         }
@@ -48,9 +48,10 @@ export default {
                     })
 
                     window.app.ws = this.WSInterface
+                    window.app.handleWSListener = this.handleWSListener
+
                     window.app.api = this.apiBridge
                     window.app.request = this.apiBridge.endpoints
-                    window.app.handleWSListener = this.handleWSListener
                 },
                 handleWSListener: (to, fn) => {
                     if (typeof to === "undefined") {
@@ -61,13 +62,13 @@ export default {
                         console.error("handleWSListener: fn must be function")
                         return false
                     }
-                   
+
                     let ns = "main"
                     let event = null
 
                     if (typeof to === "string") {
                         event = to
-                    }else if (typeof to === "object") {
+                    } else if (typeof to === "object") {
                         ns = to.ns
                         event = to.event
                     }

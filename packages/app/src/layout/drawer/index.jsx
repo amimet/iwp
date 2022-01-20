@@ -1,8 +1,6 @@
 import React from "react"
-import * as antd from "antd"
-import classnames from "classnames"
+import { DraggableDrawer } from "components"
 import EventEmitter from "@foxify/events"
-import { Icons } from "components/Icons"
 
 import "./index.less"
 
@@ -105,7 +103,7 @@ export class Drawer extends React.Component {
 	events = new EventEmitter()
 	state = {
 		locked: this.options.locked ?? false,
-		visible: false,
+		visible: true,
 	}
 
 	unlock = () => this.setState({ locked: false })
@@ -118,16 +116,17 @@ export class Drawer extends React.Component {
 		if (typeof this.props.children === "undefined") {
 			throw new Error(`Empty component`)
 		}
+	}
 
-		if (this.props.children) {
-			this.setState({ visible: true })
-		}
+	toogleVisibility = (to) => {
+		this.setState({ visible: to ?? !this.state.visible })
 	}
 
 	onClose = () => {
 		if (typeof this.options.props?.closable !== "undefined" && !this.options.props?.closable) {
 			return false
 		}
+		this.toogleVisibility(false)
 		this.close()
 	}
 
@@ -162,14 +161,13 @@ export class Drawer extends React.Component {
 
 	render() {
 		const drawerProps = {
-			destroyOnClose: true,
-			bodyStyle: { padding: 0 },
 			...this.options.props,
 			ref: this.props.ref,
-			closable: false,
 			key: this.props.id,
-			onClose: this.onClose,
-			visible: this.state.visible,
+			onRequestClose: this.onClose,
+			open: this.state.visible,
+			containerElementClass: "drawer",
+			modalElementClass: "body",
 		}
 		const componentProps = {
 			...this.options.componentProps,
@@ -179,25 +177,8 @@ export class Drawer extends React.Component {
 			handleFail: this.handleFail,
 		}
 
-		if (window.isMobile) {
-			drawerProps.height = "100%"
-			drawerProps.placement = "bottom"
-		}
-
-		return (
-			<antd.Drawer className={classnames("drawer", { ["mobile"]: window.isMobile })} {...drawerProps}>
-				{!this.props.headerDisabled && <div className="pageTitle">
-					<antd.PageHeader
-						onBack={this.onClose}
-						title={this.props.title ?? "Close"}
-						backIcon={this.props.backIcon ?? <Icons.X />}
-						subTitle={this.props.subtitle}
-					/>
-				</div>}
-				<div className="body">
-					{React.createElement(this.props.children, componentProps)}
-				</div>
-			</antd.Drawer>
-		)
+		return <DraggableDrawer {...drawerProps}>
+			{React.createElement(this.props.children, componentProps)}
+		</DraggableDrawer>
 	}
 }

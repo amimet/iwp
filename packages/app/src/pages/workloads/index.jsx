@@ -1,16 +1,24 @@
 import React from "react"
 import * as antd from "antd"
+import { PullToRefresh } from "antd-mobile"
 import moment from "moment"
 import classnames from "classnames"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList, Workload } from "components"
+import { ActionsBar, SelectableList } from "components"
 
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
+
+const statusRecord = {
+	pulling: "Slide down to refresh",
+	canRelease: "Release",
+	refreshing: <Icons.LoadingOutlined spin />,
+	complete: <Icons.Check />,
+}
 
 const renderDate = (time) => {
 	const dateNumber = Number(time)
@@ -48,6 +56,10 @@ export default class Workloads extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
+		window.app.handleWSListener("newWorkload", (data) => {
+			this.appendWorkloadToRender(data)
+		})
+
 		this.loadRegions()
 		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
 	}
@@ -55,7 +67,7 @@ export default class Workloads extends React.Component {
 	fetchWorkloadsFromRegion = async (id) => {
 		this.setState({ loading: true })
 
-		await this.api.get.workloads(undefined, { region: id })
+		await this.api.get.workload(undefined, { region: id })
 			.then((data) => {
 				console.log(data)
 				this.setState({ workloads: data, loading: false })
@@ -75,10 +87,6 @@ export default class Workloads extends React.Component {
 				console.error(error)
 				this.setState({ error })
 			})
-	}
-
-	toogleSelection = () => {
-		this.setState({ selectionEnabled: !this.state.selectionEnabled })
 	}
 
 	appendWorkloadToRender = (payload) => {
@@ -113,25 +121,6 @@ export default class Workloads extends React.Component {
 		this.setState({ workloads })
 	}
 
-	openWorkloadDetails = (id) => {
-		if (this.state.selectionEnabled) {
-			return false
-		}
-
-		window.app.openWorkloadDetails(id)
-	}
-
-	openWorkloadCreator = () => {
-		window.app.DrawerController.open("workload_creator", Workload.Creator, {
-			props: {
-				width: "55%",
-			},
-			onDone: (drawer, payload) => {
-				this.changeRegion(payload.region)
-			}
-		})
-	}
-
 	changeRegion = (region) => {
 		this.setState({ selectedRegion: region }, async () => {
 			await this.fetchWorkloadsFromRegion(region)
@@ -151,7 +140,6 @@ export default class Workloads extends React.Component {
 						.workload({ id: keys })
 						.then(() => {
 							this.deleteWorkloadFromRender(keys)
-							this.toogleSelection(false)
 							return resolve()
 						})
 						.catch((err) => {
@@ -164,6 +152,18 @@ export default class Workloads extends React.Component {
 
 	onCheckWorkloads = (keys) => {
 		console.log(keys)
+	}
+
+	onDoubleClickItem = (key) => {
+		window.app.openWorkloadDetails(key)
+	}
+
+	onSearch = (event) => {
+		if (event === "" && this.state.searchValue) {
+			return this.setState({ searchValue: null })
+		}
+
+		this.debouncedSearch(event.target.value)
 	}
 
 	search = (value) => {
@@ -192,14 +192,6 @@ export default class Workloads extends React.Component {
 
 	debouncedSearch = debounce((value) => this.search(value), 500)
 
-	onSearch = (event) => {
-		if (event === "" && this.state.searchValue) {
-			return this.setState({ searchValue: null })
-		}
-
-		this.debouncedSearch(event.target.value)
-	}
-
 	renderRegionsOptions = () => {
 		return this.state.regions.map((region) => {
 			return (
@@ -224,7 +216,7 @@ export default class Workloads extends React.Component {
 		const indicatorStatus = item.expired ? "expired" : item.status
 
 		return (
-			<div className="workload_order_item" onClick={() => this.openWorkloadDetails(item._id)} >
+			<div className="workload_order_item">
 				<div className="header">
 					<div className={classnames("indicator", indicatorStatus)}>
 						<div className="statusText">{indicatorStatus}</div>
@@ -232,15 +224,15 @@ export default class Workloads extends React.Component {
 					<div>
 						<h1>{item.name ?? "Unnamed workload"}</h1>
 					</div>
-					{!window.isMobile && <div>
-						<antd.Tag>{item._id}</antd.Tag>
-					</div>}
+					<div>
+						<antd.Tag>{String(item._id).toUpperCase()}</antd.Tag>
+					</div>
 				</div>
 				<div className="info">
 					{renderDate(item.created)}
 					<div>
 						<Icons.Box />
-						{item.orders?.length ?? 0} orders
+						{item.payloads?.length ?? 0} payloads
 					</div>
 				</div>
 			</div>
@@ -262,49 +254,30 @@ export default class Workloads extends React.Component {
 			return <antd.Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
 		}
 
-		return (
-			<SelectableList
-				selectionEnabled={this.state.selectionEnabled}
-				actions={actions}
-				onDoneRender={
-					<>
-						<Icons.Check /> Check
-					</>
-				}
-				onDone={(value) => {
-					console.log(value)
-				}}
-				onDelete={this.onDeleteWorkloads}
-				onCheck={this.onCheckWorkloads}
-				renderItem={this.renderItem}
-				items={list}
-			/>
-		)
+		return <SelectableList
+			selectionEnabled={this.state.selectionEnabled}
+			actions={actions}
+			onDoneRender={
+				<>
+					<Icons.Check /> Check
+				</>
+			}
+			onDone={(value) => {
+				console.log(value)
+			}}
+			onDoubleClick={this.onDoubleClickItem}
+			onDelete={this.onDeleteWorkloads}
+			onCheck={this.onCheckWorkloads}
+			renderItem={this.renderItem}
+			items={list}
+		/>
 	}
 
 	render() {
 		return (
-			<div style={{ height: "100%" }}>
+			<div className="workloads_list" style={{ height: "100%" }}>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar mode="float">
-						<div key="refresh">
-							<antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
-						</div>
-						<div key="toogleSelection">
-							<antd.Button
-								shape="round"
-								icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}
-								type={this.state.selectionEnabled ? "default" : "primary"}
-								onClick={() => this.toogleSelection()}
-							>
-								{this.state.selectionEnabled ? "Done" : "Select"}
-							</antd.Button>
-						</div>
-						<div key="createNew">
-							<antd.Button type="primary" onClick={this.openWorkloadCreator} icon={<Icons.Plus />}>
-								New
-							</antd.Button>
-						</div>
 						<div key="search">
 							<antd.Input.Search
 								placeholder="Search"
@@ -334,8 +307,14 @@ export default class Workloads extends React.Component {
 						</div>
 					</ActionsBar>
 				</div>
-
-				{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
+				<PullToRefresh
+					renderText={status => {
+						return <div>{statusRecord[status]}</div>
+					}}
+					onRefresh={async () => await this.fetchWorkloadsFromRegion(this.state.selectedRegion)}
+				>
+					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
+				</PullToRefresh>
 			</div>
 		)
 	}

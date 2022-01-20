@@ -32,6 +32,14 @@ export default {
             "tasks",
         ],
     },
+    stockItem: {
+        label: "Stock item",
+        icon: "Circle",
+        defaultFields: [
+            "description",
+            "quantity",
+        ],
+    },
     vaultItem: {
         icon: "Archive",
         label: "Vault item",

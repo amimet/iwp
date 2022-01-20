@@ -14,7 +14,7 @@ import React from "react"
 import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-
+import { ActionSheet } from "antd-mobile"
 import { StatusBar, Style } from '@capacitor/status-bar'
 
 import { Session, User, SidebarController, SettingsController } from "models"
@@ -157,6 +157,42 @@ class App {
 
 	static windowContext() {
 		return {
+			openCreateNew: () => {
+				const handler = React.createRef()
+
+				handler.current = ActionSheet.show({
+					extra: "Select a option",
+					cancelText: "Cancel",
+					actions: [
+						{
+							key: "workload",
+							text: "Workload",
+							onClick: () => {
+								window.app.openWorkloadCreator()
+								handler.current.close()
+							}
+						},
+						{
+							key: "fabric",
+							text: "Fabric",
+							onClick: () => {
+								window.app.openFabric()
+								handler.current.close()
+							}
+						}
+					],
+				})
+			},
+			openSettings: (goTo) => {
+				window.app.DrawerController.open("settings", Settings, {
+					props: {
+						width: "fit-content",
+					},
+					componentProps: {
+						goTo,
+					}
+				})
+			},
 			openWorkloadDetails: (id) => {
 				window.app.DrawerController.open("workload_details", Workload.Details, {
 					componentProps: {
@@ -168,16 +204,6 @@ class App {
 					onDone: (drawer) => {
 						drawer.close()
 					},
-				})
-			},
-			openSettings: (goTo) => {
-				window.app.DrawerController.open("settings", Settings, {
-					props: {
-						width: "fit-content",
-					},
-					componentProps: {
-						goTo,
-					}
 				})
 			},
 			openWorkloadCreator: () => {

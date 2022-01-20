@@ -6,8 +6,22 @@ import Sidebar from './sidebar'
 import Header from './header'
 import Drawer from './drawer'
 import Sidedrawer from './sidedrawer'
+import BottomBar from "./bottomBar"
 
 const LayoutRenders = {
+	mobile: (props) => {
+		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
+			<antd.Layout className="content_layout">
+				<antd.Layout.Content className="layout_page">
+					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
+						{props.children}
+					</div>
+				</antd.Layout.Content>
+			</antd.Layout>
+			<BottomBar user={props.user} />
+			<Drawer />
+		</antd.Layout>
+	},
 	default: (props) => {
 		return <antd.Layout className="app_layout" style={{ height: "100%" }}>
 			<Drawer />
@@ -42,13 +56,20 @@ export default class Layout extends React.Component {
 	}
 
 	componentDidMount() {
-		this.setLayout("default")
 		window.app.eventBus.on("transitionStart", () => {
 			this.setState({ isOnTransition: true })
 		})
 		window.app.eventBus.on("transitionDone", () => {
 			this.setState({ isOnTransition: false })
 		})
+
+		if (Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
+			this.setLayout("mobile")
+			window.isMobile = true
+		} else {
+			this.setLayout("default")
+			window.isMobile = false
+		}
 	}
 
 	render() {

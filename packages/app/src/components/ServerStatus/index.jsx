@@ -22,12 +22,6 @@ export default () => {
     }
 
     return <div>
-        <div key="http">
-            <Icons.Database /> {window.app?.api?.origin ?? "unavailable"}
-        </div>
-        <div key="websocket">
-            <Icons.Cpu /> {window.app?.ws?.io?.uri ?? "unavailable"}
-        </div>
         <div key="health">
             <Icons.Activity /> <antd.Tag color={getColor()}>
                 {connected ? "Connected" : "Disconnected"}
