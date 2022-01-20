@@ -19,6 +19,7 @@
     "@foxify/events": "^2.0.1",
     "@loadable/component": "^5.15.0",
     "@react-pdf/renderer": "^1.6.17",
+    "antd-mobile": "^5.0.0-rc.17",
     "antd": "^4.17.4",
     "chart.js": "^3.5.1",
     "classnames": "^2.3.1",

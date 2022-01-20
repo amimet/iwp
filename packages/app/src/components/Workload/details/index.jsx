@@ -4,9 +4,9 @@ import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 import { Icons } from "components/Icons"
-import { OperatorsAssignments, UserSelector, Fabric, ScheduledProgress } from "components"
+import { ActionsBar } from "components"
 
-import { OrdersRender } from ".."
+import { PayloadsRender, PayloadInspector } from ".."
 
 import "./index.less"
 
@@ -31,6 +31,12 @@ export default class WorkloadDetails extends React.Component {
 		await this.fetchData()
 
 		await this.setState({ qrCanvas: qr })
+
+		window.app.handleWSListener("workloadCommit", (data) => {
+			if (this.id === data.workloadId) {
+				this.fetchData()
+			}
+		})
 	}
 
 	fetchData = async () => {
@@ -113,17 +119,14 @@ export default class WorkloadDetails extends React.Component {
 		return { daysLeft, daysPassed, percentage }
 	}
 
-	openOrderItemDetails = (item) => {
-		window.app.DrawerController.open("FabricInspector", Fabric.Inspector, {
+	openPayloadDetails = (item) => {
+		window.app.DrawerController.open("PayloadInspector", PayloadInspector, {
 			onDone: (ctx, data) => {
 				ctx.close()
-				// TODO: Handle if exists any updates on data
 			},
 			componentProps: {
-				// TODO: Pass order item UUID for fetching data from API
-				runnable: true, // this enable to run the fabric task inspector process
-				resolvable: true, // this enable to resolve the fabric order task status
-				item: item,
+				workloadId: this.id,
+				payload: item,
 			}
 		})
 	}
@@ -199,12 +202,6 @@ export default class WorkloadDetails extends React.Component {
 
 							</antd.Badge.Ribbon>
 						</h1> : <h1><Icons.Box /> {data.name}</h1>}
-
-						<div>
-							<antd.Button icon={<Icons.Save />}>
-								Export
-							</antd.Button>
-						</div>
 					</div>
 				</div>
 
@@ -215,7 +212,7 @@ export default class WorkloadDetails extends React.Component {
 							ID
 						</div>
 						<div className="value">
-							{this.id}
+							{String(this.id).toUpperCase()}
 						</div>
 					</div>
 					<div key="state">
@@ -227,51 +224,33 @@ export default class WorkloadDetails extends React.Component {
 							{data.status}
 						</div>
 					</div>
+					<div key="commits">
+						<div className="name">
+							<Icons.Database />
+							Commits
+						</div>
+						<div className="value">
+							{data.commits?.length}
+						</div>
+					</div>
 				</div>
 
-				<antd.Collapse
-					bordered={false}
-					accordion={true}
-					expandIconPosition={"right"}
-					className="workload_details list"
-				>
-					{data.scheduledFinish && <antd.Collapse.Panel key="scheduled" header={<h2><Icons.Calendar /> Scheduled</h2>}>
-						<ScheduledProgress start={data.scheduledStart} finish={data.scheduledFinish} />
-					</antd.Collapse.Panel>}
-
-					<antd.Collapse.Panel key="timeline" header={<h2><Icons.Watch /> Timeline</h2>}>
-						<antd.Timeline mode="left">
-							<antd.Timeline.Item label={createdDate.toLocaleString()}>
-								Workload was created
-							</antd.Timeline.Item>
-						</antd.Timeline>
-					</antd.Collapse.Panel>
-
-					<antd.Collapse.Panel key="operators" header={<h2><Icons.Users /> Operators</h2>}>
-						<OperatorsAssignments onRemoveOperator={this.onRemoveOperator} onAssignOperator={this.onAssignOperator} assigned={data.assigned} />
-					</antd.Collapse.Panel>
-
-					<antd.Collapse.Panel key="orders" header={<h2><Icons.Archive /> Order</h2>}>
-						<OrdersRender onClickItem={(item) => this.openOrderItemDetails(item)} orders={this.state.data.orders} />
-					</antd.Collapse.Panel>
-				</antd.Collapse>
-
-				<div className="workload_details actions">
-					<div>
-						<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
-							Add token
-						</antd.Button>
+				<div className="workload_details payloads">
+					<div className="header">
+						<div>
+							<h1><Icons.Inbox /> Payloads</h1>
+						</div>
+						<div>
+							<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
+								Add token
+							</antd.Button>
+						</div>
 					</div>
-					<div>
-						<antd.Button icon={<Icons.Edit />}>
-							Edit
-						</antd.Button>
-					</div>
-					<div>
-						<antd.Button icon={<Icons.CheckCircle />}>
-							Mark as done
-						</antd.Button>
-					</div>
+
+					<PayloadsRender
+						onClickItem={(item) => this.openPayloadDetails(item)}
+						payloads={this.state.data.payloads}
+					/>
 				</div>
 			</div>
 		)

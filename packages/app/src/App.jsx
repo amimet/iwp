@@ -21,7 +21,7 @@ import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, Settings, Workload, Fabric, } from "components"
+import { NotFound, RenderError, Settings, Workload, Fabric } from "components"
 import Layout from "./layout"
 import { Icons } from "components/Icons"
 
@@ -178,6 +178,13 @@ class App {
 					componentProps: {
 						goTo,
 					}
+				})
+			},
+			openWorkloadCreator: () => {
+				window.app.DrawerController.open("workload_creator", Workload.Creator, {
+					props: {
+						width: "55%",
+					},
 				})
 			},
 			openFabric: (defaultType) => {

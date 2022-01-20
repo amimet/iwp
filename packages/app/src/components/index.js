@@ -16,6 +16,7 @@ export { default as AssignedWorkload } from "./AssignedWorkload"
 export { default as Clock } from "./Clock"
 export { default as ScheduledProgress } from "./ScheduledProgress"
 export { default as AssignedWorkloads } from "./AssignedWorkloads"
+export { default as StepsForm } from "./StepsForm"
 
 export * as Workload from "./Workload"
 export * as Fabric from "./Fabric"

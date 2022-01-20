@@ -1,345 +1,122 @@
 import React from "react"
 import * as antd from "antd"
-
-import { Icons, createIconRender } from "components/Icons"
-import { Fabric, ActionsBar, OperatorsAssignments } from "components"
-
-import { OrdersRender } from ".."
+import { Icons } from "components/Icons"
+import { UserSelector } from "components"
 
 import "./index.less"
 
-const steps = [
-	{
-		title: "Name",
-		icon: "Edit",
-		content: (props) => {
-			return <div className="workload_creator steps step content">
-				<antd.Input placeholder="Input an name" onChange={props.onChangeName} />
-			</div>
-		},
-	},
-	{
-		title: "Region",
-		icon: "Globe",
-		content: (props) => {
-			return <div className="workload_creator steps step content">
-				{props.renderRegionsSelector()}
-			</div>
-		},
-	},
-	{
-		title: "Schedule",
-		icon: "Calendar",
-		content: (props) => {
-			return <div className="workload_creator steps step content">
-				<antd.DatePicker.RangePicker
-					showTime={{ format: "HH:mm" }}
-					format="DD-MM-YYYY HH:mm"
-					onChange={props.onSetSchedule}
-				/>
-			</div>
-		}
-	},
-	{
-		title: "Workshift",
-		icon: "Clock",
-		content: (props) => {
-			return <div className="workload_creator steps step content">
-				{Object.keys(props.state.workshifts).length > 0 ? (
-					<div className="workload_creator workshift">
-						<antd.Select onChange={props.onSelectWorkshift} placeholder="Select an workshift">
-							{props.renderWorkshiftsOptions()}
-						</antd.Select>
-						{props.state.selectedWorkshift && props.renderWorkshiftInfo(props.state.selectedWorkshift)}
-					</div>
-				) : (
-					<div style={{ textAlign: "center" }}>No workshifts available for this region</div>
-				)}
-			</div>
-		},
-	},
-	{
-		title: "Operators",
-		icon: "User",
-		content: (props) => {
-			return <div className="workload_creator steps step content">
-				<OperatorsAssignments onAssignOperators={props.onAssignOperators} assigned={props.state.assigned} />
-			</div>
-		}
-	},
-	{
-		title: "Orders",
-		icon: "Box",
-		content: (props) => {
-			return <div className="workload_creator steps step content">
-				<OrdersRender onDeleteItem={props.removeOrderItem} orders={props.state.orders} />
+export const Operator = (props) => {
+    const { item, onRemove } = props
+    const [loading, setLoading] = React.useState(false)
 
-				<div key="actions" className="workload_creator steps step actions">
-					<div key="add">
-						<antd.Button onClick={props.onClickAddOrderItem} shape="round" icon={<Icons.Plus />}>
-							Add
-						</antd.Button>
-					</div>
-				</div>
-			</div>
-		}
-	},
-]
+    return <antd.List.Item className="operators_assignments item" key={item._id}>
+        <antd.List.Item.Meta
+            avatar={<antd.Avatar src={item.avatar} />}
+            title={item.fullName ?? item.username}
+        />
+        <div>
+            <antd.Button loading={loading} disabled={loading} onClick={() => {
+                setLoading(true)
+                setTimeout(() => {
+                    onRemove()
+                }, 250)
+            }}>Remove</antd.Button>
+        </div>
+    </antd.List.Item>
+}
 
-export default class WorkloadCreator extends React.Component {
-	state = {
-		step: 0,
+export default class OperatorsAssignments extends React.Component {
+    state = {
+        loading: true,
+        data: null,
+        assigned: (this.props?.assigned && Array.isArray(this.props?.assigned) ? this.props?.assigned : []) ?? [],
+    }
 
-		name: null,
-		selectedDate: null,
-		selectedRegion: null,
-		selectedWorkshift: null,
-		assigned: [],
-		regions: [],
-		orders: [],
-		workshifts: {},
-	}
+    api = window.app.request
 
-	api = window.app.request
+    componentDidMount = async () => {
+        await this.fetchOperatorsData()
+    }
 
-	componentDidMount = async () => {
-		if (typeof this.props.events !== "undefined") {
-			this.props.events.on("create_error", (error) => {
-				this.handleError(error)
-			})
-		}
+    onClickAddAssign = async () => {
+        return new Promise((resolve, reject) => {
+            window.app.DrawerController.open("OperatorAssignment", UserSelector, {
+                onDone: async (ctx, data) => {
+                    if (data.length <= 0) {
+                        ctx.close()
+                        return false
+                    }
 
-		await this.fetchRegions()
-	}
+                    let assigned = this.state.assigned
 
-	nextStep = () => {
-		this.setState({ step: this.state.step + 1 })
-	}
+                    assigned = [...assigned, ...data]
 
-	prevStep = () => {
-		this.setState({ step: this.state.step - 1 })
-	}
+                    await this.setState({ assigned })
 
-	fetchRegions = async () => {
-		await this.api.get
-			.regions()
-			.then((data) => {
-				this.setState({ regions: data })
-			})
-			.catch((err) => {
-				console.log(err)
-				this.setState({ error: err })
-			})
-	}
+                    if (typeof this.props.onAssignOperators === "function") {
+                        await this.props.onAssignOperators(data)
+                    }
 
-	fetchWorkshiftsFromRegion = async (region) => {
-		const data = await this.api.get.workshifts(undefined, { region: region })
-		const obj = Object()
+                    await this.fetchOperatorsData()
+                    ctx.close()
+                },
+                componentProps: {
+                    select: { roles: ["operator"] },
+                    excludedIds: this.state.assigned,
+                }
+            })
+        })
+    }
 
-		data.forEach((workshift) => {
-			obj[workshift._id] = workshift
-		})
+    onClickRemoveOperator = async (_id) => {
+        if (typeof this.props.onRemoveOperator === "function") {
+            let assigned = this.state.assigned
 
-		this.setState({ workshifts: obj })
-	}
+            assigned = assigned.filter((id) => id !== _id)
 
-	submit = async () => {
-		this.setState({ submitting: true, submittingError: null })
+            await this.setState({ assigned })
 
-		const { assigned, selectedRegion, selectedWorkshift, selectedDate, orders, name } = this.state
+            if (typeof this.props.onRemoveOperator === "function") {
+                await this.props.onRemoveOperator(_id)
+            }
 
-		const workload = {
-			region: selectedRegion,
-			workshift: selectedWorkshift,
-			assigned: assigned,
-			name,
-			orders,
-		}
+            await this.fetchOperatorsData()
+        }
+    }
 
-		if (selectedDate != null) {
-			workload.scheduledStart = selectedDate[0]
-			workload.scheduledFinish = selectedDate[1]
-		}
+    fetchOperatorsData = async () => {
+        if (!Array.isArray(this.state.assigned) || this.state.assigned.length <= 0) {
+            return this.setState({ data: [], loading: false })
+        }
 
-		const request = await this.api.put.workload(workload)
-			.catch((error) => {
-				this.handleError(error)
-			})
+        const data = await this.api.get.users(null, { _id: this.state.assigned }).catch((err) => {
+            console.error(err)
+            antd.message.error("Error fetching operators")
+            return []
+        })
 
-		if (typeof this.props.handleDone === "function") {
-			this.props.handleDone(request)
-		}
-		if (typeof this.props.close === "function") {
-			this.props.close()
-		}
-	}
+        this.setState({ data, loading: false })
+    }
 
-	handleError = (error) => {
-		this.setState({ submitting: false, submittingError: error })
-	}
+    render() {
+        if (this.state.loading) {
+            return <antd.Skeleton active />
+        }
 
-	onClickAddOrderItem = () => {
-		window.app.DrawerController.open("selector", Fabric.Selector, {
-			onDone: (ctx, data) => {
-				ctx.close()
-				this.appendOrderItem(data)
-			},
-			props: {
-				width: "65%",
-			},
-		})
-	}
-
-	appendOrderItem = (order) => {
-		const { orders } = this.state
-
-		orders.push(order)
-
-		this.setState({ orders })
-	}
-
-	removeOrderItem = (id) => {
-        //TODO: Remove with UUID
-		this.setState({ orders: this.state.orders.filter((order) => order._id !== id) })
-	}
-
-	canSubmit = () => {
-		const isRegionSet = this.state.selectedRegion !== null
-		const isNameSet = this.state.name !== null
-		const hasOrderItems = this.state.orders.length > 0
-
-		return isRegionSet && isNameSet && hasOrderItems
-	}
-
-	onSelectRegion = (region) => {
-		this.setState({ selectedRegion: region })
-		this.fetchWorkshiftsFromRegion(region)
-	}
-
-	onSetSchedule = (value, dateString) => {
-		this.setState({ selectedDate: dateString })
-	}
-
-	onSelectWorkshift = (key) => {
-		this.setState({ selectedWorkshift: key })
-	}
-
-	onChangeName = (event) => {
-		const value = event.target.value
-
-		if (value === "") {
-			this.setState({ name: null })
-		} else {
-			this.setState({ name: value })
-		}
-	}
-
-	onAssignOperators = (operators) => {
-		let assigned = this.state.assigned
-		assigned = [...assigned, ...operators]
-		this.setState({ assigned })
-	}
-
-	renderRegionsSelector = () => {
-		return <antd.Select
-			showSearch
-			placeholder="Select a region"
-			optionFilterProp="children"
-			onChange={this.onSelectRegion}
-			filterOption={(input, option) =>
-				option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-			}
-			loading={this.state.regions > 0}
-		>
-			{this.state.regions.map((region) => {
-				return <antd.Select.Option key={region.name} value={region.name}>
-					{region.name}
-				</antd.Select.Option>
-			})}
-		</antd.Select>
-	}
-
-	renderWorkshiftsOptions = () => {
-		return Object.keys(this.state.workshifts).map((key) => {
-			const workshift = this.state.workshifts[key]
-			return <antd.Select.Option key={workshift._id}>{workshift.name}</antd.Select.Option>
-		})
-	}
-
-	renderWorkshiftInfo = (id) => {
-		const workshift = this.state.workshifts[id]
-
-		return (
-			<div className="workload_creator workshift info">
-				<div>
-					<Icons.LogIn style={{ color: "blue", marginRight: "10px" }} />
-					{workshift.start}
-				</div>
-				<div>
-					<Icons.ArrowRight />
-				</div>
-				<div>
-					<Icons.LogOut style={{ color: "red", marginRight: "10px" }} />
-					{workshift.end}
-				</div>
-			</div>
-		)
-	}
-
-	renderStep = (step) => {
-		const current = step ?? this.state.step
-		let Element = steps[current].content
-
-		if (React.isValidElement(Element)) {
-			return <Element {...this} />
-		}
-
-		return React.createElement(Element, this)
-	}
-
-	render() {
-		if (this.state.loading) return <antd.Skeleton active />
-		const current = steps[this.state.step]
-		return (
-			<div className="workload_creator">
-				<div className="workload_creator steps">
-					<antd.Steps direction="vertical" className="workload_creator steps header" size="small" current={this.state.step}>
-						{steps.map(item => (
-							<antd.Steps.Step key={item.title} />
-						))}
-					</antd.Steps>
-
-					<div className="workload_creator steps step">
-						<h1>{current.icon && createIconRender(current.icon)}{current.title}</h1>
-						{this.renderStep()}
-					</div>
-				</div>
-
-				{this.state.submittingError && (
-					<div className="component_bottom_centered" style={{ color: "#f5222d" }}>
-						{this.state.submittingError}
-					</div>
-				)}
-
-				<ActionsBar mode="float">
-					{this.state.step > 0 && (
-						<antd.Button style={{ margin: "0 8px" }} onClick={() => this.prevStep()}>
-							<Icons.ChevronLeft />Previous
-						</antd.Button>
-					)}
-					{this.state.step < steps.length - 1 && (
-						<antd.Button type="primary" onClick={() => this.nextStep()}>
-							<Icons.ChevronRight />Next
-						</antd.Button>
-					)}
-					{this.state.step === steps.length - 1 && (
-						<antd.Button disabled={this.state.submitting || !this.canSubmit()} type="primary" onClick={this.submit}>
-							{this.state.submitting && <Icons.LoadingOutlined spin />}
-							Create
-						</antd.Button>
-					)}
-				</ActionsBar>
-			</div>
-		)
-	}
+        return <div className="operators_assignments">
+            <div>
+                <antd.List
+                    dataSource={this.state.data}
+                    renderItem={(item) => {
+                        return <Operator item={item} onRemove={() => this.onClickRemoveOperator(item._id)} />
+                    }}
+                />
+            </div>
+            <div className="operators_assignments actions">
+                <div key="add">
+                    <antd.Button icon={<Icons.Plus />} shape="round" onClick={this.onClickAddAssign}>Add</antd.Button>
+                </div>
+            </div>
+        </div>
+    }
 }

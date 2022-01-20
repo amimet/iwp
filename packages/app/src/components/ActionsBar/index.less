@@ -1,6 +1,6 @@
 @actionsBar_height: fit-content;
 
-.actionsBar_card {
+.actionsBar {
 	display: inline-block;
 	white-space: nowrap;
 
@@ -26,6 +26,22 @@
 		width: 0;
 		height: 0;
 		z-index: 0;
+	}
+
+	.wrapper {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		height: 100%;
+		transition: all 200ms ease-in-out;
+
+		> div {
+			margin: 0 5px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
 	}
 
 	&.float {
@@ -56,20 +72,19 @@
 		width: 100%;
 		margin-bottom: 10px;
 	}
-}
 
-.actionsBar_flexWrapper {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
+	&.transparent {
+		background-color: transparent;
+		border: none;
+		backdrop-filter: none;
+	}
 
-	height: 100%;
-	transition: all 200ms ease-in-out;
-
-	> div {
-		margin: 0 5px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+	&.spaced {
+		.wrapper {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+		}
 	}
 }

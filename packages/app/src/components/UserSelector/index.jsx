@@ -43,13 +43,9 @@ export default class UserSelector extends React.Component {
     }
 
     renderItem = (item) => {
-        return <div disabled={this.isExcludedId(item._id)} className="users_selector item">
-            <div>
-                <antd.Avatar shape="square" src={item.avatar} />
-            </div>
-            <div>
-                <h1>{item.fullName ?? item.username}</h1>
-            </div>
+        return <div disabled={this.isExcludedId(item._id)} className="user" >
+            <div><antd.Avatar shape="square" src={item.avatar} /></div>
+            <div><h1>{item.fullName ?? item.username}</h1></div>
         </div>
     }
 
@@ -105,7 +101,7 @@ export default class UserSelector extends React.Component {
                 </div>
             </div>
             <SelectableList
-                ignoreMobileActions
+                overrideSelectionEnabled
                 items={this.state.searchValue ?? this.state.data}
                 renderItem={this.renderItem}
                 actions={[
