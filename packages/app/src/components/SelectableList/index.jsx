@@ -100,8 +100,24 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
+	actionProviderProps = {
+		onDone: this.onDone,
+		onDiscard: this.onDiscard,
+		onCancel: this.onCancel,
+		selectKey: this.selectKey,
+		unselectKey: this.unselectKey,
+		selectAll: this.selectAll,
+		unselectAll: this.unselectAll,
+		isKeySelected: this.isKeySelected,
+		isAllSelected: this.isAllSelected,
+	}
+
 	isKeySelected = (key) => {
 		return this.state.selectedKeys.includes(key)
+	}
+
+	isAllSelected = () => {
+		return this.state.selectedKeys.length === this.props.items.length
 	}
 
 	selectAll = () => {
@@ -203,7 +219,7 @@ export default class SelectableList extends React.Component {
 										}
 									}
 
-									this.props[action.props.call](data)
+									this.props[action.props.call](this.actionProviderProps, data)
 								}
 							}
 						}}
