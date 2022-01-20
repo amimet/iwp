@@ -25,7 +25,7 @@ const ListItem = React.memo((props) => {
 	const renderChildren = props.renderChildren(item)
 	const isDisabled = renderChildren.props.disabled
 
-	const doubleClickSpeed = 350
+	const doubleClickSpeed = 100
 	let delayedClick = null
 	let clickedOnce = null
 
