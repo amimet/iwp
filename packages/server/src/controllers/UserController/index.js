@@ -34,7 +34,7 @@ export default {
             result = await User.find(req.selection, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
         }
 
-        if (req.query.select) {
+        if (req.query?.select) {
             try {
                 req.query.select = JSON.parse(req.query.select)
             } catch (error) {
