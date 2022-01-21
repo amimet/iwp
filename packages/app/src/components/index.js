@@ -18,6 +18,8 @@ export { default as ScheduledProgress } from "./ScheduledProgress"
 export { default as AssignedWorkloads } from "./AssignedWorkloads"
 export { default as StepsForm } from "./StepsForm"
 export { default as DraggableDrawer } from "./DraggableDrawer"
+export { default as AddableSelectList } from "./AddableSelectList"
+export { default as SwipeItem } from "./SwipeItem"
 
 export * as Workload from "./Workload"
 export * as Fabric from "./Fabric"
