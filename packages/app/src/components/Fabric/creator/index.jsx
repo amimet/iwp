@@ -11,6 +11,7 @@ import "./index.less"
 
 const FieldsComponents = {
     "input": antd.Input,
+    "addableSelectList": loadable(() => import("components/AddableSelectList")),
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
     "datepicker": antd.DatePicker,
@@ -242,8 +243,8 @@ export default class FabricCreator extends React.Component {
         this.toogleSubmitting(false)
 
         if (typeof this.props.handleDone === "function") {
-			this.props.handleDone(payload)
-		}
+            this.props.handleDone(payload)
+        }
 
         if (!this.state.error && typeof this.props.close === "function") {
             this.props.close()
@@ -281,10 +282,12 @@ export default class FabricCreator extends React.Component {
     }
 
     renderField = (field) => {
-        let FieldComponent = field.component
+        let RenderComponent = field.component
+        let ReturnRender = null
 
-        if (FieldComponent == null) {
+        if (RenderComponent == null) {
             console.error(`This field not have a component defined: ${field.type}`)
+
             antd.notification.error({
                 message: "Missing component",
                 description: `This field not have a component defined: ${field.type}`,
@@ -293,20 +296,20 @@ export default class FabricCreator extends React.Component {
             return null
         }
 
-        if (typeof FieldComponent === "string") {
-            if (typeof FieldsComponents[FieldComponent] === "undefined") {
+        if (typeof RenderComponent === "string") {
+            if (typeof FieldsComponents[RenderComponent] === "undefined") {
                 console.error(`No component type available for field [${field.key}]`)
                 return null
             }
 
-            FieldComponent = FieldsComponents[FieldComponent]
+            RenderComponent = FieldsComponents[RenderComponent]
         }
 
         if (!field.key) {
             field.key = this.getKeyFromLatestFieldType(field.type)
         }
 
-        let ComponentProps = {
+        let renderProps = {
             ...field.props,
             value: this.state.values[field.key],
             disabled: this.state.submitting,
@@ -318,13 +321,11 @@ export default class FabricCreator extends React.Component {
             },
         }
 
-        let RenderComponent = null
-
         if (typeof field.children === "function") {
-            RenderComponent = loadable(async () => {
+            ReturnRender = loadable(async () => {
                 try {
                     const children = await field.children()
-                    return () => React.createElement(FieldComponent, ComponentProps, children)
+                    return () => React.createElement(RenderComponent, renderProps, children)
                 } catch (error) {
                     console.log(error)
 
@@ -341,14 +342,14 @@ export default class FabricCreator extends React.Component {
                 fallback: <div>Loading...</div>,
             })
         } else {
-            RenderComponent = () => React.createElement(FieldComponent, ComponentProps)
+            ReturnRender = () => React.createElement(RenderComponent, renderProps)
         }
 
         return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
             <div className="content">
                 <h3>{field.icon && createIconRender(field.icon)}{field.label}</h3>
                 <div className="component">
-                    <RenderComponent />
+                    <ReturnRender />
                 </div>
             </div>
             <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
