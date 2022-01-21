@@ -5,6 +5,7 @@ export default {
         defaultFields: [
             "description",
             "operations",
+            "stockTarget",
         ],
     },
     operation: {

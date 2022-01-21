@@ -15,13 +15,27 @@ export default {
     },
     stockTarget: {
         label: "Stock Target",
-        component: "select",
         updateEvent: "onChange",
         props: {
-            style: { width: "100%" },
-            mode: "multiple",
-            placeholder: "Select stock items",
+            loadData: async (value) => {
+                const api = window.app.request
+
+                const data = await api.get.fabric(undefined, {
+                    select: {
+                        type: ["stockItem"],
+                    }
+                }).catch((err) => {
+                    console.error(err)
+                    return []
+                })
+    
+                return data.map((item) => {
+                    item.label = item.name
+                    return item
+                })
+            }
         },
+        component: "addableSelectList",
         children: async () => {
             const api = window.app.request
 
