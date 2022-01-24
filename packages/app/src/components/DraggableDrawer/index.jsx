@@ -146,6 +146,7 @@ export default class Drawer extends Component {
 
     tap = event => {
         const { pageY, pageX } = event.touches[0]
+        const shouldIgnored = Boolean(event.target.getAttribute("ignore-dragger") || (window.getComputedStyle(event.target).getPropertyValue("--ignore-dragger") !== ""))
 
         const start = isDirectionBottom(this.props.direction) || isDirectionTop(this.props.direction) ? pageY : pageX
 
@@ -153,13 +154,14 @@ export default class Drawer extends Component {
         this.NEW_POSITION = 0
         this.MOVING_POSITION = 0
 
-        this.setState({ ignore: event.target.getAttribute("ignore-dragger"), onRange: this.isThumbInDraggerRange(event), thumb: start, start: start, touching: true })
+        this.setState({ ignore: shouldIgnored, onRange: this.isThumbInDraggerRange(event), thumb: start, start: start, touching: true })
     }
 
     drag = event => {
         if (this.state.ignore) {
             return false
         }
+
         const { direction } = this.props
         const { thumb, start, position } = this.state
         const { pageY, pageX } = event.touches[0]
