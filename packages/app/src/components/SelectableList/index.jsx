@@ -111,14 +111,24 @@ export default class SelectableList extends React.Component {
 
 	selectAll = () => {
 		if (this.props.items.length > 0) {
+			let updatedSelectedKeys = [...this.props.items.map((item) => item.key ?? item.id ?? item._id)]
+
+			if (typeof this.props.disabledKeys !== "undefined") {
+				updatedSelectedKeys = updatedSelectedKeys.filter((key) => {
+					return !this.props.disabledKeys.includes(key)
+				})
+			}
+
 			this.setState({
-				selectedKeys: [...this.props.items.map((item) => item.key ?? item.id ?? item._id)],
+				selectionEnabled: true,
+				selectedKeys: updatedSelectedKeys,
 			})
 		}
 	}
 
 	unselectAll = () => {
 		this.setState({
+			selectionEnabled: false,
 			selectedKeys: [],
 		})
 	}
@@ -225,6 +235,7 @@ export default class SelectableList extends React.Component {
 			this.setState({ selectionEnabled: false })
 			this.unselectAll()
 		}
+		const isAllSelected = this.isAllSelected()
 
 		let items = this.props.items.length > 0 ? this.props.items.map((item, index) => {
 			item.key = item.key ?? item.id ?? item._id
@@ -259,12 +270,13 @@ export default class SelectableList extends React.Component {
 							Discard
 						</Button>
 					</div>
-					<div key="allSelection">
-						<Button
-							shape="round"
-							onClick={this.selectAll}
-						>All</Button>
-					</div>
+					{this.props.bulkSelectionAction &&
+						<div key="allSelection">
+							<Button
+								shape="round"
+								onClick={() => isAllSelected ? this.unselectAll() : this.selectAll()}
+							>{isAllSelected ? "Unselect all" : "Select all"}</Button>
+						</div>}
 					{Array.isArray(this.props.actions) && this.renderProvidedActions()}
 				</ActionsBar>
 			}
