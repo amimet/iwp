@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import { Stepper } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
 import loadable from "@loadable/component"
 import classnames from "classnames"
@@ -15,7 +16,7 @@ const FieldsComponents = {
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
     "datepicker": antd.DatePicker,
-    "inputNumber": antd.InputNumber,
+    "inputNumber": Stepper,
 }
 
 export default class FabricCreator extends React.Component {
@@ -311,6 +312,7 @@ export default class FabricCreator extends React.Component {
 
         let renderProps = {
             ...field.props,
+            "ignore-dragger": true,
             value: this.state.values[field.key],
             disabled: this.state.submitting,
             [field.updateEvent]: (...args) => {
@@ -344,15 +346,15 @@ export default class FabricCreator extends React.Component {
         } else {
             ReturnRender = () => React.createElement(RenderComponent, renderProps)
         }
-
-        return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
-            <div className="content">
+        
+        return <div ignore-dragger="true" key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
+            <div ignore-dragger="true" className="content">
                 <h3>{field.icon && createIconRender(field.icon)}{field.label}</h3>
-                <div className="component">
+                <div ignore-dragger="true" className="component">
                     <ReturnRender />
                 </div>
             </div>
-            <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
+            <div ignore-dragger="true" className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
         </div>
     }
 
