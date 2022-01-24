@@ -114,6 +114,7 @@ class SwipeToDelete extends React.Component {
 
         return (
             <Container
+                ignore-dragger
                 id="delete-container"
                 deleting={deleting}
                 {...cssParams}
@@ -126,6 +127,7 @@ class SwipeToDelete extends React.Component {
                 }}
             >
                 <Delete
+                    ignore-dragger
                     id="delete"
                     buttonMargin={shiftDelete ? this.containerWidth + translate : this.containerWidth - deleteWidth}
                     {...cssParams}
@@ -134,6 +136,7 @@ class SwipeToDelete extends React.Component {
                 </Delete>
                 <Content
                     {...cssParams}
+                    ignore-dragger
                     id="delete-content"
                     deleting={deleting}
                     onMouseDown={this.onMouseDown}
