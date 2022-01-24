@@ -102,6 +102,7 @@ export default class UserSelector extends React.Component {
             </div>
             <SelectableList
                 overrideSelectionEnabled
+                bulkSelectionAction
                 items={this.state.searchValue ?? this.state.data}
                 renderItem={this.renderItem}
                 actions={[
