@@ -127,14 +127,16 @@ const steps = [
 			}
 
 			const onAddItem = (item) => {
+				item.key = value.length + 1
+
 				const result = [...value, item]
 
 				setValue(result)
 				props.handleUpdate(result)
 			}
 
-			const onDeleteItem = (key) => {
-				const result = value.filter((item) => item._id !== key)
+			const onDeleteItem = (item) => {
+				const result = value.filter((_item) => _item.key !== item.key)
 
 				setValue(result)
 				props.handleUpdate(result)

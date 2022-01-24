@@ -8,13 +8,21 @@ import "./index.less"
 export default (props) => {
 	const onClickItem = (item) => {
 		if (typeof props.onClickItem === "function") {
-			props.onClickItem(item)
+			props.onClickItem({
+				_id: item._id,
+				key: item.key,
+				uuid: item.uuid,
+			})
 		}
 	}
 
 	const onClickDelete = (item) => {
 		if (typeof props.onDeleteItem === "function") {
-			props.onDeleteItem(item._id)
+			props.onDeleteItem({
+				_id: item._id,
+				key: item.key,
+				uuid: item.uuid,
+			})
 		}
 	}
 
