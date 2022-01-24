@@ -2,8 +2,8 @@
 @selectableList_item_borderColor_normal: rgba(51, 51, 51, 0.3);
 
 .selectableList {
-	.content {
-		.item {
+	.selectableList_content {
+		.selectableList_item {
 			--ignore-dragger: true;
 			display: inline-flex;
 			overflow-x: overlay;
@@ -43,7 +43,7 @@
 			}
 		}
 
-		.item:active {
+		.selectableList_item:active {
 			background-color: #f5f5f5;
 			transform: scale(0.98);
 			margin-bottom: 3px;
@@ -51,8 +51,8 @@
 	}
 
 	&.selectionEnabled {
-		.content {
-			.item {
+		.selectableList_content {
+			.selectableList_item {
 				cursor: pointer;
 
 				border: rgba(51, 51, 51, 0.3) 1px solid;

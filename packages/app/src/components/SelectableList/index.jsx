@@ -52,7 +52,7 @@ const ListItem = React.memo((props) => {
 		id: props.id,
 		key: props.id,
 		disabled: isDisabled,
-		className: classnames("item", {
+		className: classnames("selectableList_item", {
 			["selected"]: props.selected,
 			["disabled"]: isDisabled,
 		}),
@@ -244,7 +244,7 @@ export default class SelectableList extends React.Component {
 		}) : <antd.Empty image={antd.Empty.PRESENTED_IMAGE_SIMPLE} />
 
 		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.overrideSelectionEnabled ?? this.state.selectionEnabled })}>
-			<div className="content">
+			<div className="selectableList_content">
 				{items}
 			</div>
 			{this.props.items.length > 0 && (this.props.overrideSelectionEnabled || this.state.selectionEnabled) && !this.props.actionsDisabled &&
