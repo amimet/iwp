@@ -1,12 +1,14 @@
 import React from "react"
 import * as antd from "antd"
+import { Stepper } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
 import { Fabric } from "components"
 
 import FORMULAS from "schemas/fabricFormulas"
 import "./index.less"
 
-export class BrowserSelector extends React.Component {
+// TODO: Override with custom properties
+export default class BrowserSelector extends React.Component {
 	state = {
 		error: false,
 		loading: true,
@@ -15,6 +17,8 @@ export class BrowserSelector extends React.Component {
 		selectedItem: false,
 		selectedVariants: null,
 		quantity: 1,
+
+		createCustom: false,
 	}
 
 	api = window.app.request
@@ -54,13 +58,23 @@ export class BrowserSelector extends React.Component {
 		}
 	}
 
+	onClickCreateCustom = () => {
+		this.setState({ createCustom: true })
+	}
+
 	handleDone = () => {
 		if (typeof this.props.handleDone === "function") {
-			this.props.handleDone({
+			let item = {
 				...this.state.selectedItem,
-				selectedVariants: this.state.selectedVariants,
-				quantity: this.state.quantity
-			})
+				["properties"]: {
+					...this.state.selectedItem.properties,
+					// Override with custom properties
+					["quantity"]: this.state.quantity,
+					["variants"]: this.state.selectedVariants,
+				},
+			}
+
+			this.props.handleDone(item)
 		}
 	}
 
@@ -76,6 +90,7 @@ export class BrowserSelector extends React.Component {
 		this.setState({ selectedVariants: values })
 	}
 
+	//TODO: Split as `bruhSomething` component
 	renderSelectedItem = (item) => {
 		return <div className="fabric_selector inspector">
 			<div className="fabric_selector inspector header">
@@ -113,7 +128,7 @@ export class BrowserSelector extends React.Component {
 				</div>
 				<div style={{ textAlign: "center" }}>
 					<p>Quantity</p>
-					<antd.InputNumber
+					<Stepper
 						onChange={(value) => {
 							this.setState({ quantity: value })
 						}}
@@ -155,7 +170,7 @@ export class BrowserSelector extends React.Component {
 	render() {
 		if (this.state.loading) {
 			return <antd.Skeleton active />
-		}
+		} 
 
 		if (this.state.selectedItem) {
 			return <div className="fabric_selector">
@@ -163,9 +178,20 @@ export class BrowserSelector extends React.Component {
 			</div>
 		}
 
+		if (this.state.createCustom) {
+			return <Fabric.Creator
+				handleDone={(item) => {
+					this.setState({ createCustom: false })
+					this.handleSelectItem(item)
+				}}
+			/>
+		}
+
 		return (
 			<div className="fabric_selector">
-				<h1><Icons.Globe /> Browse</h1>
+				<div className="header">
+					<h1><Icons.Globe /> Browse</h1> or <antd.Button onClick={this.onClickCreateCustom} type="primary">Create new</antd.Button>
+				</div>
 				<antd.Input.Search />
 				<div className="fabric_selector groups">
 					<antd.List
@@ -182,27 +208,3 @@ export class BrowserSelector extends React.Component {
 		)
 	}
 }
-
-export const SelectorSwitcher = (props) => {
-	const [mode, setMode] = React.useState(null)
-
-	if (mode && mode === "browse") {
-		return <BrowserSelector {...props} />
-	}
-	if (mode && mode === "custom") {
-		return <Fabric.Creator {...props} />
-	}
-
-	return <div className="fabric_selector_switcher">
-		<div className="fabric_selector_switcher mode" onClick={() => setMode("custom")}>
-			<h1><Icons.Edit2 />Create custom</h1>
-			<p>Create a custom order from a blank template</p>
-		</div>
-		<div className="fabric_selector_switcher mode" onClick={() => setMode("browse")}>
-			<h1><Icons.Globe />Browse fabric</h1>
-			<p>Browse fabric orders from the storaged catalog</p>
-		</div>
-	</div>
-}
-
-export default SelectorSwitcher
