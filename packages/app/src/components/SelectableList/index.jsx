@@ -1,4 +1,5 @@
 import React from "react"
+import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { ActionsBar } from "components"
 import { Button } from "antd"
@@ -225,28 +226,28 @@ export default class SelectableList extends React.Component {
 			this.unselectAll()
 		}
 
-		let items = this.props.items.map((item, index) => {
+		let items = this.props.items.length > 0 ? this.props.items.map((item, index) => {
 			item.key = item.key ?? item.id ?? item._id
 
 			let selected = this.isKeySelected(item.key)
 
 			return <ListItem
-				item={item}
 				key={item.key}
 				id={item.key}
+				item={item}
 				selected={selected}
 				onDoubleClick={this.onDoubleClick}
 				onClickItem={this.onClickItem}
 				onLongPressItem={this.onLongPressItem}
 				renderChildren={this.props.renderItem}
 			/>
-		})
+		}) : <antd.Empty image={antd.Empty.PRESENTED_IMAGE_SIMPLE} />
 
 		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.overrideSelectionEnabled ?? this.state.selectionEnabled })}>
 			<div className="content">
 				{items}
 			</div>
-			{(this.props.overrideSelectionEnabled || this.state.selectionEnabled) && !this.props.actionsDisabled &&
+			{this.props.items.length > 0 && (this.props.overrideSelectionEnabled || this.state.selectionEnabled) && !this.props.actionsDisabled &&
 				<ActionsBar mode="float">
 					<div key="discard">
 						<Button
