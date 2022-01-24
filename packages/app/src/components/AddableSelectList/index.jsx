@@ -117,7 +117,9 @@ export const AddableSelectListSelector = (props = {}) => {
                         Done
                     </div>
                 ]}
-                onDone={(ctx, keys) => props.handleDone(keys, keys.map((key) => findData(key)))}
+                events={{
+                    onDone: (ctx, keys) => props.handleDone(keys, keys.map((key) => findData(key))),
+                }}
                 renderItem={(item) => {
                     return <div
                         className="item"
