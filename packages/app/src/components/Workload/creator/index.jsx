@@ -13,12 +13,11 @@ const steps = [
 		key: "name",
 		title: "Name",
 		icon: "Edit",
-		stateValidation: (value) => {
-			return value && value.length > 0
-		},
+		description: "Enter the name or a reference for the workload.",
+		required: true,
 		content: (props) => {
 			return <div className="workload_creator steps step content">
-				<antd.Input defaultValue={props.value} placeholder="Input an name" onChange={(e) => {
+				<antd.Input onPressEnter={props.onPressEnter} defaultValue={props.value} placeholder="Input an name" onChange={(e) => {
 					props.handleUpdate(e.target.value)
 				}} />
 			</div>
@@ -28,9 +27,8 @@ const steps = [
 		key: "region",
 		title: "Region",
 		icon: "Globe",
-		stateValidation: (value) => {
-			return Boolean(value)
-		},
+		required: true,
+		description: "Select the region where the workload will be deployed.",
 		content: (props) => {
 			const [regions, setRegions] = React.useState([])
 
@@ -55,6 +53,7 @@ const steps = [
 					showSearch
 					placeholder="Select a region"
 					optionFilterProp="children"
+					defaultValue={props.value}
 					onChange={(value) => {
 						props.handleUpdate(value)
 					}}
@@ -76,6 +75,7 @@ const steps = [
 		key: "schedule",
 		title: "Schedule",
 		icon: "Calendar",
+		description: "Select the schedule for the workload.",
 		content: (props) => {
 			return <div className="workload_creator steps step content">
 				<antd.DatePicker.RangePicker
@@ -93,9 +93,7 @@ const steps = [
 		key: "operators",
 		title: "Operators",
 		icon: "User",
-		onUpdateValue: (prev, next) => {
-			return [...prev, ...next]
-		},
+		description: "Assign the operators for the workload.",
 		content: (props) => {
 			return <div className="workload_creator steps step content">
 				<OperatorsAssignments
@@ -111,9 +109,8 @@ const steps = [
 		key: "payloads",
 		title: "Payloads",
 		icon: "Box",
-		stateValidation: (value) => {
-			return value && value.length > 0
-		},
+		required: true,
+		description: "Define the payloads for the workload.",
 		content: (props) => {
 			let [value, setValue] = React.useState(props.value ?? [])
 
