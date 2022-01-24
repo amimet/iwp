@@ -61,12 +61,16 @@ export const AddableSelectListSelector = (props = {}) => {
 
     const debouncedSearch = debounce((value) => search(value), props.debounceSearchWait ?? 500)
 
-    const onSearch = (event) => {
-        if (event === "" && searchValue) {
+    const onSearch = (keyword) => {
+        if (typeof keyword !== "string") {
+            keyword = keyword.target.value
+        }
+        
+        if (keyword === "" && searchValue) {
             return setSearchValue(null)
         }
 
-        debouncedSearch(event.target.value)
+        debouncedSearch(keyword)
     }
 
     const isExcludedId = (id) => {
@@ -91,7 +95,6 @@ export const AddableSelectListSelector = (props = {}) => {
         return <antd.Skeleton active />
     }
 
-    console.log(data, searchValue)
     return <div className="AddableSelectListSelector">
         <div className="header">
             <div>
@@ -120,11 +123,9 @@ export const AddableSelectListSelector = (props = {}) => {
                 events={{
                     onDone: (ctx, keys) => props.handleDone(keys, keys.map((key) => findData(key))),
                 }}
+                disabledKeys={props.excludedIds}
                 renderItem={(item) => {
-                    return <div
-                        className="item"
-                        disabled={isExcludedId(item._id)}
-                    >
+                    return <div disabled={isExcludedId(item._id)} className="item">
                         <div><antd.Avatar shape="square" src={item.image} /></div>
                         <div><h1>{item.label}</h1></div>
                     </div>
@@ -203,7 +204,7 @@ export default class AddableSelectList extends React.Component {
 
                 let { selectedKeys, selectedItems } = this.state
 
-                selectedKeys = [...selectedItems, ...keys]
+                selectedKeys = [...selectedKeys, ...keys]
                 selectedItems = [...selectedItems, ...data]
 
                 await this.setState({ selectedKeys: selectedKeys, selectedItems: selectedItems })
@@ -218,7 +219,8 @@ export default class AddableSelectList extends React.Component {
                 loadData: this.props.loadData,
                 searcherKeys: this.props.searcherKeys,
                 debounceSearchWait: this.props.debounceSearchWait,
-                excludedIds: this.state.selectedKeys.map((item) => item._id),
+                excludedIds: this.state.selectedKeys,
+                excludedSelectedKeys: this.props.excludedSelectedKeys,
             },
         })
     }
