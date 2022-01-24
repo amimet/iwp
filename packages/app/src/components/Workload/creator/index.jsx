@@ -141,7 +141,7 @@ const steps = [
 			}
 
 			return <div className="workload_creator steps step content">
-				<PayloadsRender payloads={value} onDeleteItem={onDeleteItem} />
+				<PayloadsRender preview payloads={value} onDeleteItem={onDeleteItem} />
 
 				<div key="actions" className="workload_creator steps step actions">
 					<div key="add">
