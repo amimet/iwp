@@ -1,8 +1,8 @@
-.AddableSelectListSelector {
+.addableSelectListSelector {
 	> div {
 		margin-bottom: 10px;
 	}
-    
+
 	.item {
 		h1 {
 			margin: 0;
@@ -17,4 +17,29 @@
 			margin-right: 10px;
 		}
 	}
+}
+
+.addableSelectList {
+    #delete {
+        border-radius: 4px;
+    }
+
+    .item {
+        background-color: var(--background-color-primary);
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+
+        > div {
+            margin-right: 6px;
+        }
+    }
+
+    > div {
+        margin-bottom: 10px;
+    }
 }

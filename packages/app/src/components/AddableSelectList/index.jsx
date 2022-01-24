@@ -95,7 +95,7 @@ export const AddableSelectListSelector = (props = {}) => {
         return <antd.Skeleton active />
     }
 
-    return <div className="AddableSelectListSelector">
+    return <div className="addableSelectListSelector">
         <div className="header">
             <div>
                 <antd.Input.Search
@@ -138,24 +138,6 @@ export const AddableSelectListSelector = (props = {}) => {
 export const AddableSelectListItem = (props) => {
     const { item, actions, onClick, onDelete } = props
 
-    const getActions = () => {
-        if (actions) {
-            return actions.map((action) => {
-                return <antd.Button
-                    loading={loading}
-                    disabled={loading}
-                    onClick={() => {
-                        action.onClick(item)
-                    }}
-                >
-                    {action.label}
-                </antd.Button>
-            })
-        }
-
-        return null
-    }
-
     const handleClick = () => {
         if (typeof onClick === "function") {
             onClick(item)
@@ -170,7 +152,6 @@ export const AddableSelectListItem = (props) => {
 
     return <SwipeItem
         onDelete={handleDelete}
-        height="10px"
     >
         <antd.List.Item
             key={item._id}
@@ -180,9 +161,6 @@ export const AddableSelectListItem = (props) => {
                 avatar={<antd.Avatar src={item.image} />}
                 title={item.label}
             />
-            <div className="itemActions">
-                {getActions()}
-            </div>
         </antd.List.Item>
     </SwipeItem>
 }
