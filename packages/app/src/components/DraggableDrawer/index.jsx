@@ -57,6 +57,7 @@ export default class Drawer extends Component {
     }
 
     state = {
+        ignore: false,
         onRange: false,
         open: this.props.open,
         thumb: 0,
@@ -152,10 +153,13 @@ export default class Drawer extends Component {
         this.NEW_POSITION = 0
         this.MOVING_POSITION = 0
 
-        this.setState({ onRange: this.isThumbInDraggerRange(event), thumb: start, start: start, touching: true })
+        this.setState({ ignore: event.target.getAttribute("ignore-dragger"), onRange: this.isThumbInDraggerRange(event), thumb: start, start: start, touching: true })
     }
 
     drag = event => {
+        if (this.state.ignore) {
+            return false
+        }
         const { direction } = this.props
         const { thumb, start, position } = this.state
         const { pageY, pageX } = event.touches[0]
