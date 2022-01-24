@@ -147,7 +147,7 @@ module.exports = [
     {
         route: "/workload",
         method: "DELETE",
-        middleware: "withAuthentication",
+        middleware: ["withAuthentication", "useWS"],
         fn: "WorkloadController.delete",
     },
     {

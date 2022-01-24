@@ -193,10 +193,11 @@ export default {
             const result = await Workload.findByIdAndDelete({ _id })
 
             if (result != null) {
-                req.ws.io.emit("deletedWorkload", _id)
                 deleted.push(_id)
             }
         }
+
+        req.ws.io.emit("deletedWorkload", deleted)
 
         return res.json({ deleted })
     }),
@@ -239,11 +240,11 @@ export default {
                 workload.payloads = workload.payloads.map((payload) => {
                     payload.debtQuantity = calculateWorkloadQuantityLeft(workload, payload)
                     payload.quantityReached = payload.debtQuantity === 0
+                    payload.producedQuantity = countQuantityFromCommits(workload.commits.filter(commit => commit.payloadUUID === payload.uuid))
 
                     return payload
                 })
             }
-
         }
 
         return res.json(req.selection._id ? workloads[0] : workloads)
