@@ -180,7 +180,7 @@ export default class StepsForm extends React.Component {
                     <div className="steps_form steps step">
                         <div className="title">
                             <h1>{current.icon && createIconRender(current.icon)}{current.title}</h1>
-                            {current.required && <antd.Tag color="volcano">Required</antd.Tag>}
+                            <antd.Tag color={current.required ? "volcano" : "default"}>{current.required ? "Required" : "Optional"}</antd.Tag>
                         </div>
                         {current.description && <div className="description">
                             {current.description}
