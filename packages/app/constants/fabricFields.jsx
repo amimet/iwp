@@ -33,7 +33,8 @@ export default {
                     item.label = item.name
                     return item
                 })
-            }
+            },
+            excludedSelectedKeys: true,
         },
         component: "addableSelectList",
         children: async () => {
