@@ -256,13 +256,15 @@ export default class Vault extends React.Component {
                             selectionEnabled={this.state.selectionEnabled}
                             items={this.state.searchValue ?? this.state.data}
                             renderItem={(item) => <ItemRender locations={this.state.locations} onDoubleClick={() => this.onOpenItemDetails(item._id)} compact={this.state.compactView} eventDisable={this.state.selectionEnabled} item={item} onChangeProperties={this.onChangeProperties} onOpenItemDetails={this.onOpenItemDetails} />}
-                            onDelete={this.onDeleteItems}
                             actions={[
                                 <div key="delete" call="onDelete">
                                     <Icons.Trash />
                                     Delete
                                 </div>,
                             ]}
+                            events={{
+                                onDelete: this.onDeleteItems,
+                            }}
                         />}
                 </div>
             </div>

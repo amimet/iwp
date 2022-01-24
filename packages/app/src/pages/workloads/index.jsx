@@ -255,7 +255,9 @@ export default class Workloads extends React.Component {
 			items={list}
 			actions={actions}
 			onDoubleClick={this.onDoubleClickItem}
-			onDelete={this.onDeleteWorkloads}
+			events={{
+				onDelete: this.onDeleteWorkloads,
+			}}
 			renderItem={this.renderItem}
 		/>
 	}

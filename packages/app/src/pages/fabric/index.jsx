@@ -209,13 +209,15 @@ export default class FabricManager extends React.Component {
                     selectionEnabled={this.state.selectionEnabled}
                     items={this.parseAsGroups(this.state.searchValue ?? this.state.data)}
                     renderItem={this.renderItem}
-                    onDelete={this.onDeleteItems}
                     actions={[
                         <div key="delete" call="onDelete">
                             <Icons.Trash />
                             Delete
                         </div>,
                     ]}
+                    events={{
+                        onDelete: this.onDeleteItems,
+                    }}
                 />}
         </div>
     }

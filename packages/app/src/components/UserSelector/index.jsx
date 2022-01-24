@@ -109,7 +109,9 @@ export default class UserSelector extends React.Component {
                         Done
                     </div>
                 ]}
-                onDone={(ctx, keys) => this.props.handleDone(keys)}
+                events={{
+                    onDone: (ctx, keys) => this.props.handleDone(keys),
+                }}
             />
         </div>
     }

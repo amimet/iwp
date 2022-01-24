@@ -100,18 +100,6 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
-	actionProviderProps = {
-		onDone: this.onDone,
-		onDiscard: this.onDiscard,
-		onCancel: this.onCancel,
-		selectKey: this.selectKey,
-		unselectKey: this.unselectKey,
-		selectAll: this.selectAll,
-		unselectAll: this.unselectAll,
-		isKeySelected: this.isKeySelected,
-		isAllSelected: this.isAllSelected,
-	}
-
 	isKeySelected = (key) => {
 		return this.state.selectedKeys.includes(key)
 	}
@@ -200,27 +188,27 @@ export default class SelectableList extends React.Component {
 							...action.props.style,
 						}}
 						onClick={() => {
+							if (typeof this.props.events === "undefined") {
+								console.error("No events provided to SelectableList")
+								return false
+							}
+
 							if (typeof action.onClick === "function") {
 								action.onClick(this.state.selectedKeys)
 							}
 
-							if (typeof this.props[action.props.call] !== "undefined") {
-								if (typeof this.props[action.props.call] === "function") {
-									let data = this.state.selectedKeys // by default send selectedKeys
-
-									if (typeof action.props.sendData === "string") {
-										switch (action.props.sendData) {
-											case "keys": {
-												data = this.state.selectedKeys
-											}
-											default: {
-												data = this.state.selectedKeys
-											}
-										}
-									}
-
-									this.props[action.props.call](this.actionProviderProps, data)
-								}
+							if (typeof this.props.events[action.props.call] === "function") {
+								this.props.events[action.props.call]({
+									onDone: this.onDone,
+									onDiscard: this.onDiscard,
+									onCancel: this.onCancel,
+									selectKey: this.selectKey,
+									unselectKey: this.unselectKey,
+									selectAll: this.selectAll,
+									unselectAll: this.unselectAll,
+									isKeySelected: this.isKeySelected,
+									isAllSelected: this.isAllSelected,
+								}, this.state.selectedKeys)
 							}
 						}}
 					>
