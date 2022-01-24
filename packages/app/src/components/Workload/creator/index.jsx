@@ -28,6 +28,9 @@ const steps = [
 		key: "region",
 		title: "Region",
 		icon: "Globe",
+		stateValidation: (value) => {
+			return Boolean(value)
+		},
 		content: (props) => {
 			const [regions, setRegions] = React.useState([])
 
@@ -108,8 +111,11 @@ const steps = [
 		key: "payloads",
 		title: "Payloads",
 		icon: "Box",
+		stateValidation: (value) => {
+			return value && value.length > 0
+		},
 		content: (props) => {
-			let [ value, setValue ] = React.useState(props.value ?? [])
+			let [value, setValue] = React.useState(props.value ?? [])
 
 			const openSelector = () => {
 				window.app.DrawerController.open("selector", Fabric.Selector, {
@@ -124,7 +130,7 @@ const steps = [
 			}
 
 			const onAddItem = (item) => {
-				const result = [ ...value, item ]
+				const result = [...value, item]
 
 				setValue(result)
 				props.handleUpdate(result)

@@ -13,7 +13,7 @@ export default class StepsForm extends React.Component {
 
         step: 0,
         values: {},
-        canNext: false,
+        canNext: true,
         renderStep: null,
     }
 
@@ -58,6 +58,11 @@ export default class StepsForm extends React.Component {
     }
 
     onSubmit = async () => {
+        if (!this.state.canNext) {
+            console.warn("Cannot submit form, validation failed")
+            return false
+        }
+
         if (typeof this.props.onSubmit === "function") {
             this.setState({ submitting: true, submittingError: null })
 
@@ -79,9 +84,11 @@ export default class StepsForm extends React.Component {
             return null
         }
 
-        if (typeof value !== "undefined" && typeof step.stateValidation === "function") {
+        if (typeof step.stateValidation === "function") {
             const validationResult = step.stateValidation(value)
             this.handleValidation(validationResult)
+        } else {
+            this.setState({ canNext: true })
         }
 
         const componentProps = {
@@ -175,7 +182,7 @@ export default class StepsForm extends React.Component {
                         </antd.Button>
                     )}
                     {this.state.step === steps.length - 1 && (
-                        <antd.Button disabled={this.state.submitting || !this.canSubmit()} type="primary" onClick={this.onSubmit}>
+                        <antd.Button disabled={!this.state.canNext || this.state.submitting || !this.canSubmit()} type="primary" onClick={this.onSubmit}>
                             {this.state.submitting && <Icons.LoadingOutlined spin />}
                             Done
                         </antd.Button>
