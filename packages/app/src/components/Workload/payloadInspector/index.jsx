@@ -201,13 +201,13 @@ export default class Inspector extends React.Component {
 
             <ActionsBar mode="float" type="transparent" spaced>
                 <div>
-                    <antd.Button type="primary" icon={<Icons.MdOutlinePendingActions />}>
-                        Run
+                    <antd.Button onClick={() => this.onClickCommit()} icon={<Icons.CheckCircle />}>
+                        Commit
                     </antd.Button>
                 </div>
                 <div>
-                    <antd.Button onClick={() => this.onClickCommit()} icon={<Icons.CheckCircle />}>
-                        Commit
+                    <antd.Button type="primary" icon={<Icons.MdOutlinePendingActions />}>
+                        Run
                     </antd.Button>
                 </div>
                 <div>
