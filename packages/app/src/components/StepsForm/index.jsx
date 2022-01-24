@@ -20,17 +20,27 @@ export default class StepsForm extends React.Component {
     api = window.app.request
 
     componentDidMount = async () => {
-        this.nextStep(0)
+        this.handleNext(0)
     }
 
-    nextStep = (to) => {
+    next = (to) => {
+        if (!this.state.canNext) {
+            return antd.message.error("Please complete the step.")
+        }
+
+        return this.handleNext(to)
+    }
+
+    prev = () => this.handlePrev()
+
+    handleNext = (to) => {
         const index = to ?? (this.state.step + 1)
 
         this.setState({ step: index, renderStep: this.renderStep(index) })
     }
 
-    prevStep = () => {
-        this.nextStep(this.state.step - 1)
+    handlePrev = () => {
+        this.handleNext(this.state.step - 1)
     }
 
     handleError = (error) => {
@@ -84,11 +94,15 @@ export default class StepsForm extends React.Component {
             return null
         }
 
+        if (typeof step.required !== "undefined" && step.required) {
+            this.handleValidation(Boolean(value && value.length > 0))
+        } else {
+            this.setState({ canNext: true })
+        }
+
         if (typeof step.stateValidation === "function") {
             const validationResult = step.stateValidation(value)
             this.handleValidation(validationResult)
-        } else {
-            this.setState({ canNext: true })
         }
 
         const componentProps = {
@@ -105,6 +119,10 @@ export default class StepsForm extends React.Component {
                     validationResult = step.stateValidation(to)
                 }
 
+                if (typeof step.required !== "undefined" && step.required) {
+                    validationResult = Boolean(to && to.length > 0)
+                }
+
                 this.handleUpdate(step.key, to)
                 this.handleValidation(validationResult)
             },
@@ -113,6 +131,7 @@ export default class StepsForm extends React.Component {
                     this.handleError(error)
                 }
             },
+            onPressEnter: () => this.next(),
             value: value,
         }
 
@@ -159,7 +178,13 @@ export default class StepsForm extends React.Component {
                     </antd.Steps>
 
                     <div className="steps_form steps step">
-                        <h1>{current.icon && createIconRender(current.icon)}{current.title}</h1>
+                        <div className="title">
+                            <h1>{current.icon && createIconRender(current.icon)}{current.title}</h1>
+                            {current.required && <antd.Tag color="volcano">Required</antd.Tag>}
+                        </div>
+                        {current.description && <div className="description">
+                            {current.description}
+                        </div>}
                         {this.state.renderStep}
                     </div>
                 </div>
@@ -172,12 +197,12 @@ export default class StepsForm extends React.Component {
 
                 <ActionsBar mode="float">
                     {this.state.step > 0 && (
-                        <antd.Button style={{ margin: "0 8px" }} onClick={() => this.prevStep()}>
+                        <antd.Button style={{ margin: "0 8px" }} onClick={() => this.prev()}>
                             <Icons.ChevronLeft />Previous
                         </antd.Button>
                     )}
                     {this.state.step < steps.length - 1 && (
-                        <antd.Button disabled={!this.state.canNext} type="primary" onClick={() => this.nextStep()}>
+                        <antd.Button disabled={!this.state.canNext} type="primary" onClick={() => this.next()}>
                             <Icons.ChevronRight />Next
                         </antd.Button>
                     )}
