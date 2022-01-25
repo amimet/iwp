@@ -46,7 +46,6 @@ export default class Session {
         const body = {
             username: window.btoa(payload.username),
             password: window.btoa(payload.password),
-            allowRegenerate: payload.allowRegenerate
         }
 
         return this.generateNewToken(body, (err, res) => {
@@ -83,10 +82,6 @@ export default class Session {
         }
 
         return request
-    }
-
-    regenerateToken = async () => {
-        return await Session.bridge.post.regenerate()
     }
 
     //* GETTERS
