@@ -1,11 +1,5 @@
 module.exports = [
     {
-        route: "/regenerate",
-        method: "POST",
-        middleware: ["withAuthentication", "useJwtStrategy"],
-        fn: "SessionController.regenerate"
-    },
-    {
         route: "/role",
         method: 'PUT',
         middleware: ["withAuthentication", "roles"],
@@ -33,6 +27,12 @@ module.exports = [
         method: "DELETE",
         middleware: "withAuthentication",
         fn: "SessionController.deleteAll",
+    },
+    {
+        route: "/current_session",
+        method: "GET",
+        middleware: "withAuthentication",
+        fn: "SessionController.getCurrentSession",
     },
     {
         route: "/validate_session",
