@@ -10,8 +10,7 @@ export default class SessionsView extends React.Component {
 
 	componentDidMount = async () => {
 		const currentSession = await Session.decodedToken()
-
-		this.setState({ currentSessionUUID: currentSession?.uuid })
+		this.setState({ currentSessionUUID: currentSession?.session_uuid })
 	}
 
 	signOutAll = () => {
@@ -39,12 +38,15 @@ export default class SessionsView extends React.Component {
 
 		return (
 			<div className="session_wrapper">
-				<Sessions current={this.state.currentSessionUUID} sessions={this.props.sessions} />
-				{sessions && (
-					<antd.Button onClick={this.signOutAll} type="danger">
-						Destroy all sessions
-					</antd.Button>
-				)}
+				<div>
+					<h1>All Sessions</h1>
+					<Sessions current={this.state.currentSessionUUID} sessions={this.props.sessions} />
+					{sessions && (
+						<antd.Button onClick={this.signOutAll} type="danger">
+							Destroy all sessions
+						</antd.Button>
+					)}
+				</div>
 			</div>
 		)
 	}
