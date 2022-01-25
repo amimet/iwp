@@ -1,28 +1,9 @@
-import { Session } from '../../models'
-import jwt from 'jsonwebtoken'
-import { Token } from '../../lib'
+import { Session } from "../../models"
+import jwt from "jsonwebtoken"
 
 export default {
-    regenerate: async (req, res) => {
-        jwt.verify(req.jwtToken, req.jwtStrategy.secretOrKey, async (err, decoded) => {
-            if (err && !decoded?.allowRegenerate) {
-                return res.status(403).send("This token is invalid and is not allowed to be regenerated")
-            }
-
-            const sessionToken = await Session.findOneAndDelete({ token: req.jwtToken, user_id: decoded.user_id })
-            
-            if (sessionToken) {
-                delete decoded["iat"]
-                delete decoded["exp"]
-                delete decoded["date"]
-
-                const token = await Token.signNew({
-                    ...decoded,
-                }, req.jwtStrategy)
-
-                return res.json({ token })
-            }
-        })
+    getCurrentSession: async (req, res) => {
+        return res.json(req.currentSession)
     },
     deleteAll: async (req, res) => {
         const { user_id } = req.body
