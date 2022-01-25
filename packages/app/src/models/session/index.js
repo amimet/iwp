@@ -95,6 +95,10 @@ export default class Session {
         return await Session.bridge.post.validateSession({ session })
     }
 
+    getCurrentSession = async () => {
+        return await Session.bridge.get.currentSession()
+    }
+
     isCurrentTokenValid = async () => {
         const health = await this.getTokenInfo()
 
