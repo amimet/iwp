@@ -8,6 +8,7 @@ export async function createNewAuthToken(user, options = {}) {
         username: user.username,
         email: user.email,
         refreshToken: nanoid(),
+        signLocation: global.signLocation,
     }
 
     await User.findByIdAndUpdate(user._id, { refreshToken: payload.refreshToken })
@@ -28,16 +29,22 @@ export async function signNew(payload, options = {}) {
         algorithm: options.algorithm ?? "HS256"
     })
 
+    const session = {
+        session_uuid: payload.session_uuid,
+        token: token,
+        user_id: payload.user_id,
+        date: new Date().getTime(),
+        location: payload.signLocation ?? "rs-auth",
+    }
+
     if (options.updateSession) {
-        await Session.findByIdAndUpdate(options.updateSession, { token })
-    } else {
-        let newSession = new Session({
-            session_uuid: payload.session_uuid,
-            token: token,
-            user_id: payload.user_id,
-            date: new Date().getTime(),
-            location: global.signLocation ?? "rs-auth",
+        await Session.findByIdAndUpdate(options.updateSession, {
+            token: session.token,
+            date: session.date,
+            location: session.location,
         })
+    } else {
+        let newSession = new Session(session)
 
         newSession.save()
     }
