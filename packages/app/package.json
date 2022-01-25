@@ -34,7 +34,7 @@
     "js-cookie": "3.0.1",
     "jwt-decode": "3.1.2",
     "less": "4.1.2",
-    "linebridge": "0.8.6",
+    "linebridge": "0.8.7",
     "moment": "2.29.1",
     "plyr": "3.6.12",
     "prop-types": "^15.8.1",
