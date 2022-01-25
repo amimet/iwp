@@ -120,13 +120,15 @@ export default class WorkloadDetails extends React.Component {
 	}
 
 	openPayloadDetails = (item) => {
+		const payloadData = this.state.data.payloads.find((payload) => payload.uuid === item.uuid)
+
 		window.app.DrawerController.open("PayloadInspector", PayloadInspector, {
 			onDone: (ctx, data) => {
 				ctx.close()
 			},
 			componentProps: {
 				workloadId: this.id,
-				payload: item,
+				payload: payloadData,
 			}
 		})
 	}
