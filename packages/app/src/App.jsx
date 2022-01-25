@@ -41,20 +41,6 @@ const SplashExtension = Splash.extension({
 	},
 })
 
-class ThrowCrash {
-	constructor(message, description) {
-		this.message = message
-		this.description = description
-
-		antd.notification.error({
-			message: "Fatal error",
-			description: message,
-		})
-
-		window.app.eventBus.emit("crash", this.message, this.description)
-	}
-}
-
 class App {
 	static initialize() {
 		this.configuration = {
@@ -67,14 +53,6 @@ class App {
 
 		// Only supports once loading
 		this.loadingMessage = false
-
-		this.eventBus.on("app_loading", async () => {
-			await this.setState({ initialized: false })
-		})
-
-		this.eventBus.on("app_ready", async () => {
-			await this.setState({ initialized: true })
-		})
 
 		this.eventBus.on("reinitializeSession", async () => {
 			await this.__SessionInit()
@@ -92,7 +70,6 @@ class App {
 		})
 
 		this.eventBus.on("new_session", async () => {
-			await this.initialization()
 
 			if (window.location.pathname == "/login") {
 				window.app.setLocation(this.beforeLoginLocation ?? "/main")
@@ -103,12 +80,12 @@ class App {
 			await this.flushState()
 			this.eventBus.emit("forceToLogin")
 		})
-
 		this.eventBus.on("invalid_session", async (error) => {
+			await this.sessionController.forgetLocalSession()
+			await this.flushState()
+
 			if (window.location.pathname !== "/login") {
 				this.eventBus.emit("forceToLogin")
-				await this.sessionController.forgetLocalSession()
-				await this.flushState()
 
 				antd.notification.open({
 					message: "Invalid Session",
@@ -129,7 +106,9 @@ class App {
 		})
 
 		this.eventBus.on("websocket_disconnected", () => {
-			this.loadingMessage = antd.message.loading("Trying to reconnect...", 0)
+			if (!this.loadingMessage) {
+				this.loadingMessage = antd.message.loading("Trying to reconnect...", 0)
+			}
 		})
 
 		this.eventBus.on("websocket_connected", async () => {
@@ -140,8 +119,8 @@ class App {
 			this.mainSocket.on("authenticated", () => {
 				console.log("[WS] Authenticated")
 			})
-			this.mainSocket.on("authenticatedFailed", (error) => {
-				console.error("[WS] Authenticated Failed", error)
+			this.mainSocket.on("authenticateFailed", (error) => {
+				console.error("[WS] Authenticate Failed", error)
 			})
 
 			if (typeof this.loadingMessage === "function") {
@@ -314,18 +293,22 @@ class App {
 	}
 
 	componentDidMount = async () => {
-		this.eventBus.emit("app_loading")
+		await this.setState({ initialized: false })
 
 		await this.contexts.app.initializeDefaultBridge()
 		await this.initialization()
 
-		this.eventBus.emit("app_ready")
+		await this.setState({ initialized: true })
 	}
 
 	initialization = async () => {
 		try {
 			await this.__SessionInit()
 			await this.__UserInit()
+
+			if (this.state.session) {
+				await this.contexts.app.WSInterface.sockets.main.connect()
+			}
 
 			if (this.isAppCapacitor()) {
 				window.addEventListener("statusTap", () => {
@@ -336,7 +319,7 @@ class App {
 				window.app.hideStatusBar()
 			}
 		} catch (error) {
-			throw new ThrowCrash(error.message, error.description)
+			window.app.eventBus.emit("crash", `Cannot validate initialization`, error.message)
 		}
 	}
 
@@ -346,13 +329,13 @@ class App {
 		if (typeof token === "undefined") {
 			window.app.eventBus.emit("forceToLogin")
 		} else {
-			const session = await this.sessionController.getTokenInfo()
+			const session = await this.sessionController.getCurrentSession()
 			await this.setState({ session })
 		}
 	}
 
 	__UserInit = async () => {
-		if (!this.state.session || !this.state.session.valid) {
+		if (!this.state.session) {
 			return false
 		}
 
