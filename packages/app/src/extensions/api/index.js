@@ -95,6 +95,7 @@ export default {
                     const handleResponse = async (data) => {
                         if (data.headers?.regenerated_token) {
                             Session.token = data.headers.regenerated_token
+                            console.debug("[REGENERATION] New token generated")
                         }
 
                         if (data instanceof Error) {
@@ -121,6 +122,9 @@ export default {
                 },
                 WSInterface: new WSInterface({
                     origin: config.ws.address,
+                    managerOptions: {
+                        autoConnect: false
+                    }
                 }),
             },
         },
