@@ -104,17 +104,17 @@ class App {
 			this.eventBus.emit("forceToLogin")
 		})
 
-		this.eventBus.on("invalid_session", (error) => {
+		this.eventBus.on("invalid_session", async (error) => {
 			if (window.location.pathname !== "/login") {
-				this.sessionController.forgetLocalSession()
+				this.eventBus.emit("forceToLogin")
+				await this.sessionController.forgetLocalSession()
+				await this.flushState()
 
 				antd.notification.open({
 					message: "Invalid Session",
 					description: error,
 					icon: <Icons.MdOutlineAccessTimeFilled />,
 				})
-
-				this.eventBus.emit("forceToLogin")
 			}
 		})
 
@@ -306,11 +306,11 @@ class App {
 
 		// app session
 		session: null,
-		data: null,
+		user: null,
 	}
 
 	flushState = async () => {
-		await this.setState({ session: null, data: null })
+		await this.setState({ session: null, user: null })
 	}
 
 	componentDidMount = async () => {
@@ -346,31 +346,19 @@ class App {
 		if (typeof token === "undefined") {
 			window.app.eventBus.emit("forceToLogin")
 		} else {
-			this.session = await this.sessionController.getTokenInfo().catch((error) => {
-				window.app.eventBus.emit("invalid_session", error)
-			})
-
-			if (!this.session.valid) {
-				// try to regenerate
-				//const regeneration = await this.sessionController.regenerateToken()
-				//console.log(regeneration)
-
-				window.app.eventBus.emit("invalid_session", this.session.error)
-				return false
-			}
+			const session = await this.sessionController.getTokenInfo()
+			await this.setState({ session })
 		}
-
-		this.setState({ session: this.session })
 	}
 
 	__UserInit = async () => {
-		if (!this.session || !this.session.valid) {
+		if (!this.state.session || !this.state.session.valid) {
 			return false
 		}
 
 		try {
-			this.user = await User.data()
-			this.setState({ user: this.user })
+			const user = await User.data()
+			await this.setState({ user })
 		} catch (error) {
 			console.error(error)
 			this.eventBus.emit("crash", "Cannot initialize user data", error)
