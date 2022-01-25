@@ -126,12 +126,16 @@ export default class Inspector extends React.Component {
             return null
         }
 
-        return Object.keys(item.properties).map(key => {
+        return Object.keys(item.properties).map((key) => {
             const PropertyRender = () => {
                 const property = item.properties[key]
 
+                if (property == null) {
+                    return <antd.Tag>None</antd.Tag>
+                }
+
                 if (Array.isArray(property)) {
-                    return property.map(prop => {
+                    return property.map((prop) => {
                         return <antd.Tag style={{ marginBottom: "5px" }}>{prop}</antd.Tag>
                     })
                 }
@@ -154,6 +158,10 @@ export default class Inspector extends React.Component {
         }
 
         const formula = FORMULAS[this.state.data.type]
+
+        if (!formula) {
+            return <div>No formula found for this type</div>
+        }
 
         const quantityCount = this.countQuantityFromCommits()
         const quantityLeft = this.countQuantityLeft()
