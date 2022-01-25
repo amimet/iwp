@@ -5,6 +5,50 @@ import moment from "moment"
 
 const format = "DD-MM-YYYY hh:mm"
 
+function parseWorkloadAdditions(workload) {
+    let multiple = false
+    let queue = []
+
+    if (Array.isArray(workload)) {
+        multiple = true
+        queue = workload
+    } else {
+        multiple = false
+        queue.push(workload)
+    }
+
+    queue = queue.map((workload) => {
+        // parse expiration status
+        if (typeof workload.expired !== "undefined") {
+            // check if is expired
+            const endDate = moment(workload.scheduledFinish, format)
+            const now = moment().format(format)
+
+            if (endDate.isBefore(moment(now, format))) {
+                workload.expired = true
+            }
+        }
+
+        if (workload.payloads) {
+            workload.payloads = workload.payloads.map((payload) => {
+                payload.debtQuantity = calculateWorkloadQuantityLeft(workload, payload)
+                payload.quantityReached = payload.debtQuantity === 0
+                payload.producedQuantity = countQuantityFromCommits(workload.commits.filter(commit => commit.payloadUUID === payload.uuid))
+
+                return payload
+            })
+        }
+
+        return workload
+    })
+
+    if (multiple) {
+        return queue
+    }
+
+    return queue[0]
+}
+
 function countQuantityFromCommits(commits) {
     return commits.reduce((acc, commit) => {
         return acc + commit.quantity
@@ -49,6 +93,8 @@ export default {
         }
 
         workload.commits.push(commit)
+
+        workload = parseWorkloadAdditions(workload)
 
         await Workload.findByIdAndUpdate(req.selection.workloadId, workload).catch(err => {
             return res.status(500).json({
@@ -155,12 +201,12 @@ export default {
 
         const obj = {
             created: new Date().getTime(),
+            commits: [],
             payloads,
             assigned,
             name,
             scheduledStart,
             scheduledFinish,
-            workshift,
             region,
         }
 
@@ -224,28 +270,7 @@ export default {
             workloads = await Workload.find(req.selection)
         }
 
-        for await (const workload of workloads) {
-            // parse expiration status
-            if (typeof workload.expired !== "undefined") {
-                // check if is expired
-                const endDate = moment(workload.scheduledFinish, format)
-                const now = moment().format(format)
-
-                if (endDate.isBefore(moment(now, format))) {
-                    workload.expired = true
-                }
-            }
-
-            if (workload.payloads) {
-                workload.payloads = workload.payloads.map((payload) => {
-                    payload.debtQuantity = calculateWorkloadQuantityLeft(workload, payload)
-                    payload.quantityReached = payload.debtQuantity === 0
-                    payload.producedQuantity = countQuantityFromCommits(workload.commits.filter(commit => commit.payloadUUID === payload.uuid))
-
-                    return payload
-                })
-            }
-        }
+        workloads = parseWorkloadAdditions(workloads)
 
         return res.json(req.selection._id ? workloads[0] : workloads)
     }),
@@ -253,7 +278,7 @@ export default {
         required: ["uuid"],
         select: ["uuid"],
     }, async (req, res) => {
-        const workload = await Workload.findOne({
+        let workload = await Workload.findOne({
             "payloads.uuid": req.selection.uuid,
         })
 
@@ -262,6 +287,8 @@ export default {
                 error: "Workload not found",
             })
         }
+
+        workload = parseWorkloadAdditions(workload)
 
         return res.json(workload)
     }),
