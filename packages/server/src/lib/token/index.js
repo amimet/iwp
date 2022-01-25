@@ -16,18 +16,14 @@ export async function createNewAuthToken(user, options = {}) {
 }
 
 export async function signNew(payload, options = {}) {
-    let session_uuid = null
-
     if (options.updateSession) {
-        session_uuid = options.updateSession
+        const sessionData = await Session.findById(options.updateSession)
+        payload.session_uuid = sessionData.session_uuid
     } else {
-        session_uuid = nanoid()
+        payload.session_uuid = nanoid()
     }
 
-    const token = jwt.sign({
-        ...payload,
-        session_uuid,
-    }, options.secretOrKey, {
+    const token = jwt.sign(payload, options.secretOrKey, {
         expiresIn: options.expiresIn ?? "1h",
         algorithm: options.algorithm ?? "HS256"
     })
@@ -36,7 +32,7 @@ export async function signNew(payload, options = {}) {
         await Session.findByIdAndUpdate(options.updateSession, { token })
     } else {
         let newSession = new Session({
-            session_uuid,
+            session_uuid: payload.session_uuid,
             token: token,
             user_id: payload.user_id,
             date: new Date().getTime(),
