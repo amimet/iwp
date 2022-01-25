@@ -92,9 +92,22 @@ export default {
                         return obj
                     }
 
+                    const handleResponse = async (data) => {
+                        if (data.headers?.regenerated_token) {
+                            Session.token = data.headers.regenerated_token
+                        }
+
+                        if (data instanceof Error) {
+                            if (data.response.status === 401) {
+                                window.app.eventBus.emit("invalid_session")
+                            }
+                        }
+                    }
+
                     const bridge = new Bridge({
                         origin: config.api.address,
                         onRequest: getSessionContext,
+                        onResponse: handleResponse,
                     })
 
                     await bridge.initialize().catch((err) => {
