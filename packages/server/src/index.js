@@ -1,23 +1,21 @@
-import LinebridgeServer from 'linebridge/server'
-import bcrypt from 'bcrypt'
-import mongoose from 'mongoose'
-import passport from 'passport'
-import { User, Session } from './models'
-import socketIo from 'socket.io'
-import jwt from 'jsonwebtoken'
+import LinebridgeServer from "linebridge/server"
+import bcrypt from "bcrypt"
+import mongoose from "mongoose"
+import passport from "passport"
+import { User, Session } from "./models"
+import socketIo from "socket.io"
+import jwt from "jsonwebtoken"
 
-const b64Decode = global.b64Decode = (data) => {
-    return Buffer.from(data, 'base64').toString('utf-8')
-}
-
-const b64Encode = global.b64Encode = (data) => {
-    return Buffer.from(data, 'utf-8').toString('base64')
-}
-
-const JwtStrategy = require('passport-jwt').Strategy
-const ExtractJwt = require('passport-jwt').ExtractJwt
-const LocalStrategy = require('passport-local').Strategy
 const { Buffer } = require("buffer")
+const b64Decode = global.b64Decode = (data) => {
+    return Buffer.from(data, "base64").toString("utf-8")
+}
+const b64Encode = global.b64Encode = (data) => {
+    return Buffer.from(data, "utf-8").toString("base64")
+}
+
+const ExtractJwt = require("passport-jwt").ExtractJwt
+const LocalStrategy = require("passport-local").Strategy
 
 function parseConnectionString(obj) {
     const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
@@ -38,21 +36,27 @@ class Server {
             middlewares: this.middlewares,
             controllers: this.controllers,
             endpoints: this.endpoints,
-            port: this.listenPort
+            port: this.listenPort,
+            headers: {
+                "Access-Control-Expose-Headers": "regenerated_token",
+            },
         })
 
         this.server = this.instance.httpServer
-        this.io = new socketIo.Server(3001,)
+        this.io = new socketIo.Server(this.env.wsPort ?? 3001)
 
         this.options = {
             jwtStrategy: {
                 sessionLocationSign: this.instance.id,
                 jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
                 secretOrKey: this.instance.oskid,
-                algorithms: ['sha1', 'RS256', 'HS256'],
-                expiresIn: "1h"
+                algorithms: ["sha1", "RS256", "HS256"],
+                expiresIn: this.env.signLifetime ?? "1h",
             }
         }
+
+        global.jwtStrategy = this.options.jwtStrategy
+        global.signLocation = this.env.signLocation
 
         this.WSClients = []
 
@@ -99,7 +103,7 @@ class Server {
             passwordField: "password",
             session: false
         }, (username, password, done) => {
-            User.findOne({ username: b64Decode(username) }).select('+password')
+            User.findOne({ username: b64Decode(username) }).select("+password")
                 .then((data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
@@ -111,24 +115,6 @@ class Server {
                     return done(null, data, this.options.jwtStrategy, { username, password })
                 })
                 .catch(err => done(err, null, this.options.jwtStrategy))
-        }))
-
-        passport.use(new JwtStrategy(this.options.jwtStrategy, (token, callback) => {
-            if (!token) {
-                return callback("Invalid or missing token")
-            }
-
-            User.findOne({ _id: token.user_id })
-                .then((data) => {
-                    if (data === null) {
-                        return callback(null, false)
-                    } else {
-                        return callback(null, data, token)
-                    }
-                })
-                .catch((err) => {
-                    return callback(err.message, null)
-                })
         }))
 
         this.server.use(passport.initialize())
@@ -212,7 +198,6 @@ class Server {
         if (socket) {
             socket.socket.disconnect()
             this.WSClients = this.WSClients.filter(c => c.id !== client.id)
-
         }
     }
 
