@@ -5,7 +5,6 @@ import { User } from '../../models'
 import SessionController from '../SessionController'
 import { Token, Schematized } from '../../lib'
 import AvatarController from 'dicebar_lib'
-
 import _ from 'lodash'
 
 export default {
@@ -235,21 +234,9 @@ export default {
                 return res.status(401).json("Invalid credentials")
             }
 
-            const payload = {
-                user_id: user._id,
-                username: user.username,
-                email: user.email
-            }
+            const token = await Token.createNewAuthToken(user, options)
 
-            if (req.body.allowRegenerate) {
-                payload.allowRegenerate = true
-            }
-
-            // generate token
-            const token = Token.signNew(payload, options)
-
-            // send result
-            res.json({ token: token })
+            return res.json({ token: token })
         })(req, res)
     },
     logout: async (req, res, next) => {
