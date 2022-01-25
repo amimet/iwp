@@ -213,17 +213,17 @@ export default class Workloads extends React.Component {
 		const indicatorStatus = item.expired ? "expired" : item.status
 
 		return (
-			<div className="workload_order_item">
+			<div className="workload_item">
 				<div className="header">
 					<div className={classnames("indicator", indicatorStatus)}>
 						<div className="statusText">{indicatorStatus}</div>
 					</div>
 					<div>
-						<h1>{item.name ?? "Unnamed workload"}</h1>
-					</div>
-					<div>
 						<antd.Tag>{String(item._id).toUpperCase()}</antd.Tag>
 					</div>
+				</div>
+				<div>
+					<h1>{item.name ?? "Unnamed workload"}</h1>
 				</div>
 				<div className="info">
 					{renderDate(item.created)}

@@ -5,6 +5,35 @@ import classnames from "classnames"
 
 import "./index.less"
 
+const Payload = (props) => {
+	const { item } = props
+
+	return <div
+		onClick={() => { props.onClickItem(item) }}
+		className={classnames("workload_payloadItem", { ["reached"]: item.quantityReached })}
+	>
+		<div className="data">
+			<div className="header">
+				<div className="title">
+					<div className="quantity">x{props.preview ? (item.properties?.quantity) : (item.debtQuantity ?? item.properties?.quantity ?? "0")}</div>
+					<h2>{item.name}</h2>
+				</div>
+				<div className="description">{item.properties?.description ?? "No description"}</div>
+			</div>
+
+			{item.properties?.variants && <div className="variants">
+				<Icons.Tool /> {item.properties.variants.map((variant, index) => <antd.Tag key={index}>{variant}</antd.Tag>)}
+			</div>}
+		</div>
+
+		<div className="actions">
+			{props.onDeleteItem && <antd.Button onClick={() => props.onClickDelete(item)} type="link">
+				Delete
+			</antd.Button>}
+		</div>
+	</div>
+}
+
 export default (props) => {
 	const onClickItem = (item) => {
 		if (typeof props.onClickItem === "function") {
@@ -29,30 +58,14 @@ export default (props) => {
 	return <antd.List
 		dataSource={props.payloads}
 		renderItem={(item) => {
-			return <div
-				onClick={() => { onClickItem(item) }}
-				className={classnames("workload_payloadItem", { ["reached"]: item.quantityReached })}
-			>
-				<div className="data">
-					<div className="header">
-						<div className="title">
-							<div className="quantity">x{props.preview ? (item.properties?.quantity) : (item.debtQuantity ?? item.properties?.quantity ?? "0")}</div>
-							<h2>{item.name}</h2>
-						</div>
-						<div className="description">{item.properties?.description ?? "No description"}</div>
-					</div>
+			let payloadProps = {
+				item,
+				onClickItem,
+			}
 
-					{item.properties?.variants && <div className="variants">
-						<Icons.Tool /> {item.properties.variants.map((variant, index) => <antd.Tag key={index}>{variant}</antd.Tag>)}
-					</div>}
-				</div>
+			props.onDeleteItem && (payloadProps.onClickDelete = onClickDelete)
 
-				<div className="actions">
-					{props.onDeleteItem && <antd.Button onClick={() => onClickDelete(item)} type="link">
-						Delete
-					</antd.Button>}
-				</div>
-			</div>
+			return <Payload {...payloadProps} />
 		}}
 	/>
 }
