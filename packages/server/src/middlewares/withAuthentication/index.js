@@ -1,9 +1,9 @@
-import passport from "passport"
-import { Session } from "../../models"
+import { Session, User } from "../../models"
+import { Token } from "../../lib"
+import jwt from "jsonwebtoken"
 
 export default (req, res, next) => {
     function unauthorized() {
-        console.log("Returning failed session")
         return res.status(401).send({ error: "Invalid session" })
     }
 
@@ -11,32 +11,45 @@ export default (req, res, next) => {
 
     if (authHeader && authHeader[0] === "Bearer") {
         const token = authHeader[1]
+        const decoded = jwt.decode(token)
 
-        passport.authenticate("jwt", { session: false }, async (err, user, decodedToken) => {
-            if (err) {
-                return res.status(401).send({ error: err })
-            }
+        if (!decoded) {
+            return unauthorized()
+        }
 
-            if (!user) {
-                return res.status(404).send({ error: "No user data found" })
-            }
+        jwt.verify(token, global.jwtStrategy.secretOrKey, async (err) => {
+            const sessions = await Session.find({ user_id: decoded.user_id })
+            const currentSession = sessions.find((session) => session.token === token)
 
-            const sessions = await Session.find({ user_id: decodedToken.user_id })
-            const sessionsTokens = sessions.map(session => session.token)
-
-            if (!sessionsTokens.includes(token)) {
+            if (!currentSession) {
                 return unauthorized()
             }
 
-            req.user = user
-            req.jwtToken = token
-            req.decodedToken = decodedToken
-            
-            // try to regenerate jwt token if expired
+            const userData = await User.findOne({ _id: currentSession.user_id })
 
-            
+            if (!userData) {
+                return res.status(404).send({ error: "No user data found" })
+            }
+
+            if (err) {
+                if (typeof decoded.refreshToken === "string" && typeof userData.refreshToken === "string") {
+                    if (decoded.refreshToken === userData.refreshToken) {
+                        res.setHeader("regenerated_token", await Token.createNewAuthToken(userData, {
+                            ...global.jwtStrategy,
+                            updateSession: currentSession._id,
+                        }))
+                    }
+                } else {
+                    return res.status(401).send({ error: err })
+                }
+            }
+
+            req.user = userData
+            req.jwtToken = token
+            req.decodedToken = decoded
+
             return next()
-        })(req, res, next)
+        })
     } else {
         return unauthorized()
     }
