@@ -1,12 +1,21 @@
 .assigned_workload {
-    cursor: pointer;
-    border-radius: 4px;
-    background-color: var(--background-color-accent);
-    padding: 10px;
+	cursor: pointer;
+	border-radius: 4px;
+	background-color: var(--background-color-accent);
+	padding: 10px;
 
-    transition: all 0.2s ease-in-out;
-  
+	transition: all 0.2s ease-in-out;
+
+	h2 {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+
+		overflow: hidden;
+
+		margin: 0;
+	}
 }
-.assigned_workload:hover{
-    transform: translate(-2px, -2px);
+
+.assigned_workload:hover {
+	transform: translate(-2px, -2px);
 }
