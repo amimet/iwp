@@ -32,13 +32,13 @@ export default (req, res, next) => {
             }
 
             if (err) {
-                if (typeof decoded.refreshToken === "string" && typeof userData.refreshToken === "string") {
-                    if (decoded.refreshToken === userData.refreshToken) {
-                        res.setHeader("regenerated_token", await Token.createNewAuthToken(userData, {
-                            ...global.jwtStrategy,
-                            updateSession: currentSession._id,
-                        }))
-                    }
+                if (decoded.refreshToken === userData.refreshToken) {
+                    const regeneratedToken = await Token.createNewAuthToken(userData, {
+                        ...global.jwtStrategy,
+                        updateSession: currentSession._id,
+                    })
+
+                    res.setHeader("regenerated_token", regeneratedToken)
                 } else {
                     return res.status(401).send({ error: err })
                 }
@@ -47,6 +47,7 @@ export default (req, res, next) => {
             req.user = userData
             req.jwtToken = token
             req.decodedToken = decoded
+            req.currentSession = currentSession
 
             return next()
         })
