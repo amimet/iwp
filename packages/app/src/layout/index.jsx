@@ -67,7 +67,6 @@ export default class Layout extends React.Component {
 			this.setLayout("mobile")
 			window.isMobile = true
 		} else {
-			this.setLayout("default")
 			window.isMobile = false
 		}
 	}
