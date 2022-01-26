@@ -30,8 +30,9 @@ export async function signNew(payload, options = {}) {
     })
 
     const session = {
-        session_uuid: payload.session_uuid,
         token: token,
+        session_uuid: payload.session_uuid,
+        username: payload.username,
         user_id: payload.user_id,
         date: new Date().getTime(),
         location: payload.signLocation ?? "rs-auth",
