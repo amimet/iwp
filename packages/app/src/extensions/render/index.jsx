@@ -1,9 +1,10 @@
 import React from "react"
-import loadable from "@loadable/component"
+import { EvitePureComponent } from "evite"
 import routes from "virtual:generated-pages"
 import progressBar from "nprogress"
 
-import NotFound from "./statics/404"
+import NotFoundRender from "./statics/404"
+import CrashRender from "./statics/crash"
 
 export const ConnectWithApp = (component) => {
 	return window.app.bindContexts(component)
@@ -35,65 +36,71 @@ export function GetRoutesComponentMap() {
 	}, {})
 }
 
-export class RouteRender extends React.Component {
+export class RouteRender extends EvitePureComponent {
 	state = {
+		renderComponent: null,
+		renderError: null,
+		lastLocation: window.location,
 		routes: GetRoutesComponentMap() ?? {},
-		error: null,
+		crash: null,
 	}
 
-	lastLocation = null
+	handleBusEvents = {
+		"crash": (message, error) => {
+			this.setState({ crash: { message, error } })
+		},
+		"locationChange": (event) => {
+			this.loadRender()
+		},
+	}
 
 	componentDidMount() {
-		window.app.eventBus.on("locationChange", (event) => {
-			console.debug("[App] LocationChange, forcing update render...")
+		this._ismounted = true
+		this._loadBusEvents()
+		this.loadRender()
+		console.log(this)
+	}
 
-			// render controller needs an better method for update render, this is a temporary solution
-			// FIXME: this event is called multiple times. we need to debug them methods
-			if (typeof this.forceUpdate === "function") {
-				this.forceUpdate()
-			}
-		})
+	componentWillUnmount() {
+		this._ismounted = false
+		this._unloadBusEvents()
+	}
+
+	loadRender = (path) => {
+		if (!this._ismounted) {
+			return false
+		}
+
+		let componentModule = this.state.routes[path ?? this.props.path ?? window.location.pathname] ?? this.props.staticRenders?.NotFound ?? NotFoundRender
+
+		return this.setState({ renderComponent: componentModule })
 	}
 
 	componentDidCatch(info, stack) {
-		this.setState({ error: { info, stack } })
+		this.setState({ renderError: { info, stack } })
 	}
-
-	// shouldComponentUpdate(nextProps, nextState) {
-	// 	if (this.lastLocation.pathname !== window.location.pathname) {
-	// 		return true
-	// 	}
-	// 	return false
-	// }
 
 	render() {
-		this.lastLocation = window.location
+		if (this.state.crash) {
+			const StaticCrashRender = this.props.staticRenders?.Crash ?? CrashRender
 
-		let path = this.props.path ?? window.location.pathname
-		let componentModule = this.state.routes[path] ?? this.props.staticRenders.NotFound ?? NotFound
-
-		console.debug(`[RouteRender] Rendering ${path}`)
-
-		if (this.state.error) {
-			if (this.props.staticRenders?.RenderError) {
-				return React.createElement(this.props.staticRenders?.RenderError, { error: this.state.error })
-			}
-
-			return JSON.stringify(this.state.error)
+			return <StaticCrashRender crash={this.state.crash} />
 		}
 
-		return React.createElement(ConnectWithApp(componentModule), this.props)
+		if (this.state.renderError) {
+			if (this.props.staticRenders?.RenderError) {
+				return React.createElement(this.props.staticRenders?.RenderError, { error: this.state.renderError })
+			}
+
+			return JSON.stringify(this.state.renderError)
+		}
+
+		if (!this.state.renderComponent) {
+			return null
+		}
+
+		return React.createElement(ConnectWithApp(this.state.renderComponent), this.props)
 	}
-}
-
-export const LazyRouteRender = (props) => {
-	const component = loadable(async () => {
-		// TODO: Support evite async component initializations
-
-		return RouteRender
-	})
-
-	return React.createElement(component)
 }
 
 export const extension = {
