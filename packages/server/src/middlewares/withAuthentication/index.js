@@ -3,18 +3,24 @@ import { Token } from "../../lib"
 import jwt from "jsonwebtoken"
 
 export default (req, res, next) => {
-    function unauthorized() {
-        return res.status(401).send({ error: "Invalid session" })
+    function reject(description) {
+        return res.status(401).send({ error: `${description ?? "Invalid session"}` })
     }
 
     const authHeader = req.headers?.authorization?.split(" ")
 
     if (authHeader && authHeader[0] === "Bearer") {
         const token = authHeader[1]
-        const decoded = jwt.decode(token)
+        let decoded = null
+
+        try {
+            decoded = jwt.decode(token)
+        } catch (error) {
+            console.error(error)
+        }
 
         if (!decoded) {
-            return unauthorized()
+            return reject("Cannot decode token")
         }
 
         jwt.verify(token, global.jwtStrategy.secretOrKey, async (err) => {
@@ -22,10 +28,10 @@ export default (req, res, next) => {
             const currentSession = sessions.find((session) => session.token === token)
 
             if (!currentSession) {
-                return unauthorized()
+                return reject("Cannot find session")
             }
 
-            const userData = await User.findOne({ _id: currentSession.user_id })
+            const userData = await User.findOne({ _id: currentSession.user_id }).select("+refreshToken")
 
             if (!userData) {
                 return res.status(404).send({ error: "No user data found" })
@@ -40,7 +46,7 @@ export default (req, res, next) => {
 
                     res.setHeader("regenerated_token", regeneratedToken)
                 } else {
-                    return res.status(401).send({ error: err })
+                    return reject("Token expired, cannot refresh token either")
                 }
             }
 
@@ -52,6 +58,6 @@ export default (req, res, next) => {
             return next()
         })
     } else {
-        return unauthorized()
+        return reject("Missing token header")
     }
 }
