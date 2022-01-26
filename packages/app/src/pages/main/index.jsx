@@ -8,13 +8,13 @@ import "./index.less"
 // TODO: Customizable main menu
 export default class Main extends React.Component {
 	componentDidMount() {
-		if (window.app?.HeaderController?.isVisible()) {
+		if (!window.isMobile && window.app?.HeaderController?.isVisible()) {
 			window.app.HeaderController.toogleVisible(false)
 		}
 	}
 
 	componentWillUnmount() {
-		if (!window.app?.HeaderController?.isVisible()) {
+		if (!window.isMobile && !window.app?.HeaderController?.isVisible()) {
 			window.app.HeaderController.toogleVisible(true)
 		}
 	}
