@@ -1,15 +1,5 @@
 [
     {
-        "id": "persistent_session",
-        "group": "general",
-        "type": "Switch",
-        "icon": "Key",
-        "title": "Save Session",
-        "title_i18n": "settings_general_persitentSession",
-        "description": "The application will save the session and no expire it.",
-        "description_i18n": "settings_general_persitentSession_description"
-    },
-    {
         "id": "language",
         "group": "general",
         "type": "Select",
