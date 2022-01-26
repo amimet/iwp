@@ -126,7 +126,7 @@ export class Drawer extends React.Component {
 		if (typeof this.options.props?.closable !== "undefined" && !this.options.props?.closable) {
 			return false
 		}
-		this.toogleVisibility(false)
+
 		this.close()
 	}
 
@@ -135,7 +135,7 @@ export class Drawer extends React.Component {
 			this.options.onClose(...context)
 		}
 
-		this.setState({ visible: false })
+		this.toogleVisibility(false)
 		this.unlock()
 
 		setTimeout(() => {
