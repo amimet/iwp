@@ -58,7 +58,6 @@ export class RouteRender extends EvitePureComponent {
 		this._ismounted = true
 		this._loadBusEvents()
 		this.loadRender()
-		console.log(this)
 	}
 
 	componentWillUnmount() {
