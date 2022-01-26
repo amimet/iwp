@@ -11,11 +11,11 @@ String.prototype.toTitleCase = function () {
 }
 
 import React from "react"
-import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
+import { CreateEviteApp, BindPropsProvider } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { ActionSheet } from "antd-mobile"
-import { StatusBar, Style } from '@capacitor/status-bar'
+import { StatusBar, Style } from "@capacitor/status-bar"
 
 import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
@@ -48,39 +48,33 @@ class App {
 			sidebar: new SidebarController(),
 		}
 
-		this.eventBus = this.contexts.main.eventBus
 		this.mainSocket = this.contexts.app.WSInterface.sockets.main
-
-		// Only supports once loading
 		this.loadingMessage = false
+		this.isAppCapacitor = () => navigator.userAgent === "capacitor"
+	}
 
-		this.eventBus.on("reinitializeSession", async () => {
-			await this.__SessionInit()
-		})
-		this.eventBus.on("reinitializeUser", async () => {
-			await this.__UserInit()
-		})
-
-		this.eventBus.on("forceToLogin", () => {
-			if (window.location.pathname !== "/login") {
-				this.beforeLoginLocation = window.location.pathname
-			}
-
-			window.app.setLocation("/login")
-		})
-
-		this.eventBus.on("new_session", async () => {
+	static eventsHandlers = {
+		"new_session": async function () {
+			await this.flushState()
+			await this.initialization()
 
 			if (window.location.pathname == "/login") {
 				window.app.setLocation(this.beforeLoginLocation ?? "/main")
 				this.beforeLoginLocation = null
 			}
-		})
-		this.eventBus.on("destroyed_session", async () => {
+		},
+		"destroyed_session": async function () {
 			await this.flushState()
 			this.eventBus.emit("forceToLogin")
-		})
-		this.eventBus.on("invalid_session", async (error) => {
+		},
+		"forceToLogin": function () {
+			if (window.location.pathname !== "/login") {
+				this.beforeLoginLocation = window.location.pathname
+			}
+
+			window.app.setLocation("/login")
+		},
+		"invalid_session": async function (error) {
 			await this.sessionController.forgetLocalSession()
 			await this.flushState()
 
@@ -93,25 +87,16 @@ class App {
 					icon: <Icons.MdOutlineAccessTimeFilled />,
 				})
 			}
-		})
-
-		this.eventBus.on("cleanAll", () => {
+		},
+		"cleanAll": function () {
 			window.app.DrawerController.closeAll()
-		})
-
-		this.eventBus.on("crash", (message, error) => {
-			console.error(`[Crash] ${message}\n`, error)
-
-			this.setState({ crash: { message, error } })
-		})
-
-		this.eventBus.on("websocket_disconnected", () => {
+		},
+		"websocket_disconnected": function () {
 			if (!this.loadingMessage) {
 				this.loadingMessage = antd.message.loading("Trying to reconnect...", 0)
 			}
-		})
-
-		this.eventBus.on("websocket_connected", async () => {
+		},
+		"websocket_connected": async function () {
 			const token = await Session.token
 
 			this.mainSocket.emit("authenticate", token)
@@ -129,9 +114,7 @@ class App {
 					antd.message.success("Reconnected")
 				}, 500)
 			}
-		})
-
-		this.isAppCapacitor = () => navigator.userAgent === "capacitor"
+		},
 	}
 
 	static windowContext() {
@@ -349,20 +332,6 @@ class App {
 	}
 
 	render() {
-		if (this.state.crash) {
-			return <div className="app_crash">
-				<div className="header">
-					<Icons.MdOutlineError />
-					<h1>Crash</h1>
-				</div>
-				<h2>{this.state.crash.message}</h2>
-				<pre>{this.state.crash.error}</pre>
-				<div className="actions">
-					<antd.Button onClick={() => window.location.reload()}>Reload</antd.Button>
-				</div>
-			</div>
-		}
-
 		if (!this.state.initialized) {
 			return null
 		}
