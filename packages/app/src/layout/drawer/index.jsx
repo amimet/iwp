@@ -102,12 +102,8 @@ export class Drawer extends React.Component {
 	options = this.props.options ?? {}
 	events = new EventEmitter()
 	state = {
-		locked: this.options.locked ?? false,
 		visible: true,
 	}
-
-	unlock = () => this.setState({ locked: false })
-	lock = () => this.setState({ locked: true })
 
 	componentDidMount = async () => {
 		if (typeof this.props.controller === "undefined") {
@@ -122,25 +118,15 @@ export class Drawer extends React.Component {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 
-	onClose = () => {
-		if (typeof this.options.props?.closable !== "undefined" && !this.options.props?.closable) {
-			return false
-		}
-
-		this.close()
-	}
-
 	close = (context) => {
-		if (typeof this.options.onClose === "function") {
-			this.options.onClose(...context)
-		}
-
-		this.toogleVisibility(false)
-		this.unlock()
-
 		setTimeout(() => {
+			this.toogleVisibility(false)
+			if (typeof this.options.onClose === "function") {
+				this.options.onClose(...context)
+			}
+
 			this.props.controller.destroy(this.props.id)
-		}, 400)
+		}, 500)
 	}
 
 	sendEvent = (...context) => {
@@ -164,7 +150,7 @@ export class Drawer extends React.Component {
 			...this.options.props,
 			ref: this.props.ref,
 			key: this.props.id,
-			onRequestClose: this.onClose,
+			onRequestClose: this.close,
 			open: this.state.visible,
 			containerElementClass: "drawer",
 			modalElementClass: "body",

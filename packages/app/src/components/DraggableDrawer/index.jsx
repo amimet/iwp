@@ -254,6 +254,7 @@ export default class Drawer extends Component {
         }
 
         this.setState({
+            open: false,
             position: defaultPosition,
             touching: false
         })
