@@ -66,6 +66,8 @@ const SplashExtension = Splash.extension({
 
 class App {
 	static initialize() {
+		window.app.version = config.package.version
+		
 		this.configuration = {
 			settings: new SettingsController(),
 			sidebar: new SidebarController(),
