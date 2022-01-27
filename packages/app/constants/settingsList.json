@@ -5,7 +5,9 @@
         "type": "Select",
         "icon": "MdTranslate",
         "title": "Language",
-        "title_i18n": "settings_general_language"
+        "title_i18n": "settings_general_language",
+        "description": "Choose a language for the application",
+        "description_i18n": "settings_general_language_description"
     },
     {
         "id": "edit_sidebar",
