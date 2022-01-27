@@ -27,7 +27,7 @@ const Payload = (props) => {
 		</div>
 
 		<div className="actions">
-			{props.onDeleteItem && <antd.Button onClick={() => props.onClickDelete(item)} type="link">
+			{props.onClickDelete && <antd.Button onClick={() => props.onClickDelete(item)} type="link">
 				Delete
 			</antd.Button>}
 		</div>
