@@ -379,7 +379,10 @@ class App {
 		if (typeof token === "undefined") {
 			window.app.eventBus.emit("forceToLogin")
 		} else {
-			const session = await this.sessionController.getCurrentSession()
+			const session = await this.sessionController.getCurrentSession().catch((error) => {
+				console.log(`[App] Cannot get current session: ${error.message}`)
+				return false
+			})
 			await this.setState({ session })
 		}
 	}
