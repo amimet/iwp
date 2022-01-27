@@ -10,11 +10,34 @@ String.prototype.toTitleCase = function () {
 	})
 }
 
+Promise.tasked = function (promises) {
+	return new Promise(async (resolve, reject) => {
+		let rejected = false
+
+		for await (let promise of promises) {
+			if (rejected) {
+				return
+			}
+
+			try {
+				await promise()
+			} catch (error) {
+				rejected = true
+				return reject(error)
+			}
+		}
+
+		if (!rejected) {
+			return resolve()
+		}
+	})
+}
+
 import React from "react"
 import { CreateEviteApp, BindPropsProvider } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-import { ActionSheet } from "antd-mobile"
+import { ActionSheet, Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
 
 import { Session, User, SidebarController, SettingsController } from "models"
@@ -92,8 +115,14 @@ class App {
 			window.app.DrawerController.closeAll()
 		},
 		"websocket_disconnected": function () {
-			if (!this.loadingMessage) {
-				this.loadingMessage = antd.message.loading("Trying to reconnect...", 0)
+			if (!this.wsReconnecting) {
+				this.wsReconnecting = true
+
+				Toast.show({
+					icon: 'loading',
+					content: 'Connecting...',
+					duration: 0,
+				})
 			}
 		},
 		"websocket_connected": async function () {
@@ -108,10 +137,15 @@ class App {
 				console.error("[WS] Authenticate Failed", error)
 			})
 
-			if (typeof this.loadingMessage === "function") {
+			if (this.wsReconnecting) {
+				this.wsReconnecting = false
+				await this.initialization()
+
 				setTimeout(() => {
-					this.loadingMessage()
-					antd.message.success("Reconnected")
+					Toast.show({
+						icon: 'success',
+						content: 'Connected',
+					})
 				}, 500)
 			}
 		},
@@ -258,15 +292,8 @@ class App {
 	}
 
 	sessionController = new Session()
-
 	userController = new User()
-
 	state = {
-		// app
-		initialized: false,
-		crash: false,
-
-		// app session
 		session: null,
 		user: null,
 	}
@@ -276,34 +303,74 @@ class App {
 	}
 
 	componentDidMount = async () => {
-		await this.setState({ initialized: false })
+		if (this.isAppCapacitor()) {
+			window.addEventListener("statusTap", () => {
+				this.eventBus.emit("statusTap")
+			})
 
-		await this.contexts.app.initializeDefaultBridge()
+			StatusBar.setOverlaysWebView({ overlay: true })
+			window.app.hideStatusBar()
+		}
+
+		this.eventBus.emit("render_initialization")
+
 		await this.initialization()
 
-		await this.setState({ initialized: true })
+		this.eventBus.emit("render_initialization_done")
 	}
 
 	initialization = async () => {
-		try {
-			await this.__SessionInit()
-			await this.__UserInit()
+		console.debug(`[App] Initializing app`)
 
-			if (this.state.session) {
-				await this.contexts.app.WSInterface.sockets.main.connect()
-			}
+		const initializationTasks = [
+			async () => {
+				try {
+					await this.contexts.app.attachAPIConnection()
+				} catch (error) {
+					throw {
+						cause: "Cannot connect to API",
+						details: error.message,
+					}
+				}
+			},
+			async () => {
+				try {
+					await this.__SessionInit()
+				} catch (error) {
+					throw {
+						cause: "Cannot initialize session",
+						details: error.message,
+					}
+				}
+			},
+			async () => {
+				try {
+					await this.__UserInit()
+				} catch (error) {
+					throw {
+						cause: "Cannot initialize user data",
+						details: error.message,
+					}
+				}
+			},
+			async () => {
+				try {
+					if (this.state.session) {
+						await this.contexts.app.attachWSConnection()
+					}
+				} catch (error) {
+					throw {
+						cause: "Cannot connect to WebSocket",
+						details: error.message,
+					}
+				}
+			},
+		]
 
-			if (this.isAppCapacitor()) {
-				window.addEventListener("statusTap", () => {
-					this.eventBus.emit("statusTap")
-				})
-
-				StatusBar.setOverlaysWebView({ overlay: true })
-				window.app.hideStatusBar()
-			}
-		} catch (error) {
-			window.app.eventBus.emit("crash", `Cannot validate initialization`, error.message)
-		}
+		await Promise.tasked(initializationTasks).catch((reason) => {
+			console.error(`[App] Initialization failed: ${reason.cause}`)
+			window.app.eventBus.emit("crash", reason.cause, reason.details)
+		})
 	}
 
 	__SessionInit = async () => {
@@ -322,20 +389,11 @@ class App {
 			return false
 		}
 
-		try {
-			const user = await User.data()
-			await this.setState({ user })
-		} catch (error) {
-			console.error(error)
-			this.eventBus.emit("crash", "Cannot initialize user data", error)
-		}
+		const user = await User.data()
+		await this.setState({ user })
 	}
 
 	render() {
-		if (!this.state.initialized) {
-			return null
-		}
-
 		return (
 			<React.Fragment>
 				<Helmet>
