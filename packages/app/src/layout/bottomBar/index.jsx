@@ -1,24 +1,62 @@
 import React from "react"
+import { Motion, spring } from "react-motion"
+import { EviteComponent } from "evite"
 import * as antd from "antd"
 import { createIconRender } from "components/Icons"
 import classnames from "classnames"
 
 import "./index.less"
 
-export default class BottomBar extends React.Component {
+export default class BottomBar extends EviteComponent {
     state = {
+        show: false,
+        visible: false,
         creatorActionsVisible: false,
         render: null,
     }
 
+    handleBusEvents = {
+        "render_initialization": () => {
+            this.toogle(false)
+        },
+        "render_initialization_done": () => {
+            this.toogle(true)
+        }
+    }
+
     componentDidMount = () => {
+        this._loadBusEvents()
+
         window.app.BottomBarController = {
+            toogleVisible: this.toogle,
+            isVisible: () => this.state.visible,
             render: (fragment) => {
                 this.setState({ render: fragment })
             },
             clear: () => {
                 this.setState({ render: null })
             },
+        }
+    }
+
+    componentWillUnmount = () => {
+        this._unloadBusEvents()
+        delete window.app.BottomBarController
+    }
+
+    toogle = (to) => {
+        to = to ?? !this.state.visible
+
+        if (!to) {
+            this.setState({ show: to }, () => {
+                setTimeout(() => {
+                    this.setState({ visible: to })
+                }, 500)
+            })
+        } else {
+            this.setState({ visible: to }, () => {
+                this.setState({ show: to })
+            })
         }
     }
 
@@ -33,8 +71,18 @@ export default class BottomBar extends React.Component {
             </div>
         }
 
-        return <>
-            <div className="bottomBar">
+        if (!this.state.visible) {
+            return null
+        }
+
+        return <Motion style={{ y: spring(this.state.show ? 0 : 300) }}>
+            {({ y }) => <div
+                className="bottomBar"
+                style={{
+                    WebkitTransform: `translate3d(0, ${y}px, 0)`,
+                    transform: `translate3d(0, ${y}px, 0)`,
+                }}
+            >
                 <div className="items">
                     <div
                         key="main"
@@ -96,7 +144,7 @@ export default class BottomBar extends React.Component {
                         </div>
                     </div>}
                 </div>
-            </div>
-        </>
+            </div>}
+        </Motion>
     }
 }
