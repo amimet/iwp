@@ -38,6 +38,7 @@ export function GetRoutesComponentMap() {
 
 export class RouteRender extends EvitePureComponent {
 	state = {
+		renderInitialization: true,
 		renderComponent: null,
 		renderError: null,
 		lastLocation: window.location,
@@ -46,6 +47,12 @@ export class RouteRender extends EvitePureComponent {
 	}
 
 	handleBusEvents = {
+		"render_initialization": () => {
+			this.setState({ renderInitialization: true })
+		},
+		"render_initialization_done": () => {
+			this.setState({ renderInitialization: false })
+		},
 		"crash": (message, error) => {
 			this.setState({ crash: { message, error } })
 		},
@@ -92,6 +99,12 @@ export class RouteRender extends EvitePureComponent {
 			}
 
 			return JSON.stringify(this.state.renderError)
+		}
+
+		if (this.state.renderInitialization) {
+			const StaticInitializationRender = this.props.staticRenders?.initialization ?? null
+
+			return <StaticInitializationRender />
 		}
 
 		if (!this.state.renderComponent) {
