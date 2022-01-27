@@ -111,19 +111,27 @@ export default class Login extends React.Component {
     }
 
     componentDidMount() {
-        if (window.app.SidebarController.isVisible()) {
+        const sidebarVisible = window.app.SidebarController.isVisible()
+        const headerVisible = window.app.HeaderController.isVisible()
+        const bottomBarVisible = window.app.BottomBarController.isVisible()
+
+        if (sidebarVisible) {
             window.app.SidebarController.toogleVisible(false)
         }
 
-        if (window.app.HeaderController.isVisible()) {
+        if (headerVisible) {
             window.app.HeaderController.toogleVisible(false)
+        }
+
+        if (bottomBarVisible) {
+            app.BottomBarController.toogleVisible(false)
         }
     }
 
     render() {
         return (
             <div className="app_login">
-                {this.props.session?.valid && <div className="session_available">
+                {this.props.session && <div className="session_available">
                     <h3><Icons.AlertCircle /> You already have a valid session.</h3>
                     <div className="session_card">
                         @{this.props.session.username}
