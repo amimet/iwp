@@ -63,9 +63,9 @@ export default class Layout extends React.Component {
 			this.setState({ isOnTransition: false })
 		})
 
-		if (Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
-			this.setLayout("mobile")
+		if (window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
 			window.isMobile = true
+			this.setLayout("mobile")
 		} else {
 			window.isMobile = false
 		}
