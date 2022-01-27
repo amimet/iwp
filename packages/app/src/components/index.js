@@ -20,6 +20,7 @@ export { default as StepsForm } from "./StepsForm"
 export { default as DraggableDrawer } from "./DraggableDrawer"
 export { default as AddableSelectList } from "./AddableSelectList"
 export { default as SwipeItem } from "./SwipeItem"
+export { default as Crash } from "./Crash"
 
 export * as Workload from "./Workload"
 export * as Fabric from "./Fabric"
