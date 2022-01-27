@@ -31,7 +31,7 @@ export const AboutCard = (props) => {
 			<Card title={appConfig.siteName}>
 				<div>
 					<antd.Tag>
-						<Icons.Tag />v{eviteNamespace?.projectVersion ?? " experimental"}
+						<Icons.Tag />v{window.app.version ?? "experimental"}
 					</antd.Tag>
 					{eviteNamespace.eviteVersion &&
 						<antd.Tag color="geekblue">eVite v{eviteNamespace?.eviteVersion}</antd.Tag>}

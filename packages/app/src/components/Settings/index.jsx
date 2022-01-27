@@ -166,7 +166,7 @@ export default class SettingsMenu extends React.Component {
 						<div>{config.app?.siteName}</div>
 						<div>
 							<antd.Tag>
-								<Icons.Tag />v{window.__evite?.projectVersion}
+								<Icons.Tag />v{window.app.version}
 							</antd.Tag>
 						</div>
 						<div>
