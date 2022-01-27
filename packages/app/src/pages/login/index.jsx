@@ -74,6 +74,10 @@ const formInstance = [
 
 export default class Login extends React.Component {
     static bindApp = ["sessionController"]
+    
+    static pageStatement = {
+        bottomBarAllowed: false
+    }
 
     handleFinish = async (values, ctx) => {
         ctx.toogleValidation(true)
@@ -113,7 +117,6 @@ export default class Login extends React.Component {
     componentDidMount() {
         const sidebarVisible = window.app.SidebarController.isVisible()
         const headerVisible = window.app.HeaderController.isVisible()
-        const bottomBarVisible = window.app.BottomBarController.isVisible()
 
         if (sidebarVisible) {
             window.app.SidebarController.toogleVisible(false)
@@ -121,10 +124,6 @@ export default class Login extends React.Component {
 
         if (headerVisible) {
             window.app.HeaderController.toogleVisible(false)
-        }
-
-        if (bottomBarVisible) {
-            app.BottomBarController.toogleVisible(false)
         }
     }
 
