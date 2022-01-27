@@ -25,6 +25,9 @@ export default class BottomBar extends EviteComponent {
                 this.toogle(true)
             }
         },
+        "crash": () => {
+            this.toogle(false)
+        },
         "locationChange": () => {
             this.toogle(this.isAllowed())
         }
