@@ -9,6 +9,7 @@ import "./index.less"
 
 export default class BottomBar extends EviteComponent {
     state = {
+        allowed: true,
         show: false,
         visible: false,
         creatorActionsVisible: false,
@@ -20,7 +21,12 @@ export default class BottomBar extends EviteComponent {
             this.toogle(false)
         },
         "render_initialization_done": () => {
-            this.toogle(true)
+            if (this.isAllowed()) {
+                this.toogle(true)
+            }
+        },
+        "locationChange": () => {
+            this.toogle(this.isAllowed())
         }
     }
 
@@ -44,8 +50,16 @@ export default class BottomBar extends EviteComponent {
         delete window.app.BottomBarController
     }
 
+    isAllowed() {
+        return app.pageStatement?.bottomBarAllowed !== "undefined" && app.pageStatement?.bottomBarAllowed !== false
+    }
+
     toogle = (to) => {
-        to = to ?? !this.state.visible
+        if (!window.isMobile) {
+            to = false
+        } else {
+            to = to ?? !this.state.visible
+        }
 
         if (!to) {
             this.setState({ show: to }, () => {
