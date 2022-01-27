@@ -44,7 +44,7 @@ import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, Settings, Workload, Fabric } from "components"
+import { NotFound, RenderError, Crash, Settings, Workload, Fabric } from "components"
 import Layout from "./layout"
 import { Icons } from "components/Icons"
 
@@ -67,7 +67,7 @@ const SplashExtension = Splash.extension({
 class App {
 	static initialize() {
 		window.app.version = config.package.version
-		
+
 		this.configuration = {
 			settings: new SettingsController(),
 			sidebar: new SidebarController(),
@@ -149,6 +149,17 @@ class App {
 						content: 'Connected',
 					})
 				}, 500)
+			}
+		},
+		"websocket_connection_error": function (error) {
+			if (!this.wsReconnecting) {
+				this.wsReconnecting = true
+
+				Toast.show({
+					icon: 'loading',
+					content: 'Connecting...',
+					duration: 0,
+				})
 			}
 		},
 	}
@@ -288,6 +299,7 @@ class App {
 		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
+		Crash: Crash,
 		initialization: () => {
 			return <Splash.SplashComponent logo={config.logo.alt} />
 		}
