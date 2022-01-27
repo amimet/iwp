@@ -34,17 +34,21 @@ export default {
                 async (app, main) => {
                     app.WSInterface = await app.createWSBridge()
                     app.WSSockets = app.WSInterface.sockets
+                    app.WSInterface.mainSocketConnected = false
 
                     app.WSSockets.main.on("connect", () => {
                         window.app.eventBus.emit("websocket_connected")
+                        app.WSInterface.mainSocketConnected = true
                     })
 
                     app.WSSockets.main.on("disconnect", (...context) => {
                         window.app.eventBus.emit("websocket_disconnected", ...context)
+                        app.WSInterface.mainSocketConnected = false
                     })
 
                     app.WSSockets.main.on("connect_error", (...context) => {
                         window.app.eventBus.emit("websocket_connection_error", ...context)
+                        app.WSInterface.mainSocketConnected = false
                     })
 
                     window.app.ws = app.WSInterface
@@ -59,7 +63,9 @@ export default {
             ],
             mutateContext: {
                 async attachWSConnection() {
-                    await this.WSInterface.sockets.main.connect()
+                    if (!this.WSInterface.sockets.main.connected) {
+                        await this.WSInterface.sockets.main.connect()
+                    }
                 },
                 async attachAPIConnection() {
                     await this.apiBridge.initialize()
