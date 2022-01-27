@@ -30,28 +30,39 @@ export default {
     key: "apiBridge",
     expose: [
         {
-            mutateContext: {
-                async initializeDefaultBridge() {
-                    this.apiBridge = await this.createBridge()
-                    this.WSSockets = this.WSInterface.sockets
+            initialization: [
+                async (app, main) => {
+                    app.WSInterface = await app.createWSBridge()
+                    app.WSSockets = app.WSInterface.sockets
 
-                    this.WSSockets.main.on("connect", () => {
+                    app.WSSockets.main.on("connect", () => {
                         window.app.eventBus.emit("websocket_connected")
                     })
 
-                    this.WSSockets.main.on("disconnect", (...context) => {
+                    app.WSSockets.main.on("disconnect", (...context) => {
                         window.app.eventBus.emit("websocket_disconnected", ...context)
                     })
 
-                    this.WSSockets.main.on("connect_error", (...context) => {
+                    app.WSSockets.main.on("connect_error", (...context) => {
                         window.app.eventBus.emit("websocket_connection_error", ...context)
                     })
 
-                    window.app.ws = this.WSInterface
-                    window.app.handleWSListener = this.handleWSListener
+                    window.app.ws = app.WSInterface
+                    window.app.handleWSListener = app.handleWSListener
+                },
+                async (self) => {
+                    self.apiBridge = await self.createApiBridge()
 
-                    window.app.api = this.apiBridge
-                    window.app.request = this.apiBridge.endpoints
+                    window.app.api = self.apiBridge
+                    window.app.request = self.apiBridge.endpoints
+                },
+            ],
+            mutateContext: {
+                async attachWSConnection() {
+                    await this.WSInterface.sockets.main.connect()
+                },
+                async attachAPIConnection() {
+                    await this.apiBridge.initialize()
                 },
                 handleWSListener: (to, fn) => {
                     if (typeof to === "undefined") {
@@ -77,7 +88,15 @@ export default {
                         return await fn(...context)
                     })
                 },
-                createBridge: async () => {
+                createWSBridge: async () => {
+                    return new WSInterface({
+                        origin: config.ws.address,
+                        managerOptions: {
+                            autoConnect: false
+                        }
+                    })
+                },
+                createApiBridge: async () => {
                     const getSessionContext = async () => {
                         const obj = {}
                         const token = await Session.token
@@ -111,21 +130,9 @@ export default {
                         onResponse: handleResponse,
                     })
 
-                    await bridge.initialize().catch((err) => {
-                        throw {
-                            message: "Failed to connect with API",
-                            description: err.message,
-                        }
-                    })
-
                     return bridge
                 },
-                WSInterface: new WSInterface({
-                    origin: config.ws.address,
-                    managerOptions: {
-                        autoConnect: false
-                    }
-                }),
+
             },
         },
     ],
