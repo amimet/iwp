@@ -36,12 +36,23 @@ export function GetRoutesComponentMap() {
 	}, {})
 }
 
+// class PageStatement {
+// 	constructor() {
+// 		this.state = {}
+
+// 	}
+
+// 	getProxy() {
+
+// 	}
+// }
+
 export class RouteRender extends EvitePureComponent {
 	state = {
 		renderInitialization: true,
 		renderComponent: null,
 		renderError: null,
-		lastLocation: window.location,
+		//pageStatement: new PageStatement(),
 		routes: GetRoutesComponentMap() ?? {},
 		crash: null,
 	}
@@ -78,6 +89,9 @@ export class RouteRender extends EvitePureComponent {
 		}
 
 		let componentModule = this.state.routes[path ?? this.props.path ?? window.location.pathname] ?? this.props.staticRenders?.NotFound ?? NotFoundRender
+
+		// TODO: in a future use, we can use `pageStatement` class for managing statement
+		window.app.pageStatement = Object.freeze(componentModule.pageStatement) ?? Object.freeze({})
 
 		return this.setState({ renderComponent: componentModule })
 	}
