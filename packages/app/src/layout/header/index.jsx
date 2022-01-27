@@ -28,16 +28,12 @@ export default class Header extends React.Component {
 		window.app["HeaderController"] = this.HeaderController
 	}
 
-	onClickCreate = () => {
-		window.app.openCreateNew()
-	}
-
 	render() {
 		return (
 			<antd.Layout.Header className={classnames(`app_header`, { ["hidden"]: !window.isMobile && !this.state.visible })}>
 				<div>
 					<antd.Button
-						onClick={this.onClickCreate}
+						onClick={window.app.openCreateNew}
 						type="primary"
 						shape="circle"
 						icon={<Icons.Plus style={{ margin: 0 }} />}
