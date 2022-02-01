@@ -7,7 +7,7 @@ import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList } from "components"
+import { ActionsBar, SelectableList, SearchButton } from "components"
 
 import "./index.less"
 
@@ -177,12 +177,12 @@ export default class Workloads extends React.Component {
 		window.app.openWorkloadDetails(key)
 	}
 
-	onSearch = (event) => {
-		if (event === "" && this.state.searchValue) {
+	onSearch = (value) => {
+		if (value === "" && this.state.searchValue) {
 			return this.setState({ searchValue: null })
 		}
 
-		this.debouncedSearch(event.target.value)
+		this.debouncedSearch(value)
 	}
 
 	search = (value) => {
@@ -290,9 +290,7 @@ export default class Workloads extends React.Component {
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar mode="float">
 						<div key="search">
-							<antd.Input.Search
-								placeholder="Search"
-								allowClear
+							<SearchButton
 								onSearch={this.onSearch}
 								onChange={this.onSearch}
 							/>
