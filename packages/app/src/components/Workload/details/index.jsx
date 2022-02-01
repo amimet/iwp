@@ -32,10 +32,8 @@ export default class WorkloadDetails extends React.Component {
 
 		await this.setState({ qrCanvas: qr })
 
-		window.app.handleWSListener("workloadCommit", (data) => {
-			if (this.id === data.workloadId) {
-				this.fetchData()
-			}
+		window.app.handleWSListener(`workloadUpdate_${this.id}`, (data) => {
+			this.setState({ data: data })
 		})
 	}
 
