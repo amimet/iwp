@@ -44,6 +44,7 @@ class Server {
 
         this.server = this.instance.httpServer
         this.io = new socketIo.Server(this.env.wsPort ?? 3001)
+        this.WSClients = []
 
         this.options = {
             jwtStrategy: {
@@ -57,8 +58,18 @@ class Server {
 
         global.jwtStrategy = this.options.jwtStrategy
         global.signLocation = this.env.signLocation
-
-        this.WSClients = []
+        global.wsInterface = {
+            io: this.io,
+            clients: this.WSClients,
+            getClientSocket: (userId) => {
+                return this.WSClients.find(c => c.userId === userId).socket
+            },
+            broadcast: async (channel, ...args) => {
+                for await (const client of this.WSClients) {
+                    client.socket.emit(channel, ...args)
+                }
+            },
+        }
 
         this.initialize()
     }
@@ -122,19 +133,7 @@ class Server {
 
     initWebsockets() {
         this.instance.middlewares["useWS"] = (req, res, next) => {
-            req.ws = {
-                io: this.io,
-                clients: this.WSClients,
-                getClientSocket: (userId) => {
-                    return this.WSClients.find(c => c.userId === userId).socket
-                },
-                broadcast: async (channel, ...args) => {
-                    for await (const client of this.WSClients) {
-                        client.socket.emit(channel, ...args)
-                    }
-                },
-            }
-
+            req.ws = global.wsInterface
             next()
         }
 
