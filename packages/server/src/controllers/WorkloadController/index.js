@@ -5,7 +5,7 @@ import moment from "moment"
 
 const format = "DD-MM-YYYY hh:mm"
 
-function parseWorkloadAdditions(workload) {
+function stepWorkloadUpdate(workload) {
     let multiple = false
     let queue = []
 
@@ -39,6 +39,12 @@ function parseWorkloadAdditions(workload) {
             })
         }
 
+        // if all payloads are reached, mark workload as finished
+        if (workload.payloads && workload.payloads.every(payload => payload.quantityReached)) {
+            workload.status = "finished"
+            workload.finished = true
+        }
+
         return workload
     })
 
@@ -68,12 +74,47 @@ function calculateWorkloadQuantityLeft(workload, payload) {
     return result
 }
 
+const Methods = {
+    finish: async (_id) => {
+        let workload = await Workload.findById(_id)
+
+        workload.finished = true
+
+        await workload.save()
+
+        global.wsInterface.io.emit(`workloadFinished_${_id}`, workload)
+    },
+    update: async (_id, update) => {
+        let workload = await Workload.findById(_id)
+
+        const allowedUpdates = ["commits", "payloads", "assigned", "expired", "finished", "status", "region", "name"]
+
+        allowedUpdates.forEach((key) => {
+            if (update[key]) {
+                workload[key] = update[key]
+            }
+        })
+
+        // this is important, here we are updating statement of the workload
+        workload = stepWorkloadUpdate(workload)
+
+        await Workload.findByIdAndUpdate(_id, workload)
+
+        global.wsInterface.io.emit(`workloadUpdate_${_id}`, workload)
+        global.wsInterface.io.emit(`workloadUpdate`, workload)
+
+        return workload
+    },
+}
+
 export default {
     pushCommit: Schematized({
         required: ["workloadId", "payloadUUID", "quantity"],
         select: ["workloadId", "payloadUUID", "quantity", "tooks"],
     }, async (req, res) => {
-        let workload = await Workload.findById(req.selection.workloadId)
+        let workload = await Workload.findById(req.selection.workloadId).catch(() => {
+            return false
+        })
 
         if (!workload) {
             return res.status(404).send({
@@ -95,9 +136,9 @@ export default {
 
         workload.commits.push(commit)
 
-        workload = parseWorkloadAdditions(workload)
-
-        await Workload.findByIdAndUpdate(req.selection.workloadId, workload).catch(err => {
+        workload = Methods.update(req.selection.workloadId, {
+            commits: workload.commits,
+        }).catch((err) => {
             return res.status(500).json({
                 error: err,
             })
@@ -187,11 +228,20 @@ export default {
         return res.json(workload)
     }),
     update: Schematized({
-        required: ["_id"],
-        select: ["_id"],
+        required: ["_id", "update"],
+        select: ["_id", "update"],
     }, async (req, res) => {
-        // TODO: Update method
-        let workload = await Workload.findById(req.selection._id)
+        let workload = await Workload.findById(req.selection._id).catch((err) => {
+            return res.status(404).json({
+                error: "Workload not found",
+            })
+        })
+
+        workload = Methods.update(workload, req.selection.update).catch((err) => {
+            return res.status(500).json({
+                error: err,
+            })
+        })
 
         return res.json(workload)
     }),
@@ -249,7 +299,7 @@ export default {
         return res.json({ deleted })
     }),
     get: Schematized({
-        select: ["_id", "region", "name"],
+        select: ["_id", "region", "name", "finished"],
     }, async (req, res) => {
         let workloads = null
 
@@ -271,8 +321,6 @@ export default {
             workloads = await Workload.find(req.selection)
         }
 
-        workloads = parseWorkloadAdditions(workloads)
-
         return res.json(req.selection._id ? workloads[0] : workloads)
     }),
     getWorkloadWithPayloadUUID: Schematized({
@@ -289,15 +337,13 @@ export default {
             })
         }
 
-        workload = parseWorkloadAdditions(workload)
-
         return res.json(workload)
     }),
     getWorkloadAssignedToUserID: Schematized({
         select: ["_id"],
     }, async (req, res) => {
-        let workloads = await Workload.find()
-
+        // must exclude finished workloads
+        let workloads = await Workload.find({ finished: false })
         workloads = workloads.filter(workload => workload.assigned.includes(req.selection._id ?? req.user._id))
 
         return res.json(workloads)
