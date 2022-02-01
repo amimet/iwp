@@ -71,7 +71,7 @@ function calculateWorkloadQuantityLeft(workload, payload) {
 export default {
     pushCommit: Schematized({
         required: ["workloadId", "payloadUUID", "quantity"],
-        select: ["workloadId", "payloadUUID", "quantity"],
+        select: ["workloadId", "payloadUUID", "quantity", "tooks"],
     }, async (req, res) => {
         let workload = await Workload.findById(req.selection.workloadId)
 
@@ -90,6 +90,7 @@ export default {
             quantity: req.selection.quantity,
             user_id: req.user._id,
             timestamp: new Date().getTime(),
+            tooks: req.selection.tooks ?? 0,
         }
 
         workload.commits.push(commit)
@@ -102,7 +103,7 @@ export default {
             })
         })
 
-        req.ws.io.emit("workloadCommit", {
+        req.ws.io.emit(`newCommit_${commit.payloadUUID}`, {
             workloadId: req.selection.workloadId,
             commit,
         })
