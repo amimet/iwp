@@ -70,6 +70,14 @@
 		display: flex;
 		flex-direction: column;
 
+		background-color: var(--background-color-accent);
+		border-radius: 8px;
+		padding: 10px;
+
+		h3 {
+			font-size: 20px;
+		}
+
 		.content {
 			display: flex;
 			flex-direction: column;
@@ -102,7 +110,31 @@
 		}
 	}
 
+	.assistant {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		.controls {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-around;
+
+			width: 100%;
+
+			> div {
+				button {
+					--ignore-dragger: true;
+					width: 40vw;
+					height: 10vh;
+				}
+			}
+		}
+	}
+
 	.actions {
+		--ignore-dragger: true;
 		position: sticky;
 		bottom: 0;
 		display: flex;
@@ -110,5 +142,9 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 10px;
+	}
+
+	> div {
+		margin-bottom: 20px;
 	}
 }

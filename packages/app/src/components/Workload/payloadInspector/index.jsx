@@ -1,5 +1,8 @@
 import React from "react"
 import * as antd from "antd"
+import { Toast } from "antd-mobile"
+
+import moment from "moment"
 
 import { Icons, createIconRender } from "components/Icons"
 import { ActionsBar } from "components"
@@ -9,12 +12,31 @@ import { Commit } from ".."
 
 import "./index.less"
 
+class Counter {
+    constructor() {
+        this.times = {
+            start: null,
+            stop: null,
+        }
+    }
+
+    update(type) {
+        this.times[type] = moment()
+    }
+
+    tooks() {
+        return this.times.stop.diff(this.times.start)
+    }
+}
+
 export default class Inspector extends React.Component {
     state = {
         loading: true,
         workload: null,
         data: null,
     }
+
+    counter = new Counter()
 
     api = window.app.request
 
@@ -35,10 +57,16 @@ export default class Inspector extends React.Component {
             await this.setState({ data })
         }
 
-        window.app.handleWSListener("workloadCommit", (data) => {
-            if (this.uuid === data.commit.payloadUUID) {
-                this.fetchWorkloadDataWithUUID()
+        window.app.handleWSListener(`newCommit_${this.uuid}`, (data) => {
+            let workload = this.state.workload
+
+            if (!workload.commits) {
+                workload.commits = []
             }
+
+            workload.commits.push(data.commit)
+
+            this.setState({ workload })
         })
     }
 
@@ -121,6 +149,45 @@ export default class Inspector extends React.Component {
         }
     }
 
+    toogleAssistantMode = (to) => {
+        to = to ?? !this.state.assistantMode
+
+        this.setState({ assistantMode: to })
+
+        if (to) {
+            this.counter.update("start")
+        }
+    }
+
+    onMakeStep = async () => {
+        if (this.countQuantityLeft() === 0) {
+            console.warn("No quantity left")
+            return false
+        }
+
+        this.counter.update("stop")
+        const tooks = this.counter.tooks()
+
+        const result = await this.api.post.workloadCommit({
+            workloadId: this.state.workload._id,
+            payloadUUID: this.state.data.uuid,
+            tooks: tooks,
+            quantity: 1,
+        }).catch((err) => {
+            console.error(err)
+            antd.message.error(`Failed to commit: ${err}`)
+            return false
+        })
+
+        if (result) {
+            this.counter.update("start")
+            Toast.show({
+                icon: "success",
+                content: "Done"
+            })
+        }
+    }
+
     renderProperties = (item) => {
         if (!item.properties) {
             return null
@@ -166,6 +233,9 @@ export default class Inspector extends React.Component {
         const quantityCount = this.countQuantityFromCommits()
         const quantityLeft = this.countQuantityLeft()
 
+        // calculate percent for reach target quantity
+        const percent = Math.round((quantityCount / this.state.data.properties.quantity) * 100)
+
         return <div className="payload_inspector">
             <div className="header">
                 <div className="typeIndicator">
@@ -179,7 +249,7 @@ export default class Inspector extends React.Component {
                 </div>
             </div>
 
-            <div className="properties">
+            {!this.state.assistantMode && <div className="properties">
                 {this.renderProperties(this.state.data)}
                 <div className="property">
                     <div className="name">Quantity produced</div>
@@ -189,7 +259,7 @@ export default class Inspector extends React.Component {
                     <div className="name">Quantity left</div>
                     <div className="value">{quantityLeft}</div>
                 </div>
-            </div>
+            </div>}
 
             <div className="production">
                 <h3><Icons.Disc /> Production target</h3>
@@ -205,25 +275,42 @@ export default class Inspector extends React.Component {
                         </div>
                     </div>
                 </div>
+
+                <antd.Progress percent={percent} />
             </div>
 
-            <ActionsBar mode="float" type="transparent" spaced>
+            {this.state.assistantMode && <div className="assistant">
+                <div className="controls">
+                    <div>
+                        <antd.Button disabled={quantityLeft === 0} onClick={this.onMakeStep} icon={<Icons.Plus />} type="primary">
+                            1
+                        </antd.Button>
+                    </div>
+                    <div>
+                        <antd.Button onClick={() => this.toogleAssistantMode(false)} icon={<Icons.LogOut />}>
+                            Stop
+                        </antd.Button>
+                    </div>
+                </div>
+            </div>}
+
+            {!this.state.assistantMode && <ActionsBar mode="float" type="transparent" spaced>
                 <div>
                     <antd.Button onClick={() => this.onClickCommit()} icon={<Icons.CheckCircle />}>
                         Commit
                     </antd.Button>
                 </div>
                 <div>
-                    <antd.Button type="primary" icon={<Icons.MdOutlinePendingActions />}>
-                        Run
+                    <antd.Button
+                        disabled={quantityLeft === 0}
+                        onClick={() => this.toogleAssistantMode()}
+                        type={this.state.assistantMode ? undefined : "primary"}
+                        icon={this.state.assistantMode ? <Icons.ChevronLeft /> : <Icons.MdOutlinePendingActions />}
+                    >
+                        {this.state.assistantMode ? "Exit" : "Assistant mode"}
                     </antd.Button>
                 </div>
-                <div>
-                    <antd.Button icon={<Icons.Edit />}>
-                        Edit
-                    </antd.Button>
-                </div>
-            </ActionsBar>
+            </ActionsBar>}
         </div>
     }
 }
