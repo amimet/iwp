@@ -86,7 +86,7 @@ class Server {
         return new Promise((resolve, reject) => {
             try {
                 console.log("🌐 Trying to connect to DB...")
-                mongoose.connect(parseConnectionString(this.env), { useNewUrlParser: true, useFindAndModify: false })
+                mongoose.connect(parseConnectionString(this.env), { useNewUrlParser: true, useUnifiedTopology: true })
                     .then((res) => { return resolve(true) })
                     .catch((err) => { return reject(err) })
             } catch (err) {
