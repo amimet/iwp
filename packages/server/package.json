@@ -1,6 +1,6 @@
 {
   "name": "amimet-server",
-  "version": "0.5.0",
+  "version": "0.7.01",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "scripts": {
