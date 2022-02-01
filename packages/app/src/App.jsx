@@ -223,7 +223,7 @@ class App {
 				})
 			},
 			openFabric: (defaultType) => {
-				window.app.DrawerController.open("FabricCreator", Fabric.Creator, {
+				window.app.DrawerController.open("fabric_creator", Fabric.Creator, {
 					props: {
 						width: "70%",
 					},
@@ -234,7 +234,7 @@ class App {
 				})
 			},
 			openFabricInspector: (id) => {
-				window.app.DrawerController.open("FabricCreator", Fabric.Inspector, {
+				window.app.DrawerController.open("fabric_inspector", Fabric.Inspector, {
 					props: {
 						width: "70%",
 					},
