@@ -47,7 +47,7 @@ export default class Workloads extends React.Component {
 	state = {
 		loading: true,
 		regions: [],
-		selectionEnabled: false,
+		viewFinished: false,
 		selectedRegion: "all",
 		searchValue: null,
 		workloads: null,
@@ -60,22 +60,44 @@ export default class Workloads extends React.Component {
 			this.appendWorkloadToRender(data)
 		})
 
+		window.app.handleWSListener("workloadUpdate", (data) => {
+			let workloads = this.state.workloads
+
+			workloads = workloads.map((workload) => {
+				if (workload.id === data.id) {
+					return data
+				}
+
+				return workload
+			})
+
+			this.setState({ workloads })
+		})
+
 		this.loadRegions()
-		this.fetchWorkloadsFromRegion(this.state.selectedRegion)
+		this.fetchWorkloads(this.state.selectedRegion)
 	}
 
-	fetchWorkloadsFromRegion = async (id) => {
-		this.setState({ loading: true })
+	fetchWorkloads = async (regionId, viewFinished) => {
+		regionId = regionId ?? this.state.selectedRegion
+		viewFinished = viewFinished ?? this.state.viewFinished
 
-		await this.api.get.workload(undefined, { region: id })
-			.then((data) => {
-				console.log(data)
-				this.setState({ workloads: data, loading: false })
+		await this.setState({ loading: true })
+
+		const data = await this.api.get.workload(undefined, {
+			region: regionId,
+			finished: this.state.viewFinished,
+		}).catch((err) => {
+			console.log(err)
+			return false
+		})
+
+		if (data) {
+			this.setState({
+				loading: false,
+				workloads: data,
 			})
-			.catch((err) => {
-				console.log(err)
-				this.setState({ error: err, loading: false })
-			})
+		}
 	}
 
 	loadRegions = async () => {
@@ -123,7 +145,7 @@ export default class Workloads extends React.Component {
 
 	changeRegion = (region) => {
 		this.setState({ selectedRegion: region }, async () => {
-			await this.fetchWorkloadsFromRegion(region)
+			await this.fetchWorkloads(region)
 		})
 	}
 
@@ -275,6 +297,17 @@ export default class Workloads extends React.Component {
 								onChange={this.onSearch}
 							/>
 						</div>
+						<div>
+							<span>View finished</span>
+							<antd.Switch
+								value={this.state.viewFinished}
+								onChange={() => {
+									this.setState({ viewFinished: !this.state.viewFinished }, () => {
+										this.fetchWorkloads()
+									})
+								}}
+							/>
+						</div>
 						<div key="regionSelection">
 							<antd.Select
 								key="region_select"
@@ -300,7 +333,7 @@ export default class Workloads extends React.Component {
 					renderText={status => {
 						return <div>{statusRecord[status]}</div>
 					}}
-					onRefresh={async () => await this.fetchWorkloadsFromRegion(this.state.selectedRegion)}
+					onRefresh={async () => await this.fetchWorkloads(this.state.selectedRegion)}
 				>
 					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
 				</PullToRefresh>
