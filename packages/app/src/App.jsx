@@ -373,7 +373,8 @@ class App {
 
 	__SessionInit = async () => {
 		const token = await Session.token
-		if (token != null) {
+
+		if (token) {
 			const session = await this.sessionController.getCurrentSession().catch((error) => {
 				console.log(`[App] Cannot get current session: ${error.message}`)
 				return false
@@ -382,7 +383,6 @@ class App {
 		} else {
 			window.app.eventBus.emit("forceToLogin")
 		}
-
 	}
 
 	__WSInit = async () => {
