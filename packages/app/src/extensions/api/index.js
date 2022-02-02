@@ -8,6 +8,7 @@ class WSInterface {
         this.params = params
         this.manager = new io.Manager(this.params.origin, {
             autoConnect: true,
+            transports: ["websocket"],
             ...this.params.managerOptions,
         })
         this.sockets = {}
@@ -35,6 +36,13 @@ export default {
                     app.WSInterface = await app.createWSBridge()
                     app.WSSockets = app.WSInterface.sockets
                     app.WSInterface.mainSocketConnected = false
+
+                    app.WSSockets.main.on("authenticated", () => {
+                        console.log("[WS] Authenticated")
+                    })
+                    app.WSSockets.main.on("authenticateFailed", (error) => {
+                        console.error("[WS] Authenticate Failed", error)
+                    })
 
                     app.WSSockets.main.on("connect", () => {
                         window.app.eventBus.emit("websocket_connected")
