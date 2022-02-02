@@ -61,8 +61,8 @@ class Server {
         global.wsInterface = {
             io: this.io,
             clients: this.WSClients,
-            getClientSocket: (userId) => {
-                return this.WSClients.find(c => c.userId === userId).socket
+            getClientSockets: (userId) => {
+                return this.WSClients.filter(client => client.userId === userId)
             },
             broadcast: async (channel, ...args) => {
                 for await (const client of this.WSClients) {
