@@ -13,7 +13,7 @@ export default {
         address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://devapi_amimet01.ragestudio.net",
     },
     ws: {
-        address: process.env.NODE_ENV !== 'production' ? `ws://${window.location.hostname}:3001` : "https://devws_amimet01.ragestudio.net",
+        address: process.env.NODE_ENV !== 'production' ? `ws://${window.location.hostname}:3001` : "wss://devws_amimet01.ragestudio.net",
     },
     app: {
         title: packagejson.name,
