@@ -4,6 +4,8 @@ import * as antd from "antd"
 import { Card, Mask } from "antd-mobile"
 
 import { Icons } from "components/Icons"
+import { DiReact } from "react-icons/di"
+
 import config from "config"
 
 import "./index.less"
@@ -22,30 +24,47 @@ export const AboutCard = (props) => {
 		}, 150)
 	}
 
-	const eviteNamespace = window.__evite ?? {}
-	const appConfig = config.app ?? {}
-	const isDevMode = eviteNamespace?.env?.NODE_ENV !== "production"
+	const isProduction = import.meta.env.PROD
+	const isWSMainConnected = window.app.ws.mainSocketConnected
+	const WSMainOrigin = app.ws.sockets.main.io.uri
 
 	return <Mask visible={visible} onMaskClick={() => close()}>
-		<div className="about_app_wrapper">
-			<Card title={appConfig.siteName}>
-				<div>
-					<antd.Tag>
-						<Icons.Tag />v{window.app.version ?? "experimental"}
-					</antd.Tag>
-					{eviteNamespace.eviteVersion &&
-						<antd.Tag color="geekblue">eVite v{eviteNamespace?.eviteVersion}</antd.Tag>}
-					{eviteNamespace.version?.node && <antd.Tag color="green">
-						<Icons.Hexagon /> v{eviteNamespace?.versions?.node}
-					</antd.Tag>}
-					<antd.Tag color={isDevMode ? "magenta" : "green"}>
-						{isDevMode ? <Icons.Triangle /> : <Icons.CheckCircle />}
-						{isDevMode ? "development" : "stable"}
-					</antd.Tag>
+		<div className="aboutApp_wrapper">
+			<Card
+				bodyClassName="aboutApp_card"
+				headerClassName="aboutApp_card_header"
+				title={
+					<div className="content">
+						<div className="branding">
+							<h2>{config.app.siteName}</h2>
+							<span>{config.author}</span>
+						</div>
+						<div>
+							<antd.Tag><Icons.Tag />v{window.app.version ?? "experimental"}</antd.Tag>
+							<antd.Tag color={isProduction ? "green" : "magenta"}>
+								{isProduction ? <Icons.CheckCircle /> : <Icons.Triangle />}
+								{isProduction ? "stable" : "development"}
+							</antd.Tag>
+						</div>
+					</div>
+				}
+			>
+				<div className="group">
+					<h3><Icons.Globe />Server information</h3>
+					<div>
+						<antd.Tag color={isWSMainConnected ? "green" : "red"}><Icons.Cpu />{WSMainOrigin}</antd.Tag>
+					</div>
+				</div>
+				<div className="group">
+					<h3><Icons.GitMerge />Versions</h3>
+					<div>
+						<antd.Tag color="#ffec3d">eVite v{window.__eviteVersion ?? "experimental"}</antd.Tag>
+						<antd.Tag color="#61DBFB"><DiReact /> v{React.version ?? "experimental"}</antd.Tag>
+					</div>
 				</div>
 			</Card>
 		</div>
-	</Mask>
+	</Mask >
 }
 
 export function openModal() {
