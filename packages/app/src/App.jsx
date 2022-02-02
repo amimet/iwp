@@ -116,19 +116,9 @@ class App {
 		"cleanAll": function () {
 			window.app.DrawerController.closeAll()
 		},
-		"websocket_disconnected": function () {
-			if (!this.wsReconnecting) {
-				this.wsReconnecting = true
-
-				Toast.show({
-					icon: 'loading',
-					content: 'Connecting...',
-					duration: 0,
-				})
-			}
-		},
 		"websocket_connected": function () {
 			if (this.wsReconnecting) {
+				this.wsReconnectingTry = 0
 				this.wsReconnecting = false
 				this.initialization()
 
@@ -140,11 +130,9 @@ class App {
 				}, 500)
 			}
 		},
-		"websocket_connection_error": function (error) {
-			console.error(error)
-			console.error(error.message)
-			
+		"websocket_connection_error": function () {
 			if (!this.wsReconnecting) {
+				this.wsReconnectingTry = 0
 				this.wsReconnecting = true
 
 				Toast.show({
@@ -152,6 +140,12 @@ class App {
 					content: "Connecting...",
 					duration: 0,
 				})
+			}
+
+			this.wsReconnectingTry = this.wsReconnectingTry + 1
+
+			if (this.wsReconnectingTry > 3) {
+				window.location.reload()
 			}
 		},
 	}
@@ -379,16 +373,16 @@ class App {
 
 	__SessionInit = async () => {
 		const token = await Session.token
-
-		if (typeof token === "undefined") {
-			window.app.eventBus.emit("forceToLogin")
-		} else {
+		if (token != null) {
 			const session = await this.sessionController.getCurrentSession().catch((error) => {
 				console.log(`[App] Cannot get current session: ${error.message}`)
 				return false
 			})
 			await this.setState({ session })
+		} else {
+			window.app.eventBus.emit("forceToLogin")
 		}
+
 	}
 
 	__WSInit = async () => {

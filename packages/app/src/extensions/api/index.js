@@ -115,7 +115,7 @@ export default {
                         const obj = {}
                         const token = await Session.token
 
-                        if (typeof token !== "undefined") {
+                        if (token != null) {
                             // append token to context
                             obj.headers = {
                                 Authorization: `Bearer ${token ?? null}`,
