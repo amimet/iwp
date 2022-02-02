@@ -6,6 +6,7 @@ export default {
     package: packagejson,
     defaultTheme: defaultTheme,
     defaultSoundPack: defaultSoundPack,
+    author: "RageStudio© 2022",
     logo: {
         alt: "/logo_alt.svg"
     },
