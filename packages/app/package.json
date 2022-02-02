@@ -1,6 +1,6 @@
 {
   "name": "amimet_app",
-  "version": "0.7.01",
+  "version": "0.7.2",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
