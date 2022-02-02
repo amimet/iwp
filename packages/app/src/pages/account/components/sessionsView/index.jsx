@@ -57,7 +57,6 @@ const SessionsList = (props) => {
 	</div>
 }
 
-
 export default class SessionsView extends React.Component {
 	state = {
 		currentSessionUUID: null,
