@@ -268,6 +268,17 @@ export default {
 
         const result = await Workload.create(obj)
 
+        // notify operators
+        if (Array.isArray(assigned) && assigned.length > 0) {
+            assigned.forEach(async (operator) => {
+                const userSocket = req.ws.getClientSocket(operator)
+
+                if (userSocket) {
+                    await userSocket.emit("workloadAssigned", result._id)
+                }
+            })
+        }
+
         req.ws.io.emit("newWorkload", result)
 
         return res.json(result)

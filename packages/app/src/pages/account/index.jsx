@@ -129,18 +129,6 @@ export default class Account extends React.Component {
 		})
 	}
 
-	renderSelfActions = () => {
-		if (this.state.isSelf) {
-			return (
-				<div onClick={this.openUserEdit}>
-					<antd.Button>Edit</antd.Button>
-				</div>
-			)
-		}
-
-		return null
-	}
-
 	render() {
 		const user = this.state.user
 
@@ -164,7 +152,6 @@ export default class Account extends React.Component {
 							</>
 						}
 					</div>
-					{this.state.isSelf && this.renderSelfActions()}
 				</div>
 
 				{this.state.isSelf && (

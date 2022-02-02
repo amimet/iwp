@@ -3,8 +3,6 @@ export { default as Settings } from "./Settings"
 export { default as NotFound } from "./NotFound"
 export { default as AppSearcher } from "./AppSearcher"
 export { default as RenderError } from "./RenderError"
-
-export { default as Sessions } from "./Sessions"
 export { default as ActionsBar } from "./ActionsBar"
 export { default as SelectableList } from "./SelectableList"
 export { default as ObjectInspector } from "./ObjectInspector"
