@@ -29,20 +29,21 @@
 
 	.items {
 		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		//white-space: nowrap;
 		//overflow-x: overlay;
 
 		height: 100%;
 		width: 100vw;
 
-		> div {
+		.item {
 			display: inline-flex;
 
 			height: 100%;
-			//margin: 0 12px;
-		}
+			align-items: center;
+			justify-content: center;
 
-		.item {
 			transition: all 150ms ease-in;
 			
 			width: 20vw;
@@ -52,7 +53,7 @@
 			.icon {
 				border-radius: 360px;
 				height: 100%;
-				width: 100%;
+				width: fit-content;
 
 				display: flex;
 				flex-direction: column;
