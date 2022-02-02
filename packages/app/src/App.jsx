@@ -374,24 +374,28 @@ class App {
 	__SessionInit = async () => {
 		const token = await Session.token
 
-		if (token) {
-			const session = await this.sessionController.getCurrentSession().catch((error) => {
-				console.log(`[App] Cannot get current session: ${error.message}`)
-				return false
-			})
-			await this.setState({ session })
-		} else {
+		if (!token || token == null) {
 			window.app.eventBus.emit("forceToLogin")
+			return false
 		}
+
+		const session = await this.sessionController.getCurrentSession().catch((error) => {
+			console.log(`[App] Cannot get current session: ${error.message}`)
+			return false
+		})
+
+		await this.setState({ session })
 	}
 
 	__WSInit = async () => {
-		if (this.state.session) {
-			const token = await Session.token
-			await this.contexts.app.attachWSConnection()
-
-			this.mainSocket.emit("authenticate", token)
+		if (!this.state.session) {
+			return false
 		}
+
+		const token = await Session.token
+		await this.contexts.app.attachWSConnection()
+
+		this.mainSocket.emit("authenticate", token)
 	}
 
 	__UserInit = async () => {
