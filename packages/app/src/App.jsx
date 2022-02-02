@@ -127,37 +127,29 @@ class App {
 				})
 			}
 		},
-		"websocket_connected": async function () {
-			const token = await Session.token
-
-			this.mainSocket.emit("authenticate", token)
-
-			this.mainSocket.on("authenticated", () => {
-				console.log("[WS] Authenticated")
-			})
-			this.mainSocket.on("authenticateFailed", (error) => {
-				console.error("[WS] Authenticate Failed", error)
-			})
-
+		"websocket_connected": function () {
 			if (this.wsReconnecting) {
 				this.wsReconnecting = false
-				await this.initialization()
+				this.initialization()
 
 				setTimeout(() => {
 					Toast.show({
-						icon: 'success',
-						content: 'Connected',
+						icon: "success",
+						content: "Connected",
 					})
 				}, 500)
 			}
 		},
 		"websocket_connection_error": function (error) {
+			console.error(error)
+			console.error(error.message)
+			
 			if (!this.wsReconnecting) {
 				this.wsReconnecting = true
 
 				Toast.show({
-					icon: 'loading',
-					content: 'Connecting...',
+					icon: "loading",
+					content: "Connecting...",
 					duration: 0,
 				})
 			}
@@ -369,9 +361,7 @@ class App {
 			},
 			async () => {
 				try {
-					if (this.state.session) {
-						await this.contexts.app.attachWSConnection()
-					}
+					await this.__WSInit()
 				} catch (error) {
 					throw {
 						cause: "Cannot connect to WebSocket",
@@ -398,6 +388,15 @@ class App {
 				return false
 			})
 			await this.setState({ session })
+		}
+	}
+
+	__WSInit = async () => {
+		if (this.state.session) {
+			const token = await Session.token
+			await this.contexts.app.attachWSConnection()
+
+			this.mainSocket.emit("authenticate", token)
 		}
 	}
 
