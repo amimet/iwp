@@ -1,5 +1,4 @@
 @bottomBar_height: 80px;
-
 @bottomBar_iconSize: 24px;
 
 .bottomBar {
@@ -10,6 +9,10 @@
 	bottom: 0;
 
 	width: 100vw;
+	min-width: 100vw;
+	max-width: 100vw;
+	
+	overflow: hidden;
 
 	display: flex;
 	flex-direction: row;
@@ -25,21 +28,26 @@
 	padding: 10px;
 
 	.items {
-		display: inline-block;
-		white-space: nowrap;
-		overflow-x: overlay;
+		display: inline-flex;
+		//white-space: nowrap;
+		//overflow-x: overlay;
 
 		height: 100%;
+		width: 100vw;
 
 		> div {
-			display: inline-block;
+			display: inline-flex;
 
 			height: 100%;
-			margin: 0 12px;
+			//margin: 0 12px;
 		}
 
 		.item {
 			transition: all 150ms ease-in;
+			
+			width: 20vw;
+			min-width: 20vw;
+			max-width: 20vw;
 
 			.icon {
 				border-radius: 360px;
