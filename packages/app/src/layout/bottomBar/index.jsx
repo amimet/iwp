@@ -148,7 +148,7 @@ export default class BottomBar extends EviteComponent {
                         onClick={() => window.app.goToAccount()}
                     >
                         <div className="icon">
-                            <antd.Avatar src={this.props.user?.avatar} />
+                            <antd.Avatar shape="square" src={this.props.user?.avatar} />
                         </div>
                     </div> : <div
                         key="login"
