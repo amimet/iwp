@@ -39,6 +39,7 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { ActionSheet, Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
+import * as i18n from "_i18n"
 
 import { Session, User, SidebarController, SettingsController } from "models"
 import { API, Render, Splash, Theme, Sound } from "extensions"
@@ -266,6 +267,7 @@ class App {
 			configuration: this.configuration,
 			isAppCapacitor: this.isAppCapacitor,
 			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
+			i18n: i18n,
 		}
 	}
 
@@ -314,6 +316,7 @@ class App {
 
 		this.eventBus.emit("render_initialization")
 
+		await i18n.install()
 		await this.initialization()
 
 		this.eventBus.emit("render_initialization_done")

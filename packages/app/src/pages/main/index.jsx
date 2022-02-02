@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { AppSearcher, ServerStatus, Clock, AssignedWorkloads, } from "components"
+import { Translation } from "react-i18next"
 
 import "./index.less"
 
@@ -38,7 +39,9 @@ export default class Main extends React.Component {
 								<Clock />
 							</div>
 							<div>
-								<h1>Welcome back, {user.fullName ?? user.username ?? "Guest"}</h1>
+								<Translation>{
+									(t) => <h1>{t("main_welcome")} {user.fullName ?? user.username ?? "Guest"}</h1>
+								}</Translation>
 							</div>
 							{!window.isMobile && <div>
 								<ServerStatus />

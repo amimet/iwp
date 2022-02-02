@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { AssignedWorkload } from "components"
+import { Translation } from "react-i18next"
 
 import "./index.less"
 
@@ -68,7 +69,9 @@ export default class AssignedWorkloads extends React.Component {
 
 	renderList = () => {
 		if (this.state.list.length === 0) {
-			return <>No assigned workloads</>
+			return <Translation>{
+				t => t("no_assigned_workloads")
+			}</Translation>
 		}
 
 		return this.state.list.map((workload) => {
@@ -80,7 +83,9 @@ export default class AssignedWorkloads extends React.Component {
 
 	render() {
 		return <div className="assigned">
-			<h2><Icons.MdPendingActions /> Assigned for you</h2>
+			<h2><Icons.MdPendingActions /> <Translation>{
+				t => t("assigned_for_you")
+			}</Translation></h2>
 			<div>
 				{this.state.loading ? <antd.Skeleton active /> : this.renderList()}
 			</div>

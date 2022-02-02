@@ -22,9 +22,10 @@ function importLocale(locale) {
     return importLocale && importLocale()
 }
 
-export async function loadAsyncLanguage(i18n, locale = DEFAULT_LOCALE) {
+export async function loadAsyncLanguage(locale = DEFAULT_LOCALE) {
     try {
         const result = await importLocale(locale)
+        
         if (result) {
             i18n.addResourceBundle(locale, 'translation', result.default || result)
             i18n.changeLanguage(locale)
@@ -34,7 +35,7 @@ export async function loadAsyncLanguage(i18n, locale = DEFAULT_LOCALE) {
     }
 }
 
-export async function installI18n(locale = '') {
+export async function install(locale = '') {
     locale = SUPPORTED_LOCALES.includes(locale) ? locale : DEFAULT_LOCALE
     const messages = await importLocale(locale)
 

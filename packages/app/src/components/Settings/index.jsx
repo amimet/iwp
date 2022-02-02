@@ -4,7 +4,7 @@ import { SliderPicker } from "react-color"
 import * as antd from "antd"
 import config from "config"
 
-import settingList from "schemas/settingsList.json"
+import settingList from "schemas/settings"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
 import { AboutApp } from ".."
@@ -100,6 +100,11 @@ export default class SettingsMenu extends React.Component {
 				break
 			}
 		}
+
+		// TODO: Support async children
+		// if (typeof item.children === "function") {
+			
+		// }
 
 		return (
 			<div key={item.id} className="settingItem">

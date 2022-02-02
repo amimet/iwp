@@ -1,4 +1,8 @@
-[
+import React from "react"
+import supportedLanguages from 'schemas/supportedLanguages'
+import { Select } from "antd"
+
+export default [
     {
         "id": "language",
         "group": "general",
@@ -7,7 +11,13 @@
         "title": "Language",
         "title_i18n": "settings_general_language",
         "description": "Choose a language for the application",
-        "description_i18n": "settings_general_language_description"
+        "description_i18n": "settings_general_language_description",
+        "props": {
+            defaultValue: "es",
+            children: supportedLanguages.map((language) => {
+                return <Select.Option value={language.locale}>{language.name}</Select.Option>
+            })
+        }
     },
     {
         "id": "edit_sidebar",

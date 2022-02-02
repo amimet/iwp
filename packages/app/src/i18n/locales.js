@@ -1,10 +1,6 @@
-export const SUPPORTED_LANGUAGES = [
-    {
-        locale: 'en',
-        name: 'English',
-        default: true,
-    },
-]
+import SUPPORTED_LANGUAGES from "schemas/supportedLanguages"
+
+export { default as SUPPORTED_LANGUAGES} from "schemas/supportedLanguages"
 
 export const SUPPORTED_LOCALES = SUPPORTED_LANGUAGES.map((l) => l.locale)
 

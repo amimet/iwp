@@ -4,6 +4,7 @@ const aliases = {
     '~/': `${path.resolve(__dirname, 'src')}/`,
     "__": __dirname,
     "@src": path.resolve(__dirname, 'src'),
+    "_i18n": path.resolve(__dirname, 'src/i18n'),
     schemas: path.resolve(__dirname, 'constants'),
     config: path.join(__dirname, 'config'),
     extensions: path.resolve(__dirname, 'src/extensions'),
