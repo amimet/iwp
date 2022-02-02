@@ -181,12 +181,14 @@ export default {
                     if (!workload.assigned.includes(operator)) {
                         workload.assigned.push(operator)
 
-                        // send update with WS
-                        const userSocket = req.ws.getClientSocket(operator)
-
-                        if (userSocket) {
-                            userSocket.emit("workloadAssigned", workload._id)
-                        }
+                        // TODO: send update with WS (USE METHODS)
+                        // const userSockets = req.ws.getClientSockets(operator)
+                        // console.log(userSockets)
+                        // if (userSockets) {
+                        //     userSockets.forEach(socket => {
+                        //         socket.emit("workloadAssigned", result._id)
+                        //     })
+                        // }
                     }
                 }
             } else {
@@ -211,12 +213,12 @@ export default {
                         workload.assigned.splice(workload.assigned.indexOf(operator), 1)
                     }
 
-                    // send update with WS
-                    const userSocket = req.ws.getClientSocket(operator)
+                    // TODO: send update with WS (USE METHODS)
+                    // const userSocket = req.ws.getClientSocket(operator)
 
-                    if (userSocket) {
-                        userSocket.emit("workloadUnassigned", workload._id)
-                    }
+                    // if (userSocket) {
+                    //     userSocket.emit("workloadUnassigned", workload._id)
+                    // }
                 }
             } else {
                 return res.status(400).json({ error: "Invalid operators type. Must be an array." })
@@ -268,16 +270,19 @@ export default {
 
         const result = await Workload.create(obj)
 
-        // notify operators
-        if (Array.isArray(assigned) && assigned.length > 0) {
-            assigned.forEach(async (operator) => {
-                const userSocket = req.ws.getClientSocket(operator)
+        // TODO: send update with WS (USE METHODS)
+        // if (Array.isArray(assigned) && assigned.length > 0) {
+        //     assigned.forEach((operator) => {
+        //         const userSockets = req.ws.getClientSockets(operator)
+        //         console.log(userSockets)
 
-                if (userSocket) {
-                    await userSocket.emit("workloadAssigned", result._id)
-                }
-            })
-        }
+        //         if (userSockets) {
+        //             userSockets.forEach(socket => {
+        //                 socket.emit("workloadAssigned", result._id)
+        //             })
+        //         }
+        //     })
+        // }
 
         req.ws.io.emit("newWorkload", result)
 
