@@ -432,7 +432,7 @@ const Container = css`
   z-index: 11;
   transition: background-color 0.2s linear;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
 `
 
 const HaveWeScrolled = css`
