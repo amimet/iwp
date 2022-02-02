@@ -1,11 +1,11 @@
 import React from "react"
-import { Icons } from "components/icons"
-import { SliderPicker } from "react-color"
 import * as antd from "antd"
-import config from "config"
+import { SliderPicker } from "react-color"
+import { Icons } from "components/icons"
 
 import settingList from "schemas/settingsList.json"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
+import config from "config"
 
 import { AboutApp } from ".."
 
@@ -101,42 +101,43 @@ export default class SettingsMenu extends React.Component {
 			}
 		}
 
-		return (
-			<div key={item.id} className="settingItem">
-				<div className="header">
-					<div>
-						<h4>
-							{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
-							{item.title ?? item.id}
-						</h4>
-						<p>{item.description}</p>
-					</div>
-					<div>
-						{item.experimental && <antd.Tag> Experimental </antd.Tag>}
-					</div>
+		return <div key={item.id} className="settingItem">
+			<div className="header">
+				<div>
+					<h4>
+						{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
+						{item.title ?? item.id}
+					</h4>
+					<p>{item.description}</p>
 				</div>
-				<div className="component">
-					{React.createElement(ItemTypes[item.type], item.props)}
+				<div>
+					{item.experimental && <antd.Tag> Experimental </antd.Tag>}
 				</div>
 			</div>
-		)
+			<div className="component">
+				{React.createElement(ItemTypes[item.type], item.props)}
+			</div>
+		</div>
 	}
 
 	renderGroup = (key, group) => {
 		const fromDecoratorIcon = groupsDecorator[key]?.icon
 		const fromDecoratorTitle = groupsDecorator[key]?.title
 
-		return (
-			<div key={key} className="group">
-				<h1>
-					{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}
-					{fromDecoratorTitle ?? key}
-				</h1>
+		return <antd.Collapse.Panel
+			key={key}
+			showArrow={false}
+			header={<h1>
+				{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}
+				{fromDecoratorTitle ?? key}
+			</h1>}
+		>
+			<div className="group">
 				<div className="content">
 					{group.map((item) => this.renderItem(item))}
 				</div>
 			</div>
-		)
+		</antd.Collapse.Panel>
 	}
 
 	generateSettings = (data) => {
@@ -160,7 +161,9 @@ export default class SettingsMenu extends React.Component {
 
 		return (
 			<div className="settings">
-				{this.generateSettings(settingList)}
+				<antd.Collapse defaultActiveKey={["general"]} bordered={false} ghost accordion>
+					{this.generateSettings(settingList)}
+				</antd.Collapse>
 				<div className="footer">
 					<div>
 						<div>{config.app?.siteName}</div>
