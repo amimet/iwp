@@ -1,4 +1,14 @@
-{   
+{
     "collapseOnLooseFocus": true,
-    "language": "es"
+    "language": "es",
+    "sidebarKeys": [
+        "main",
+        "fabric",
+        "workloads",
+        "users",
+        "geo",
+        "vault",
+        "statistics",
+        "reports"
+    ]
 }
