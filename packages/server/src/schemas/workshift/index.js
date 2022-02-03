@@ -1,5 +1,5 @@
 export default {
-    region: { type: String, default: 0 },
+    section: { type: String, default: 0 },
     name: { type: String, required: true },
     start: { type: String, required: true },
     end: { type: String, required: true },

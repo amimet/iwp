@@ -1,7 +1,7 @@
 export { default as User } from "./user"
 export { default as Contract } from "./contract"
 export { default as FabricObject } from "./fabricObject"
-export { default as Region } from "./region"
+export { default as Section } from "./section"
 export { default as Role } from "./role"
 export { default as Session } from "./session"
 export { default as VaultItem } from "./vaultItem"

@@ -3,7 +3,7 @@ export default {
     payloads: { type: Object, required: true },
     commits: { type: Array, default: [] },
     assigned: { type: Array, default: [] },
-    region: { type: String, default: 0 },
+    section: { type: String, default: 0 },
     status: { type: String, default: 'pending' },
     finished: { type: Boolean, default: false },
     debtQuantity: { type: Number, default: 0 },

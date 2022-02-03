@@ -6,7 +6,7 @@ const workableDays = ["M", "TU", "W", "TH", "F", "SU", "SA"]
 
 export default {
     get: Schematized({
-        select: ["name", "region", "start", "end", "periodicity", "_id"],
+        select: ["name", "section", "start", "end", "periodicity", "_id"],
     }, async (req, res) => {
         let result = Array()
 
@@ -20,7 +20,7 @@ export default {
     }),
     set: Schematized({
         required: ["name", "start", "end"],
-        select: ["name", "regionId", "start", "end", "periodicity"],
+        select: ["name", "sectionId", "start", "end", "periodicity"],
     }, async (req, res) => {
         if (await Workshift.findOne({ name: req.selection.name, start: req.selection.start, end: req.selection.end })) {
             return res.status(400).json({ message: "Workshift already exists" })

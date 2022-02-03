@@ -151,20 +151,20 @@ module.exports = [
         fn: "WorkloadController.delete",
     },
     {
-        route: "/region",
+        route: "/section",
         method: "GET",
-        fn: "RegionController.get",
+        fn: "SectionController.get",
     },
     {
-        route: "/regions",
+        route: "/sections",
         method: "GET",
-        fn: "RegionController.getAll",
+        fn: "SectionController.getAll",
     },
     {
-        route: "/region",
+        route: "/section",
         method: "PUT",
         middleware: "withAuthentication",
-        fn: "RegionController.new",
+        fn: "SectionController.new",
     },
     {
         route: "/has_permissions",

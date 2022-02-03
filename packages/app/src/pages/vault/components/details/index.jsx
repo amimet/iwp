@@ -38,14 +38,14 @@ export default (props) => {
 
     const fetchLocations = async () => {
         const api = window.app.request
-        const regions = await api.get.regions().catch(err => {
+        const sections = await api.get.sections().catch(err => {
             setError(err)
         })
 
-        return regions.map((region) => {
+        return sections.map((section) => {
             return {
-                value: region.name,
-                label: region.name,
+                value: section.name,
+                label: section.name,
             }
         })
     }

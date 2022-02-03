@@ -43,14 +43,14 @@ export default class Vault extends React.Component {
     }
 
     fetchLocations = async () => {
-        const regions = await this.api.get.regions().catch(err => {
+        const sections = await this.api.get.sections().catch(err => {
             return []
         })
 
-        return regions.map((region) => {
+        return sections.map((section) => {
             return {
-                value: region.name,
-                label: region.name,
+                value: section.name,
+                label: section.name,
             }
         })
     }

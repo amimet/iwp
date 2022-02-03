@@ -8,17 +8,17 @@ import "./index.less"
 
 
 // TODO: Work on location childrens
-class NewRegionForm extends React.Component {
+class NewSectionForm extends React.Component {
 	api = window.app.request
 
-	handleFinishNewRegion = async (values, ctx) => {
+	handleFinishNewSection = async (values, ctx) => {
 		const { name, address } = values
 
 		ctx.toogleValidation(true)
 		ctx.clearErrors()
 	
 
-		this.api.put.region({ name, address })
+		this.api.put.section({ name, address })
 			.then((data) => {
 				this.props.handleDone(data)
 				this.props.close()
@@ -37,15 +37,15 @@ class NewRegionForm extends React.Component {
 				<h2><Icons.MdLocationSearching style={{ marginRight: "8px", }} /> New Location</h2>
 			</div>
 			<FormGenerator
-				name="new_region_form"
-				onFinish={this.handleFinishNewRegion}
+				name="new_section_form"
+				onFinish={this.handleFinishNewSection}
 				items={[
 					{
 						id: "name",
 						element: {
 							component: "Input",
 							icon: <Icons.MdOutlineTag />,
-							placeholder: "New region",
+							placeholder: "New section",
 							props: null
 						},
 						item: {
@@ -98,7 +98,7 @@ export default class Geo extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
-		const data = await this.api.get.regions()
+		const data = await this.api.get.sections()
 		console.log(data)
 
 		this.setState({ data })
@@ -108,7 +108,7 @@ export default class Geo extends React.Component {
 		this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
 	}
 
-	appendRegion = (data) => {
+	appendSection = (data) => {
 		let update = this.state.data
 
 		update.push(data)
@@ -116,10 +116,10 @@ export default class Geo extends React.Component {
 		this.setState({ data: update })
 	}
 
-	createNewRegion = async () => {
-		window.app.DrawerController.open("new_region_form", NewRegionForm, {
+	createNewSection = async () => {
+		window.app.DrawerController.open("new_section_form", NewSectionForm, {
 			onDone: (ctx, data) => {
-				this.appendRegion(data)
+				this.appendSection(data)
 			},
 		})
 	}
@@ -138,15 +138,15 @@ export default class Geo extends React.Component {
 		if (this.state.data.length === 0) {
 			return <antd.Result
 				icon={<Icons.MdWrongLocation style={{ width: 100, height: 100 }} />}
-				title="No regions available"
-				extra={<antd.Button type="primary" onClick={this.createNewRegion} >Create new</antd.Button>}
+				title="No sections available"
+				extra={<antd.Button type="primary" onClick={this.createNewSection} >Create new</antd.Button>}
 			/>
 		}
 
-		return <div className="regions_list">
+		return <div className="sections_list">
 			<ActionsBar mode="float">
 				<div>
-					<antd.Button icon={<Icons.Plus />} type="primary" onClick={this.createNewRegion}>
+					<antd.Button icon={<Icons.Plus />} type="primary" onClick={this.createNewSection}>
 						New
 					</antd.Button>
 				</div>

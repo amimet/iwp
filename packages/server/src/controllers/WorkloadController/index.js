@@ -1,4 +1,4 @@
-import { Workload, } from "../../models"
+import { Workload } from "../../models"
 import { Schematized } from "../../lib"
 import { nanoid } from "nanoid"
 import moment from "moment"
@@ -87,7 +87,7 @@ const Methods = {
     update: async (_id, update) => {
         let workload = await Workload.findById(_id)
 
-        const allowedUpdates = ["commits", "payloads", "assigned", "expired", "finished", "status", "region", "name"]
+        const allowedUpdates = ["commits", "payloads", "assigned", "expired", "finished", "status", "section", "name"]
 
         allowedUpdates.forEach((key) => {
             if (update[key]) {
@@ -248,9 +248,9 @@ export default {
         return res.json(workload)
     }),
     set: Schematized({
-        required: ["payloads", "region", "name"],
+        required: ["payloads", "section", "name"],
     }, async (req, res) => {
-        const { payloads, region, name, assigned, scheduledStart, scheduledFinish, workshift } = req.body
+        const { payloads, section, name, assigned, scheduledStart, scheduledFinish, workshift } = req.body
 
         const obj = {
             created: new Date().getTime(),
@@ -260,7 +260,7 @@ export default {
             name,
             scheduledStart,
             scheduledFinish,
-            region,
+            section,
         }
 
         // create on each payload an UUID property
@@ -315,12 +315,12 @@ export default {
         return res.json({ deleted })
     }),
     get: Schematized({
-        select: ["_id", "region", "name", "finished"],
+        select: ["_id", "section", "name", "finished"],
     }, async (req, res) => {
         let workloads = null
 
-        if (req.selection.region === "all") {
-            delete req.selection.region
+        if (req.selection.section === "all") {
+            delete req.selection.section
         }
 
         if (req.selection._id) {

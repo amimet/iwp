@@ -1,4 +1,4 @@
-export { default as RegionController } from './RegionController'
+export { default as SectionController } from './SectionController'
 export { default as RolesController } from './RolesController'
 export { default as SessionController } from './SessionController'
 export { default as UserController } from './UserController'
