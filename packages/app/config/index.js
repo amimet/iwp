@@ -11,15 +11,15 @@ export default {
         alt: "/logo_alt.svg"
     },
     api: {
-        address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://devapi_amimet01.ragestudio.net",
+        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : "https://devapi_amimet01.ragestudio.net",
     },
     ws: {
-        address: process.env.NODE_ENV !== 'production' ? `ws://${window.location.hostname}:3001` : "wss://devws_amimet01.ragestudio.net",
+        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : "wss://devws_amimet01.ragestudio.net",
     },
     app: {
         title: packagejson.name,
         siteName: "AmimetApp",
-        mainPath: '/main',
+        mainPath: "/main",
         storage: {
             basics: "user",
             token: "token",
@@ -40,6 +40,6 @@ export default {
                 name: "Español"
             }
         ],
-        defaultLanguage: 'en',
+        defaultLocale: "en",
     }
 }
