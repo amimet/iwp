@@ -32,14 +32,13 @@ export default {
         languages: [
             {
                 locale: "en",
-                name: "English",
-                default: true
+                name: "English"
             },
             {
                 locale: "es",
                 name: "Español"
             }
         ],
-        defaultLocale: "en",
+        defaultLocale: "es",
     }
 }
