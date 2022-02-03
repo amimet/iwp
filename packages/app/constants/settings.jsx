@@ -1,5 +1,5 @@
 import React from "react"
-import supportedLanguages from "schemas/supportedLanguages"
+import config from "config"
 import { Select } from "antd"
 
 export default [
@@ -13,7 +13,7 @@ export default [
         "description": "Choose a language for the application",
         "description_i18n": "settings_general_language_description",
         "props": {
-            children: supportedLanguages.map((language) => {
+            children: config.i18n.languages.map((language) => {
                 return <Select.Option value={language.locale}>{language.name}</Select.Option>
             })
         },
