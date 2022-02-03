@@ -1,5 +1,5 @@
 import React from "react"
-import supportedLanguages from 'schemas/supportedLanguages'
+import supportedLanguages from "schemas/supportedLanguages"
 import { Select } from "antd"
 
 export default [
@@ -13,11 +13,11 @@ export default [
         "description": "Choose a language for the application",
         "description_i18n": "settings_general_language_description",
         "props": {
-            defaultValue: "es",
             children: supportedLanguages.map((language) => {
                 return <Select.Option value={language.locale}>{language.name}</Select.Option>
             })
-        }
+        },
+        "emitEvent": "changeLanguage"
     },
     {
         "id": "edit_sidebar",
@@ -66,7 +66,11 @@ export default [
         "title_i18n": "settings_aspect_primaryColor",
         "description_i18n": "settings_aspect_primaryColor_description",
         "emitEvent": "modifyTheme",
-        "updateValueKey": "primaryColor"
+        "emissionValueUpdate": (value) => {
+            return {
+                primaryColor: value
+            }
+        }
     },
     {
         "id": "resetTheme",
