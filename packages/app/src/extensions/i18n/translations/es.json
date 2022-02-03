@@ -85,19 +85,20 @@
     "select_variant": "Selecciona una variante",
     "select_variants": "Selecciona variantes",
 
-    "settins_group_general": "General",
-    "settings_general_language": "Idioma",
-    "settings_general_language_description": "El idioma que se usará en la aplicación",
-    "settings_general_sidebarAutoCollapse": "Colapsar barra lateral automáticamente",
-    "settings_general_sidebarAutoCollapse_description": "Colapsa automáticamente la barra lateral cuando no se pierde el foco",
+    "Experimental": "Experimental",
 
-    "settings_group_aspect": "Aspecto",
-    "settings_aspect_reduceAnimations": "Reducir animación",
-    "settings_aspect_reduceAnimations_description": "Reduce la animación de la aplicación.",
-    "settings_aspect_darkMode": "Modo oscuro",
-    "settings_aspect_darkMode_description": "Activa el modo oscuro de la aplicación.",
-    "settings_aspect_primaryColor": "Color primario",
-    "settings_aspect_primaryColor_description": "Color primario de la aplicación.",
-    "settings_aspect_resetTheme": "Restablecer tema",
-    "settings_aspect_resetTheme_description": "Restablece el tema de la aplicación."
+    "General": "General",
+    "Sidebar": "Barra lateral",
+    "Aspect": "Aspecto",
+    "Language": "Idioma",
+    "Choose a language for the application": "Elige un idioma para la aplicación.",
+    "Edit Sidebar": "Editar barra lateral",
+    "Auto Collapse": "Auto colapsar",
+    "Collapse the sidebar when loose focus": "Colapsar la barra lateral cuando pierda el foco.",
+
+    "Reduce animation": "Reducir animación",
+    "Primary color": "Color primario",
+    "Change primary color of the application.": "Cambia el color primario de la aplicación.",
+    "Dark mode": "Modo oscuro"
+   
 }
