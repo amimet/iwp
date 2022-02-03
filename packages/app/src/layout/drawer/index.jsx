@@ -118,11 +118,12 @@ export class Drawer extends React.Component {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 
-	close = (context) => {
+	close = () => {
+		this.toogleVisibility(false)
+
 		setTimeout(() => {
-			this.toogleVisibility(false)
 			if (typeof this.options.onClose === "function") {
-				this.options.onClose(...context)
+				this.options.onClose()
 			}
 
 			this.props.controller.destroy(this.props.id)

@@ -163,7 +163,7 @@ export default class Drawer extends Component {
         }
 
         const { direction } = this.props
-        const { thumb, start, position } = this.state
+        const { thumb, position } = this.state
         const { pageY, pageX } = event.touches[0]
 
         const movingPosition = isDirectionBottom(direction) || isDirectionTop(direction) ? pageY : pageX
@@ -212,7 +212,7 @@ export default class Drawer extends Component {
         this.setState({ touching: false })
 
         if (this.shouldWeCloseDrawer() && this.state.onRange) {
-            this.hideDrawer()
+            this.props.onRequestClose(this)
         } else {
             let newPosition = 0
 
@@ -236,7 +236,7 @@ export default class Drawer extends Component {
     }
 
     hideDrawer = () => {
-        const { allowClose, onRequestClose, direction } = this.props
+        const { allowClose, direction } = this.props
 
         let defaultPosition = 0
 
@@ -261,7 +261,6 @@ export default class Drawer extends Component {
 
         // cleanup
         this.removeListeners()
-        onRequestClose()
     }
 
     shouldWeCloseDrawer = () => {
@@ -354,9 +353,9 @@ export default class Drawer extends Component {
         // also, if we're not client side we need to return early because createPortal is only
         // a clientside method
 
-        if ((!this.state.open && !this.props.open)) {
-            return null
-        }
+        // if ((!this.state.open && !this.props.open)) {
+        //     return null
+        // }
 
         const { touching } = this.state
 
@@ -393,7 +392,7 @@ export default class Drawer extends Component {
                         <div
                             id={id}
                             style={containerStyle}
-                            onClick={this.hideDrawer}
+                            onClick={this.props.onRequestClose}
                             className={`${Container} ${containerElementClass} `}
                             ref={getContainerRef}
                         >
