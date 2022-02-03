@@ -31,12 +31,13 @@ export default {
     i18n: {
         languages: [
             {
-                key: 'en',
-                title: 'English',
+                locale: "en",
+                name: "English",
+                default: true
             },
             {
-                key: 'es',
-                title: 'Español',
+                locale: "es",
+                name: "Español"
             }
         ],
         defaultLanguage: 'en',
