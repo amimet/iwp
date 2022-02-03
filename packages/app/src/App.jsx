@@ -39,10 +39,9 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { ActionSheet, Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
-import * as i18n from "_i18n"
 
-import { Session, User, SidebarController, SettingsController } from "models"
-import { API, Render, Splash, Theme, Sound } from "extensions"
+import { Session, User, SidebarController } from "models"
+import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Workload, Fabric } from "components"
@@ -70,7 +69,6 @@ class App {
 		window.app.version = config.package.version
 
 		this.configuration = {
-			settings: new SettingsController(),
 			sidebar: new SidebarController(),
 		}
 
@@ -266,8 +264,6 @@ class App {
 			},
 			configuration: this.configuration,
 			isAppCapacitor: this.isAppCapacitor,
-			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
-			i18n: i18n,
 		}
 	}
 
@@ -315,10 +311,7 @@ class App {
 		}
 
 		this.eventBus.emit("render_initialization")
-
-		await i18n.install()
 		await this.initialization()
-
 		this.eventBus.emit("render_initialization_done")
 	}
 
@@ -432,5 +425,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
+	extensions: [SettingsController, i18n.extension, Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
 })
