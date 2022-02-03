@@ -1,14 +1,13 @@
 import React from "react"
-import { Icons, createIconRender } from "components/Icons"
 import { Layout, Menu, Avatar } from "antd"
-
-import { SidebarEditor } from "./components"
-
-import config from "config"
-import sidebarItems from "schemas/routes.json"
-import defaultSidebarItems from "schemas/defaultSidebar.json"
 import classnames from "classnames"
 
+import config from "config"
+import { Icons, createIconRender } from "components/Icons"
+import { sidebarKeys as defaultSidebarItems } from "schemas/defaultSettings"
+import sidebarItems from "schemas/routes.json"
+
+import { SidebarEditor } from "./components"
 import "./index.less"
 
 const { Sider } = Layout
@@ -57,7 +56,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	getStoragedKeys = () => {
-		return window.app.configuration?.sidebar.get()
+		return window.app.settings.get("sidebarKeys")
 	}
 
 	appendItem = (item = {}) => {
@@ -108,7 +107,7 @@ export default class Sidebar extends React.Component {
 					keys = keys.move(index, item.index)
 
 					//update index
-					window.app.configuration.sidebar._push(keys)
+					window.app.settings.set("sidebarKeys", keys)
 				}
 			}
 		})
@@ -214,7 +213,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	toogleCollapse = (to) => {
-		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+		if (window.app.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
 			this.setState({ collapsed: to ?? !this.state.collapsed })
 		} else {
 			this.setState({ collapsed: false })
