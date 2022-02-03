@@ -45,9 +45,9 @@ import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "ext
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Workload, Fabric } from "components"
-import Layout from "./layout"
 import { Icons } from "components/Icons"
 
+import Layout from "./layout"
 import "theme/index.less"
 
 const SplashExtension = Splash.extension({
