@@ -40,7 +40,7 @@ import * as antd from "antd"
 import { ActionSheet, Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
 
-import { Session, User, SidebarController } from "models"
+import { Session, User } from "models"
 import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "extensions"
 import config from "config"
 
@@ -67,10 +67,6 @@ const SplashExtension = Splash.extension({
 class App {
 	static initialize() {
 		window.app.version = config.package.version
-
-		this.configuration = {
-			sidebar: new SidebarController(),
-		}
 
 		this.mainSocket = this.contexts.app.WSInterface.sockets.main
 		this.loadingMessage = false
@@ -262,7 +258,6 @@ class App {
 				}
 				return await StatusBar.show()
 			},
-			configuration: this.configuration,
 			isAppCapacitor: this.isAppCapacitor,
 		}
 	}
@@ -272,7 +267,6 @@ class App {
 			renderRef: this.renderRef,
 			sessionController: this.sessionController,
 			userController: this.userController,
-			configuration: this.configuration,
 		}
 	}
 
