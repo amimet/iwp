@@ -9,9 +9,7 @@ export default [
         "type": "Select",
         "icon": "MdTranslate",
         "title": "Language",
-        "title_i18n": "settings_general_language",
         "description": "Choose a language for the application",
-        "description_i18n": "settings_general_language_description",
         "props": {
             children: config.i18n.languages.map((language) => {
                 return <Select.Option value={language.locale}>{language.name}</Select.Option>
@@ -25,7 +23,6 @@ export default [
         "type": "Button",
         "icon": "Edit",
         "title": "Edit Sidebar",
-        "title_i18n": "settings_sidebar_edit",
         "emitEvent": "edit_sidebar",
         "noStorage": true
     },
@@ -35,8 +32,6 @@ export default [
         "type": "Switch",
         "title": "Auto Collapse",
         "description": "Collapse the sidebar when loose focus",
-        "title_i18n": "settings_sidebar_autoCollapse",
-        "description_i18n": "settings_sidebar_autoCollapse_description"
     },
     {
         "id": "reduceAnimations",
@@ -44,7 +39,6 @@ export default [
         "type": "Switch",
         "icon": "MdOutlineAnimation",
         "title": "Reduce animation",
-        "title_i18n": "settings_aspect_reduceAnimation",
         "experimental": true
     },
     {
@@ -52,8 +46,7 @@ export default [
         "group": "aspect",
         "type": "Switch",
         "icon": "Moon",
-        "title": "Dark Mode",
-        "title_i18n": "settings_aspect_darkMode",
+        "title": "Dark mode",
         "emitEvent": "darkMode",
         "experimental": true
     },
@@ -63,8 +56,6 @@ export default [
         "type": "SliderColorPicker",
         "title": "Primary color",
         "description": "Change primary color of the application.",
-        "title_i18n": "settings_aspect_primaryColor",
-        "description_i18n": "settings_aspect_primaryColor_description",
         "emitEvent": "modifyTheme",
         "emissionValueUpdate": (value) => {
             return {
@@ -77,7 +68,6 @@ export default [
         "group": "aspect",
         "type": "Button",
         "title": "Reset theme",
-        "title_i18n": "settings_aspect_resetTheme",
         "props": {
             "children": "Default Theme"
         },

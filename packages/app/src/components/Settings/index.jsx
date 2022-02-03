@@ -1,9 +1,10 @@
 import React from "react"
-import { Icons } from "components/icons"
-import { SliderPicker } from "react-color"
 import * as antd from "antd"
-import config from "config"
+import { SliderPicker } from "react-color"
+import { Translation } from "react-i18next"
 
+import config from "config"
+import { Icons } from "components/icons"
 import settingList from "schemas/settings"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
@@ -89,7 +90,7 @@ export default class SettingsMenu extends React.Component {
 			case "select": {
 				item.props.onChange = (value) => this.handleUpdate(item, value)
 				item.props.defaultValue = this.state.settings[item.id]
-				
+
 				break
 			}
 			default: {
@@ -104,7 +105,7 @@ export default class SettingsMenu extends React.Component {
 
 		// TODO: Support async children
 		// if (typeof item.children === "function") {
-			
+
 		// }
 
 		return (
@@ -113,9 +114,13 @@ export default class SettingsMenu extends React.Component {
 					<div>
 						<h4>
 							{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
-							{item.title ?? item.id}
+							<Translation>{
+								t => t(item.title ?? item.id)
+							}</Translation>
 						</h4>
-						<p>{item.description}</p>
+						<p>	<Translation>{
+							t => t(item.description)
+						}</Translation></p>
 					</div>
 					<div>
 						{item.experimental && <antd.Tag> Experimental </antd.Tag>}
@@ -136,7 +141,9 @@ export default class SettingsMenu extends React.Component {
 			<div key={key} className="group">
 				<h1>
 					{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}
-					{fromDecoratorTitle ?? key}
+					<Translation>{
+						t => t(fromDecoratorTitle ?? key)
+					}</Translation>
 				</h1>
 				<div className="content">
 					{group.map((item) => this.renderItem(item))}
@@ -184,7 +191,9 @@ export default class SettingsMenu extends React.Component {
 					</div>
 					<div>
 						<antd.Button type="link" onClick={() => AboutApp.openModal()}>
-							About
+							<Translation>
+								{t => t("about")}
+							</Translation>
 						</antd.Button>
 					</div>
 				</div>
