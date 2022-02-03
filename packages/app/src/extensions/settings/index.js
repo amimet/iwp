@@ -20,6 +20,18 @@ class SettingsController {
         })
     }
 
+    defaults = (key) => {
+        if (typeof key === "undefined") {
+            return defaultSettings
+        }
+
+        return defaultSettings[key]
+    }
+
+    is = (key, value) => {
+        return this.settings[key] === value
+    }
+
     set = (key, value) => {
         this.settings[key] = value
         store.set(this.storeKey, this.settings)
