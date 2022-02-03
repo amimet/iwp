@@ -202,7 +202,7 @@ export default class Sidebar extends React.Component {
 		}
 
 		if (to) {
-			window.app.eventBus.emit("cleanAll")
+			window.app.eventBus.emit("clearAllOverlays")
 		} else {
 			if (this.itemsMap !== this.getStoragedKeys()) {
 				this.loadSidebarItems()

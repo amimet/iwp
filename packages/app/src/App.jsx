@@ -108,7 +108,7 @@ class App {
 				})
 			}
 		},
-		"cleanAll": function () {
+		"clearAllOverlays": function () {
 			window.app.DrawerController.closeAll()
 		},
 		"websocket_connected": function () {
