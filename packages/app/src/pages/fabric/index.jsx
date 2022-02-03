@@ -111,10 +111,6 @@ export default class FabricManager extends React.Component {
     }
 
     onClickItem = (_id) => {
-        if (this.state.selectionEnabled) {
-            return false
-        }
-
         console.debug(`Opening Fabric.Inspector with id [${_id}]`)
         window.app.openFabricInspector(_id)
     }
@@ -130,6 +126,12 @@ export default class FabricManager extends React.Component {
     }
 
     parseAsGroups = (objects) => {
+        objects = objects.map((obj) => {
+            obj.key = obj._id
+            
+            return obj
+        })
+
         objects = objects.reduce((acc, obj) => {
             if (typeof acc[obj.type] !== "object") {
                 acc[obj.type] = []
@@ -145,9 +147,8 @@ export default class FabricManager extends React.Component {
             const formula = FORMULAS[type]
 
             return {
-                label: <h1>
-                    {Icons[formula.icon] && createIconRender(formula.icon)} {formula.label ?? String(type).toTitleCase()}
-                </h1>,
+                label: formula.label ?? String(type).toTitleCase(),
+                icon: Icons[formula.icon] && createIconRender(formula.icon),
                 children: objects[type],
             }
         })
@@ -156,7 +157,7 @@ export default class FabricManager extends React.Component {
     renderItem = (item) => {
         const { _id, name } = item
 
-        return <div onClick={() => this.onClickItem(_id)} className="item" key={_id}>
+        return <div className="item" key={_id}>
             <div className="title">
                 <h1>{name}</h1>
                 <h4>#{_id.toString()}</h4>
@@ -206,9 +207,9 @@ export default class FabricManager extends React.Component {
             </ActionsBar>
             {this.state.data.length === 0 ? <antd.Skeleton active /> :
                 <SelectableList
-                    selectionEnabled={this.state.selectionEnabled}
                     items={this.parseAsGroups(this.state.searchValue ?? this.state.data)}
                     renderItem={this.renderItem}
+                    onClickItem={this.onClickItem}
                     actions={[
                         <div key="delete" call="onDelete">
                             <Icons.Trash />
