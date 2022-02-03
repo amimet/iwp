@@ -27,7 +27,7 @@ export default class Sidebar extends React.Component {
 			editMode: false,
 			visible: true,
 			loading: true,
-			collapsed: window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
+			collapsed: window.app.settings.get("collapseOnLooseFocus") ?? false,
 			pathResolve: {},
 			menus: {},
 			extraItems: {
