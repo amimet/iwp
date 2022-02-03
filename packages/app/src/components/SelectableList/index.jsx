@@ -5,7 +5,7 @@ import classnames from "classnames"
 import _ from "lodash"
 import { Translation } from "react-i18next"
 
-import { Icons } from "components/Icons"
+import { Icons, createIconRender } from "components/Icons"
 import { ActionsBar } from "components"
 import { useLongPress } from "utils"
 
@@ -14,12 +14,18 @@ import "./index.less"
 const ListItem = React.memo((props) => {
 	let { item } = props
 
-	if (item.children) {
+	if (item.children && Array.isArray(item.children)) {
 		return <div className="selectableList_group">
-			{item.label}
+			<h1>
+				{React.isValidElement(item.icon) ? item.icon : Icons[item.icon] && createIconRender(item.icon)}
+				<Translation>
+					{t => t(item.label)}
+				</Translation>
+			</h1>
+
 			<div className="selectableList_subItems">
 				{item.children.map((subItem) => {
-					return <ListItem item={subItem} />
+					return <ListItem {...props} item={subItem} />
 				})}
 			</div>
 		</div>
@@ -40,7 +46,13 @@ const ListItem = React.memo((props) => {
 			return false
 		}
 
-		props.onClickItem(props.id)
+		if (typeof props.onClickItem === "function") {
+			return props.onClickItem(props.id)
+		}
+
+		if (typeof renderChildren.onClick === "function") {
+			return renderChildren.onClick()
+		}
 	}
 
 	const onDoubleClick = () => {
@@ -48,7 +60,13 @@ const ListItem = React.memo((props) => {
 			return false
 		}
 
-		props.onDoubleClick(props.id)
+		if (typeof props.onDoubleClick === "function") {
+			return props.onDoubleClick(props.id)
+		}
+
+		if (typeof renderChildren.onDoubleClick === "function") {
+			return renderChildren.onDoubleClick()
+		}
 	}
 
 	return React.createElement("div", {
