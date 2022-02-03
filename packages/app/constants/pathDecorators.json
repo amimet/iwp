@@ -11,9 +11,9 @@
         "icon": "Users",
         "title": "Users"
     },
-    "regions": {
+    "sections": {
         "icon": "Globe",
-        "title": "Locations"
+        "title": "Sections"
     },
     "vault": {
         "icon": "Archive",

@@ -112,30 +112,20 @@ export default {
             placeholder: "Select tasks",
         },
     },
-    location: {
-        label: "Location",
+    section: {
+        label: "Section",
         component: "select",
         updateEvent: "onChange",
         children: async () => {
             const api = window.app.request
-            const regions = await api.get.regions()
+            const sections = await api.get.sections()
 
-            return regions.map(region => {
-                return <antd.Select.Option value={region.name}>{region.name}</antd.Select.Option>
+            return sections.map(section => {
+                return <antd.Select.Option value={section.name}>{section.name}</antd.Select.Option>
             })
         },
         props: {
-            placeholder: "Select a location",
-        },
-    },
-    sections: {
-        label: "Sections",
-        component: "select",
-        updateEvent: "onChange",
-        props: {
-            mode: "tags",
-            placeholder: "Select sections",
-            tokenSeparators: [','],
+            placeholder: "Select a section",
         },
     },
     monetary_value: {
