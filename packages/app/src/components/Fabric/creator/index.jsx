@@ -4,6 +4,7 @@ import { Stepper } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
 import loadable from "@loadable/component"
 import classnames from "classnames"
+import { Translation } from "react-i18next"
 
 import FORMULAS from "schemas/fabricFormulas"
 import FIELDS from "schemas/fabricFields"
@@ -261,7 +262,9 @@ export default class FabricCreator extends React.Component {
 
                 return <antd.Menu.Item disabled={disabled} key={key}>
                     {field.icon && createIconRender(field.icon)}
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                    <Translation>
+                        {t => t(key.charAt(0).toUpperCase() + key.slice(1))}
+                    </Translation>
                 </antd.Menu.Item>
             })}
         </antd.Menu>
@@ -276,7 +279,9 @@ export default class FabricCreator extends React.Component {
 
                 return <antd.Menu.Item key={type}>
                     {(typeFormula.icon && createIconRender(typeFormula.icon)) ?? null}
-                    {typeFormula.label ?? (type.charAt(0).toUpperCase() + type.slice(1))}
+                    <Translation>
+                        {t => t(typeFormula.label ?? (type.charAt(0).toUpperCase() + type.slice(1)))}
+                    </Translation>
                 </antd.Menu.Item>
             })}
         </antd.Menu>
@@ -346,10 +351,15 @@ export default class FabricCreator extends React.Component {
         } else {
             ReturnRender = () => React.createElement(RenderComponent, renderProps)
         }
-        
+
         return <div ignore-dragger="true" key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
             <div ignore-dragger="true" className="content">
-                <h3>{field.icon && createIconRender(field.icon)}{field.label}</h3>
+                <h3>
+                    {field.icon && createIconRender(field.icon)}
+                    <Translation>
+                        {t => t(field.label)}
+                    </Translation>
+                </h3>
                 <div ignore-dragger="true" className="component">
                     <ReturnRender />
                 </div>
@@ -373,7 +383,11 @@ export default class FabricCreator extends React.Component {
                         {TypeIcon ?? <Icons.HelpCircle />}
                     </antd.Dropdown>
                 </div>
-                <antd.Input value={this.state.name} placeholder={`New ${this.state.type}`} onChange={this.onChangeName} />
+                <antd.Input
+                    value={this.state.name}
+                    placeholder={`New ${this.state.type}`}
+                    onChange={this.onChangeName}
+                />
             </div>
 
             <div className="fields">
@@ -387,13 +401,23 @@ export default class FabricCreator extends React.Component {
                     </antd.Button>
                 </antd.Dropdown>
 
-                <antd.Button disabled={!canSubmit} loading={this.state.submitting} onClick={this.submit}>Done</antd.Button>
+                <antd.Button disabled={!canSubmit} loading={this.state.submitting} onClick={this.submit}>
+                    <Translation>
+                        {t => t("Done")}
+                    </Translation>
+                </antd.Button>
 
-                <antd.Checkbox checked={this.state.submitToCatalog} onChange={this.onChangeCatalogMode}>Add to catalog</antd.Checkbox>
+                <antd.Checkbox checked={this.state.submitToCatalog} onChange={this.onChangeCatalogMode}>
+                    <Translation>
+                        {t => t("Add to catalog")}
+                    </Translation>
+                </antd.Checkbox>
             </div>
 
             {this.state.error && <div className="error">
-                {this.state.error}
+                <Translation>
+                    {t => t(this.state.error)}
+                </Translation>
             </div>}
         </div>
     }

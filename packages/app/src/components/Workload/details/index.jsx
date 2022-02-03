@@ -1,13 +1,13 @@
 import React from "react"
 import * as antd from "antd"
+import { Translation } from "react-i18next"
 import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
+
 import { Icons } from "components/Icons"
-import { ActionsBar } from "components"
 
 import { PayloadsRender, PayloadInspector } from ".."
-
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
@@ -45,8 +45,6 @@ export default class WorkloadDetails extends React.Component {
 			console.error(err)
 			return false
 		})
-
-		console.log(result)
 
 		if (result) {
 			await this.setState({ data: result })
@@ -196,7 +194,11 @@ export default class WorkloadDetails extends React.Component {
 					<div className="workload_details header content">
 						{data.scheduledFinish ? <h1>
 							<antd.Badge.Ribbon
-								text={isExpired ? "expired" : `${datesDiff.daysLeft} days left`}
+								text={
+									<Translation>
+										{t => isExpired ? t("expired") : `${datesDiff.daysLeft} ${t("days left")}`}
+									</Translation>
+								}
 								color={isExpired ? "red" : undefined}
 							><Icons.Box /> {data.name}
 
@@ -218,16 +220,22 @@ export default class WorkloadDetails extends React.Component {
 					<div key="state">
 						<div className="name">
 							<Icons.Activity />
-							State
+							<Translation>
+								{t => t("State")}
+							</Translation>
 						</div>
 						<div className="value">
-							{data.status}
+							<Translation>
+								{t => t(data.status)}
+							</Translation>
 						</div>
 					</div>
 					<div key="commits">
 						<div className="name">
 							<Icons.Database />
-							Commits
+							<Translation>
+								{t => t("Commits")}
+							</Translation>
 						</div>
 						<div className="value">
 							{data.commits?.length}
@@ -238,11 +246,18 @@ export default class WorkloadDetails extends React.Component {
 				<div className="workload_details payloads">
 					<div className="header">
 						<div>
-							<h1><Icons.Inbox /> Payloads</h1>
+							<h1>
+								<Icons.Inbox />
+								<Translation>
+									{t => t("Payloads")}
+								</Translation>
+							</h1>
 						</div>
 						<div>
 							<antd.Button type="primary" icon={<Icons.MdGeneratingTokens />}>
-								Add token
+								<Translation>
+									{t => t("Add commit")}
+								</Translation>
 							</antd.Button>
 						</div>
 					</div>

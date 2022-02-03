@@ -1,11 +1,13 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
-import { ActionsBar } from "components"
 import { Button } from "antd"
 import classnames from "classnames"
-import { useLongPress } from "utils"
 import _ from "lodash"
+import { Translation } from "react-i18next"
+
+import { Icons } from "components/Icons"
+import { ActionsBar } from "components"
+import { useLongPress } from "utils"
 
 import "./index.less"
 
@@ -26,6 +28,7 @@ const ListItem = React.memo((props) => {
 	const renderChildren = props.renderChildren(item)
 	const isDisabled = renderChildren.props.disabled
 
+	// FIXME: This sucks, you needs to stroke your fingers as fast as possible to make an double click work
 	const doubleClickSpeed = 100
 	let delayedClick = null
 	let clickedOnce = null
@@ -267,7 +270,9 @@ export default class SelectableList extends React.Component {
 							{...this.props.onDiscardProps}
 						>
 							{this.props.onDiscardRender ?? <Icons.X />}
-							Discard
+							<Translation>
+								{(t) => t("Discard")}
+							</Translation>
 						</Button>
 					</div>
 					{this.props.bulkSelectionAction &&
@@ -275,7 +280,11 @@ export default class SelectableList extends React.Component {
 							<Button
 								shape="round"
 								onClick={() => isAllSelected ? this.unselectAll() : this.selectAll()}
-							>{isAllSelected ? "Unselect all" : "Select all"}</Button>
+							>
+								<Translation>
+									{(t) => t(isAllSelected ? "Unselect all" : "Select all")}
+								</Translation>
+							</Button>
 						</div>}
 					{Array.isArray(this.props.actions) && this.renderProvidedActions()}
 				</ActionsBar>

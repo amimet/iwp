@@ -3,6 +3,7 @@ import * as antd from "antd"
 import { Stepper } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
 import { Fabric } from "components"
+import { Translation } from "react-i18next"
 
 import FORMULAS from "schemas/fabricFormulas"
 import "./index.less"
@@ -95,25 +96,44 @@ export default class BrowserSelector extends React.Component {
 		return <div className="fabric_selector inspector">
 			<div className="fabric_selector inspector header">
 				{item.properties?.imagePreview && <img src={item.properties.imagePreview} />}
-				<h1>{item.name}</h1>
-				<h3>{item.properties?.description}</h3>
+				<Translation>
+					{(t) => <h1>{t(item.name)}</h1>}
+				</Translation>
+				<Translation>
+					{(t) => <h3>{t(item.properties?.description)}</h3>}
+				</Translation>
 			</div>
 
 			<div className="fabric_selector inspector properties">
 				<div className="fabric_selector inspector properties variants">
-					<h3><Icons.Triangle /> Variants</h3>
+					<h3><Icons.Triangle />
+						<Translation>
+							{(t) => t("Variants")}
+						</Translation>
+					</h3>
 					<div className="fabric_selector inspector properties variants options">
 						{Array.isArray(item.properties?.variants) ?
-							<antd.Select mode="tags" style={{ width: '100%' }} placeholder={`${item.properties.variants.length} variants available`} onChange={this.handleSelectVariant}>
+							<antd.Select
+								mode="tags"
+								style={{ width: '100%' }}
+								placeholder={<Translation>
+									{(t) => `${item.properties.variants.length} ${t("variants available")}`}
+								</Translation>}
+								onChange={this.handleSelectVariant}
+							>
 								{item.properties.variants.map((variant) => {
 									return <antd.Select.Option key={variant}>
-										{variant}
+										<Translation>
+											{(t) => t(variant)}
+										</Translation>
 									</antd.Select.Option>
 								})}
 							</antd.Select>
 							:
 							<div>
-								No variants provided
+								<Translation>
+									{(t) => t("No variants provided")}
+								</Translation>
 							</div>
 						}
 					</div>
@@ -123,11 +143,15 @@ export default class BrowserSelector extends React.Component {
 			<div className="fabric_selector inspector actions">
 				<div>
 					<antd.Button danger onClick={() => this.handleSelectBack()}>
-						<Icons.ChevronLeft /> Back
+						<Icons.ChevronLeft /> <Translation>
+							{(t) => t("Back")}
+						</Translation>
 					</antd.Button>
 				</div>
 				<div style={{ textAlign: "center" }}>
-					<p>Quantity</p>
+					<p><Translation>
+						{(t) => t("Quantity")}
+					</Translation></p>
 					<Stepper
 						onChange={(value) => {
 							this.setState({ quantity: value })
@@ -139,7 +163,9 @@ export default class BrowserSelector extends React.Component {
 				</div>
 				<div>
 					<antd.Button type="primary" onClick={this.handleDone}>
-						<Icons.Check /> Add
+						<Icons.Check /> <Translation>
+							{(t) => t("Add")}
+						</Translation>
 					</antd.Button>
 				</div>
 			</div>
@@ -150,7 +176,9 @@ export default class BrowserSelector extends React.Component {
 		const formulaIcon = FORMULAS[group.type].icon
 
 		return <div className="fabric_selector groups group">
-			<h2>{Icons[formulaIcon] && createIconRender(formulaIcon)} {String(group.type).toTitleCase()}</h2>
+			<h2>{Icons[formulaIcon] && createIconRender(formulaIcon)} <Translation>
+				{(t) => t(String(group.type).toTitleCase())}
+			</Translation></h2>
 			<div className="fabric_selector groups group items">
 				{group.items.map((item) => {
 					return <antd.List.Item
@@ -159,7 +187,18 @@ export default class BrowserSelector extends React.Component {
 						onClick={() => this.handleSelectItem(item)}
 						extra={item.properties?.previewImage && <img width={272} alt="item_view" src={item.properties.previewImage} />}
 					>
-						<antd.List.Item.Meta title={item.name} description={item.properties?.description} />
+						<antd.List.Item.Meta
+							title={
+								<Translation>
+									{(t) => t(item.name)}
+								</Translation>
+							}
+							description={
+								<Translation>
+									{(t) => t(item.properties?.description)}
+								</Translation>
+							}
+						/>
 					</antd.List.Item>
 				})}
 			</div>
@@ -170,7 +209,7 @@ export default class BrowserSelector extends React.Component {
 	render() {
 		if (this.state.loading) {
 			return <antd.Skeleton active />
-		} 
+		}
 
 		if (this.state.selectedItem) {
 			return <div className="fabric_selector">
@@ -190,7 +229,19 @@ export default class BrowserSelector extends React.Component {
 		return (
 			<div className="fabric_selector">
 				<div className="header">
-					<h1><Icons.Globe /> Browse</h1> or <antd.Button onClick={this.onClickCreateCustom} type="primary">Create new</antd.Button>
+					<h1><Icons.Globe />
+						<Translation>
+							{(t) => t("Browse")}
+						</Translation>
+					</h1>
+					<Translation>
+						{(t) => t("or")}
+					</Translation>
+					<antd.Button onClick={this.onClickCreateCustom} type="primary">
+						<Translation>
+							{(t) => t("Create new")}
+						</Translation>
+					</antd.Button>
 				</div>
 				<antd.Input.Search />
 				<div className="fabric_selector groups">

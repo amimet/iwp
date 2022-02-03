@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { PullToRefresh } from "antd-mobile"
+import { Translation } from "react-i18next"
 import moment from "moment"
 import classnames from "classnames"
 import { debounce } from "lodash"
@@ -46,9 +47,9 @@ const renderDate = (time) => {
 export default class Workloads extends React.Component {
 	state = {
 		loading: true,
-		regions: [],
+		sections: [],
 		viewFinished: false,
-		selectedRegion: "all",
+		selectedSection: "all",
 		searchValue: null,
 		workloads: null,
 	}
@@ -74,18 +75,18 @@ export default class Workloads extends React.Component {
 			this.setState({ workloads })
 		})
 
-		this.loadRegions()
-		this.fetchWorkloads(this.state.selectedRegion)
+		this.loadSections()
+		this.fetchWorkloads(this.state.selectedSection)
 	}
 
-	fetchWorkloads = async (regionId, viewFinished) => {
-		regionId = regionId ?? this.state.selectedRegion
+	fetchWorkloads = async (sectionId, viewFinished) => {
+		sectionId = sectionId ?? this.state.selectedSection
 		viewFinished = viewFinished ?? this.state.viewFinished
 
 		await this.setState({ loading: true })
 
 		const data = await this.api.get.workload(undefined, {
-			region: regionId,
+			section: sectionId,
 			finished: this.state.viewFinished,
 		}).catch((err) => {
 			console.log(err)
@@ -100,10 +101,10 @@ export default class Workloads extends React.Component {
 		}
 	}
 
-	loadRegions = async () => {
-		await this.api.get.regions()
+	loadSections = async () => {
+		await this.api.get.sections()
 			.then((data) => {
-				this.setState({ regions: data })
+				this.setState({ sections: data })
 			})
 			.catch((error) => {
 				console.error(error)
@@ -143,15 +144,17 @@ export default class Workloads extends React.Component {
 		this.setState({ workloads })
 	}
 
-	changeRegion = (region) => {
-		this.setState({ selectedRegion: region }, async () => {
-			await this.fetchWorkloads(region)
+	changeSection = (section) => {
+		this.setState({ selectedSection: section }, async () => {
+			await this.fetchWorkloads(section)
 		})
 	}
 
 	onDeleteWorkloads = (ctx, keys) => {
 		antd.Modal.confirm({
-			title: "Do you want to delete these items?",
+			title: <Translation>
+				{t => t("Do you want to delete these items?")}
+			</Translation>,
 			icon: <Icons.ExclamationCircleOutlined />,
 			content: keys.map((key) => {
 				return <div>{key}</div>
@@ -211,11 +214,11 @@ export default class Workloads extends React.Component {
 
 	debouncedSearch = debounce((value) => this.search(value), 500)
 
-	renderRegionsOptions = () => {
-		return this.state.regions.map((region) => {
+	renderSectionsOptions = () => {
+		return this.state.sections.map((section) => {
 			return (
-				<antd.Select.Option key={region.name} value={region.name}>
-					{region.name}
+				<antd.Select.Option key={section.name} value={section.name}>
+					{section.name}
 				</antd.Select.Option>
 			)
 		})
@@ -238,7 +241,11 @@ export default class Workloads extends React.Component {
 			<div className="workload_item">
 				<div className="header">
 					<div className={classnames("indicator", indicatorStatus)}>
-						<div className="statusText">{indicatorStatus}</div>
+						<div className="statusText">
+							<Translation>
+								{t => t(indicatorStatus)}
+							</Translation>
+						</div>
 					</div>
 					<div>
 						<antd.Tag>{String(item._id).toUpperCase()}</antd.Tag>
@@ -251,7 +258,9 @@ export default class Workloads extends React.Component {
 					{renderDate(item.created)}
 					<div>
 						<Icons.Box />
-						{item.payloads?.length ?? 0} payloads
+						<Translation>
+							{t => `${item.payloads?.length ?? 0} ${t("payloads")}`}
+						</Translation>
 					</div>
 				</div>
 			</div>
@@ -265,12 +274,18 @@ export default class Workloads extends React.Component {
 		actions.push(
 			<div key="delete" call="onDelete">
 				<Icons.Trash />
-				Delete
+				<Translation>
+					{t => t("Delete")}
+				</Translation>
 			</div>,
 		)
 
 		if (list.length === 0) {
-			return <antd.Result icon={<Icons.SmileOutlined />} title="Great, there are no more workloads" />
+			return <antd.Result
+				icon={<Icons.SmileOutlined />}
+				// TODO: Add translation
+				title="Great, there are no more workloads"
+			/>
 		}
 
 		return <SelectableList
@@ -296,7 +311,11 @@ export default class Workloads extends React.Component {
 							/>
 						</div>
 						<div>
-							<span>View finished</span>
+							<span>
+								<Translation>
+									{t => t("View finished")}
+								</Translation>
+							</span>
 							<antd.Switch
 								value={this.state.viewFinished}
 								onChange={() => {
@@ -306,32 +325,36 @@ export default class Workloads extends React.Component {
 								}}
 							/>
 						</div>
-						<div key="regionSelection">
+						<div key="sectionSelection">
 							<antd.Select
-								key="region_select"
+								key="section_select"
 								showSearch
 								style={{ width: 200 }}
-								placeholder="Select a region"
+								placeholder="Select a section"
 								optionFilterProp="children"
-								onChange={this.changeRegion}
-								value={this.state.selectedRegion}
+								onChange={this.changeSection}
+								value={this.state.selectedSection}
 								filterOption={(input, option) =>
 									option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 								}
 							>
 								<antd.Select.Option key="all" value="all">
-									All regions
+									<Translation>
+										{t => t("All")}
+									</Translation>
 								</antd.Select.Option>
-								{this.renderRegionsOptions()}
+								{this.renderSectionsOptions()}
 							</antd.Select>
 						</div>
 					</ActionsBar>
 				</div>
 				<PullToRefresh
 					renderText={status => {
-						return <div>{statusRecord[status]}</div>
+						return <div>
+							{statusRecord[status]}
+						</div>
 					}}
-					onRefresh={async () => await this.fetchWorkloads(this.state.selectedRegion)}
+					onRefresh={async () => await this.fetchWorkloads(this.state.selectedSection)}
 				>
 					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
 				</PullToRefresh>

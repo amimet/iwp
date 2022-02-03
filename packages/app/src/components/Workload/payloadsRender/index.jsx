@@ -1,7 +1,9 @@
 import React from "react"
-import { Icons } from "components/Icons"
 import * as antd from "antd"
 import classnames from "classnames"
+import { Translation } from "react-i18next"
+
+import { Icons } from "components/Icons"
 
 import "./index.less"
 
@@ -18,7 +20,11 @@ const Payload = (props) => {
 					<div className="quantity">x{props.preview ? (item.properties?.quantity) : (item.debtQuantity ?? item.properties?.quantity ?? "0")}</div>
 					<h2>{item.name}</h2>
 				</div>
-				<div className="description">{item.properties?.description ?? "No description"}</div>
+				<div className="description">
+					<Translation>
+						{t => t(item.properties?.description ?? "No description")}
+					</Translation>
+				</div>
 			</div>
 
 			{item.properties?.variants && <div className="variants">
@@ -28,7 +34,9 @@ const Payload = (props) => {
 
 		<div className="actions">
 			{props.onClickDelete && <antd.Button onClick={() => props.onClickDelete(item)} type="link">
-				Delete
+				<Translation>
+					{t => t("Delete")}
+				</Translation>
 			</antd.Button>}
 		</div>
 	</div>

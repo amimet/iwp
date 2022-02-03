@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Toast } from "antd-mobile"
+import { Translation } from "react-i18next"
 
 import moment from "moment"
 
@@ -138,8 +139,12 @@ export default class Inspector extends React.Component {
 
         if (quantityLeft <= 0) {
             antd.Modal.confirm({
-                title: "Production quantity already has been reached",
-                content: "Are you sure you want to commit for this payload?",
+                title: <Translation>
+                    {(t) => t("Production quantity already has been reached")}
+                </Translation>,
+                content: <Translation>
+                    {(t) => t("Are you sure you want to commit for this payload?")}
+                </Translation>,
                 onOk: () => {
                     open()
                 },
@@ -212,8 +217,14 @@ export default class Inspector extends React.Component {
 
             return (
                 <div className="property" key={key}>
-                    <div className="name">{String(key).toTitleCase()}</div>
-                    <div className="value"><PropertyRender /></div>
+                    <div className="name">
+                        <Translation>
+                            {t => t(String(key).toTitleCase())}
+                        </Translation>
+                    </div>
+                    <div className="value">
+                        <PropertyRender />
+                    </div>
                 </div>
             )
         })
@@ -239,7 +250,12 @@ export default class Inspector extends React.Component {
         return <div className="payload_inspector">
             <div className="header">
                 <div className="typeIndicator">
-                    <h1>{Icons[formula.icon] && createIconRender(formula.icon)} {String(this.state.data.type).toTitleCase()}</h1>
+                    <h1>
+                        {Icons[formula.icon] && createIconRender(formula.icon)}
+                        <Translation>
+                            {t => t(String(this.state.data.type).toTitleCase())}
+                        </Translation>
+                    </h1>
                 </div>
                 <div>
                     <h1>{this.state.data.name}</h1>
@@ -252,21 +268,41 @@ export default class Inspector extends React.Component {
             {!this.state.assistantMode && <div className="properties">
                 {this.renderProperties(this.state.data)}
                 <div className="property">
-                    <div className="name">Quantity produced</div>
-                    <div className="value">{quantityCount}</div>
+                    <div className="name">
+                        <Translation>
+                            {t => t("Quantity produced")}
+                        </Translation>
+                    </div>
+                    <div className="value">
+                        {quantityCount}
+                    </div>
                 </div>
                 <div className="property">
-                    <div className="name">Quantity left</div>
-                    <div className="value">{quantityLeft}</div>
+                    <div className="name">
+                        <Translation>
+                            {t => t("Quantity left")}
+                        </Translation>
+                    </div>
+                    <div className="value">
+                        {quantityLeft}
+                    </div>
                 </div>
             </div>}
 
             <div className="production">
-                <h3><Icons.Disc /> Production target</h3>
+                <h3>
+                    <Icons.Disc />
+                    <Translation>
+                        {t => t("Production target")}
+                    </Translation>
+                </h3>
 
                 <div className="content">
                     <div className="counter">
-                        <div style={this.isQuantityProductionOverreached() ? { color: "red" } : undefined} className={quantityLeft === 0 ? "completed" : undefined} >
+                        <div
+                            style={this.isQuantityProductionOverreached() ? { color: "red" } : undefined}
+                            className={quantityLeft === 0 ? "completed" : undefined}
+                        >
                             {quantityCount}
                         </div>
                         <div>/</div>
@@ -288,7 +324,9 @@ export default class Inspector extends React.Component {
                     </div>
                     <div>
                         <antd.Button onClick={() => this.toogleAssistantMode(false)} icon={<Icons.LogOut />}>
-                            Stop
+                            <Translation>
+                                {t => t("Stop")}
+                            </Translation>
                         </antd.Button>
                     </div>
                 </div>
@@ -297,7 +335,9 @@ export default class Inspector extends React.Component {
             {!this.state.assistantMode && <ActionsBar mode="float" type="transparent" spaced>
                 <div>
                     <antd.Button onClick={() => this.onClickCommit()} icon={<Icons.CheckCircle />}>
-                        Commit
+                        <Translation>
+                            {t => t("Commit")}
+                        </Translation>
                     </antd.Button>
                 </div>
                 <div>
@@ -307,7 +347,9 @@ export default class Inspector extends React.Component {
                         type={this.state.assistantMode ? undefined : "primary"}
                         icon={this.state.assistantMode ? <Icons.ChevronLeft /> : <Icons.MdOutlinePendingActions />}
                     >
-                        {this.state.assistantMode ? "Exit" : "Assistant mode"}
+                        <Translation>
+                            {t => t(this.state.assistantMode ? "Exit" : "Assistant mode")}
+                        </Translation>
                     </antd.Button>
                 </div>
             </ActionsBar>}

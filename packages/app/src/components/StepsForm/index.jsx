@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import loadable from "@loadable/component"
+import { Translation } from "react-i18next"
 
 import { Icons, createIconRender } from "components/Icons"
 import { ActionsBar } from "components"
@@ -179,11 +180,21 @@ export default class StepsForm extends React.Component {
 
                     <div className="steps_form steps step">
                         <div className="title">
-                            <h1>{current.icon && createIconRender(current.icon)}{current.title}</h1>
-                            <antd.Tag color={current.required ? "volcano" : "default"}>{current.required ? "Required" : "Optional"}</antd.Tag>
+                            <h1>{current.icon && createIconRender(current.icon)}
+                                <Translation>
+                                    {t => t(current.title)}
+                                </Translation>
+                            </h1>
+                            <antd.Tag color={current.required ? "volcano" : "default"}>
+                                <Translation>
+                                    {t => t(current.required ? "Required" : "Optional")}
+                                </Translation>
+                            </antd.Tag>
                         </div>
                         {current.description && <div className="description">
-                            {current.description}
+                            <Translation>
+                                {t => t(current.description)}
+                            </Translation>
                         </div>}
                         {this.state.renderStep}
                     </div>
@@ -191,25 +202,35 @@ export default class StepsForm extends React.Component {
 
                 {this.state.submittingError && (
                     <div style={{ color: "#f5222d" }}>
-                        {String(this.state.submittingError)}
+                        <Translation>
+                            {t => t(String(this.state.submittingError))}
+                        </Translation>
                     </div>
                 )}
 
                 <ActionsBar mode="float">
                     {this.state.step > 0 && (
                         <antd.Button style={{ margin: "0 8px" }} onClick={() => this.prev()}>
-                            <Icons.ChevronLeft />Previous
+                            <Icons.ChevronLeft />
+                            <Translation>
+                                {t => t("Previous")}
+                            </Translation>
                         </antd.Button>
                     )}
                     {this.state.step < steps.length - 1 && (
                         <antd.Button disabled={!this.state.canNext} type="primary" onClick={() => this.next()}>
-                            <Icons.ChevronRight />Next
+                            <Icons.ChevronRight />
+                            <Translation>
+                                {t => t("Next")}
+                            </Translation>
                         </antd.Button>
                     )}
                     {this.state.step === steps.length - 1 && (
                         <antd.Button disabled={!this.state.canNext || this.state.submitting || !this.canSubmit()} type="primary" onClick={this.onSubmit}>
                             {this.state.submitting && <Icons.LoadingOutlined spin />}
-                            Done
+                            <Translation>
+                                {t => t("Done")}
+                            </Translation>
                         </antd.Button>
                     )}
                 </ActionsBar>

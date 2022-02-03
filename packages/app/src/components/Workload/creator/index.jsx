@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import { Translation } from "react-i18next"
 
 import { Icons, } from "components/Icons"
 import { Fabric, OperatorsAssignments, StepsForm } from "components"
@@ -24,34 +25,34 @@ const steps = [
 		},
 	},
 	{
-		key: "region",
-		title: "Region",
+		key: "section",
+		title: "Section",
 		icon: "Globe",
 		required: true,
-		description: "Select the region where the workload will be deployed.",
+		description: "Select the section where the workload will be deployed.",
 		content: (props) => {
-			const [regions, setRegions] = React.useState([])
+			const [sections, setSections] = React.useState([])
 
 			React.useEffect(async () => {
 				const api = window.app.request
-				const regions = await api.get.regions().catch((err) => {
+				const sections = await api.get.sections().catch((err) => {
 					console.log(err)
 					return false
 				})
 
-				if (regions) {
-					setRegions(regions)
+				if (sections) {
+					setSections(sections)
 				}
 			}, [])
 
-			if (regions.length === 0) {
-				return <antd.Skeleton />
+			if (sections.length === 0) {
+				return <antd.Skeleton active />
 			}
 
 			return <div className="workload_creator steps step content">
 				<antd.Select
 					showSearch
-					placeholder="Select a region"
+					placeholder="Select a section"
 					optionFilterProp="children"
 					defaultValue={props.value}
 					onChange={(value) => {
@@ -60,11 +61,11 @@ const steps = [
 					filterOption={(input, option) =>
 						option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 					}
-					loading={regions > 0}
+					loading={sections > 0}
 				>
-					{regions.map((region) => {
-						return <antd.Select.Option key={region.name} value={region.name}>
-							{region.name}
+					{sections.map((section) => {
+						return <antd.Select.Option key={section.name} value={section.name}>
+							{section.name}
 						</antd.Select.Option>
 					})}
 				</antd.Select>
@@ -82,7 +83,6 @@ const steps = [
 					showTime={{ format: "HH:mm" }}
 					format="DD-MM-YYYY HH:mm"
 					onChange={(value) => {
-						console.log(value)
 						props.handleUpdate(value)
 					}}
 				/>
@@ -174,7 +174,7 @@ export default class WorkloadCreator extends React.Component {
 
 	submit = async (data, callback) => {
 		const workload = {
-			region: data.region,
+			section: data.section,
 			workshift: data.workshift,
 			assigned: data.operators,
 			name: data.name,

@@ -39,6 +39,7 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { ActionSheet, Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
+import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
 import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "extensions"
@@ -102,8 +103,12 @@ class App {
 				this.eventBus.emit("forceToLogin")
 
 				antd.notification.open({
-					message: "Invalid Session",
-					description: error,
+					message: <Translation>
+						{(t) => t("Invalid Session")}
+					</Translation>,
+					description: <Translation>
+						{(t) => t(error)}
+					</Translation>,
 					icon: <Icons.MdOutlineAccessTimeFilled />,
 				})
 			}
@@ -151,12 +156,12 @@ class App {
 				const handler = React.createRef()
 
 				handler.current = ActionSheet.show({
-					extra: "Select a option",
-					cancelText: "Cancel",
+					extra: <Translation>{t => t("Select a option")}</Translation>,
+					cancelText: <Translation>{t => t("Cancel")}</Translation>,
 					actions: [
 						{
 							key: "workload",
-							text: "Workload",
+							text: <Translation>{t => t("Workload")}</Translation>,
 							onClick: () => {
 								window.app.openWorkloadCreator()
 								handler.current.close()
@@ -164,7 +169,7 @@ class App {
 						},
 						{
 							key: "fabric",
-							text: "Fabric",
+							text: <Translation>{t => t("Fabric")}</Translation>,
 							onClick: () => {
 								window.app.openFabric()
 								handler.current.close()
