@@ -220,7 +220,7 @@ class App {
 				})
 			},
 			openFabricInspector: (id) => {
-				window.app.DrawerController.open("fabric_inspector", Fabric.Inspector, {
+				window.app.DrawerController.open("workload_inspector", Workload.PayloadInspector, {
 					props: {
 						width: "70%",
 					},
