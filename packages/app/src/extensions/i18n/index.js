@@ -35,7 +35,7 @@ export const extension = {
                                 [locale]: { translation: messages.default || messages },
                             },
                             lng: locale,
-                            fallbackLng: DEFAULT_LOCALE,
+                            //fallbackLng: DEFAULT_LOCALE,
                             interpolation: {
                                 escapeValue: false, // react already safes from xss
                             },
