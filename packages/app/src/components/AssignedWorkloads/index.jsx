@@ -16,7 +16,7 @@ export default class AssignedWorkloads extends React.Component {
 
 	componentDidMount() {
 		window.app.handleWSListener("workloadAssigned", async (workloadId) => {
-			const data = await this.api.get.workload({ id: workloadId }).catch(() => {
+			const data = await this.api.get.workload(undefined, { _id: workloadId }).catch(() => {
 				return false
 			})
 
