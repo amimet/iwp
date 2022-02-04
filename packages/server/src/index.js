@@ -62,7 +62,9 @@ class Server {
             io: this.io,
             clients: this.WSClients,
             getClientSockets: (userId) => {
-                return this.WSClients.filter(client => client.userId === userId)
+                return this.WSClients.filter(client => client.userId === userId).map((client) => {
+                    return client?.socket
+                })
             },
             broadcast: async (channel, ...args) => {
                 for await (const client of this.WSClients) {
