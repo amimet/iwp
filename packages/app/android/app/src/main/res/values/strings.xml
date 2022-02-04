@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Amimet APP</string>
+    <string name="title_activity_main">Amimet APP</string>
+    <string name="package_name">com.amimet.app</string>
+    <string name="custom_url_scheme">com.amimet.app</string>
+</resources>

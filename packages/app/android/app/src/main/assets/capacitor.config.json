@@ -1,0 +1,7 @@
+{
+	"appId": "com.amimet.app",
+	"appName": "Amimet APP",
+	"bundledWebRuntime": true,
+	"overrideUserAgent": "capacitor",
+	"webDir": "dist"
+}

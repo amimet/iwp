@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
+    "@capacitor/android": "^3.4.0",
     "@capacitor/status-bar": "1.0.7",
     "@capacitor/storage": "1.2.4",
     "@corenode/utils": "0.28.26",
