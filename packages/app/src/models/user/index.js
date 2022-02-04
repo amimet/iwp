@@ -1,4 +1,4 @@
-import Session from '../session'
+import Session from "../session"
 
 export default class User {
     static get bridge() {
@@ -47,13 +47,23 @@ export default class User {
         return request.response.data
     }
 
+    hasRole = async (role) => {
+        const roles = await User.roles()
+
+        if (!roles) {
+            return false
+        }
+
+        return Array.isArray(roles) && roles.includes(role)
+    }
+    
     hasAdmin = async () => {
         const roles = await User.roles()
 
         if (!roles) {
             return false
         }
-    
+
         return Array.isArray(roles) && roles.includes("admin")
     }
 }
