@@ -19,20 +19,25 @@ export default class Users extends React.Component {
 
 	loadData = async () => {
 		this.setState({ data: null })
-		const data = await this.api.get.users()
-		this.setState({ data })
-	}
 
-	toogleSelection = (to) => {
-		this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
-	}
-
-	openUser(username) {
-		if (this.state.selectionEnabled) {
+		const data = await this.api.get.users().catch((err) => {
+			console.error(err)
 			return false
-		}
+		})
 
-		window.app.setLocation(`/account`, { username })
+		if (data) {
+			this.setState({ data })
+		}
+	}
+
+	openUser = (key) => {
+		const username = this.state.data.find((user) => {
+			return user._id === key
+		})?.username
+
+		if (username) {
+			window.app.setLocation(`/account`, { username })
+		}
 	}
 
 	renderRoles(roles) {
@@ -45,7 +50,6 @@ export default class Users extends React.Component {
 		return (
 			<div
 				key={item._id}
-				onDoubleClick={() => this.openUser(item.username)}
 				className="user_item"
 			>
 				<div>
@@ -56,12 +60,9 @@ export default class Users extends React.Component {
 						<div>
 							<h1>{item.fullName ?? item.username}</h1>
 						</div>
-						<div>
-							<h3>#{item._id}</h3>
-						</div>
 					</div>
-					<div>{this.renderRoles(item.roles)}</div>
 				</div>
+				<div>{this.renderRoles(item.roles)}</div>
 			</div>
 		)
 	}
@@ -72,18 +73,13 @@ export default class Users extends React.Component {
 				<div className="users_list">
 					<ActionsBar mode="float">
 						<div>
-							<antd.Button shape="round" icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />} type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
-								{this.state.selectionEnabled ? "Done" : "Select"}
-							</antd.Button>
-						</div>
-						<div>
 							<antd.Button type="primary" icon={<Icons.Plus />}>New User</antd.Button>
 						</div>
 					</ActionsBar>
 					{!this.state.data ? <antd.Skeleton active /> :
 						<SelectableList
-							selectionEnabled={this.state.selectionEnabled}
 							items={this.state.data}
+							onDoubleClick={(key) => this.openUser(key)}
 							renderItem={this.renderItem}
 						/>}
 				</div>
