@@ -54,10 +54,14 @@ class UpdateUserRoles extends React.Component {
         this.fetchUsersData(users)
     }
 
-    handleRoleChange = (userId, role) => {
+    handleRoleChange = (userId, role, to) => {
         let updatedUsers = this.state.users.map((user) => {
             if (user._id === userId) {
-                user.roles = role
+                if (to == true) {
+                    user.roles.push(role)
+                } else {
+                    user.roles = user.roles.filter((r) => r !== role)
+                }
             }
 
             return user
@@ -97,9 +101,8 @@ class UpdateUserRoles extends React.Component {
                 {this.state.roles.map((role) => {
                     return <antd.Checkbox
                         key={role.name}
-                        value={role.name}
-                        defaultChecked={item.roles.includes(role.name)}
-                        onChange={() => this.handleRoleChange(item._id, role.name)}
+                        checked={item.roles.includes(role.name)}
+                        onChange={(to) => this.handleRoleChange(item._id, role.name, to.target.checked)}
                     >
                         {role.name}
                     </antd.Checkbox>
