@@ -115,7 +115,7 @@ export class Commit extends React.Component {
                 <div>
                     <span>
                         <Translation>
-                            {(t) => t("Select a quantity produced")}
+                            {(t) => t("Set the quantity produced")}
                         </Translation>
                     </span>
                     <Stepper
