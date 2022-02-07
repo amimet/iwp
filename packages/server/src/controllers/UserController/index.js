@@ -86,7 +86,7 @@ export default {
 
         return res.json(user)
     }),
-    register: (req, res, next) => {
+    register: (req, res) => {
         User.findOne({ username: req.body.username })
             .then((data) => {
                 if (data) {
@@ -101,7 +101,6 @@ export default {
                     fullName: req.body.fullName,
                     avatar: avatar.uri,
                     email: req.body.email,
-                    roles: ["registered"],
                     password: hash
                 })
 
@@ -111,7 +110,7 @@ export default {
                 return res.send(data)
             })
             .catch(err => {
-                return next(err)
+                return res.json(err)
             })
     },
     updatePassword: async (req, res) => {
