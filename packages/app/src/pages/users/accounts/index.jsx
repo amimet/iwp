@@ -1,7 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/icons"
-import { ActionsBar, SelectableList } from "components"
+import { ActionsBar, SelectableList, UserRegister } from "components"
+import { Translation } from "react-i18next"
 
 import "./index.less"
 
@@ -40,6 +41,10 @@ export default class Users extends React.Component {
 		}
 	}
 
+	handleUserRegister = async () => {
+		window.app.DrawerController.open("UserRegister", UserRegister)
+	}
+
 	renderRoles(roles) {
 		return roles.map((role) => {
 			return <antd.Tag key={role}> {role} </antd.Tag>
@@ -73,7 +78,15 @@ export default class Users extends React.Component {
 				<div className="users_list">
 					<ActionsBar mode="float">
 						<div>
-							<antd.Button type="primary" icon={<Icons.Plus />}>New User</antd.Button>
+							<antd.Button
+								type="primary"
+								icon={<Icons.Plus />}
+								onClick={this.handleUserRegister}
+							>
+								<Translation>
+									{t => t("New User")}
+								</Translation>
+							</antd.Button>
 						</div>
 					</ActionsBar>
 					{!this.state.data ? <antd.Skeleton active /> :
