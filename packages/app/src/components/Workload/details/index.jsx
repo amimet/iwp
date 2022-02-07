@@ -281,11 +281,12 @@ export default class WorkloadDetails extends React.Component {
 							</antd.Button>
 						</div>
 					</div>
-
-					<PayloadsRender
-						onClickItem={(item) => this.openPayloadDetails(item)}
-						payloads={this.state.data.payloads}
-					/>
+					<div className="content">
+						<PayloadsRender
+							onClickItem={(item) => this.openPayloadDetails(item)}
+							payloads={this.state.data.payloads}
+						/>
+					</div>
 				</div>
 			</div>
 		)
