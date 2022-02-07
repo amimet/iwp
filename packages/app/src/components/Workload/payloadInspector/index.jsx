@@ -173,7 +173,7 @@ export default class Inspector extends React.Component {
         this.counter.update("stop")
         const tooks = this.counter.tooks()
 
-        const result = await this.api.post.workloadCommit({
+        await this.api.post.workloadCommit({
             workloadId: this.state.workload._id,
             payloadUUID: this.state.data.uuid,
             tooks: tooks,
@@ -184,12 +184,10 @@ export default class Inspector extends React.Component {
             return false
         })
 
-        if (result) {
-            this.counter.update("start")
-            Toast.show({
-                icon: "success",
-                content: "Done"
-            })
+        this.counter.update("start")
+
+        if (this.countQuantityLeft() === 0) {
+            this.toogleAssistantMode(false)
         }
     }
 
