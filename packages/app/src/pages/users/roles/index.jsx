@@ -1,58 +1,133 @@
-import React from 'react'
-import * as antd from 'antd'
-import { Icons } from 'components/icons'
+import React from "react"
+import * as antd from "antd"
 
-import { ActionsBar, FormGenerator } from 'components'
+import { ActionsBar, UserSelector } from "components"
+import { Icons } from "components/icons"
 
-class ModifyRole extends React.Component {
-    handleSubmit(context) {
-        console.log(context)
+import "./index.less"
+
+class UpdateUserRoles extends React.Component {
+    state = {
+        users: null,
+        roles: null,
+    }
+
+    api = window.app.request
+
+    componentDidMount = async () => {
+        await this.fetchRoles()
+    }
+
+    fetchRoles = async () => {
+        const result = await this.api.get.roles().catch((err) => {
+            antd.message.error(err)
+            console.error(err)
+            return false
+        })
+
+        if (result) {
+            this.setState({ roles: result })
+        }
+    }
+
+    fetchUsersData = async (users) => {
+        const result = await this.api.get.users(undefined, { _id: users }).catch((err) => {
+            antd.message.error(err)
+            console.error(err)
+            return false
+        })
+
+        if (result) {
+            this.setState({
+                users: result.map((data) => {
+                    return {
+                        _id: data._id,
+                        username: data.username,
+                        roles: data.roles,
+                    }
+                })
+            })
+        }
+    }
+
+    handleSelectUser = async (users) => {
+        this.fetchUsersData(users)
+    }
+
+    handleRoleChange = (userId, role) => {
+        let updatedUsers = this.state.users.map((user) => {
+            if (user._id === userId) {
+                user.roles = role
+            }
+
+            return user
+        })
+
+        this.setState({ users: updatedUsers })
+    }
+
+    handleSubmit = async () => {
+        const update = this.state.users.map((data) => {
+            return {
+                _id: data._id,
+                roles: data.roles,
+            }
+        })
+
+        const result = await this.api.post.updateUserRoles({ update }).catch((err) => {
+            antd.message.error(err)
+            console.error(err)
+            return false
+        })
+
+        if (result) {
+            this.props.handleDone(result)
+            if (typeof this.props.close === "function") {
+                this.props.close()
+            }
+        }
+    }
+
+    renderItem = (item) => {
+        return <div className="grantRoles_user">
+            <h2>
+                <Icons.User /> {item.username}
+            </h2>
+            <div className="roles">
+                {this.state.roles.map((role) => {
+                    return <antd.Checkbox
+                        key={role.name}
+                        value={role.name}
+                        defaultChecked={item.roles.includes(role.name)}
+                        onChange={() => this.handleRoleChange(item._id, role.name)}
+                    >
+                        {role.name}
+                    </antd.Checkbox>
+                })}
+            </div>
+        </div>
     }
 
     render() {
-        return <FormGenerator
-            name="roles_createnew"
-            renderLoadingIcon
-            onFinish={(context) => this.handleSubmit(context)}
-            items={[
-                {
-                    id: "title",
-                    title: "Role name",
-                    element: {
-                        component: "Input"
-                    },
-                    item: {
-                        hasFeedback: true,
-                        rules: [
-                            {
-                                required: true,
-                                message: 'Input an name for role',
-                            },
-                        ],
-                    }
-                },
-                {
-                    id: "permissions",
-                    title: "Permissions",
-                    element: {
-                        component: "Select",
-                        props: {
-                            mode: "multiple",
-                            allowClear: true,
-                        }
-                    },
-                    item: {
-                        hasFeedback: true,
-                        rules: [
-                            {
-                                required: true,
-                                message: 'Input an name for Device',
-                            },
-                        ],
-                    }
-                },
-            ]}
-        />
+        const { users } = this.state
+
+        if (!users) {
+            return <UserSelector handleDone={this.handleSelectUser} />
+        }
+
+        return <div>
+            {users.map((data) => {
+                return this.renderItem(data)
+            })}
+
+            <ActionsBar>
+                <div>
+                    <antd.Button icon={<Icons.Save />} onClick={() => this.handleSubmit()}>
+                        Submit
+                    </antd.Button>
+                </div>
+            </ActionsBar>
+        </div>
     }
 }
 
@@ -64,21 +139,43 @@ export default class Roles extends React.Component {
     api = window.app.request
 
     componentDidMount = async () => {
-        await this.api.get
-            .roles()
-            .then((data) => {
-                this.setState({ data })
-            })
-            .catch((err) => {
-                this.setState({ error: err.message })
-            })
+        await this.fetchRoles()
     }
 
-    openRoleCreator = () => {
-        window.app.DrawerController.open("roleCreator", ModifyRole)
+    fetchRoles = async () => {
+        const roles = await this.api.get.roles().catch((err) => {
+            antd.message.error(err)
+            console.error(err)
+            return false
+        })
+
+        if (roles) {
+            this.setState({ data: roles })
+        }
     }
 
-    createNewRole() {
+    handleRoleDelete = (role) => {
+        antd.Modal.confirm({
+            title: "Are you sure you want to delete this role?",
+            content: `Role: ${role}`,
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "No",
+            onOk: async () => {
+                const result = await this.api.delete.role({ name: role }).catch((err) => {
+                    antd.message.error(err)
+                    console.error(err)
+                    return false
+                })
+
+                if (result) {
+                    await this.fetchRoles()
+                }
+            }
+        })
+    }
+
+    handleCreateNew = () => {
         let inputRoleRef = React.createRef()
         let inputDescriptionRef = React.createRef()
 
@@ -91,47 +188,63 @@ export default class Roles extends React.Component {
                 <div>
                     <antd.Input ref={inputDescriptionRef} placeholder="Description" />
                 </div>
-                <div>
-
-                </div>
             </div>,
             onOk: () => {
-                return new Promise((resolve, reject) => {
+                return new Promise(async (resolve, reject) => {
                     const roleValue = inputRoleRef.current.state.value
                     const roleDescription = inputDescriptionRef.current.state.value
 
-                    console.log(roleDescription)
+                    const result = await this.api.post.role({
+                        name: roleValue,
+                        description: roleDescription,
+                    }).catch((err) => {
+                        antd.message.error(err)
+                        console.error(err)
+                        reject()
+                        return false
+                    })
 
-                    // TODO: post to api 
-
+                    if (result) {
+                        this.fetchRoles()
+                        return resolve()
+                    }
                 })
             }
         })
     }
 
+    updateUserRoles = async () => {
+        window.app.DrawerController.open("grant-roles-to-user", UpdateUserRoles)
+    }
+
+    renderItem = (item) => {
+        return <div key={item._id}>
+            <antd.List.Item
+                actions={[<a onClick={() => this.handleRoleDelete(item.name)} key="delete">Delete</a>]}
+            >
+                <antd.List.Item.Meta
+                    avatar={<Icons.Box />}
+                    title={item.name}
+                    description={item.description}
+                />
+            </antd.List.Item>
+        </div>
+    }
+
     render() {
         return <div className="users_list_wrapper" >
-            <ActionsBar mode="float">
-                <antd.Button onClick={() => { this.openRoleCreator() }} icon={<Icons.PlusOutlined />} type="primary">New</antd.Button>
+            <ActionsBar mode="float" spaced>
+                <antd.Button onClick={() => this.handleCreateNew()} icon={<Icons.PlusOutlined />} type="primary">New</antd.Button>
+                <antd.Button onClick={() => this.updateUserRoles()} icon={<Icons.User />} >Update users</antd.Button>
             </ActionsBar>
 
-            {!this.state.data ? <antd.Skeleton active /> :
+            {!this.state.data ?
+                <antd.Skeleton active /> :
                 <antd.List
                     dataSource={this.state.data}
-                    renderItem={(item) => {
-                        return <div key={item._id}>
-                            <antd.List.Item
-                                actions={[<a key="list-loadmore-edit">edit</a>, <a key="list-loadmore-more">apply</a>]}
-                            >
-                                <antd.List.Item.Meta
-                                    avatar={<Icons.Box />}
-                                    title={item.name}
-                                    description={item.description}
-                                />
-                            </antd.List.Item>
-                        </div>
-                    }}
-                />}
+                    renderItem={(item) => this.renderItem(item)}
+                />
+            }
         </div>
     }
 }
