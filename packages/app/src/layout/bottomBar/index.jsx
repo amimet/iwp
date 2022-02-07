@@ -14,6 +14,7 @@ export default class BottomBar extends EviteComponent {
         visible: false,
         creatorActionsVisible: false,
         render: null,
+        isManager: false,
     }
 
     handleBusEvents = {
@@ -101,6 +102,7 @@ export default class BottomBar extends EviteComponent {
                 }}
             >
                 <div className="items">
+
                     <div
                         key="main"
                         id="main"
@@ -122,8 +124,8 @@ export default class BottomBar extends EviteComponent {
                         </div>
                     </div>
                     <div
-                        key="fabric"
-                        id="fabric"
+                        key="createNew"
+                        id="createNew"
                         className={classnames("item", ["primary"])}
                         onClick={() => window.app.openCreateNew()}
                     >
