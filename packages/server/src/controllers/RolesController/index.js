@@ -47,7 +47,7 @@ export default {
         })
     }),
     getUserRoles: Schematized({
-        select: ["user_id", "username"],
+        select: ["username"],
     }, async (req, res) => {
         const user = await User.findOne(req.selection)
 
@@ -74,6 +74,8 @@ export default {
             const user = await User.findById(update._id).catch(err => {
                 return false
             })
+
+            console.log(update.roles)
 
             if (user) {
                 user.roles = update.roles
