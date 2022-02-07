@@ -25,6 +25,16 @@ export default class User {
         return User.bridge.get.userRoles({ username: token.username })
     }
 
+    static async hasRole(role) {
+        const roles = await User.roles()
+
+        if (!roles) {
+            return false
+        }
+
+        return Array.isArray(roles) && roles.includes(role)
+    }
+
     getAssignedWorkloads = async () => {
         const token = await Session.decodedToken()
 
@@ -47,16 +57,6 @@ export default class User {
         return request.response.data
     }
 
-    hasRole = async (role) => {
-        const roles = await User.roles()
-
-        if (!roles) {
-            return false
-        }
-
-        return Array.isArray(roles) && roles.includes(role)
-    }
-    
     hasAdmin = async () => {
         const roles = await User.roles()
 
