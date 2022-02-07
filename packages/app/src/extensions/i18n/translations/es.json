@@ -36,6 +36,13 @@
     "Cancel": "Cancelar",
     "Delete": "Eliminar",
     "State": "Estado",
+    "Modify": "Modificar",
+    "modify": "modificar",
+    
+    "Manage operators": "Administrar operadores",
+    "Manage users": "Administrar usuarios",
+    "Manage groups": "Administrar grupos",
+    "Manage workflows": "Administrar flujos de trabajo",
 
     "Disable": "Deshabilitar",
     "Disabled": "Deshabilitado",
