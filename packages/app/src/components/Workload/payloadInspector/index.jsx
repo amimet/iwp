@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { Toast } from "antd-mobile"
 import { Translation } from "react-i18next"
 
 import moment from "moment"
@@ -131,11 +130,14 @@ export default class Inspector extends React.Component {
     }
 
     onClickCommit = () => {
+        const quantityLeft = this.countQuantityLeft()
+
         const open = () => Commit.openModal({
+            data: this.state.data,
+            quantityLeft: quantityLeft,
             workloadId: this.props.workloadId,
             payloadUUID: this.uuid,
         })
-        const quantityLeft = this.countQuantityLeft()
 
         if (quantityLeft <= 0) {
             antd.Modal.confirm({

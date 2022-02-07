@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Stepper, Toast } from "antd-mobile"
+import { Translation } from "react-i18next"
 
 import "./index.less"
 
@@ -59,6 +60,10 @@ export class Commit extends React.Component {
         }
     }
 
+    setQuantityLeft = () => {
+        this.setState({ quantity: this.props.quantityLeft })
+    }
+
     onCommit = async () => {
         const result = await this.api.post.workloadCommit({
             workloadId: this.props.workloadId,
@@ -104,18 +109,37 @@ export class Commit extends React.Component {
         return <div className="commitStepper">
             <div className="commitStepper content">
                 <div>
+                    <h1>{this.props.data.name}</h1>
                     <h3>{String(this.props.payloadUUID).toUpperCase()}</h3>
                 </div>
                 <div>
-                    <Stepper defaultValue={this.state.quantity} min={1} onChange={(value) => {
-                        this.setState({ quantity: value })
-                    }} />
+                    <span>
+                        <Translation>
+                            {(t) => t("Select a quantity produced")}
+                        </Translation>
+                    </span>
+                    <Stepper
+                        value={this.state.quantity}
+                        defaultValue={this.state.quantity}
+                        min={1}
+                        onChange={(value) => {
+                            this.setState({ quantity: value })
+                        }} />
                 </div>
             </div>
             <div className="commitStepper actions">
                 <div>
                     <antd.Button type="primary" onClick={this.onCommit}>
-                        Commit
+                        <Translation>
+                            {(t) => t("Commit")}
+                        </Translation>
+                    </antd.Button>
+                </div>
+                <div>
+                    <antd.Button onClick={this.setQuantityLeft}>
+                        <Translation>
+                            {(t) => t("All")}
+                        </Translation>
                     </antd.Button>
                 </div>
             </div>
