@@ -1,21 +1,35 @@
 module.exports = [
+    // User roles controller
     {
-        route: "/role",
-        method: 'PUT',
-        middleware: ["withAuthentication", "roles"],
-        fn: "UserController.grantRole"
+        route: "/user_roles",
+        method: "GET",
+        fn: "RolesController.getUserRoles",
     },
     {
-        route: "/role",
-        method: "DELETE",
+        route: "/update_user_roles",
+        method: "POST",
         middleware: ["withAuthentication", "roles"],
-        fn: "UserController.denyRole"
+        fn: "RolesController.updateRoles",
     },
+    // Roles controller
     {
         route: "/roles",
         method: "GET",
         fn: "RolesController.get",
     },
+    {
+        route: "/role",
+        method: "DELETE",
+        middleware: ["withAuthentication", "roles"],
+        fn: "RolesController.delete",
+    },
+    {
+        route: "/role",
+        method: "POST",
+        middleware: ["withAuthentication", "roles"],
+        fn: "RolesController.create"
+    },
+    // Sessions controller
     {
         route: "/session",
         method: "DELETE",
