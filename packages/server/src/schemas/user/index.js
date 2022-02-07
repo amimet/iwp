@@ -5,7 +5,5 @@ export default {
     fullName: String,
     avatar: { type: String },
     email: String,
-    roles: [],
-    legal_id: Object,
-    phone: Number,
+    roles: { type: Array, default: [] },
 }
