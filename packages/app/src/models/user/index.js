@@ -22,7 +22,7 @@ export default class User {
             return false
         }
 
-        return User.bridge.get.roles({ username: token.username })
+        return User.bridge.get.userRoles({ username: token.username })
     }
 
     getAssignedWorkloads = async () => {
