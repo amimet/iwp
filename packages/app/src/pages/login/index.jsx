@@ -1,8 +1,9 @@
-import React from 'react'
-import config from "config"
+import React from "react"
 import * as antd from "antd"
-import { FormGenerator } from 'components'
-import { Icons } from 'components/Icons'
+import { FormGenerator } from "components"
+import { Icons } from "components/Icons"
+
+import config from "config"
 
 import "./index.less"
 
@@ -13,7 +14,9 @@ const formInstance = [
             component: "Input",
             icon: "User",
             placeholder: "Username",
-            props: null
+            props: {
+                className: "login-form-username",
+            },
         },
         item: {
             hasFeedback: true,
@@ -23,7 +26,6 @@ const formInstance = [
                     message: 'Please input your Username!',
                 },
             ],
-            props: null
         }
     },
     {
@@ -59,17 +61,6 @@ const formInstance = [
             }
         }
     },
-    {
-        id: "allowRegenerate",
-        withValidation: false,
-        element: {
-            component: "Checkbox",
-            props: {
-                children: "Not expire",
-                defaultChecked: false,
-            }
-        }
-    }
 ]
 
 export default class Login extends React.Component {
