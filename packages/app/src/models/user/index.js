@@ -22,7 +22,7 @@ export default class User {
             return false
         }
 
-        return User.bridge.get.userRoles({ username: token.username })
+        return User.bridge.get.userRoles(undefined, { username: token.username })
     }
 
     static async hasRole(role) {
