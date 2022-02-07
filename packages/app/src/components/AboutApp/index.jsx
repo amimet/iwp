@@ -43,7 +43,7 @@ export const AboutCard = (props) => {
 							<antd.Tag><Icons.Tag />v{window.app.version ?? "experimental"}</antd.Tag>
 							<antd.Tag color={isProduction ? "green" : "magenta"}>
 								{isProduction ? <Icons.CheckCircle /> : <Icons.Triangle />}
-								{isProduction ? "stable" : "development"}
+								{String(import.meta.env.MODE)}
 							</antd.Tag>
 						</div>
 					</div>
