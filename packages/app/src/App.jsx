@@ -424,5 +424,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [SettingsController, i18n.extension, Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
+	extensions: [API, SettingsController, i18n.extension, Sound.extension, Render.extension, Theme.extension, SplashExtension],
 })
