@@ -25,19 +25,29 @@ const ListItem = React.memo((props) => {
 
 			<div className="selectableList_subItems">
 				{item.children.map((subItem) => {
-					return <ListItem {...props} item={subItem} />
+					return <ListItem
+						renderChildren={props.renderChildren}
+						onClickItem={props.onClickItem}
+						onDoubleClick={props.onDoubleClick}
+						onLongPress={props.onLongPress}
+						item={subItem}
+					/>
 				})}
 			</div>
 		</div>
 	}
 
-	const renderChildren = props.renderChildren(item)
-	const isDisabled = renderChildren.props.disabled
+	if (!item.key) {
+		item.key = item._id ?? item.id
+	}
 
 	// FIXME: This sucks, you needs to stroke your fingers as fast as possible to make an double click work
 	const doubleClickSpeed = 100
 	let delayedClick = null
 	let clickedOnce = null
+
+	const renderChildren = props.renderChildren(item)
+	const isDisabled = renderChildren.props.disabled
 
 	const onOnceClick = () => {
 		clickedOnce = null
@@ -47,12 +57,12 @@ const ListItem = React.memo((props) => {
 		}
 
 		if (typeof props.onClickItem === "function") {
-			return props.onClickItem(props.id)
+			return props.onClickItem(item.key)
 		}
 
-		if (typeof renderChildren.onClick === "function") {
-			return renderChildren.onClick()
-		}
+		// if (typeof renderChildren.onClick === "function") {
+		// 	return renderChildren.onClick()
+		// }
 	}
 
 	const onDoubleClick = () => {
@@ -61,17 +71,42 @@ const ListItem = React.memo((props) => {
 		}
 
 		if (typeof props.onDoubleClick === "function") {
-			return props.onDoubleClick(props.id)
+			return props.onDoubleClick(item.key)
 		}
 
-		if (typeof renderChildren.onDoubleClick === "function") {
-			return renderChildren.onDoubleClick()
+		// if (typeof renderChildren.onDoubleClick === "function") {
+		// 	return renderChildren.onDoubleClick()
+		// }
+	}
+
+	const onLongPress = () => {
+		if (isDisabled) {
+			return false
+		}
+
+		if (typeof props.onLongPressItem === "function") {
+			return props.onLongPressItem(item.key)
+		}
+	}
+
+	const onClick = () => {
+		if (!delayedClick) {
+			delayedClick = _.debounce(onOnceClick, doubleClickSpeed)
+		}
+
+		if (clickedOnce) {
+			delayedClick.cancel()
+			clickedOnce = false
+			onDoubleClick()
+		} else {
+			clickedOnce = true
+			delayedClick()
 		}
 	}
 
 	return React.createElement("div", {
-		id: props.id,
-		key: props.id,
+		id: item.key,
+		key: item.key,
 		disabled: isDisabled,
 		className: classnames("selectableList_item", {
 			["selected"]: props.selected,
@@ -79,27 +114,8 @@ const ListItem = React.memo((props) => {
 		}),
 		onDoubleClick: onDoubleClick,
 		...useLongPress(
-			() => {
-				if (isDisabled) {
-					return false
-				}
-
-				props.onLongPressItem(props.id)
-			},
-			() => {
-				if (!delayedClick) {
-					delayedClick = _.debounce(onOnceClick, doubleClickSpeed)
-				}
-
-				if (clickedOnce) {
-					delayedClick.cancel()
-					clickedOnce = false
-					onDoubleClick()
-				} else {
-					clickedOnce = true
-					delayedClick()
-				}
-			},
+			onLongPress,
+			onClick,
 			{
 				shouldPreventDefault: true,
 				delay: 500,
@@ -193,10 +209,10 @@ export default class SelectableList extends React.Component {
 			} else {
 				this.selectKey(key)
 			}
-		}
-
-		if (typeof this.props.onClickItem === "function") {
-			this.props.onClickItem(key)
+		} else {
+			if (typeof this.props.onClickItem === "function") {
+				this.props.onClickItem(key)
+			}
 		}
 	}
 
@@ -264,8 +280,6 @@ export default class SelectableList extends React.Component {
 			let selected = this.isKeySelected(item.key)
 
 			return <ListItem
-				key={item.key}
-				id={item.key}
 				item={item}
 				selected={selected}
 				onDoubleClick={this.onDoubleClick}
