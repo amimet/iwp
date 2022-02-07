@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import { User } from "models"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 import moment from "moment"
@@ -14,6 +15,7 @@ const dateFormat = "DD-MM-YYYY hh:mm"
 
 export default class WorkloadDetails extends React.Component {
 	state = {
+		hasManager: false,
 		data: null,
 		qrCanvas: null,
 	}
@@ -30,7 +32,7 @@ export default class WorkloadDetails extends React.Component {
 		const qr = await this.createQR()
 		await this.fetchData()
 
-		await this.setState({ qrCanvas: qr })
+		await this.setState({ qrCanvas: qr, hasManager: await User.hasRole("manager") })
 
 		window.app.handleWSListener(`workloadUpdate_${this.id}`, (data) => {
 			this.setState({ data: data })
@@ -205,6 +207,7 @@ export default class WorkloadDetails extends React.Component {
 							</antd.Badge.Ribbon>
 						</h1> : <h1><Icons.Box /> {data.name}</h1>}
 					</div>
+
 				</div>
 
 				<div className="workload_details info">
@@ -242,6 +245,23 @@ export default class WorkloadDetails extends React.Component {
 						</div>
 					</div>
 				</div>
+
+				{this.state.hasManager && <div className="manager_actions">
+					<div>
+						<antd.Button icon={<Icons.Edit />}>
+							<Translation>
+								{t => t("Modify")}
+							</Translation>
+						</antd.Button>
+					</div>
+					<div>
+						<antd.Button icon={<Icons.Users />}>
+							<Translation>
+								{t => t("Manage operators")}
+							</Translation>
+						</antd.Button>
+					</div>
+				</div>}
 
 				<div className="workload_details payloads">
 					<div className="header">
