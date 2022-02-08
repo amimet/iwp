@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "vite",
     "dev:ssr": "vite-ssr",
-    "build": "cross-env NODE_ENV=production vite build && capacitor sync",
-    "build:preview": "cross-env NODE_ENV=preview vite build && capacitor sync",
+    "sync": "capacitor sync ios && capacitor sync android",
+    "build": "cross-env NODE_ENV=production vite build && yarn sync",
+    "build:preview": "cross-env NODE_ENV=preview vite build && yarn sync",
     "build:ssr": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
     "preview": "vite preview",
     "capacitor": "capacitor"
