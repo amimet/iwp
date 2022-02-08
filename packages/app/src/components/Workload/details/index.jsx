@@ -188,11 +188,11 @@ export default class WorkloadDetails extends React.Component {
 		return (
 			<div className={classnames("workload_details", { ["mobile"]: window.isMobile })} id={this.id} ref={this.ref} >
 				<div className="workload_details header">
-					<div className="workload_details header matrix">
+					{this.state.hasManager && <div className="workload_details header matrix">
 						<antd.Tooltip placement="bottom" title="Download">
 							<img onClick={this.downloadQR} src={this.state.qrCanvas?.toDataURL()} />
 						</antd.Tooltip>
-					</div>
+					</div>}
 					<div className="workload_details header content">
 						{data.scheduledFinish ? <h1>
 							<antd.Badge.Ribbon
