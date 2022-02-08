@@ -67,13 +67,14 @@ export default (props) => {
 		dataSource={props.payloads}
 		renderItem={(item) => {
 			let payloadProps = {
+				preview: props.preview,
 				item,
 				onClickItem,
 			}
 
 			props.onDeleteItem && (payloadProps.onClickDelete = onClickDelete)
 
-			return <Payload preview {...payloadProps} />
+			return <Payload {...payloadProps} />
 		}}
 	/>
 }
