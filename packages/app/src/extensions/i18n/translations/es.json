@@ -3,6 +3,10 @@
     "assigned_for_you": "Asignado para usted",
     "no_assigned_workloads": "No hay trabajos asignados",
 
+    "Start": "Iniciar",
+    "End": "Finalizar",
+    "Stop": "Parar",
+
     "Pending": "Pendiente",
     "pending": "pendiente",
 
@@ -51,9 +55,9 @@
     "Unselect all": "Deseleccionar todo",
     "Select all": "Seleccionar todo",
 
-    "Add commit": "Añadir Consolidación",
-    "Commit": "Consolidar",
-    "Commits": "Consolidaciones",
+    "Add commit": "Añadir registro",
+    "Commit": "Registrar",
+    "Commits": "Registros",
 
     "Assistant mode": "Modo asistente",
 
@@ -65,6 +69,8 @@
     "View all": "Ver todos",
     "View": "Ver",
     
+    "Mark produced quantity": "Marcar cantidad producida",
+    "Mark remaining amount": "Marcar cantidad restante",
     "Quantity": "Cantidad",
     "Quantity produced": "Cantidad producida",
     "Quantity left": "Cantidad restante",
@@ -90,9 +96,28 @@
     "Products": "Productos",
     "Operator": "Operador",
     "Operators": "Operadores",
-    "Payload": "Carga",
-    "Payloads": "Cargas",
-    "payloads": "cargas",
+
+    "Workpart": "Parte de trabajo",
+    "workpart": "parte de trabajo",
+    "Workparts": "Partes de trabajo",
+    "workparts": "parte de trabajo",
+
+    "Workload": "Carga de trabajo",
+    "workload": "carga de trabajo",
+    "Workloads": "Cargas de trabajo",
+    "workloads": "carga de trabajo",
+  
+    "Mark quantity": "Marcar cantidad",
+    "Mark": "Marcar",
+    "Marked": "Marcado",
+    "Marked quantity": "Cantidad marcada",
+    "Marked amount": "Cantidad marcada",
+    "Marked amount left": "Cantidad restante marcada",
+    "Marked amount produced": "Cantidad producida marcada",
+    "Marked amount remaining": "Cantidad restante marcada",
+    "Marked amount target": "Cantidad objetivo marcada",
+    "Marked amount stock": "Cantidad stock marcada",
+
     "Import": "Importar",
     "Export": "Exportar",
     "Refresh": "Actualizar",
@@ -112,8 +137,12 @@
     "Sessions": "Sesiones",
     "Compact view": "Vista compacta",
     "Add to catalog": "Añadir al catálogo",
-    "Workload": "Manifiesto de trabajo",
     "Fabric": "Fabric",
+
+
+    "Production quantity already has been reached": "La cantidad de producción ya ha sido alcanzada",
+    "Production quantity is not enough": "La cantidad de producción no es suficiente",
+    "Are you sure you want to commit for this workpart?": "¿Está seguro de que desea consolidar esta parte de trabajo?",
 
     "Enter the name or a reference for the workload.": "Introduzca el nombre o una referencia para la carga de trabajo.",
     "Select the section where the workload will be deployed.": "Seleccione la sección donde se desplegará la carga de trabajo.",
