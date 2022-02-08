@@ -269,7 +269,7 @@ export default class WorkloadDetails extends React.Component {
 							<h1>
 								<Icons.Inbox />
 								<Translation>
-									{t => t("Payloads")}
+									{t => t("Workparts")}
 								</Translation>
 							</h1>
 						</div>
