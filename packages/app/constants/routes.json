@@ -16,11 +16,6 @@
         "icon": "Users",
         "children": [
             {
-                "id": "users/contracts",
-                "title": "Contracts",
-                "icon": "Briefcase"
-            },
-            {
                 "id": "users/roles",
                 "title": "Roles",
                 "icon": "Link"
@@ -58,21 +53,6 @@
         "id": "vault",
         "title": "Vault",
         "icon": "Archive"
-    },
-    {
-        "id": "reports",
-        "title": "Reports",
-        "icon": "Umbrella"
-    },
-    {
-        "id": "server_manager",
-        "title": "Server",
-        "icon": "Database"
-    },
-    {
-        "id": "launchpad",
-        "title": "Launchpad",
-        "icon": "Command"
     },
     {
         "id": "statistics",
