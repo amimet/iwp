@@ -29,6 +29,20 @@ export default class AssignedWorkloads extends React.Component {
 			this.removeItem(workloadId)
 		})
 
+		window.app.handleWSListener("workloadUpdate", (update) => {
+			this.fetchAssignedWorkloads()
+
+			// this.setState({
+			// 	list: this.state.list.map((item) => {
+			// 		if (item._id === update._id) {
+			// 			return update
+			// 		}
+
+			// 		return item
+			// 	})
+			// })
+		})
+
 		this.fetchAssignedWorkloads()
 	}
 
