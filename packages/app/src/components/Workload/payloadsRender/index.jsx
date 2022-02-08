@@ -17,7 +17,7 @@ const Payload = (props) => {
 		<div className="data">
 			<div className="header">
 				<div className="title">
-					<div className="quantity">x{props.preview ? (item.properties?.quantity) : (item.debtQuantity ?? item.properties?.quantity ?? "0")}</div>
+					{props.preview && <div className="quantity">x{item.properties?.quantity}</div>}
 					<h2>{item.name}</h2>
 				</div>
 				<div className="description">
@@ -73,7 +73,7 @@ export default (props) => {
 
 			props.onDeleteItem && (payloadProps.onClickDelete = onClickDelete)
 
-			return <Payload {...payloadProps} />
+			return <Payload preview {...payloadProps} />
 		}}
 	/>
 }
