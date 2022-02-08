@@ -1,14 +1,15 @@
 import React from "react"
 import * as antd from "antd"
+import { Modal, Toast } from "antd-mobile"
 import { Translation } from "react-i18next"
+import classnames from "classnames"
 
 import moment from "moment"
 
+import { QuantityInput } from "components"
 import { Icons, createIconRender } from "components/Icons"
-import { ActionsBar } from "components"
 
 import FORMULAS from "schemas/fabricFormulas"
-import { Commit } from ".."
 
 import "./index.less"
 
@@ -34,6 +35,7 @@ export default class Inspector extends React.Component {
         loading: true,
         workload: null,
         data: null,
+        running: false,
     }
 
     counter = new Counter()
@@ -129,15 +131,58 @@ export default class Inspector extends React.Component {
         this.setState({ loading: to ?? !this.state.loading })
     }
 
-    onClickCommit = () => {
+    toogleRunning = (to) => {
+        to = to ?? !this.state.running
+
+        this.setState({ running: to })
+
+        if (to) {
+            this.counter.update("start")
+        } else {
+            this.counter.update("stop")
+        }
+    }
+
+    manualQuantityPicker = async () => {
+        const modal = Modal.show({
+            title: <Translation>
+                {(t) => t("Mark produced quantity")}
+            </Translation>,
+            content: <QuantityInput
+                onOk={async (value) => {
+                    await this.submitCommit(value)
+                    modal.close()
+                }}
+                onClose={() => {
+                    modal.close()
+                }}
+            />
+        })
+    }
+
+    submitCommit = async (quantity, tooks) => {
+        quantity = quantity ?? 1
+
         const quantityLeft = this.countQuantityLeft()
 
-        const open = () => Commit.openModal({
-            data: this.state.data,
-            quantityLeft: quantityLeft,
-            workloadId: this.props.workloadId,
-            payloadUUID: this.uuid,
-        })
+        const makeCommit = async () => {
+            await this.api.post.workloadCommit({
+                workloadId: this.state.workload._id,
+                payloadUUID: this.uuid,
+                quantity: quantity,
+                tooks: tooks,
+            }).catch((error) => {
+                console.error(error)
+                antd.message.error(`Failed to commit: ${error}`)
+
+                return false
+            })
+
+            Toast.show({
+                icon: "success",
+                content: "Commited",
+            })
+        }
 
         if (quantityLeft <= 0) {
             antd.Modal.confirm({
@@ -145,25 +190,26 @@ export default class Inspector extends React.Component {
                     {(t) => t("Production quantity already has been reached")}
                 </Translation>,
                 content: <Translation>
-                    {(t) => t("Are you sure you want to commit for this payload?")}
+                    {(t) => t("Are you sure you want to commit for this workpart?")}
                 </Translation>,
-                onOk: () => {
-                    open()
+                onOk: async () => {
+                    return await makeCommit()
                 },
             })
         } else {
-            open()
+            await makeCommit()
         }
     }
 
-    toogleAssistantMode = (to) => {
-        to = to ?? !this.state.assistantMode
-
-        this.setState({ assistantMode: to })
-
-        if (to) {
-            this.counter.update("start")
+    onWorkpartFinished = () => {
+        if (typeof this.props.close === "function") {
+            this.props.close()
         }
+
+        Toast.show({
+            icon: "success",
+            content: "Finished",
+        })
     }
 
     onMakeStep = async () => {
@@ -173,23 +219,14 @@ export default class Inspector extends React.Component {
         }
 
         this.counter.update("stop")
-        const tooks = this.counter.tooks()
 
-        await this.api.post.workloadCommit({
-            workloadId: this.state.workload._id,
-            payloadUUID: this.state.data.uuid,
-            tooks: tooks,
-            quantity: 1,
-        }).catch((err) => {
-            console.error(err)
-            antd.message.error(`Failed to commit: ${err}`)
-            return false
-        })
+        await this.submitCommit(1, this.counter.tooks())
 
         this.counter.update("start")
 
         if (this.countQuantityLeft() === 0) {
-            this.toogleAssistantMode(false)
+            this.toogleRunning(false)
+            this.onWorkpartFinished()
         }
     }
 
@@ -267,26 +304,6 @@ export default class Inspector extends React.Component {
 
             {!this.state.assistantMode && <div className="properties">
                 {this.renderProperties(this.state.data)}
-                <div className="property">
-                    <div className="name">
-                        <Translation>
-                            {t => t("Quantity produced")}
-                        </Translation>
-                    </div>
-                    <div className="value">
-                        {quantityCount}
-                    </div>
-                </div>
-                <div className="property">
-                    <div className="name">
-                        <Translation>
-                            {t => t("Quantity left")}
-                        </Translation>
-                    </div>
-                    <div className="value">
-                        {quantityLeft}
-                    </div>
-                </div>
             </div>}
 
             <div className="production">
@@ -315,44 +332,40 @@ export default class Inspector extends React.Component {
                 <antd.Progress percent={percent} />
             </div>
 
-            {this.state.assistantMode && <div className="assistant">
-                <div className="controls">
+            <div className="assistant">
+                <div className={classnames("controls", { ["running"]: this.state.running })}>
                     <div>
-                        <antd.Button disabled={quantityLeft === 0} onClick={this.onMakeStep} icon={<Icons.Plus />} type="primary">
-                            1
-                        </antd.Button>
-                    </div>
-                    <div>
-                        <antd.Button onClick={() => this.toogleAssistantMode(false)} icon={<Icons.LogOut />}>
+                        <antd.Button
+                            type="primary"
+                            disabled={quantityLeft === 0}
+                            onClick={() => this.toogleRunning()}
+                            icon={this.state.running ? <Icons.Pause /> : <Icons.Clock />}
+                        >
                             <Translation>
-                                {t => t("Stop")}
+                                {t => t(this.state.running ? "Stop" : "Start")}
                             </Translation>
                         </antd.Button>
                     </div>
+                    {this.state.running ? <div>
+                        <antd.Button
+                            icon={<Icons.Plus />}
+                            disabled={quantityLeft === 0}
+                            onClick={this.onMakeStep}
+                        >
+                            1
+                        </antd.Button>
+                    </div> : <div>
+                        <antd.Button
+                            onClick={() => this.manualQuantityPicker()}
+                        >
+                            <Translation>
+                                {t => t("Mark quantity")}
+                            </Translation>
+                        </antd.Button>
+                    </div>
+                    }
                 </div>
-            </div>}
-
-            {!this.state.assistantMode && <ActionsBar mode="float" type="transparent" spaced>
-                <div>
-                    <antd.Button onClick={() => this.onClickCommit()} icon={<Icons.CheckCircle />}>
-                        <Translation>
-                            {t => t("Commit")}
-                        </Translation>
-                    </antd.Button>
-                </div>
-                <div>
-                    <antd.Button
-                        disabled={quantityLeft === 0}
-                        onClick={() => this.toogleAssistantMode()}
-                        type={this.state.assistantMode ? undefined : "primary"}
-                        icon={this.state.assistantMode ? <Icons.ChevronLeft /> : <Icons.MdOutlinePendingActions />}
-                    >
-                        <Translation>
-                            {t => t(this.state.assistantMode ? "Exit" : "Assistant mode")}
-                        </Translation>
-                    </antd.Button>
-                </div>
-            </ActionsBar>}
+            </div>
         </div>
     }
 }

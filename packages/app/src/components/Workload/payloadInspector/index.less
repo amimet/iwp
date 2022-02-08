@@ -120,17 +120,27 @@
 			display: flex;
 			flex-direction: row;
 			justify-content: space-around;
+			align-items: center;
 
 			width: 100%;
+
+			//transition: all 150ms ease-in-out;
 
 			> div {
 				button {
 					--ignore-dragger: true;
 					width: 40vw;
 					height: 10vh;
+					margin-bottom: 20px;
 				}
 			}
+
+			&.running {
+				flex-direction: column;
+			}
 		}
+
+		
 	}
 
 	.actions {
