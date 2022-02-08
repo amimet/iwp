@@ -85,6 +85,7 @@ export class RouteRender extends EvitePureComponent {
 
 	loadRender = (path) => {
 		if (!this._ismounted) {
+			console.warn("RouteRender is not mounted, skipping render load")
 			return false
 		}
 
