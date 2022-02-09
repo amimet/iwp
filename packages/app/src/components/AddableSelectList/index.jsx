@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { PullToRefresh } from "antd-mobile"
 import { Icons } from "components/Icons"
-import { SelectableList, SwipeItem } from "components"
+import { SelectableList, SwipeItem, Skeleton } from "components"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
 
@@ -92,7 +92,7 @@ export const AddableSelectListSelector = (props = {}) => {
     }
 
     if (loading) {
-        return <antd.Skeleton active />
+        return <Skeleton />
     }
 
     return <div className="addableSelectListSelector">

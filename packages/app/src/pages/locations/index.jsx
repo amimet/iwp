@@ -1,11 +1,10 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { FormGenerator, ActionsBar, SelectableList } from "components"
+import { FormGenerator, ActionsBar, SelectableList, Skeleton } from "components"
 import classnames from "classnames"
 
 import "./index.less"
-
 
 // TODO: Work on location childrens
 class NewSectionForm extends React.Component {
@@ -16,7 +15,7 @@ class NewSectionForm extends React.Component {
 
 		ctx.toogleValidation(true)
 		ctx.clearErrors()
-	
+
 
 		this.api.put.section({ name, address })
 			.then((data) => {
@@ -133,7 +132,7 @@ export default class Geo extends React.Component {
 	}
 
 	render() {
-		if (!this.state.data) return <antd.Skeleton active />
+		if (!this.state.data) return <Skeleton />
 
 		if (this.state.data.length === 0) {
 			return <antd.Result

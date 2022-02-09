@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Stepper } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
-import { Fabric } from "components"
+import { Fabric, Skeleton } from "components"
 import { Translation } from "react-i18next"
 
 import FORMULAS from "schemas/fabricFormulas"
@@ -208,7 +208,7 @@ export default class BrowserSelector extends React.Component {
 
 	render() {
 		if (this.state.loading) {
-			return <antd.Skeleton active />
+			return <Skeleton active />
 		}
 
 		if (this.state.selectedItem) {

@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList } from "components"
+import { ActionsBar, SelectableList, Skeleton } from "components"
 import { ItemRender, ItemDetails, ImportTool } from "./components"
 import classnames from "classnames"
 import { debounce } from "lodash"
@@ -250,7 +250,7 @@ export default class Vault extends React.Component {
                         { ["compact"]: this.state.compactView }
                     )}
                 >
-                    {!this.state.data ? <antd.Skeleton active /> :
+                    {!this.state.data ? <Skeleton /> :
                         <SelectableList
                             ref={this.itemListRef}
                             selectionEnabled={this.state.selectionEnabled}

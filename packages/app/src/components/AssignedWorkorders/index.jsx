@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { AssignedWorkorder } from "components"
+import { AssignedWorkorder, Skeleton } from "components"
 import { Translation } from "react-i18next"
 
 import "./index.less"
@@ -101,7 +101,7 @@ export default class AssignedWorkorders extends React.Component {
 				t => t("assigned_for_you")
 			}</Translation></h2>
 			<div>
-				{this.state.loading ? <antd.Skeleton active /> : this.renderList()}
+				{this.state.loading ? <Skeleton /> : this.renderList()}
 			</div>
 		</div>
 	}

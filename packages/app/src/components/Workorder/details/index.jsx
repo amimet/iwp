@@ -7,6 +7,7 @@ import moment from "moment"
 import QRCode from "qrcode"
 
 import { Icons } from "components/Icons"
+import { Skeleton } from "components"
 
 import { PayloadsRender, PayloadInspector } from ".."
 import "./index.less"
@@ -173,7 +174,7 @@ export default class WorkorderDetails extends React.Component {
 
 	render() {
 		if (!this.state.data) {
-			return <antd.Skeleton active />
+			return <Skeleton />
 		}
 
 		const { data } = this.state

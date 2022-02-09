@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { AppSearcher, ServerStatus, Clock, AssignedWorkorders, } from "components"
+import { AppSearcher, ServerStatus, Clock, AssignedWorkorders } from "components"
 import { Translation } from "react-i18next"
 
 import "./index.less"

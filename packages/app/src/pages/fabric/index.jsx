@@ -1,10 +1,9 @@
 import React from "react"
 import * as antd from "antd"
-import classnames from "classnames"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
 
-import { ActionsBar, SelectableList } from "components"
+import { ActionsBar, SelectableList, Skeleton } from "components"
 import { Icons, createIconRender } from "components/Icons"
 import FORMULAS from "schemas/fabricFormulas"
 
@@ -205,7 +204,7 @@ export default class FabricManager extends React.Component {
                     </antd.Select>
                 </div>
             </ActionsBar>
-            {this.state.data.length === 0 ? <antd.Skeleton active /> :
+            {this.state.data.length === 0 ? <Skeleton /> :
                 <SelectableList
                     items={this.parseAsGroups(this.state.searchValue ?? this.state.data)}
                     renderItem={this.renderItem}

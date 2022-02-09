@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { ModifierTag } from "components"
+import { ModifierTag, Skeleton } from "components"
 import Statements from "schemas/vaultItemStatements.json"
 
 import "./index.less"
@@ -78,8 +78,9 @@ export default (props) => {
             Error: {error}
         </div>
     }
+
     if (!item) {
-        return <antd.Skeleton active />
+        return <Skeleton />
     }
 
     return <div className="itemDetails">

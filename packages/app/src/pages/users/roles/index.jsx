@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { ActionsBar, UserSelector } from "components"
+import { ActionsBar, UserSelector, Skeleton } from "components"
 import { Icons } from "components/icons"
 
 import "./index.less"
@@ -242,7 +242,7 @@ export default class Roles extends React.Component {
             </ActionsBar>
 
             {!this.state.data ?
-                <antd.Skeleton active /> :
+                <Skeleton /> :
                 <antd.List
                     dataSource={this.state.data}
                     renderItem={(item) => this.renderItem(item)}

@@ -1,9 +1,9 @@
 import React from "react"
 import * as antd from "antd"
-import { SelectableList } from "components"
+import { Translation } from "react-i18next"
+import { SelectableList, Skeleton } from "components"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
-import { Translation } from "react-i18next"
 
 import "./index.less"
 
@@ -86,7 +86,7 @@ export default class UserSelector extends React.Component {
 
     render() {
         if (this.state.loading) {
-            return <antd.Skeleton active />
+            return <Skeleton />
         }
 
         return <div className="users_selector">

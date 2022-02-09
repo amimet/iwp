@@ -1,10 +1,11 @@
 import React from "react"
 import * as antd from "antd"
+
 import { Icons } from "components/Icons"
+import { Skeleton } from "components"
+import { Session } from "models"
 
 import { AccountEditor, SessionsView, StatisticsView } from "./components"
-
-import { Session } from "models"
 
 import "./index.less"
 
@@ -133,7 +134,7 @@ export default class Account extends React.Component {
 		const user = this.state.user
 
 		if (!user) {
-			return <antd.Skeleton active />
+			return <Skeleton />
 		}
 
 		return (

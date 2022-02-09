@@ -6,7 +6,7 @@ import classnames from "classnames"
 
 import moment from "moment"
 
-import { QuantityInput } from "components"
+import { QuantityInput, Skeleton } from "components"
 import { Icons, createIconRender } from "components/Icons"
 
 import FORMULAS from "schemas/fabricFormulas"
@@ -290,7 +290,7 @@ export default class Inspector extends React.Component {
 
     render() {
         if (!this.state.data || this.state.loading) {
-            return <antd.Skeleton active />
+            return <Skeleton />
         }
 
         const formula = FORMULAS[this.state.data.type]

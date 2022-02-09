@@ -2,8 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
 
-import { Icons, } from "components/Icons"
-import { Fabric, OperatorsAssignments, StepsForm } from "components"
+import { Icons } from "components/Icons"
+import { Fabric, OperatorsAssignments, StepsForm, Skeleton } from "components"
 
 import { PayloadsRender } from ".."
 
@@ -46,7 +46,7 @@ const steps = [
 			}, [])
 
 			if (sections.length === 0) {
-				return <antd.Skeleton active />
+				return <Skeleton />
 			}
 
 			return <div className="workorder_creator steps step content">

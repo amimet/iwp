@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Stepper } from "antd-mobile"
+import { Skeleton } from "components"
 import { Icons, createIconRender } from "components/Icons"
 import loadable from "@loadable/component"
 import classnames from "classnames"
@@ -370,7 +371,7 @@ export default class FabricCreator extends React.Component {
 
     render() {
         if (this.state.loading) {
-            return <antd.Skeleton active />
+            return <Skeleton />
         }
 
         const canSubmit = this.canSubmit()
@@ -391,7 +392,7 @@ export default class FabricCreator extends React.Component {
             </div>
 
             <div className="fields">
-                {this.state.submitting ? <antd.Skeleton active /> : this.state.fields}
+                {this.state.submitting ? <Skeleton /> : this.state.fields}
             </div>
 
             <div className="bottom_actions">

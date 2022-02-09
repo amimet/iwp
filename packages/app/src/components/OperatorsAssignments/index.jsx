@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { UserSelector } from "components"
+import { UserSelector, Skeleton } from "components"
 
 import "./index.less"
 
@@ -100,7 +100,7 @@ export default class OperatorsAssignments extends React.Component {
 
     render() {
         if (this.state.loading) {
-            return <antd.Skeleton active />
+            return <Skeleton />
         }
 
         return <div className="operators_assignments">

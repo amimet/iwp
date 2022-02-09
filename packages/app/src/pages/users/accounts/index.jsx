@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/icons"
-import { ActionsBar, SelectableList, UserRegister } from "components"
+import { ActionsBar, SelectableList, UserRegister, Skeleton } from "components"
 import { Translation } from "react-i18next"
 
 import "./index.less"
@@ -89,7 +89,7 @@ export default class Users extends React.Component {
 							</antd.Button>
 						</div>
 					</ActionsBar>
-					{!this.state.data ? <antd.Skeleton active /> :
+					{!this.state.data ? <Skeleton /> :
 						<SelectableList
 							items={this.state.data}
 							onDoubleClick={(key) => this.openUser(key)}

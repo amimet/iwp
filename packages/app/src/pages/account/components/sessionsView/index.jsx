@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import { Skeleton } from "components"
 import { Icons } from "components/Icons"
 import { Session } from "models"
 
@@ -87,7 +88,7 @@ export default class SessionsView extends React.Component {
 		const { sessions } = this.props
 
 		if (!sessions) {
-			return <antd.Skeleton active />
+			return <Skeleton />
 		}
 
 		return (

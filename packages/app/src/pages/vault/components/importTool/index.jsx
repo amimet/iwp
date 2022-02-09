@@ -1,8 +1,10 @@
-import React from 'react'
-import * as antd from 'antd'
-import { Icons } from "components/Icons"
-import classnames from 'classnames'
+import React from "react"
+import * as antd from "antd"
+import classnames from "classnames"
 import _ from "lodash"
+
+import { Icons } from "components/Icons"
+import { Skeleton } from "components"
 
 import "./index.less"
 
@@ -252,9 +254,9 @@ export default (props) => {
     }
 
     const uploaderProps = {
-        name: 'file',
+        name: "file",
         multiple: false,
-        accept: '.json',
+        accept: ".json",
         beforeUpload(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader()
@@ -303,7 +305,7 @@ export default (props) => {
     }
 
     if (loading) {
-        return <antd.Skeleton active />
+        return <Skeleton />
     }
 
     if (changes.length === 0 && conflicts.length === 0) {

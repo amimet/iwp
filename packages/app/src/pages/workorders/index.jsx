@@ -8,7 +8,7 @@ import { debounce } from "lodash"
 import fuse from "fuse.js"
 
 import { Icons } from "components/Icons"
-import { ActionsBar, SelectableList, SearchButton } from "components"
+import { ActionsBar, SelectableList, SearchButton, Skeleton } from "components"
 
 import "./index.less"
 
@@ -356,7 +356,7 @@ export default class Workorders extends React.Component {
 					}}
 					onRefresh={async () => await this.fetchWorkorders(this.state.selectedSection)}
 				>
-					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkorders(this.state.searchValue ?? this.state.workorders)}
+					{this.state.loading ? <Skeleton /> : this.renderWorkorders(this.state.searchValue ?? this.state.workorders)}
 				</PullToRefresh>
 			</div>
 		)
