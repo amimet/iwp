@@ -232,6 +232,9 @@ export default class SelectableList extends React.Component {
 			return (
 				<div key={action.key}>
 					<Button
+						type={action.props.type}
+						shape={action.props.shape}
+						size={action.props.size}
 						style={{
 							...action.props.style,
 						}}

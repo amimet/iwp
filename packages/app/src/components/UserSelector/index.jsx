@@ -1,9 +1,9 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
 import { SelectableList } from "components"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
+import { Translation } from "react-i18next"
 
 import "./index.less"
 
@@ -106,8 +106,10 @@ export default class UserSelector extends React.Component {
                 items={this.state.searchValue ?? this.state.data}
                 renderItem={this.renderItem}
                 actions={[
-                    <div call="onDone" key="done">
-                        Done
+                    <div type="primary" call="onDone" key="done">
+                        <Translation>
+                            {t => t("Done")}
+                        </Translation>
                     </div>
                 ]}
                 events={{
