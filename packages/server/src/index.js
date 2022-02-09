@@ -191,6 +191,8 @@ class Server {
             socket: client,
             userId,
         })
+
+        this.io.emit("user_connected", userId)
     }
 
     detachClientSocket = async (client) => {
@@ -200,6 +202,8 @@ class Server {
             socket.socket.disconnect()
             this.WSClients = this.WSClients.filter(c => c.id !== client.id)
         }
+
+        this.io.emit("user_disconnected", client.id)
     }
 
     verifyJwt = (token, callback) => {
