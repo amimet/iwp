@@ -23,6 +23,7 @@ export { default as SearchButton } from "./SearchButton"
 export { default as UserRegister } from "./UserRegister"
 export { default as QuantityInput } from "./QuantityInput"
 export { default as Skeleton } from "./Skeleton"
+export { default as ManagerQuickView } from "./ManagerQuickView"
 
 export * as Workorder from "./Workorder"
 export * as Fabric from "./Fabric"
