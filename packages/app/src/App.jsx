@@ -132,6 +132,7 @@ class App {
 		},
 		"websocket_connection_error": function () {
 			if (!this.wsReconnecting) {
+				this.latencyWarning = null
 				this.wsReconnectingTry = 0
 				this.wsReconnecting = true
 

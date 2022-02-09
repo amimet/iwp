@@ -91,11 +91,11 @@ export default {
                     this.WSInterface.sockets.main.on("pong", () => {
                         latency = Date.now() - startTime
 
-                        if (latency > 800) {
+                        if (latency > 800 && this.WSInterface.mainSocketConnected) {
                             latencyWarning = true
                             console.error("[WS] Latency is too high > 800ms", latency)
                             window.app.eventBus.emit("websocket_latency_too_high", latency)
-                        } else if (latencyWarning) {
+                        } else if (latencyWarning && this.WSInterface.mainSocketConnected) {
                             latencyWarning = false
                             window.app.eventBus.emit("websocket_latency_normal", latency)
                         }
