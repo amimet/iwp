@@ -13,7 +13,7 @@ const steps = [
         description: "Enter the username for the account",
         required: true,
         content: (props) => {
-            return <div className="workload_creator steps step content">
+            return <div className="workorder_creator steps step content">
                 <antd.Input
                     onPressEnter={props.onPressEnter}
                     placeholder="@newuser"
@@ -31,7 +31,7 @@ const steps = [
         description: "Enter a password for the account",
         required: true,
         content: (props) => {
-            return <div className="workload_creator steps step content">
+            return <div className="workorder_creator steps step content">
                 <antd.Input.Password
                     onPressEnter={props.onPressEnter}
                     placeholder="Password"
@@ -49,7 +49,7 @@ const steps = [
         description: "Enter a email for the account",
         required: true,
         content: (props) => {
-            return <div className="workload_creator steps step content">
+            return <div className="workorder_creator steps step content">
                 <antd.Input
                     onPressEnter={props.onPressEnter}
                     placeholder="Email"

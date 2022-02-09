@@ -6,8 +6,8 @@
         "locked": true
     },
     {
-        "id": "workloads",
-        "title": "Workloads",
+        "id": "workorders",
+        "title": "Workorders",
         "icon": "GitCommit"
     },
     {

@@ -44,48 +44,48 @@ const renderDate = (time) => {
 	)
 }
 
-export default class Workloads extends React.Component {
+export default class Workorders extends React.Component {
 	state = {
 		loading: true,
 		sections: [],
 		viewFinished: false,
 		selectedSection: "all",
 		searchValue: null,
-		workloads: null,
+		workorders: null,
 	}
 
 	api = window.app.request
 
 	componentDidMount = async () => {
-		window.app.handleWSListener("newWorkload", (data) => {
-			this.appendWorkloadToRender(data)
+		window.app.handleWSListener("newWorkorder", (data) => {
+			this.appendWorkorderToRender(data)
 		})
 
-		window.app.handleWSListener("workloadUpdate", (data) => {
-			let workloads = this.state.workloads
+		window.app.handleWSListener("workorderUpdate", (data) => {
+			let workorders = this.state.workorders
 
-			workloads = workloads.map((workload) => {
-				if (workload.id === data.id) {
+			workorders = workorders.map((workorder) => {
+				if (workorder.id === data.id) {
 					return data
 				}
 
-				return workload
+				return workorder
 			})
 
-			this.setState({ workloads })
+			this.setState({ workorders })
 		})
 
 		this.loadSections()
-		this.fetchWorkloads(this.state.selectedSection)
+		this.fetchWorkorders(this.state.selectedSection)
 	}
 
-	fetchWorkloads = async (sectionId, viewFinished) => {
+	fetchWorkorders = async (sectionId, viewFinished) => {
 		sectionId = sectionId ?? this.state.selectedSection
 		viewFinished = viewFinished ?? this.state.viewFinished
 
 		await this.setState({ loading: true })
 
-		const data = await this.api.get.workload(undefined, {
+		const data = await this.api.get.workorder(undefined, {
 			section: sectionId,
 			finished: this.state.viewFinished,
 		}).catch((err) => {
@@ -96,7 +96,7 @@ export default class Workloads extends React.Component {
 		if (data) {
 			this.setState({
 				loading: false,
-				workloads: data,
+				workorders: data,
 			})
 		}
 	}
@@ -112,9 +112,9 @@ export default class Workloads extends React.Component {
 			})
 	}
 
-	appendWorkloadToRender = (payload) => {
+	appendWorkorderToRender = (payload) => {
 		let query = []
-		let workloads = this.state.workloads ?? []
+		let workorders = this.state.workorders ?? []
 
 		if (Array.isArray(payload)) {
 			query = payload
@@ -123,15 +123,15 @@ export default class Workloads extends React.Component {
 		}
 
 		query.forEach((_payload) => {
-			workloads.push(_payload)
+			workorders.push(_payload)
 		})
 
-		this.setState({ workloads })
+		this.setState({ workorders })
 	}
 
-	deleteWorkloadFromRender = (id) => {
+	deleteWorkorderFromRender = (id) => {
 		let query = []
-		let workloads = this.state.workloads
+		let workorders = this.state.workorders
 
 		if (Array.isArray(id)) {
 			query = id
@@ -139,18 +139,18 @@ export default class Workloads extends React.Component {
 			query.push(id)
 		}
 
-		workloads = workloads.filter((workload) => !id.includes(workload._id))
+		workorders = workorders.filter((workorder) => !id.includes(workorder._id))
 
-		this.setState({ workloads })
+		this.setState({ workorders })
 	}
 
 	changeSection = (section) => {
 		this.setState({ selectedSection: section }, async () => {
-			await this.fetchWorkloads(section)
+			await this.fetchWorkorders(section)
 		})
 	}
 
-	onDeleteWorkloads = (ctx, keys) => {
+	onDeleteWorkorders = (ctx, keys) => {
 		antd.Modal.confirm({
 			title: <Translation>
 				{t => t("Do you want to delete these items?")}
@@ -162,10 +162,10 @@ export default class Workloads extends React.Component {
 			onOk: () => {
 				return new Promise((resolve, reject) => {
 					this.api.delete
-						.workload({ id: keys })
+						.workorder({ id: keys })
 						.then(() => {
 							ctx.unselectAll()
-							this.deleteWorkloadFromRender(keys)
+							this.deleteWorkorderFromRender(keys)
 							return resolve()
 						})
 						.catch((err) => {
@@ -177,7 +177,7 @@ export default class Workloads extends React.Component {
 	}
 
 	onDoubleClickItem = (key) => {
-		window.app.openWorkloadDetails(key)
+		window.app.openWorkorderDetails(key)
 	}
 
 	onSearch = (value) => {
@@ -199,7 +199,7 @@ export default class Workloads extends React.Component {
 			return this.setState({ searchValue: null })
 		}
 
-		const searcher = new fuse(this.state.workloads, {
+		const searcher = new fuse(this.state.workorders, {
 			includeScore: true,
 			keys: ["name", "_id"],
 		})
@@ -238,7 +238,7 @@ export default class Workloads extends React.Component {
 		const indicatorStatus = item.expired ? "expired" : item.status
 
 		return (
-			<div className="workload_item">
+			<div className="workorder_item">
 				<div className="header">
 					<div className={classnames("indicator", indicatorStatus)}>
 						<div className="statusText">
@@ -252,7 +252,7 @@ export default class Workloads extends React.Component {
 					</div>
 				</div>
 				<div>
-					<h1>{item.name ?? "Unnamed workload"}</h1>
+					<h1>{item.name ?? "Unnamed workorder"}</h1>
 				</div>
 				<div className="info">
 					{renderDate(item.created)}
@@ -267,7 +267,7 @@ export default class Workloads extends React.Component {
 		)
 	}
 
-	renderWorkloads = (list) => {
+	renderWorkorders = (list) => {
 		const actions = []
 
 		// TODO: Fetch user permissions and check if user has permission to delete
@@ -284,7 +284,7 @@ export default class Workloads extends React.Component {
 			return <antd.Result
 				icon={<Icons.SmileOutlined />}
 				// TODO: Add translation
-				title="Great, there are no more workloads"
+				title="Great, there are no more workorders"
 			/>
 		}
 
@@ -293,7 +293,7 @@ export default class Workloads extends React.Component {
 			actions={actions}
 			onDoubleClick={this.onDoubleClickItem}
 			events={{
-				onDelete: this.onDeleteWorkloads,
+				onDelete: this.onDeleteWorkorders,
 			}}
 			renderItem={this.renderItem}
 		/>
@@ -301,7 +301,7 @@ export default class Workloads extends React.Component {
 
 	render() {
 		return (
-			<div className="workloads_list" style={{ height: "100%" }}>
+			<div className="workorders_list" style={{ height: "100%" }}>
 				<div style={{ marginBottom: "10px" }}>
 					<ActionsBar mode="float">
 						<div key="search">
@@ -320,7 +320,7 @@ export default class Workloads extends React.Component {
 								value={this.state.viewFinished}
 								onChange={() => {
 									this.setState({ viewFinished: !this.state.viewFinished }, () => {
-										this.fetchWorkloads()
+										this.fetchWorkorders()
 									})
 								}}
 							/>
@@ -354,9 +354,9 @@ export default class Workloads extends React.Component {
 							{statusRecord[status]}
 						</div>
 					}}
-					onRefresh={async () => await this.fetchWorkloads(this.state.selectedSection)}
+					onRefresh={async () => await this.fetchWorkorders(this.state.selectedSection)}
 				>
-					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkloads(this.state.searchValue ?? this.state.workloads)}
+					{this.state.loading ? <antd.Skeleton active /> : this.renderWorkorders(this.state.searchValue ?? this.state.workorders)}
 				</PullToRefresh>
 			</div>
 		)

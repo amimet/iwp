@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { AppSearcher, ServerStatus, Clock, AssignedWorkloads, } from "components"
+import { AppSearcher, ServerStatus, Clock, AssignedWorkorders, } from "components"
 import { Translation } from "react-i18next"
 
 import "./index.less"
@@ -65,8 +65,8 @@ export default class Main extends React.Component {
 				</div>}
 
 				<div className="widgets">
-					<div key="assignedWorkloads" className="widget">
-						<AssignedWorkloads />
+					<div key="assignedWorkorders" className="widget">
+						<AssignedWorkorders />
 					</div>
 				</div>
 			</div>

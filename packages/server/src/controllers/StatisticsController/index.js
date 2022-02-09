@@ -1,7 +1,7 @@
 import { Schematized } from '../../lib'
 
 export default {
-    getMonthlyCompletedWorkloads: Schematized({
+    getMonthlyCompletedWorkorders: Schematized({
         select: ["section", "user_id", "section"],
     }, async (req, res) => {
 

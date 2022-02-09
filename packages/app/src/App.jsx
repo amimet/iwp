@@ -45,7 +45,7 @@ import { Session, User } from "models"
 import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Workload, Fabric } from "components"
+import { NotFound, RenderError, Crash, Settings, Workorder, Fabric } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -160,10 +160,10 @@ class App {
 					cancelText: <Translation>{t => t("Cancel")}</Translation>,
 					actions: [
 						{
-							key: "workload",
-							text: <Translation>{t => t("Workload")}</Translation>,
+							key: "workorder",
+							text: <Translation>{t => t("Workorder")}</Translation>,
 							onClick: () => {
-								window.app.openWorkloadCreator()
+								window.app.openWorkorderCreator()
 								handler.current.close()
 							}
 						},
@@ -188,8 +188,8 @@ class App {
 					}
 				})
 			},
-			openWorkloadDetails: (id) => {
-				window.app.DrawerController.open("workload_details", Workload.Details, {
+			openWorkorderDetails: (id) => {
+				window.app.DrawerController.open("workorder_details", Workorder.Details, {
 					componentProps: {
 						id,
 					},
@@ -201,8 +201,8 @@ class App {
 					},
 				})
 			},
-			openWorkloadCreator: () => {
-				window.app.DrawerController.open("workload_creator", Workload.Creator, {
+			openWorkorderCreator: () => {
+				window.app.DrawerController.open("workorder_creator", Workorder.Creator, {
 					props: {
 						width: "55%",
 					},
@@ -219,8 +219,9 @@ class App {
 					}
 				})
 			},
+			// FIXME: Correct naming
 			openFabricInspector: (id) => {
-				window.app.DrawerController.open("workload_inspector", Workload.PayloadInspector, {
+				window.app.DrawerController.open("workorder_inspector", Workorder.PayloadInspector, {
 					props: {
 						width: "70%",
 					},

@@ -14,10 +14,10 @@ const steps = [
 		key: "name",
 		title: "Name",
 		icon: "Edit",
-		description: "Enter the name or a reference for the workload.",
+		description: "Enter the name or a reference for the workorder.",
 		required: true,
 		content: (props) => {
-			return <div className="workload_creator steps step content">
+			return <div className="workorder_creator steps step content">
 				<antd.Input onPressEnter={props.onPressEnter} defaultValue={props.value} placeholder="Input an name" onChange={(e) => {
 					props.handleUpdate(e.target.value)
 				}} />
@@ -29,7 +29,7 @@ const steps = [
 		title: "Section",
 		icon: "Globe",
 		required: true,
-		description: "Select the section where the workload will be deployed.",
+		description: "Select the section where the workorder will be deployed.",
 		content: (props) => {
 			const [sections, setSections] = React.useState([])
 
@@ -49,7 +49,7 @@ const steps = [
 				return <antd.Skeleton active />
 			}
 
-			return <div className="workload_creator steps step content">
+			return <div className="workorder_creator steps step content">
 				<antd.Select
 					showSearch
 					placeholder="Select a section"
@@ -76,9 +76,9 @@ const steps = [
 		key: "schedule",
 		title: "Schedule",
 		icon: "Calendar",
-		description: "Select the schedule for the workload.",
+		description: "Select the schedule for the workorder.",
 		content: (props) => {
-			return <div className="workload_creator steps step content">
+			return <div className="workorder_creator steps step content">
 				<antd.DatePicker.RangePicker
 					showTime={{ format: "HH:mm" }}
 					format="DD-MM-YYYY HH:mm"
@@ -93,9 +93,9 @@ const steps = [
 		key: "operators",
 		title: "Operators",
 		icon: "User",
-		description: "Assign the operators for the workload.",
+		description: "Assign the operators for the workorder.",
 		content: (props) => {
-			return <div className="workload_creator steps step content">
+			return <div className="workorder_creator steps step content">
 				<OperatorsAssignments
 					onAssignOperators={(operators) => {
 						props.handleUpdate(operators)
@@ -107,10 +107,10 @@ const steps = [
 	},
 	{
 		key: "payloads",
-		title: "Payloads",
+		title: "Workloads",
 		icon: "Box",
 		required: true,
-		description: "Define the payloads for the workload.",
+		description: "Define the workloads for the workorder.",
 		content: (props) => {
 			let [value, setValue] = React.useState(props.value ?? [])
 
@@ -142,10 +142,10 @@ const steps = [
 				props.handleUpdate(result)
 			}
 
-			return <div className="workload_creator steps step content">
+			return <div className="workorder_creator steps step content">
 				<PayloadsRender preview payloads={value} onDeleteItem={onDeleteItem} />
 
-				<div key="actions" className="workload_creator steps step actions">
+				<div key="actions" className="workorder_creator steps step actions">
 					<div key="add">
 						<antd.Button onClick={openSelector} shape="round" icon={<Icons.Plus />}>
 							Add
@@ -157,7 +157,7 @@ const steps = [
 	},
 ]
 
-export default class WorkloadCreator extends React.Component {
+export default class WorkorderCreator extends React.Component {
 	state = {
 		values: null
 	}
@@ -173,7 +173,7 @@ export default class WorkloadCreator extends React.Component {
 	}
 
 	submit = async (data, callback) => {
-		const workload = {
+		const workorder = {
 			section: data.section,
 			workshift: data.workshift,
 			assigned: data.operators,
@@ -182,11 +182,11 @@ export default class WorkloadCreator extends React.Component {
 		}
 
 		if (data.schedule != null) {
-			workload.scheduledStart = data.schedule[0]
-			workload.scheduledFinish = data.schedule[1]
+			workorder.scheduledStart = data.schedule[0]
+			workorder.scheduledFinish = data.schedule[1]
 		}
 
-		const result = await this.api.put.workload(workload)
+		const result = await this.api.put.workorder(workorder)
 
 		if (result) {
 			if (typeof this.props.handleDone === "function") {

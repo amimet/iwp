@@ -35,14 +35,14 @@ export default class User {
         return Array.isArray(roles) && roles.includes(role)
     }
 
-    getAssignedWorkloads = async () => {
+    getAssignedWorkorders = async () => {
         const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
         }
 
-        return User.bridge.get.workloads({ username: token.username })
+        return User.bridge.get.workorders({ username: token.username })
     }
 
     getData = async (payload, callback) => {

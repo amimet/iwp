@@ -12,7 +12,7 @@ const Payload = (props) => {
 
 	return <div
 		onClick={() => { props.onClickItem(item) }}
-		className={classnames("workload_payloadItem", { ["reached"]: item.quantityReached })}
+		className={classnames("workorder_payloadItem", { ["reached"]: item.quantityReached })}
 	>
 		<div className="data">
 			<div className="header">

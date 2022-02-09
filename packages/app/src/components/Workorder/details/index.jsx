@@ -13,7 +13,7 @@ import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
 
-export default class WorkloadDetails extends React.Component {
+export default class WorkorderDetails extends React.Component {
 	state = {
 		hasManager: false,
 		data: null,
@@ -34,7 +34,7 @@ export default class WorkloadDetails extends React.Component {
 
 		await this.setState({ qrCanvas: qr, hasManager: await User.hasRole("manager") })
 
-		window.app.handleWSListener(`workloadUpdate_${this.id}`, (data) => {
+		window.app.handleWSListener(`workorderUpdate_${this.id}`, (data) => {
 			this.setState({ data: data })
 		})
 	}
@@ -42,7 +42,7 @@ export default class WorkloadDetails extends React.Component {
 	fetchData = async () => {
 		await this.setState({ data: null })
 
-		const result = await this.api.get.workload(undefined, { _id: this.id }).catch((err) => {
+		const result = await this.api.get.workorder(undefined, { _id: this.id }).catch((err) => {
 			antd.message.error(err)
 			console.error(err)
 			return false
@@ -125,14 +125,14 @@ export default class WorkloadDetails extends React.Component {
 				ctx.close()
 			},
 			componentProps: {
-				workloadId: this.id,
+				workorderId: this.id,
 				payload: payloadData,
 			}
 		})
 	}
 
 	onAssignOperator = async (data) => {
-		const result = await this.api.put.workloadOperators({
+		const result = await this.api.put.workorderOperators({
 			_id: this.state.data._id,
 			operators: data,
 		}).catch((err) => {
@@ -149,7 +149,7 @@ export default class WorkloadDetails extends React.Component {
 	onRemoveOperator = async (operator) => {
 		// TODO: Use modal to confirm
 		return new Promise(async (resolve, reject) => {
-			const result = await this.api.delete.workloadOperators({
+			const result = await this.api.delete.workorderOperators({
 				_id: this.state.data._id,
 				operators: [operator],
 			}).catch((err) => {
@@ -186,14 +186,14 @@ export default class WorkloadDetails extends React.Component {
 		const isExpired = this.isExpired(finishReached, data.status)
 
 		return (
-			<div className={classnames("workload_details", { ["mobile"]: window.isMobile })} id={this.id} ref={this.ref} >
-				<div className="workload_details header">
-					{this.state.hasManager && <div className="workload_details header matrix">
+			<div className={classnames("workorder_details", { ["mobile"]: window.isMobile })} id={this.id} ref={this.ref} >
+				<div className="workorder_details header">
+					{this.state.hasManager && <div className="workorder_details header matrix">
 						<antd.Tooltip placement="bottom" title="Download">
 							<img onClick={this.downloadQR} src={this.state.qrCanvas?.toDataURL()} />
 						</antd.Tooltip>
 					</div>}
-					<div className="workload_details header content">
+					<div className="workorder_details header content">
 						{data.scheduledFinish ? <h1>
 							<antd.Badge.Ribbon
 								text={
@@ -210,7 +210,7 @@ export default class WorkloadDetails extends React.Component {
 
 				</div>
 
-				<div className="workload_details info">
+				<div className="workorder_details info">
 					<div key="id">
 						<div className="name">
 							<Icons.Tag />
@@ -263,13 +263,13 @@ export default class WorkloadDetails extends React.Component {
 					</div>
 				</div>}
 
-				<div className="workload_details payloads">
+				<div className="workorder_details payloads">
 					<div className="header">
 						<div>
 							<h1>
 								<Icons.Inbox />
 								<Translation>
-									{t => t("Workparts")}
+									{t => t("Workloads")}
 								</Translation>
 							</h1>
 						</div>

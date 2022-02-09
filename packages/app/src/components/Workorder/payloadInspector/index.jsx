@@ -33,7 +33,7 @@ class Counter {
 export default class Inspector extends React.Component {
     state = {
         loading: true,
-        workload: null,
+        workorder: null,
         data: null,
         running: false,
     }
@@ -50,49 +50,49 @@ export default class Inspector extends React.Component {
             return false
         }
 
-        await this.fetchWorkloadDataWithUUID()
+        await this.fetchWorkorderDataWithUUID()
 
         if (this.props.payload) {
             await this.setState({ data: this.props.payload })
         } else {
-            const data = this.state.workload.payloads.find((payload) => payload.payloadUUID === this.uuid)
+            const data = this.state.workorder.payloads.find((payload) => payload.payloadUUID === this.uuid)
             await this.setState({ data })
         }
 
         window.app.handleWSListener(`newCommit_${this.uuid}`, (data) => {
-            let workload = this.state.workload
+            let workorder = this.state.workorder
 
-            if (!workload.commits) {
-                workload.commits = []
+            if (!workorder.commits) {
+                workorder.commits = []
             }
 
-            workload.commits.push(data.commit)
+            workorder.commits.push(data.commit)
 
-            this.setState({ workload })
+            this.setState({ workorder })
         })
     }
 
-    fetchWorkloadDataWithUUID = async () => {
+    fetchWorkorderDataWithUUID = async () => {
         this.toogleLoading(true)
 
-        const data = await this.api.get.workloadPayloadUuid(undefined, { uuid: this.uuid }).catch((err) => {
+        const data = await this.api.get.workorderPayloadUuid(undefined, { uuid: this.uuid }).catch((err) => {
             console.error(err)
-            antd.message.error(`Failed to load workload: ${err}`)
+            antd.message.error(`Failed to load workorder: ${err}`)
             return false
         })
 
         if (data) {
             this.toogleLoading(false)
-            return await this.setState({ workload: data })
+            return await this.setState({ workorder: data })
         }
     }
 
     findCommitsAssociated = () => {
-        if (!this.state.workload.commits || this.state.workload.commits.length === 0) {
+        if (!this.state.workorder.commits || this.state.workorder.commits.length === 0) {
             return false
         }
 
-        return this.state.workload.commits.filter((commit) => commit.payloadUUID === this.uuid)
+        return this.state.workorder.commits.filter((commit) => commit.payloadUUID === this.uuid)
     }
 
     countQuantityFromCommits = () => {
@@ -166,8 +166,8 @@ export default class Inspector extends React.Component {
         const quantityLeft = this.countQuantityLeft()
 
         const makeCommit = async () => {
-            await this.api.post.workloadCommit({
-                workloadId: this.state.workload._id,
+            await this.api.post.workorderCommit({
+                workorderId: this.state.workorder._id,
                 payloadUUID: this.uuid,
                 quantity: quantity,
                 tooks: tooks,
