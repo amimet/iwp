@@ -93,8 +93,8 @@ export default class BrowserSelector extends React.Component {
 
 	//TODO: Split as `bruhSomething` component
 	renderSelectedItem = (item) => {
-		return <div className="fabric_selector inspector">
-			<div className="fabric_selector inspector header">
+		return <div className="inspector">
+			<div className="header">
 				{item.properties?.imagePreview && <img src={item.properties.imagePreview} />}
 				<Translation>
 					{(t) => <h1>{t(item.name)}</h1>}
@@ -104,14 +104,14 @@ export default class BrowserSelector extends React.Component {
 				</Translation>
 			</div>
 
-			<div className="fabric_selector inspector properties">
-				<div className="fabric_selector inspector properties variants">
+			<div className="properties">
+				<div className="property">
 					<h3><Icons.Triangle />
 						<Translation>
 							{(t) => t("Variants")}
 						</Translation>
 					</h3>
-					<div className="fabric_selector inspector properties variants options">
+					<div className="option">
 						{Array.isArray(item.properties?.variants) ?
 							<antd.Select
 								mode="tags"
@@ -140,7 +140,7 @@ export default class BrowserSelector extends React.Component {
 				</div>
 			</div>
 
-			<div className="fabric_selector inspector actions">
+			<div className="actions">
 				<div>
 					<antd.Button danger onClick={() => this.handleSelectBack()}>
 						<Icons.ChevronLeft /> <Translation>
@@ -175,15 +175,15 @@ export default class BrowserSelector extends React.Component {
 	renderGroups = (group) => {
 		const formulaIcon = FORMULAS[group.type].icon
 
-		return <div className="fabric_selector groups group">
+		return <div className="group">
 			<h2>{Icons[formulaIcon] && createIconRender(formulaIcon)} <Translation>
 				{(t) => t(String(group.type).toTitleCase())}
 			</Translation></h2>
-			<div className="fabric_selector groups group items">
+			<div className="items">
 				{group.items.map((item) => {
 					return <antd.List.Item
 						key={item._id}
-						className="fabric_selector groups group items item"
+						className="item"
 						onClick={() => this.handleSelectItem(item)}
 						extra={item.properties?.previewImage && <img width={272} alt="item_view" src={item.properties.previewImage} />}
 					>
@@ -243,8 +243,10 @@ export default class BrowserSelector extends React.Component {
 						</Translation>
 					</antd.Button>
 				</div>
-				<antd.Input.Search />
-				<div className="fabric_selector groups">
+				<div>
+					<antd.Input.Search />
+				</div>
+				<div className="groups">
 					<antd.List
 						itemLayout="vertical"
 						size="large"
