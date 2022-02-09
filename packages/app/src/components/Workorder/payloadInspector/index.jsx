@@ -150,13 +150,34 @@ export default class Inspector extends React.Component {
             </Translation>,
             content: <QuantityInput
                 onOk={async (value) => {
-                    await this.submitCommit(value)
-                    modal.close()
+                    if (value > 0) {
+                        await this.submitCommit(value)
+                        modal.close()
+                    }
                 }}
                 onClose={() => {
                     modal.close()
                 }}
             />
+        })
+    }
+
+    commitQuantityLeft = async () => {
+        antd.Modal.confirm({
+            title: <Translation>
+                {(t) => t("Are you sure you want to commit all quantity left?")}
+            </Translation>,
+            content: <Translation>
+                {(t) => t("This will commit all quantity left and finish the production for this workload.")}
+            </Translation>,
+            onOk: async () => {
+                const quantityLeft = this.countQuantityLeft()
+                this.counter.update("stop")
+
+                await this.submitCommit(quantityLeft, this.counter.tooks())
+
+                this.counter.update("start")
+            },
         })
     }
 
@@ -199,6 +220,11 @@ export default class Inspector extends React.Component {
         } else {
             await makeCommit()
         }
+
+        if (this.countQuantityLeft() === 0) {
+            this.toogleRunning(false)
+            this.onWorkpartFinished()
+        }
     }
 
     onWorkpartFinished = () => {
@@ -223,11 +249,6 @@ export default class Inspector extends React.Component {
         await this.submitCommit(1, this.counter.tooks())
 
         this.counter.update("start")
-
-        if (this.countQuantityLeft() === 0) {
-            this.toogleRunning(false)
-            this.onWorkpartFinished()
-        }
     }
 
     renderProperties = (item) => {
@@ -364,6 +385,17 @@ export default class Inspector extends React.Component {
                         </antd.Button>
                     </div>
                     }
+                    {this.state.running && <div>
+                        <antd.Button
+                            icon={<Icons.Check />}
+                            disabled={quantityLeft === 0}
+                            onClick={this.commitQuantityLeft}
+                        >
+                            <Translation>
+                                {t => t("Commit all")}
+                            </Translation>
+                        </antd.Button>
+                    </div>}
                 </div>
             </div>
         </div>
