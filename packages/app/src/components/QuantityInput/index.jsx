@@ -9,7 +9,7 @@ import "./index.less"
 
 export default (props) => {
     const [visible, setVisible] = React.useState(true)
-    const [value, setValue] = React.useState(1)
+    const [value, setValue] = React.useState(null)
 
     const onClose = () => {
         setVisible(false)
@@ -18,12 +18,12 @@ export default (props) => {
 
     const onOk = () => {
         setVisible(false)
-        props.onOk(Number(value))
+        props.onOk(Number(value ?? 0))
     }
 
     return <div className="number_picker">
         <div className="value">
-            {value}
+            {value ?? 0}
         </div>
 
         <div className="actions">
@@ -49,9 +49,12 @@ export default (props) => {
             visible={visible}
             onClose={onClose}
             onInput={(e) => {
-                setValue(Number(`${value}${e}`))
+                setValue(Number(`${value ?? ""}${e}`))
             }}
             onDelete={() => {
+                if(!value) { 
+                    return false
+                }
                 setValue(Number(`${value}`.slice(0, -1)))
             }}
         />
