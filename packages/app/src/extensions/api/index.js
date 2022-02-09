@@ -74,6 +74,32 @@ export default {
                     if (!this.WSInterface.sockets.main.connected) {
                         await this.WSInterface.sockets.main.connect()
                     }
+
+                    let startTime = null
+                    let latency = null
+                    let latencyWarning = false
+
+                    let pingInterval = setInterval(() => {
+                        if (!this.WSInterface.mainSocketConnected) {
+                            return clearTimeout(pingInterval)
+                        }
+
+                        startTime = Date.now()
+                        this.WSInterface.sockets.main.emit("ping")
+                    }, 2000)
+
+                    this.WSInterface.sockets.main.on("pong", () => {
+                        latency = Date.now() - startTime
+
+                        if (latency > 800) {
+                            latencyWarning = true
+                            console.error("[WS] Latency is too high > 800ms", latency)
+                            window.app.eventBus.emit("websocket_latency_too_high", latency)
+                        } else if (latencyWarning) {
+                            latencyWarning = false
+                            window.app.eventBus.emit("websocket_latency_normal", latency)
+                        }
+                    })
                 },
                 async attachAPIConnection() {
                     await this.apiBridge.initialize()

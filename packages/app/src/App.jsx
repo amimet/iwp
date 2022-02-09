@@ -148,6 +148,25 @@ class App {
 				window.location.reload()
 			}
 		},
+		"websocket_latency_too_high": function () {
+			if (!this.latencyWarning) {
+				this.latencyWarning = true
+				Toast.show({
+					icon: "loading",
+					content: "Slow connection...",
+					duration: 0,
+				})
+			}
+		},
+		"websocket_latency_normal": function () {
+			if (this.latencyWarning) {
+				this.latencyWarning = null
+				Toast.show({
+					icon: "success",
+					content: "Connection restored",
+				})
+			}
+		}
 	}
 
 	static windowContext() {
