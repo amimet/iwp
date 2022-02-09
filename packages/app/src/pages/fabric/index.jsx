@@ -12,7 +12,6 @@ import "./index.less"
 export default class FabricManager extends React.Component {
     state = {
         selectedTypes: [],
-        selectionEnabled: false,
         searchValue: null,
         data: [],
     }
@@ -80,10 +79,6 @@ export default class FabricManager extends React.Component {
         this.debouncedSearch(event.target.value)
     }
 
-    toogleSelection = (to) => {
-        this.setState({ selectionEnabled: to ?? !this.state.selectionEnabled })
-    }
-
     onChangeSelectType = async (value) => {
         await this.setState({ selectedTypes: value })
         await this.fetchFabricItems()
@@ -110,7 +105,6 @@ export default class FabricManager extends React.Component {
     }
 
     onClickItem = (_id) => {
-        console.debug(`Opening Fabric.Inspector with id [${_id}]`)
         window.app.openFabricInspector(_id)
     }
 
@@ -127,7 +121,7 @@ export default class FabricManager extends React.Component {
     parseAsGroups = (objects) => {
         objects = objects.map((obj) => {
             obj.key = obj._id
-            
+
             return obj
         })
 
@@ -170,16 +164,6 @@ export default class FabricManager extends React.Component {
                 <div key="refresh">
                     <antd.Button icon={<Icons.RefreshCcw style={{ margin: 0 }} />} shape="circle" onClick={this.componentDidMount} />
                 </div>
-                <div key="toogleSelection">
-                    <antd.Button
-                        shape="round"
-                        icon={this.state.selectionEnabled ? <Icons.Check /> : <Icons.MousePointer />}
-                        type={this.state.selectionEnabled ? "default" : "primary"}
-                        onClick={() => this.toogleSelection()}
-                    >
-                        {this.state.selectionEnabled ? "Done" : "Select"}
-                    </antd.Button>
-                </div>
                 <div key="search">
                     <antd.Input.Search
                         placeholder="Search"
@@ -204,21 +188,20 @@ export default class FabricManager extends React.Component {
                     </antd.Select>
                 </div>
             </ActionsBar>
-            {this.state.data.length === 0 ? <Skeleton /> :
-                <SelectableList
-                    items={this.parseAsGroups(this.state.searchValue ?? this.state.data)}
-                    renderItem={this.renderItem}
-                    onClickItem={this.onClickItem}
-                    actions={[
-                        <div key="delete" call="onDelete">
-                            <Icons.Trash />
-                            Delete
-                        </div>,
-                    ]}
-                    events={{
-                        onDelete: this.onDeleteItems,
-                    }}
-                />}
+            <SelectableList
+                items={this.parseAsGroups(this.state.searchValue ?? this.state.data)}
+                renderItem={this.renderItem}
+                onClickItem={this.onClickItem}
+                actions={[
+                    <div key="delete" call="onDelete">
+                        <Icons.Trash />
+                        Delete
+                    </div>,
+                ]}
+                events={{
+                    onDelete: this.onDeleteItems,
+                }}
+            />
         </div>
     }
 }
