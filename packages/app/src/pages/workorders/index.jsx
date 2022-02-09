@@ -89,7 +89,7 @@ export default class Workorders extends React.Component {
 			section: sectionId,
 			finished: this.state.viewFinished,
 		}).catch((err) => {
-			console.log(err)
+			console.error(err)
 			return false
 		})
 

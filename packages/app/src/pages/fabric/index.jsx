@@ -40,7 +40,6 @@ export default class FabricManager extends React.Component {
         })
 
         if (data) {
-            console.log(data)
             return this.setState({ data })
         }
     }

@@ -395,7 +395,7 @@ class App {
 		}
 
 		const session = await this.sessionController.getCurrentSession().catch((error) => {
-			console.log(`[App] Cannot get current session: ${error.message}`)
+			console.error(`[App] Cannot get current session: ${error.message}`)
 			return false
 		})
 

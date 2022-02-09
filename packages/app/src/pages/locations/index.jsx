@@ -98,7 +98,6 @@ export default class Geo extends React.Component {
 
 	componentDidMount = async () => {
 		const data = await this.api.get.sections()
-		console.log(data)
 
 		this.setState({ data })
 	}
@@ -124,8 +123,6 @@ export default class Geo extends React.Component {
 	}
 
 	renderItem = (item) => {
-		console.log(item)
-
 		return <div>
 			<h1>{item.name}</h1>
 		</div>

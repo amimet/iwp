@@ -35,8 +35,6 @@ export default class Inspector extends React.Component {
             return false
         })
 
-        console.log(result)
-
         if (result) {
             await this.setState({ data: result, loading: false })
         }

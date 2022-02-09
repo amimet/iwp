@@ -38,7 +38,7 @@ export default {
                     app.WSInterface.mainSocketConnected = false
 
                     app.WSSockets.main.on("authenticated", () => {
-                        console.log("[WS] Authenticated")
+                        console.debug("[WS] Authenticated")
                     })
                     app.WSSockets.main.on("authenticateFailed", (error) => {
                         console.error("[WS] Authenticate Failed", error)

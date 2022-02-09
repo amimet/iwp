@@ -154,7 +154,7 @@ export default class WorkorderDetails extends React.Component {
 				_id: this.state.data._id,
 				operators: [operator],
 			}).catch((err) => {
-				console.log(err)
+				console.error(err)
 				return reject(err)
 			})
 
