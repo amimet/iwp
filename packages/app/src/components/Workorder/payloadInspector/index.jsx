@@ -131,14 +131,16 @@ export default class Inspector extends React.Component {
         this.setState({ loading: to ?? !this.state.loading })
     }
 
-    toogleRunning = (to) => {
+    toogleRunning = async (to) => {
         to = to ?? !this.state.running
 
-        this.setState({ running: to })
+        await this.setState({ running: to })
 
         if (to) {
+            // TODO: emit event to server
             this.counter.update("start")
         } else {
+            // TODO: emit event to server
             this.counter.update("stop")
         }
     }
