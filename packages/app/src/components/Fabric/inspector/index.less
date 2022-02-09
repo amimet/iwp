@@ -1,0 +1,60 @@
+.inspector {
+	h1,
+	h2,
+	h3,
+	p {
+		margin: 0;
+	}
+
+	.header {
+		h3 {
+			color: var(--background-color-contrast);
+			font-family: "DM Mono", monospace;
+		}
+
+		margin-bottom: 5px;
+	}
+
+	.properties {
+		background-color: var(--background-color-accent);
+		border-radius: 8px;
+		padding: 8px 15px;
+
+		.property {
+			height: fit-content;
+
+			display: flex;
+			flex-direction: column;
+			padding: 5px;
+
+			.value {
+				display: inline-flex;
+				flex-wrap: wrap;
+
+				justify-content: space-between;
+				justify-self: center;
+
+				width: fit-content;
+
+				padding-left: 20px;
+
+				color: var(--background-color-contrast);
+			}
+		}
+	}
+	
+	.actions {
+		--ignore-dragger: true;
+		position: sticky;
+		bottom: 0;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 10px;
+	}
+
+	> div {
+		margin-bottom: 20px;
+	}
+}

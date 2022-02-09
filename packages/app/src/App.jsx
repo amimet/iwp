@@ -239,9 +239,8 @@ class App {
 					}
 				})
 			},
-			// FIXME: Correct naming
 			openFabricInspector: (id) => {
-				window.app.DrawerController.open("workorder_inspector", Workorder.PayloadInspector, {
+				window.app.DrawerController.open("fabric_inspector", Fabric.Inspector, {
 					props: {
 						width: "70%",
 					},
