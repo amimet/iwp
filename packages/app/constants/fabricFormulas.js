@@ -4,8 +4,6 @@ export default {
         icon: "Box",
         defaultFields: [
             "description",
-            "operations",
-            "stockTarget",
         ],
     },
     operation: {
@@ -52,7 +50,7 @@ export default {
             "vaultItemSerial",
             "vaultItemManufacturer",
             "vaultItemManufacturedYear",
-            "location",
+            "section",
         ],
     },
 }
