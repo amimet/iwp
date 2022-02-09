@@ -385,7 +385,7 @@ export default class FabricCreator extends React.Component {
                 </div>
                 <antd.Input
                     value={this.state.name}
-                    placeholder={`New ${this.state.type}`}
+                    placeholder={`${String(this.state.type).toTitleCase()} name...`}
                     onChange={this.onChangeName}
                 />
             </div>
