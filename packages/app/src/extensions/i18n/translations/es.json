@@ -117,6 +117,8 @@
     "Payloads": "Cargas",
     "payloads": "carga",
 
+    "Commit all": "Registrar todo",
+
     "Mark quantity": "Marcar cantidad",
     "Mark": "Marcar",
     "Marked": "Marcado",
@@ -152,6 +154,8 @@
     "Production quantity already has been reached": "La cantidad de producción ya ha sido alcanzada",
     "Production quantity is not enough": "La cantidad de producción no es suficiente",
     "Are you sure you want to commit for this workpart?": "¿Está seguro de que desea consolidar esta parte de trabajo?",
+    "Are you sure you want to commit all quantity left?": "¿Está seguro de que desea consolidar toda la cantidad restante?",
+    "This will commit all quantity left and finish the production for this workload.": "Esto consolidará toda la cantidad restante y terminará la producción para esta carga de trabajo.",
 
     "Enter the name or a reference for the workorder.": "Introduzca el nombre o una referencia para la orden de trabajo.",
     "Select the section where the workorder will be deployed.": "Seleccione la sección donde se desplegará la orden de trabajo.",
@@ -159,7 +163,7 @@
     "Assign the operators for the workorder.": "Asigne los operadores para la orden de trabajo.",
     "Define the payloads for the workorder.": "Defina las cargas para la orden de trabajo.",
     "Define the workloads for the workorder.": "Defina las cargas de trabajo para la orden de trabajo.",
-
+    
     "Select a option": "Seleccione una opción",
     "Set the quantity produced": "Marque la cantidad producida",
     "Experimental": "Experimental",
