@@ -92,6 +92,7 @@ export default {
             return update.target.value
         },
         props: {
+            size: "large",
             autoSize: { minRows: 1, maxRows: 7 },
             placeholder: "Describe something...",
         }
