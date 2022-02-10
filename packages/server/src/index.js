@@ -24,7 +24,7 @@ function parseConnectionString(obj) {
 
 class Server {
     constructor() {
-        this.env = _env
+        this.env = process.env
         this.listenPort = this.env.listenPort ?? 3000
 
         this.middlewares = require("./middlewares")
