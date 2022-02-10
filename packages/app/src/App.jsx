@@ -45,7 +45,7 @@ import { Session, User } from "models"
 import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Workorder, Fabric } from "components"
+import { NotFound, RenderError, Crash, Settings, Workorder, Fabric, Navigation } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -172,6 +172,8 @@ class App {
 
 	static windowContext() {
 		return {
+			// TODO: Open with popup controller instead drawer controller
+			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
 			newNotification: (notification = {}) => {
 				if (typeof notification === "string") {
 					notification = {
