@@ -9,10 +9,7 @@
 
 ### Next features
 - [x] (*UI*)Feedback cuando la estabilidad de la red es mala.
-  
 - [-Discarded] (*UI*) Native notifications
-  
-- [x] (*UI*) Sound alerts on workorders events
 
 ### Bugs
 
@@ -22,3 +19,8 @@
 - [] (*API*)Emitir un evento cuando el operador empieza a trabajar en un pedido.
 - [] (*Fabric*) Implement fabric field `ImagePreview`
 - [] (*Workload.inspector*) Visualizador lista de operadores con monitorizacion en tiempo real de las actualizaciones de los operadores. 
+
+### Next features
+- [x] (*UI*) Navigation desplegable menu
+- [x] (*UI*) In APP notifications api
+- [x] (*UI*) Sound alerts on workorders events
