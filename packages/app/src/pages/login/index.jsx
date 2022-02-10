@@ -15,6 +15,8 @@ const formInstance = [
             icon: "User",
             placeholder: "Username",
             props: {
+                autocorrect: "off",
+                autocapitalize: "none",
                 className: "login-form-username",
             },
         },
@@ -65,7 +67,7 @@ const formInstance = [
 
 export default class Login extends React.Component {
     static bindApp = ["sessionController"]
-    
+
     static pageStatement = {
         bottomBarAllowed: false
     }

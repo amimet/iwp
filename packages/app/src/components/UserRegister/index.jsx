@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/icons"
 import { StepsForm } from "components"
 
 import "./index.less"
@@ -15,6 +14,8 @@ const steps = [
         content: (props) => {
             return <div className="workorder_creator steps step content">
                 <antd.Input
+                    autocorrect="off" 
+                    autocapitalize="none"
                     onPressEnter={props.onPressEnter}
                     placeholder="@newuser"
                     onChange={(e) => {
@@ -33,6 +34,8 @@ const steps = [
         content: (props) => {
             return <div className="workorder_creator steps step content">
                 <antd.Input.Password
+                    autocorrect="off" 
+                    autocapitalize="none"
                     onPressEnter={props.onPressEnter}
                     placeholder="Password"
                     onChange={(e) => {
