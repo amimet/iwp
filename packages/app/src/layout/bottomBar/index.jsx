@@ -117,7 +117,7 @@ export default class BottomBar extends EviteComponent {
                         key="nav"
                         id="nav"
                         className="item"
-                        onClick={() => this.onClickItemId("nav")}
+                        onClick={() => window.app.openNavigationMenu()}
                     >
                         <div className="icon">
                             {createIconRender("Navigation")}
