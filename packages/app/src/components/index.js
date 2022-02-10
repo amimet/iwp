@@ -24,6 +24,7 @@ export { default as UserRegister } from "./UserRegister"
 export { default as QuantityInput } from "./QuantityInput"
 export { default as Skeleton } from "./Skeleton"
 export { default as ManagerQuickView } from "./ManagerQuickView"
+export { default as Navigation } from "./Navigation"
 
 export * as Workorder from "./Workorder"
 export * as Fabric from "./Fabric"
