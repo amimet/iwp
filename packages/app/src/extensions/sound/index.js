@@ -18,7 +18,8 @@ export class SoundEngine {
             const src = soundPack[key]
 
             soundPack[key] = new Howl({
-                src: [src]
+                src: [src],
+                volume: window.app.settings.get("audioVolume") ?? 0.2,
             })
         })
 
@@ -27,9 +28,10 @@ export class SoundEngine {
 
     play = (name) => {
         if (this.sounds[name]) {
-            this.sounds[name].play()
+            return this.sounds[name].play()
         } else {
             console.error(`Sound ${name} not found.`)
+            return false
         }
     }
 }
@@ -41,6 +43,7 @@ export const extension = {
             initialization: [
                 async (app, main) => {
                     app.SoundEngine = new SoundEngine()
+                    main.setToWindowContext("SoundEngine", app.SoundEngine)
                     await app.SoundEngine.initialize()
                 }
             ]
