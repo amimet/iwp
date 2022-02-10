@@ -75,8 +75,8 @@ export default class Workorders extends React.Component {
 			this.setState({ workorders })
 		})
 
-		this.loadSections()
-		this.fetchWorkorders(this.state.selectedSection)
+		await this.loadSections()
+		await this.fetchWorkorders(this.state.selectedSection)
 	}
 
 	fetchWorkorders = async (sectionId, viewFinished) => {
@@ -156,9 +156,9 @@ export default class Workorders extends React.Component {
 				{t => t("Do you want to delete these items?")}
 			</Translation>,
 			icon: <Icons.ExclamationCircleOutlined />,
-			content: keys.map((key) => {
-				return <div>{key}</div>
-			}),
+			content: <Translation>
+				{t => t("This action cannot be undone, and will permanently delete the selected items.")}
+			</Translation>,
 			onOk: () => {
 				return new Promise((resolve, reject) => {
 					this.api.delete

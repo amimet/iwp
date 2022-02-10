@@ -171,6 +171,9 @@
     "New workorder assigned": "Nueva orden de trabajo asignada",
     "Check the new list of workorder": "Compruebe la nueva lista de ordenes de trabajo",
 
+    "Do you want to delete these items?": "¿Desea eliminar estos elementos?",
+    "This action cannot be undone, and will permanently delete the selected items.": "Esta acción no se puede deshacer, y eliminará permanentemente los elementos seleccionados.",
+    
     "General": "General",
     "Sidebar": "Barra lateral",
     "Aspect": "Aspecto",
