@@ -351,7 +351,17 @@ class App {
 		}
 
 		this.eventBus.emit("render_initialization")
+
 		await this.initialization()
+		// declare WS Handlers
+
+		window.app.handleWSListener("workorderAssigned", async () => {
+			window.app.newNotification({
+				title: "New workorder assigned",
+				description: "Check the new list of workorder"
+			})
+		})
+
 		this.eventBus.emit("render_initialization_done")
 	}
 
