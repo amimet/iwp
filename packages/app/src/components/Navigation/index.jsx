@@ -7,6 +7,7 @@ import "./index.less"
 export default class NavigationMenu extends React.Component {
     onClick = (id) => {
         window.app.setLocation(`/${id}`)
+        this.props.close()
     }
 
     generateItems = () => {
