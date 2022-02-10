@@ -172,6 +172,27 @@ class App {
 
 	static windowContext() {
 		return {
+			newNotification: (notification = {}) => {
+				if (typeof notification === "string") {
+					notification = {
+						title: "New notification",
+						description: notification
+					}
+				}
+
+				antd.notification.open({
+					message: <Translation>
+						{(t) => t(notification.title)}
+					</Translation>,
+					description: <Translation>
+						{(t) => t(notification.description)}
+					</Translation>,
+					duration: notification.duration ?? 4,
+					icon: React.isValidElement(notification.icon) ? notification.icon : (Icons[notification.icon] ?? <Icons.Bell />),
+				})
+
+				window.app.SoundEngine.play("notification")
+			},
 			openCreateNew: () => {
 				const handler = React.createRef()
 
@@ -444,5 +465,13 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [API, SettingsController, i18n.extension, Sound.extension, Render.extension, Theme.extension, SplashExtension],
+	extensions: [
+		SettingsController,
+		i18n.extension,
+		Sound.extension,
+		API,
+		Render.extension,
+		Theme.extension,
+		SplashExtension,
+	],
 })
