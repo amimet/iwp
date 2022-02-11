@@ -1,4 +1,15 @@
 module.exports = [
+    {
+        route: "/upload",
+        method: "POST",
+        middleware: ["fileUpload", "withAuthentication"],
+        fn: "FilesController.upload",
+    },
+    {
+        route: "/upload",
+        method: "GET",
+        fn: "FilesController.get"
+    },
     // User roles controller
     {
         route: "/user_roles",
