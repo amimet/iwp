@@ -28,7 +28,7 @@ export default {
                     console.error(err)
                     return []
                 })
-    
+
                 return data.map((item) => {
                     item.label = item.name
                     return item
@@ -154,6 +154,28 @@ export default {
     },
     imagePreview: {
         // TODO
+        label: "Image Preview",
+        component: "uploader",
+        updateEvent: "onUpload",
+        onUpdate: async (update) => {
+            const api = window.app.request
+
+            const payloadData = new FormData()
+            payloadData.append(update.file.name, update.file)
+
+            const result = await api.post.upload(payloadData).catch(() => {
+                update.onError("Error uploading image")
+                return false
+            })
+
+            if (result) {
+                update.onSuccess()
+            }
+
+            console.log(result)
+
+            return result.urls
+        },
     },
     vaultItemTypeSelector: {
         label: "Type",
