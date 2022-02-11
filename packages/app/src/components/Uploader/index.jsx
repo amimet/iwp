@@ -11,9 +11,9 @@ export default class Uploader extends React.Component {
         fileList: [],
     }
 
-    handleChange = ({ fileList }) => this.setState({ fileList }, () => console.log(this.state.fileList))
+    handleChange = ({ fileList }) => this.setState({ fileList })
 
-    handleCancel = () => this.setState({ previewVisible: false }, () => console.log(this.state.previewVisible))
+    handleCancel = () => this.setState({ previewVisible: false })
 
     handlePreview = async file => {
         if (!file.url && !file.preview) {
