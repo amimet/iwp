@@ -1,3 +1,4 @@
+import path from "path"
 import LinebridgeServer from "linebridge/server"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
@@ -56,6 +57,7 @@ class Server {
             }
         }
 
+        global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
         global.jwtStrategy = this.options.jwtStrategy
         global.signLocation = this.env.signLocation
         global.wsInterface = {
