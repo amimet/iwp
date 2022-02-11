@@ -11,10 +11,10 @@ export default {
         alt: "/logo_alt.svg"
     },
     api: {
-        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : "https://devapi_amimet01.ragestudio.net",
+        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : process.env.HTTP_API_ADDRESS,
     },
     ws: {
-        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : "wss://devws_amimet01.ragestudio.net",
+        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : process.env.WS_API_ADDRESS,
     },
     app: {
         title: packagejson.name,
