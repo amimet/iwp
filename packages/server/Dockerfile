@@ -20,7 +20,7 @@ ENV listenPort=3000
 ENV wsPort=3001
 
 ENV BCRYPT_ROUNDS=2
-ENV signLifetime=300
+ENV signLifetime=1h
 ENV signLocation=amimet_api
 ENV db_driver=mongodb
 ENV db_port=27017
