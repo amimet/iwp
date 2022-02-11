@@ -145,7 +145,7 @@ class Server {
             socket.on("ping", () => {
                 socket.emit("pong")
             })
-            
+
             const onAuthenticated = (user_id) => {
                 this.attachClientSocket(socket, user_id)
                 socket.emit("authenticated")
