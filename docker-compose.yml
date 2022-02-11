@@ -2,4 +2,19 @@ version: "3"
 
 services:
   api:
-    build: ./packages/api
+    build: ./packages/server
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - db_user=db_user
+      - db_name=db_name
+      - db_pwd=password123
+      - db_hostname=localhost
+
+  web:
+    build: ./packages/app
+    ports:
+      - "8000:8000"
+
+  # db:
