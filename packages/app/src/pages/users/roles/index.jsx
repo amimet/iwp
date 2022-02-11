@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 
 import { ActionsBar, UserSelector, Skeleton } from "components"
-import { Icons } from "components/icons"
+import { Icons } from "components/Icons"
 
 import "./index.less"
 

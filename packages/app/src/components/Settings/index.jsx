@@ -4,7 +4,7 @@ import { SliderPicker } from "react-color"
 import { Translation } from "react-i18next"
 
 import config from "config"
-import { Icons } from "components/icons"
+import { Icons } from "components/Icons"
 import settingList from "schemas/settings"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
