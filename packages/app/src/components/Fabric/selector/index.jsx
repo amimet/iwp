@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { Stepper } from "antd-mobile"
+import { Stepper, Swiper, Image } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
 import { Fabric, Skeleton } from "components"
 import { Translation } from "react-i18next"
@@ -91,11 +91,19 @@ export default class BrowserSelector extends React.Component {
 		this.setState({ selectedVariants: values })
 	}
 
+	getImagePreviews = (items) => {
+		return items.map((item) => {
+			return <Swiper.Item>
+				<Image src={item} />
+			</Swiper.Item>
+		})
+	}
+
 	//TODO: Split as `bruhSomething` component
 	renderSelectedItem = (item) => {
 		return <div className="inspector">
 			<div className="header">
-				{item.properties?.imagePreview && <img src={item.properties.imagePreview} />}
+				{this.getImagePreviews(item.properties.imagePreview)}
 				<Translation>
 					{(t) => <h1>{t(item.name)}</h1>}
 				</Translation>
