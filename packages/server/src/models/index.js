@@ -16,12 +16,10 @@ const schemas = getSchemas()
 
 export const FabricObject = mongoose.model("FabricObject", schemas.FabricObject, "fabricObjects")
 export const Workorder = mongoose.model("Workorder", schemas.Workorder, "workorder")
-export const Workshifts = mongoose.model("Workshifts", schemas.Workshift, "workshifts")
 export const Role = mongoose.model("Role", schemas.Role, "roles")
 export const Vault = mongoose.model("Vault", schemas.VaultItem, "vault")
-export const Section = mongoose.model("Section", schemas.Section, "Sections")
+export const Section = mongoose.model("Section", schemas.Section, "sections")
 
-export const Contract = mongoose.model("Contract", schemas.Contract, "contracts")
 export const User = mongoose.model("User", schemas.User, "accounts")
 export const Session = mongoose.model("Session", schemas.Session, "sessions")
 export const Workshift = mongoose.model("Workshift", schemas.Workshift, "workshifts")
