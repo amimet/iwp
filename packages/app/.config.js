@@ -29,6 +29,8 @@ module.exports = (config = {}) => {
         allow: [".."]
     }
 
+    config.envDir = path.join(__dirname, 'environments')
+
     config.css = {
         preprocessorOptions: {
             less: {
