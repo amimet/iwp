@@ -25,3 +25,7 @@
 - [x] (*UI*) In APP notifications api
 - [x] (*UI*) Sound alerts on workorders events
 - [ ] (*API*) App version checking
+
+
+### Next features
+ - [] (*API*) Implement URL resolver
