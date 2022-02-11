@@ -1,19 +1,20 @@
 FROM node:16
 
 # Create app directory
-WORKDIR /usr/src
+WORKDIR /usr/api
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY package*.json ./
+COPY . .
 
 RUN npm install
+RUN npm run build
 # If you are building your code for production
 # RUN npm ci --only=production
 
 # Bundle app source
-COPY ./dist .
 
 ENV listenPort=3000
 ENV wsPort=3001
@@ -27,4 +28,4 @@ ENV db_port=27017
 EXPOSE $listenPort
 EXPOSE $wsPort
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "dist/index.js" ]
