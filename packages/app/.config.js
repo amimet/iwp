@@ -23,7 +23,7 @@ module.exports = (config = {}) => {
     }
 
     config.resolve.alias = aliases
-    config.server.port = 8000
+    config.server.port = process.env.listenPort ?? 8000
     config.server.host = "0.0.0.0"
     config.server.fs = {
         allow: [".."]
