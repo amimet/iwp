@@ -15,6 +15,7 @@ import "./index.less"
 const FieldsComponents = {
     "input": antd.Input,
     "addableSelectList": loadable(() => import("components/AddableSelectList")),
+    "uploader": loadable(() => import("components/Uploader")),
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
     "datepicker": antd.DatePicker,
@@ -124,7 +125,7 @@ export default class FabricCreator extends React.Component {
 
         let state = this.state
         state.values[key] = value
-
+        
         this.setState(state)
     }
 
@@ -321,11 +322,11 @@ export default class FabricCreator extends React.Component {
             "ignore-dragger": true,
             value: this.state.values[field.key],
             disabled: this.state.submitting,
-            [field.updateEvent]: (...args) => {
+            [field.updateEvent]: async (...args) => {
                 if (typeof field.onUpdate === "function") {
-                    return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, field.onUpdate(...args))
+                    return await this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, await field.onUpdate(...args))
                 }
-                return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, ...args)
+                return await this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, ...args)
             },
         }
 
