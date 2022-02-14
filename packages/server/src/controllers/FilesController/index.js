@@ -1,6 +1,9 @@
 import path from "path"
 import fs from "fs"
-import { Schematized } from "../../lib"
+
+function resolveToUrl(filepath) {
+    return `${global.globalPublicURI}:${global.httpListenPort}/uploads/${filepath}`
+}
 
 export default {
     upload: async (req, res) => {
@@ -14,18 +17,13 @@ export default {
         if (req.files) {
             for await (let file of req.files) {
                 try {
-                    const storagePath = path.join(global.uploadPath, req.decodedToken.user_id)
-                    const filename = `${new Date().getTime()}-${file.filename}`
+                    const filename = `${req.decodedToken.user_id}-${new Date().getTime()}-${file.filename}`
 
-                    const urlPath = path.join(req.decodedToken.user_id, filename)
-                    const diskPath = path.join(storagePath, filename)
-
-                    if (!fs.existsSync(storagePath)) {
-                        await fs.promises.mkdir(storagePath, { recursive: true })
-                    }
+                    const diskPath = path.join(global.uploadPath, filename)
 
                     await fs.promises.writeFile(diskPath, file.data)
-                    urls.push(urlPath)
+
+                    urls.push(resolveToUrl(filename))
                 } catch (error) {
                     console.log(error)
                     failed.push(file.filename)
@@ -38,18 +36,10 @@ export default {
             failed: failed,
         })
     },
-    get: (Schematized({
-        required: ["id"],
-        select: ["id"]
-    }, async (req, res) => {
-        const { id } = req.selection
+    get: async (req, res) => {
+        const { id } = req.params
 
-        await fs.promises.access(path.join(global.uploadPath, id), fs.constants.R_OK).catch(() => {
-            return res.status(404).json({
-                error: "File not found",
-            })
-        })
-
-        return res.sendFile(path.resolve(global.uploadPath, id))
-    }))
+        const filePath = path.join(global.uploadPath, id)
+        return res.sendFile(filePath)
+    },
 }
