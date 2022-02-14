@@ -186,7 +186,13 @@ export default {
             await FabricObject.findByIdAndDelete(id)
         }
 
-        const result = await FabricObject.find({ type })
+        let finalQuery = undefined
+
+        if (type) {
+            finalQuery = { type }
+        }
+
+        const result = await FabricObject.find(finalQuery)
 
         return res.json(result)
     }),
