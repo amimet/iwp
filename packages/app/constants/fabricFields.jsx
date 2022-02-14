@@ -155,7 +155,7 @@ export default {
     imagePreview: {
         // TODO
         label: "Image Preview",
-        component: "uploader",
+        component: "imageUploader",
         updateEvent: "onUploadDone",
         onUpdate: async (prev, update) => {
             return update
