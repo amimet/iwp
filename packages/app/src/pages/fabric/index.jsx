@@ -104,8 +104,6 @@ export default class FabricManager extends React.Component {
                     return false
                 })
 
-                console.log(result)
-
                 if (result) {
                     this.setState({ data: result })
                     ctx.unselectAll()
