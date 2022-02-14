@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
+import { Translation } from "react-i18next"
 
 import { ActionsBar, SelectableList, Skeleton } from "components"
 import { Icons, createIconRender } from "components/Icons"
@@ -83,22 +84,32 @@ export default class FabricManager extends React.Component {
         await this.fetchFabricItems()
     }
 
-    onDeleteItems = async (items) => {
+    onDeleteItems = async (ctx, items) => {
         antd.Modal.confirm({
-            content: `Are you sure you want to delete ${items.length} item(s)?`,
+            title: <Translation>
+                {(t) => t(`Are you sure you want to delete these item(s)?`)}
+            </Translation>,
+            content: <div>
+                <Translation>
+                    {(t) => t(`This action cannot be undone and will permanently delete data of the selected item(s).`)}
+                </Translation>
+            </div>,
             onOk: async () => {
-                await this.api.delete.fabric({ _id: items, type: "vaultItem" })
-                    .then((data) => {
-                        this.setState({ data: data })
-                        this.toogleSelection(false)
+                const result = await this.api.delete.fabric({ _id: items }).catch(error => {
+                    console.error("Cannot delete items: ", error)
+                    antd.notification.error({
+                        message: "Cannot delete items",
+                        description: error,
                     })
-                    .catch(error => {
-                        console.error("Cannot delete items: ", error)
-                        antd.notification.error({
-                            message: "Cannot delete items",
-                            description: error,
-                        })
-                    })
+                    return false
+                })
+
+                console.log(result)
+
+                if (result) {
+                    this.setState({ data: result })
+                    ctx.unselectAll()
+                }
             },
         })
     }
@@ -190,7 +201,7 @@ export default class FabricManager extends React.Component {
             <SelectableList
                 items={this.parseAsGroups(this.state.searchValue ?? this.state.data)}
                 renderItem={this.renderItem}
-                onClickItem={this.onClickItem}
+                onDoubleClick={this.onClickItem}
                 actions={[
                     <div key="delete" call="onDelete">
                         <Icons.Trash />
