@@ -38,8 +38,8 @@
         "icon": "MapPin",
         "children": [
             {
-                "id": "locations",
-                "title": "Locations",
+                "id": "sections",
+                "title": "Sections",
                 "icon": "Map"
             }
         ]

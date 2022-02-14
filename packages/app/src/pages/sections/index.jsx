@@ -33,7 +33,7 @@ class NewSectionForm extends React.Component {
 	render() {
 		return <div>
 			<div style={{ display: "flex", }}>
-				<h2><Icons.MdLocationSearching style={{ marginRight: "8px", }} /> New Location</h2>
+				<h2><Icons.MdLocationSearching style={{ marginRight: "8px", }} /> New Section</h2>
 			</div>
 			<FormGenerator
 				name="new_section_form"
@@ -144,11 +144,6 @@ export default class Geo extends React.Component {
 				<div>
 					<antd.Button icon={<Icons.Plus />} type="primary" onClick={this.createNewSection}>
 						New
-					</antd.Button>
-				</div>
-				<div>
-					<antd.Button type={this.state.selectionEnabled ? "default" : "primary"} onClick={() => this.toogleSelection()}>
-						{this.state.selectionEnabled ? "Cancel" : "Select"}
 					</antd.Button>
 				</div>
 			</ActionsBar>
