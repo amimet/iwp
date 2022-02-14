@@ -37,9 +37,13 @@ export default {
         })
     },
     get: async (req, res) => {
-        const { id } = req.params
+        try {
+            const { id } = req.params
 
-        const filePath = path.join(global.uploadPath, id)
-        return res.sendFile(filePath)
+            const filePath = path.join(global.uploadPath, id)
+            return res.sendFile(filePath)
+        } catch (error) {
+            console.log(error)
+        }
     },
 }
