@@ -9,9 +9,18 @@ export default class Uploader extends React.Component {
         previewImage: "",
         previewTitle: "",
         fileList: [],
+        urlList: [],
     }
 
-    handleChange = ({ fileList }) => this.setState({ fileList })
+    api = window.app.request
+
+    handleChange = ({ fileList }) => {
+        this.setState({ fileList })
+
+        if (typeof this.props.onChange === "function") {
+            this.props.onChange(fileList)
+        }
+    }
 
     handleCancel = () => this.setState({ previewVisible: false })
 
@@ -27,12 +36,28 @@ export default class Uploader extends React.Component {
         })
     }
 
-    handleUploadRequest = (req) => {
+    handleUploadRequest = async (req) => {
         if (typeof this.props.onUpload === "function") {
             this.props.onUpload(req)
         } else {
-            req.onSuccess()
-            return req
+            const payloadData = new FormData()
+            payloadData.append(req.file.name, req.file)
+
+            const result = await this.api.post.upload(payloadData).catch(() => {
+                req.onError("Error uploading image")
+                return false
+            })
+
+            if (result) {
+                req.onSuccess()
+                await this.setState({ urlList: [...this.state.urlList, ...result.urls] })
+            }
+
+            if (typeof this.props.onUploadDone === "function") {
+                await this.props.onUploadDone(this.state.urlList)
+            }
+
+            return result.urls
         }
     }
 
