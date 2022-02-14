@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
+import _ from "lodash"
 
 import { Icons } from "components/Icons"
 import { Fabric, OperatorsAssignments, StepsForm, Skeleton } from "components"
@@ -90,7 +91,7 @@ const steps = [
 		}
 	},
 	{
-		key: "operators",
+		key: "assigned",
 		title: "Operators",
 		icon: "User",
 		description: "Assign the operators for the workorder.",
@@ -159,7 +160,9 @@ const steps = [
 
 export default class WorkorderCreator extends React.Component {
 	state = {
-		values: null
+		values: null,
+		editMode: false,
+		loading: true,
 	}
 
 	api = window.app.request
@@ -170,13 +173,41 @@ export default class WorkorderCreator extends React.Component {
 				this.handleError(error)
 			})
 		}
+
+		if (typeof this.props.uuid !== "undefined") {
+			antd.message.info("Loading workorder on edit mode...")
+			await this.setState({ editMode: true })
+
+			const data = await this.fetchWorkorderData()
+
+			if (data) {
+				await this.setState({ values: data })	
+			}
+		}
+
+		await this.setState({ loading: false })
+	}
+
+	fetchWorkorderData = async () => {
+		const result = await this.api.get.workorder(undefined, {_id: this.props.uuid}).catch((err) => {
+			console.error(err)
+			antd.message.error("Failed to load workorder data.")
+
+			if (typeof this.props.close === "function") {
+				this.props.close()
+			}
+
+			return false
+		})
+
+		return _.omit(result, "_id")
 	}
 
 	submit = async (data, callback) => {
 		const workorder = {
 			section: data.section,
 			workshift: data.workshift,
-			assigned: data.operators,
+			assigned: data.assigned,
 			name: data.name,
 			payloads: data.payloads,
 		}
@@ -186,7 +217,17 @@ export default class WorkorderCreator extends React.Component {
 			workorder.scheduledFinish = data.schedule[1]
 		}
 
-		const result = await this.api.put.workorder(workorder)
+		let result = null
+
+		if (!this.state.editMode) {
+			result = await this.api.put.workorder(workorder)
+		} else {
+			result = await this.api.put.updateWorkorder({
+				_id: this.props.uuid,
+				update: workorder,
+			})
+			console.log(result)
+		}
 
 		if (result) {
 			if (typeof this.props.handleDone === "function") {
@@ -199,8 +240,13 @@ export default class WorkorderCreator extends React.Component {
 	}
 
 	render() {
+		if (this.state.loading) {
+			return <Skeleton />
+		}
+
 		return (
 			<StepsForm
+				defaultValues={this.state.editMode && this.state.values}
 				steps={steps}
 				onSubmit={this.submit}
 			/>

@@ -21,7 +21,11 @@ export default class StepsForm extends React.Component {
     api = window.app.request
 
     componentDidMount = async () => {
-        this.handleNext(0)
+        if (this.props.defaultValues) {
+            await this.setState({ values: this.props.defaultValues })
+        }
+
+        await this.handleNext(0)
     }
 
     next = (to) => {

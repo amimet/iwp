@@ -132,6 +132,16 @@ export default class WorkorderDetails extends React.Component {
 		})
 	}
 
+	openModify = () => {
+		window.app.openWorkorderCreator(this.id, (result) => {
+			this.fetchData()
+			// console.log(result)
+			// if (result) {
+			// 	this.setState({ data: result })
+			// }
+		})
+	}
+
 	openOperatorSelector = () => {
 		window.app.DrawerController.open("OperatorSelector", OperatorsAssignments, {
 			componentProps: {
@@ -263,14 +273,20 @@ export default class WorkorderDetails extends React.Component {
 
 				{this.state.hasManager && <div className="manager_actions">
 					<div>
-						<antd.Button icon={<Icons.Edit />}>
+						<antd.Button
+							icon={<Icons.Edit />}
+							onClick={this.openModify}
+						>
 							<Translation>
 								{t => t("Modify")}
 							</Translation>
 						</antd.Button>
 					</div>
 					<div>
-						<antd.Button onClick={this.openOperatorSelector} icon={<Icons.Users />}>
+						<antd.Button
+							icon={<Icons.Users />}
+							onClick={this.openOperatorSelector}
+						>
 							<Translation>
 								{t => t("Manage operators")}
 							</Translation>

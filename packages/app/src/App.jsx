@@ -244,11 +244,19 @@ class App {
 					},
 				})
 			},
-			openWorkorderCreator: () => {
+			openWorkorderCreator: (uuid, result) => {
 				window.app.DrawerController.open("workorder_creator", Workorder.Creator, {
 					props: {
 						width: "55%",
 					},
+					componentProps: {
+						uuid,
+					},
+					onDone: (ctx, data) => {
+						if (typeof result === "function") {
+							return result(data)
+						}
+					}
 				})
 			},
 			openFabricEditor: (uuid, result) => {
