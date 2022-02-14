@@ -6,7 +6,7 @@ module.exports = [
         fn: "FilesController.upload",
     },
     {
-        route: "/upload",
+        route: "/uploads/:id",
         method: "GET",
         fn: "FilesController.get"
     },
