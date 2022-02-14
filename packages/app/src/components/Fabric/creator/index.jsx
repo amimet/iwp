@@ -15,7 +15,7 @@ import "./index.less"
 const FieldsComponents = {
     "input": antd.Input,
     "addableSelectList": loadable(() => import("components/AddableSelectList")),
-    "uploader": loadable(() => import("components/Uploader")),
+    "imageUploader": loadable(() => import("components/ImageUploader")),
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
     "datepicker": antd.DatePicker,
@@ -24,6 +24,7 @@ const FieldsComponents = {
 
 export default class FabricCreator extends React.Component {
     state = {
+        editMode: false,
         submitToCatalog: this.props.submitToCatalog ?? false,
         loading: true,
         submitting: false,
@@ -38,8 +39,38 @@ export default class FabricCreator extends React.Component {
     api = window.app.request
 
     componentDidMount = async () => {
-        await this.loadType(this.props.defaultType ?? "product")
+        if (typeof this.props.uuid !== "undefined") {
+            // load edit mode
+            const data = await this.fetchFabricObjectData(this.props.uuid)
+
+            if (data) {
+                this.setState({
+                    editMode: true,
+                    type: data.type,
+                    name: data.name,
+                })
+
+                Object.keys(data.properties).forEach(async (key) => {
+                    const value = data.properties[key]
+                    await this.appendFieldByType(key, value)
+                })
+            }
+        } else {
+            await this.loadType(this.props.defaultType ?? "product")
+        }
         this.toogleLoading(false)
+    }
+
+    fetchFabricObjectData = async (id) => {
+        const data = await this.api.get.fabricById(undefined, { _id: id }).catch((err) => {
+            console.error(err)
+            antd.message.error(`Failed to load fabric item: ${err}`)
+            return false
+        })
+
+        if (data) {
+            return data
+        }
     }
 
     //* GETTERS METHODS
@@ -123,10 +154,7 @@ export default class FabricCreator extends React.Component {
     onUpdateValue = (event, value) => {
         const { updateEvent, key } = event
 
-        let state = this.state
-        state.values[key] = value
-
-        this.setState(state)
+        this.setState({ values: { ...this.state.values, [key]: value } })
     }
 
     onChangeCatalogMode = (to) => {
@@ -158,13 +186,13 @@ export default class FabricCreator extends React.Component {
         await this.setState({ type: type })
     }
 
-    appendFieldByType = (type) => {
+    appendFieldByType = async (type, defaultValue) => {
         const field = this.getField(type)
 
         if (typeof field === "undefined") {
             antd.notification.warning({
                 message: "Missing field",
-                description: `The field you selected can"t be found in the fields. No field will be added.`,
+                description: `The field you selected can't be found in the fields. No field will be added.`,
             })
             console.error(`No form available for field [${type}]`)
             return null
@@ -177,12 +205,18 @@ export default class FabricCreator extends React.Component {
             return false
         }
 
-        const fieldRender = this.renderField({ type: type, ...field })
+        const fieldRender = await this.renderField({ type: type, defaultValue, ...field })
+
+        if (defaultValue) {
+            this.setState({ values: { ...this.state.values, [fieldRender.key]: defaultValue } })
+        }
 
         if (fieldRender) {
             currentFields.push(fieldRender)
-            this.setState({ fields: currentFields })
+            await this.setState({ fields: currentFields })
         }
+
+        return fieldRender.key
     }
 
     canSubmit = () => {
@@ -235,9 +269,16 @@ export default class FabricCreator extends React.Component {
             }
         }
 
-        if (this.state.submitToCatalog) {
+        if (this.state.submitToCatalog && !this.state.editMode) {
             // send to api
             await this.api.put.fabric(payload).catch((response) => {
+                console.error(response)
+                return this.setState({ error: response })
+            })
+        }
+
+        if (this.state.editMode) {
+            await this.api.post.fabric({ _id: this.props.uuid, mutation: payload }).catch((response) => {
                 console.error(response)
                 return this.setState({ error: response })
             })
@@ -289,7 +330,7 @@ export default class FabricCreator extends React.Component {
         </antd.Menu>
     }
 
-    renderField = (field) => {
+    renderField = async (field) => {
         let RenderComponent = field.component
         let ReturnRender = null
 
@@ -315,6 +356,14 @@ export default class FabricCreator extends React.Component {
 
         if (!field.key) {
             field.key = this.getKeyFromLatestFieldType(field.type)
+        }
+
+        if (!field.props) {
+            field.props = {}
+        }
+
+        if (field.defaultValue) {
+            field.props.defaultValue = field.defaultValue
         }
 
         let renderProps = {
@@ -374,14 +423,13 @@ export default class FabricCreator extends React.Component {
         if (this.state.loading) {
             return <Skeleton />
         }
-
         const canSubmit = this.canSubmit()
         const TypeIcon = FORMULAS[this.state.type].icon && createIconRender(FORMULAS[this.state.type].icon)
 
         return <div className={classnames("fabric_creator", { ["mobile"]: window.isMobile })}>
             <div key="name" className="name">
-                <div className="type">
-                    <antd.Dropdown trigger={["click"]} overlay={this.renderTypesSelector}>
+                <div className={classnames("type", { ["disabled"]: this.state.editMode })}>
+                    <antd.Dropdown disabled={this.state.editMode} trigger={["click"]} overlay={this.renderTypesSelector}>
                         {TypeIcon ?? <Icons.HelpCircle />}
                     </antd.Dropdown>
                 </div>
@@ -409,11 +457,11 @@ export default class FabricCreator extends React.Component {
                     </Translation>
                 </antd.Button>
 
-                <antd.Checkbox checked={this.state.submitToCatalog} onChange={this.onChangeCatalogMode}>
+                {!this.state.editMode && <antd.Checkbox checked={this.state.submitToCatalog} onChange={this.onChangeCatalogMode}>
                     <Translation>
                         {t => t("Add to catalog")}
                     </Translation>
-                </antd.Checkbox>
+                </antd.Checkbox>}
             </div>
 
             {this.state.error && <div className="error">
