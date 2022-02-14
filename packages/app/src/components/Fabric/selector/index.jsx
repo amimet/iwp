@@ -91,19 +91,27 @@ export default class BrowserSelector extends React.Component {
 		this.setState({ selectedVariants: values })
 	}
 
-	getImagePreviews = (items) => {
-		return items.map((item) => {
-			return <Swiper.Item>
-				<Image src={item} />
-			</Swiper.Item>
-		})
+	renderImagePreview = (item) => {
+		if (Array.isArray(item.properties.imagePreview)) {
+			return <Swiper>
+				{item.properties.imagePreview.map((image) => {
+					return <Swiper.Item>
+						<Image src={image} fit="cover" />
+					</Swiper.Item>
+				})}
+			</Swiper>
+		}
+
+		return false
 	}
 
 	//TODO: Split as `bruhSomething` component
 	renderSelectedItem = (item) => {
 		return <div className="inspector">
 			<div className="header">
-				{this.getImagePreviews(item.properties.imagePreview)}
+				{item?.properties?.imagePreview && <div className="images">
+					{this.renderImagePreview(item)}
+				</div>}
 				<Translation>
 					{(t) => <h1>{t(item.name)}</h1>}
 				</Translation>

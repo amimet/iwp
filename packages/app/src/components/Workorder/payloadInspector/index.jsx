@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { Modal, Toast } from "antd-mobile"
+import { Modal, Toast, Swiper, Image } from "antd-mobile"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 
@@ -12,6 +12,8 @@ import { Icons, createIconRender } from "components/Icons"
 import FORMULAS from "schemas/fabricFormulas"
 
 import "./index.less"
+
+const excludedProperties = ["imagePreview"]
 
 class Counter {
     constructor() {
@@ -255,10 +257,23 @@ export default class Inspector extends React.Component {
 
     renderProperties = (item) => {
         if (!item.properties) {
-            return null
+            return false
         }
 
-        return Object.keys(item.properties).map((key) => {
+        const keys = Object.keys(item.properties).filter((key) => !excludedProperties.includes(key))
+
+        if (keys.length <= 0) {
+            return <div style={{ textAlign: "center" }}>
+                <antd.Empty description={false} />
+                <h2>
+                    <Translation>
+                        {t => t("No properties")}
+                    </Translation>
+                </h2>
+            </div>
+        }
+
+        return keys.map((key) => {
             const PropertyRender = () => {
                 const property = item.properties[key]
 
@@ -268,7 +283,9 @@ export default class Inspector extends React.Component {
 
                 if (Array.isArray(property)) {
                     return property.map((prop) => {
-                        return <antd.Tag style={{ marginBottom: "5px" }}>{prop}</antd.Tag>
+                        return <antd.Tag style={{ marginBottom: "5px" }}>
+                            <p>{prop}</p>
+                        </antd.Tag>
                     })
                 }
 
@@ -290,6 +307,20 @@ export default class Inspector extends React.Component {
         })
     }
 
+    renderImagePreview = (item) => {
+        if (Array.isArray(item.properties.imagePreview)) {
+            return <Swiper>
+                {item.properties.imagePreview.map((image) => {
+                    return <Swiper.Item>
+                        <Image src={image} fit="cover" />
+                    </Swiper.Item>
+                })}
+            </Swiper>
+        }
+
+        return false
+    }
+
     render() {
         if (!this.state.data || this.state.loading) {
             return <Skeleton />
@@ -309,14 +340,9 @@ export default class Inspector extends React.Component {
 
         return <div className="payload_inspector">
             <div className="header">
-                <div className="typeIndicator">
-                    <h1>
-                        {Icons[formula.icon] && createIconRender(formula.icon)}
-                        <Translation>
-                            {t => t(String(this.state.data.type).toTitleCase())}
-                        </Translation>
-                    </h1>
-                </div>
+                {this.state.data?.properties?.imagePreview && <div className="images">
+                    {this.renderImagePreview(this.state.data)}
+                </div>}
                 <div>
                     <h1>{this.state.data.name}</h1>
                 </div>
@@ -326,6 +352,18 @@ export default class Inspector extends React.Component {
             </div>
 
             {!this.state.assistantMode && <div className="properties">
+                <div className="property">
+                    <div className="name">
+                        <Translation>
+                            {t => t("Type")}
+                        </Translation>
+                    </div>
+                    <div className="value">
+                        <Translation>
+                            {t => t(String(this.state.data.type).toTitleCase())}
+                        </Translation>
+                    </div>
+                </div>
                 {this.renderProperties(this.state.data)}
             </div>}
 

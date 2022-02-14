@@ -18,6 +18,15 @@
 			display: flex;
 			flex-direction: column;
 
+			.images {
+				--ignore-dragger: true;
+	
+				img {
+					border-radius: 8px;
+					--ignore-dragger: true;
+				}
+			}
+
 			h1 {
 				margin: 0;
 			}

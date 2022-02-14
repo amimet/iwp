@@ -12,11 +12,13 @@
 			font-family: "DM Mono", monospace;
 		}
 
-		.typeIndicator {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 18px;
+		.images {
+			--ignore-dragger: true;
+
+			img {
+				border-radius: 8px;
+				--ignore-dragger: true;
+			}
 		}
 
 		margin-bottom: 5px;
