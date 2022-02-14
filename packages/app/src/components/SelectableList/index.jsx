@@ -14,29 +14,6 @@ import "./index.less"
 const ListItem = React.memo((props) => {
 	let { item } = props
 
-	if (item.children && Array.isArray(item.children)) {
-		return <div className="selectableList_group">
-			<h1>
-				{React.isValidElement(item.icon) ? item.icon : Icons[item.icon] && createIconRender(item.icon)}
-				<Translation>
-					{t => t(item.label)}
-				</Translation>
-			</h1>
-
-			<div className="selectableList_subItems">
-				{item.children.map((subItem) => {
-					return <ListItem
-						renderChildren={props.renderChildren}
-						onClickItem={props.onClickItem}
-						onDoubleClick={props.onDoubleClick}
-						onLongPress={props.onLongPress}
-						item={subItem}
-					/>
-				})}
-			</div>
-		</div>
-	}
-
 	if (!item.key) {
 		item.key = item._id ?? item.id
 	}
@@ -45,67 +22,28 @@ const ListItem = React.memo((props) => {
 	let delayedClick = null
 	let clickedOnce = null
 
-	const renderChildren = props.renderChildren(item)
-	const isDisabled = renderChildren.props.disabled
-
-	const onOnceClick = () => {
+	const handleOnceClick = () => {
 		clickedOnce = null
-
-		if (isDisabled) {
-			return false
-		}
 
 		if (typeof props.onClickItem === "function") {
 			return props.onClickItem(item.key)
 		}
-
-		// if (typeof renderChildren.onClick === "function") {
-		// 	return renderChildren.onClick()
-		// }
 	}
 
-	const onDoubleClick = () => {
-		if (isDisabled) {
-			return false
+	const handleDoubleClick = () => {
+		if (typeof props.onDoubleClickItem === "function") {
+			return props.onDoubleClickItem(item.key)
 		}
-
-		if (typeof props.onDoubleClick === "function") {
-			return props.onDoubleClick(item.key)
-		}
-
-		// if (typeof renderChildren.onDoubleClick === "function") {
-		// 	return renderChildren.onDoubleClick()
-		// }
 	}
 
-	const onLongPress = () => {
-		if (props.onlyClickSelection || isDisabled) {
-			return false
-		}
-
+	const handleLongPress = () => {
 		if (typeof props.onLongPressItem === "function") {
 			return props.onLongPressItem(item.key)
 		}
 	}
 
-	const onClick = () => {
-		if (props.onlyClickSelection) {
-			return onOnceClick()
-		}
-
-		if (!delayedClick) {
-			delayedClick = _.debounce(onOnceClick, doubleClickSpeed)
-		}
-
-		if (clickedOnce) {
-			delayedClick.cancel()
-			clickedOnce = false
-			onDoubleClick()
-		} else {
-			clickedOnce = true
-			delayedClick()
-		}
-	}
+	const renderChildren = props.renderChildren(item)
+	const isDisabled = renderChildren.props.disabled
 
 	return React.createElement("div", {
 		id: item.key,
@@ -115,13 +53,52 @@ const ListItem = React.memo((props) => {
 			["selected"]: props.selected,
 			["disabled"]: isDisabled,
 		}),
-		onDoubleClick: onDoubleClick,
+		onDoubleClick: () => {
+			if (isDisabled) {
+				return false
+			}
+
+			handleDoubleClick()
+		},
 		...useLongPress(
-			onLongPress,
-			onClick,
+			// onLongPress
+			() => {
+				if (isDisabled) {
+					return false
+				}
+
+				if (props.onlyClickSelection) {
+					return false
+				}
+
+				handleLongPress()
+			},
+			// onClick
+			() => {
+				if (isDisabled) {
+					return false
+				}
+
+				if (props.onlyClickSelection) {
+					return handleOnceClick()
+				}
+
+				if (!delayedClick) {
+					delayedClick = _.debounce(handleOnceClick, doubleClickSpeed)
+				}
+
+				if (clickedOnce) {
+					delayedClick.cancel()
+					clickedOnce = false
+					handleDoubleClick()
+				} else {
+					clickedOnce = true
+					delayedClick()
+				}
+			},
 			{
 				shouldPreventDefault: true,
-				delay: 500,
+				delay: 300,
 			}
 		),
 	}, renderChildren)
@@ -199,7 +176,7 @@ export default class SelectableList extends React.Component {
 		this.unselectAll()
 	}
 
-	onDoubleClick = (key) => {
+	onDoubleClickItem = (key) => {
 		if (typeof this.props.onDoubleClick === "function") {
 			this.props.onDoubleClick(key)
 		}
@@ -273,28 +250,49 @@ export default class SelectableList extends React.Component {
 		})
 	}
 
-	render() {
-		if (!this.props.overrideSelectionEnabled && this.state.selectionEnabled && this.state.selectedKeys.length === 0) {
-			this.setState({ selectionEnabled: false })
-			this.unselectAll()
-		}
-		const isAllSelected = this.isAllSelected()
-
-		let items = this.props.items.length > 0 ? this.props.items.map((item, index) => {
+	renderItems = (data) => {
+		return data.length > 0 ? data.map((item, index) => {
 			item.key = item.key ?? item.id ?? item._id
+			
+			if (item.children && Array.isArray(item.children)) {
+				return <div className="selectableList_group">
+					<h1>
+						{React.isValidElement(item.icon) ? item.icon : Icons[item.icon] && createIconRender(item.icon)}
+						<Translation>
+							{t => t(item.label)}
+						</Translation>
+					</h1>
+		
+					<div className="selectableList_subItems">
+						{this.renderItems(item.children)}
+					</div>
+				</div>
+			}
 
 			let selected = this.isKeySelected(item.key)
 
 			return <ListItem
 				item={item}
 				selected={selected}
-				onDoubleClick={this.onDoubleClick}
+
 				onClickItem={this.onClickItem}
+				onDoubleClickItem={this.onDoubleClickItem}
 				onLongPressItem={this.onLongPressItem}
+
 				renderChildren={this.props.renderItem}
-				onlyClickSelection={this.props.onlyClickSelection}
+				onlyClickSelection={this.props.onlyClickSelection || this.state.selectionEnabled}
 			/>
 		}) : <antd.Empty image={antd.Empty.PRESENTED_IMAGE_SIMPLE} />
+	}
+
+	render() {
+		if (!this.props.overrideSelectionEnabled && this.state.selectionEnabled && this.state.selectedKeys.length === 0) {
+			this.setState({ selectionEnabled: false })
+			this.unselectAll()
+		}
+
+		const isAllSelected = this.isAllSelected()
+		let items = this.renderItems(this.props.items)
 
 		return <div className={classnames("selectableList", { ["selectionEnabled"]: this.props.overrideSelectionEnabled ?? this.state.selectionEnabled })}>
 			<div className="selectableList_content">
