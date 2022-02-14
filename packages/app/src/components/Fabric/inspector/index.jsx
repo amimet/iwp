@@ -1,10 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-import { Swiper, Image } from "antd-mobile"
 import { Translation } from "react-i18next"
 
+import { User } from "models"
+import { Skeleton, ActionsBar, ImageViewer } from "components"
 import { Icons } from "components/Icons"
-import { Skeleton, ActionsBar } from "components"
 
 import "./index.less"
 
@@ -14,6 +14,7 @@ export default class Inspector extends React.Component {
     state = {
         loading: true,
         data: null,
+        hasManager: false,
     }
 
     api = window.app.request
@@ -25,7 +26,8 @@ export default class Inspector extends React.Component {
             console.error("No ID provided")
             return false
         }
-
+        
+        await this.setState({ hasManager: await User.hasRole("manager") })
         await this.fetchFabricObjectData()
     }
 
@@ -49,6 +51,11 @@ export default class Inspector extends React.Component {
                 this.setState({ data: result })
             }
         })
+    }
+
+    onClickHelp = () => {
+        // TODO: Implement
+        antd.message.info("This function is not implemented yet")
     }
 
     renderProperties = (item) => {
@@ -103,20 +110,6 @@ export default class Inspector extends React.Component {
         })
     }
 
-    renderImagePreview = (item) => {
-        if (Array.isArray(item.properties.imagePreview)) {
-            return <Swiper>
-                {item.properties.imagePreview.map((image) => {
-                    return <Swiper.Item>
-                        <Image src={image} fit="cover" />
-                    </Swiper.Item>
-                })}
-            </Swiper>
-        }
-
-        return false
-    }
-
     render() {
         if (!this.state.data || this.state.loading) {
             return <Skeleton />
@@ -124,9 +117,7 @@ export default class Inspector extends React.Component {
 
         return <div className="inspector">
             <div className="header">
-                {this.state.data?.properties?.imagePreview && <div className="images">
-                    {this.renderImagePreview(this.state.data)}
-                </div>}
+                {this.state.data?.properties?.imagePreview && <ImageViewer src={this.state.data?.properties?.imagePreview} />}
                 <div>
                     <h1>{this.state.data.name}</h1>
                 </div>
@@ -139,7 +130,7 @@ export default class Inspector extends React.Component {
                 {this.renderProperties(this.state.data)}
             </div>
             <ActionsBar float spaced>
-                <div>
+                {this.state.hasManager &&
                     <antd.Button
                         icon={<Icons.Edit />}
                         onClick={this.onClickEdit}
@@ -148,7 +139,16 @@ export default class Inspector extends React.Component {
                             {t => t("Edit")}
                         </Translation>
                     </antd.Button>
-                </div>
+                }
+
+                <antd.Button
+                    icon={<Icons.HelpCircle />}
+                    onClick={this.onClickHelp}
+                >
+                    <Translation>
+                        {t => t("Help")}
+                    </Translation>
+                </antd.Button>
             </ActionsBar>
         </div>
     }

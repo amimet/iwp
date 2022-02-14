@@ -1,13 +1,13 @@
 import React from "react"
 import * as antd from "antd"
-import { User } from "models"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 import moment from "moment"
 import QRCode from "qrcode"
 
+import { User } from "models"
 import { Icons } from "components/Icons"
-import { Skeleton } from "components"
+import { Skeleton, OperatorsAssignments } from "components"
 
 import { PayloadsRender, PayloadInspector } from ".."
 import "./index.less"
@@ -128,6 +128,20 @@ export default class WorkorderDetails extends React.Component {
 			componentProps: {
 				workorderId: this.id,
 				payload: payloadData,
+			}
+		})
+	}
+
+	openOperatorSelector = () => {
+		window.app.DrawerController.open("OperatorSelector", OperatorsAssignments, {
+			componentProps: {
+				onAssignOperators: (operators) => {
+					this.onAssignOperator(operators)
+				},
+				onRemoveOperator: (operator) => {
+					this.onRemoveOperator(operator)
+				},
+				assigned: this.state.data.assigned,
 			}
 		})
 	}
@@ -256,7 +270,7 @@ export default class WorkorderDetails extends React.Component {
 						</antd.Button>
 					</div>
 					<div>
-						<antd.Button icon={<Icons.Users />}>
+						<antd.Button onClick={this.openOperatorSelector} icon={<Icons.Users />}>
 							<Translation>
 								{t => t("Manage operators")}
 							</Translation>

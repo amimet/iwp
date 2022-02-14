@@ -6,7 +6,7 @@ import classnames from "classnames"
 
 import moment from "moment"
 
-import { QuantityInput, Skeleton } from "components"
+import { QuantityInput, Skeleton, ImageViewer } from "components"
 import { Icons, createIconRender } from "components/Icons"
 
 import FORMULAS from "schemas/fabricFormulas"
@@ -307,20 +307,6 @@ export default class Inspector extends React.Component {
         })
     }
 
-    renderImagePreview = (item) => {
-        if (Array.isArray(item.properties.imagePreview)) {
-            return <Swiper>
-                {item.properties.imagePreview.map((image) => {
-                    return <Swiper.Item>
-                        <Image src={image} fit="cover" />
-                    </Swiper.Item>
-                })}
-            </Swiper>
-        }
-
-        return false
-    }
-
     render() {
         if (!this.state.data || this.state.loading) {
             return <Skeleton />
@@ -340,9 +326,7 @@ export default class Inspector extends React.Component {
 
         return <div className="payload_inspector">
             <div className="header">
-                {this.state.data?.properties?.imagePreview && <div className="images">
-                    {this.renderImagePreview(this.state.data)}
-                </div>}
+                {this.state.data?.properties?.imagePreview && <ImageViewer src={this.state.data?.properties?.imagePreview} />}
                 <div>
                     <h1>{this.state.data.name}</h1>
                 </div>

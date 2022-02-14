@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Stepper, Swiper, Image } from "antd-mobile"
 import { Icons, createIconRender } from "components/Icons"
-import { Fabric, Skeleton } from "components"
+import { Fabric, Skeleton, ImageViewer } from "components"
 import { Translation } from "react-i18next"
 
 import FORMULAS from "schemas/fabricFormulas"
@@ -109,9 +109,7 @@ export default class BrowserSelector extends React.Component {
 	renderSelectedItem = (item) => {
 		return <div className="inspector">
 			<div className="header">
-				{item?.properties?.imagePreview && <div className="images">
-					{this.renderImagePreview(item)}
-				</div>}
+				{item?.properties?.imagePreview && <ImageViewer src={item?.properties?.imagePreview} />}
 				<Translation>
 					{(t) => <h1>{t(item.name)}</h1>}
 				</Translation>
