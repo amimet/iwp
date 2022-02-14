@@ -3,7 +3,7 @@ import { Icons } from "components/Icons"
 import * as antd from "antd"
 import { getBase64 } from "utils"
 
-export default class Uploader extends React.Component {
+export default class ImageUploader extends React.Component {
     state = {
         previewVisible: false,
         previewImage: "",
