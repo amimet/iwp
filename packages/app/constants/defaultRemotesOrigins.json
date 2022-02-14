@@ -1,0 +1,4 @@
+{
+    "http_api": "https://devapi_amimet01.ragestudio.net",
+    "ws_api": "wss://devws_amimet01.ragestudio.net"
+}

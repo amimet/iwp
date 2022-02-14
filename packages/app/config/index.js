@@ -1,6 +1,7 @@
 import packagejson from "../package.json"
 import defaultTheme from "../constants/defaultTheme.json"
 import defaultSoundPack from "../constants/defaultSoundPack.json"
+import defaultRemotesOrigins from "../constants/defaultRemotesOrigins.json"
 
 export default {
     package: packagejson,
@@ -11,10 +12,10 @@ export default {
         alt: "/logo_alt.svg"
     },
     api: {
-        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : process.env.HTTP_API_ADDRESS,
+        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : defaultRemotesOrigins.http_api,
     },
     ws: {
-        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : process.env.WS_API_ADDRESS,
+        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : defaultRemotesOrigins.ws_api,
     },
     app: {
         title: packagejson.name,
