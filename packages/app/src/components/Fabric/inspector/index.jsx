@@ -44,7 +44,11 @@ export default class Inspector extends React.Component {
     }
 
     onClickEdit = () => {
-        // TODO: Open fabric modify mode
+        window.app.openFabricEditor(this.id, (result) => {
+            if (result) {
+                this.setState({ data: result })
+            }
+        })
     }
 
     renderProperties = (item) => {
@@ -138,7 +142,7 @@ export default class Inspector extends React.Component {
                 <div>
                     <antd.Button
                         icon={<Icons.Edit />}
-                        onClick={() => this.onClickEdit}
+                        onClick={this.onClickEdit}
                     >
                         <Translation>
                             {t => t("Edit")}
