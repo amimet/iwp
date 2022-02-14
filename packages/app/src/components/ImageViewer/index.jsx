@@ -25,7 +25,7 @@ const ImageViewer = (props) => {
         })
     }
 
-    return <div className={classnames("imagesViewer", { ["extended"]: props.extended })}>
+    return <div className={classnames("ImageViewer", { ["extended"]: props.extended })}>
         <Swiper>
             {props.src.map((image) => {
                 return <Swiper.Item
