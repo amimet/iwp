@@ -41,8 +41,7 @@ const ListItem = React.memo((props) => {
 		item.key = item._id ?? item.id
 	}
 
-	// FIXME: This sucks, you needs to stroke your fingers as fast as possible to make an double click work
-	const doubleClickSpeed = 100
+	const doubleClickSpeed = 400
 	let delayedClick = null
 	let clickedOnce = null
 
@@ -80,7 +79,7 @@ const ListItem = React.memo((props) => {
 	}
 
 	const onLongPress = () => {
-		if (isDisabled) {
+		if (props.onlyClickSelection || isDisabled) {
 			return false
 		}
 
@@ -90,6 +89,10 @@ const ListItem = React.memo((props) => {
 	}
 
 	const onClick = () => {
+		if (props.onlyClickSelection) {
+			return onOnceClick()
+		}
+
 		if (!delayedClick) {
 			delayedClick = _.debounce(onOnceClick, doubleClickSpeed)
 		}
@@ -289,6 +292,7 @@ export default class SelectableList extends React.Component {
 				onClickItem={this.onClickItem}
 				onLongPressItem={this.onLongPressItem}
 				renderChildren={this.props.renderItem}
+				onlyClickSelection={this.props.onlyClickSelection}
 			/>
 		}) : <antd.Empty image={antd.Empty.PRESENTED_IMAGE_SIMPLE} />
 
