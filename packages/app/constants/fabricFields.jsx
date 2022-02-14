@@ -88,7 +88,7 @@ export default {
         label: "Description",
         component: "textarea",
         updateEvent: "onChange",
-        onUpdate: (update) => {
+        onUpdate: (prev, update) => {
             return update.target.value
         },
         props: {
@@ -156,25 +156,9 @@ export default {
         // TODO
         label: "Image Preview",
         component: "uploader",
-        updateEvent: "onUpload",
-        onUpdate: async (update) => {
-            const api = window.app.request
-
-            const payloadData = new FormData()
-            payloadData.append(update.file.name, update.file)
-
-            const result = await api.post.upload(payloadData).catch(() => {
-                update.onError("Error uploading image")
-                return false
-            })
-
-            if (result) {
-                update.onSuccess()
-            }
-
-            console.log(result)
-
-            return result.urls
+        updateEvent: "onUploadDone",
+        onUpdate: async (prev, update) => {
+            return update
         },
     },
     vaultItemTypeSelector: {
@@ -202,7 +186,7 @@ export default {
         label: "Serial number",
         component: "input",
         updateEvent: "onChange",
-        onUpdate: (update) => {
+        onUpdate: (prev, update) => {
             return update.target.value
         },
         props: {
@@ -213,7 +197,7 @@ export default {
         label: "Manufacturer",
         component: "input",
         updateEvent: "onChange",
-        onUpdate: (update) => {
+        onUpdate: (prev, update) => {
             return update.target.value
         },
         props: {
@@ -224,7 +208,7 @@ export default {
         label: "Manufactured Year",
         component: "datepicker",
         updateEvent: "onChange",
-        onUpdate: (update) => {
+        onUpdate: (prev, update) => {
             return update.year()
         },
         props: {
