@@ -125,7 +125,7 @@ export default class FabricCreator extends React.Component {
 
         let state = this.state
         state.values[key] = value
-        
+
         this.setState(state)
     }
 
@@ -324,7 +324,7 @@ export default class FabricCreator extends React.Component {
             disabled: this.state.submitting,
             [field.updateEvent]: async (...args) => {
                 if (typeof field.onUpdate === "function") {
-                    return await this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, await field.onUpdate(...args))
+                    return await this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, await field.onUpdate(this.state.values[field.key], ...args))
                 }
                 return await this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, ...args)
             },
