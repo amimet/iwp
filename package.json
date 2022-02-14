@@ -11,5 +11,5 @@
     "app:dev": "cd packages/app && yarn dev",
     "server:dev": "cd packages/server && yarn dev"
   },
-  "version": "0.7.8"
+  "version": "0.7.9"
 }
