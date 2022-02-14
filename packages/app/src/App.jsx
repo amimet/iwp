@@ -251,6 +251,18 @@ class App {
 					},
 				})
 			},
+			openFabricEditor: (uuid, result) => {
+				window.app.DrawerController.open("fabric_editor", Fabric.Creator, {
+					componentProps: {
+						uuid: uuid,
+					},
+					onDone: (ctx, data) => {
+						if (typeof result === "function") {
+							return result(data)
+						}
+					}
+				})
+			},
 			openFabric: (defaultType) => {
 				window.app.DrawerController.open("fabric_creator", Fabric.Creator, {
 					props: {
