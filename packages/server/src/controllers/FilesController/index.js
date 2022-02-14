@@ -41,9 +41,24 @@ export default {
             const { id } = req.params
 
             const filePath = path.join(global.uploadPath, id)
+
+            const file = await fs.promises.readFile(filePath).catch(() => {
+                return false
+            })
+
+            if (!file) {
+                return res.status(404).json({
+                    error: "File not found",
+                })
+            }
+
             return res.sendFile(filePath)
         } catch (error) {
             console.log(error)
+
+            return res.status(500).json({
+                error: "Cannot get file",
+            })
         }
     },
 }
