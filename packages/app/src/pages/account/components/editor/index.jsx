@@ -1,9 +1,10 @@
 import React from "react"
-import debounce from "lodash/debounce"
-import { Icons } from "components/Icons"
-
-import classnames from "classnames"
 import * as antd from "antd"
+import debounce from "lodash/debounce"
+import { Translation } from "react-i18next"
+
+import { ActionsBar } from "components"
+import { Icons } from "components/Icons"
 
 import "./index.less"
 
@@ -53,11 +54,8 @@ export const EditAccountField = ({ id, component, props, header, handleChange, d
 		}
 	}
 
-	window.app.eventBus.on("discardAllChanges", () => {
-		setCurrentValue(defaultValue)
-	})
-
 	const RenderComponent = component
+
 	return (
 		<div key={id} className="edit_account_field">
 			{header ? header : null}
@@ -73,22 +71,16 @@ export default class EditAccount extends React.Component {
 		loading: false,
 	}
 
-	toogleLoading = (to) => {
-		this.setState({ loading: to ?? !this.state.loading })
-	}
+	onSave = async () => {
+		await this.setState({ loading: true })
 
-	onSaveDone = (error, data) => {
-		this.setState({ changes: [] })
-		this.toogleLoading(false)
-	}
+		const result = await this.props.onSave(this.state.changes)
 
-	onSave = () => {
-		this.props.onSave(this.state.changes, this.onSaveDone)
-	}
+		await this.setState({ changes: [], loading: false })
 
-	discardAll = () => {
-		window.app.eventBus.emit("discardAllChanges")
-		this.setState({ changes: [] }) // clean changes after emit, cause controller wont handle changes
+		if (typeof this.props.handleDone === "function") {
+			this.props.handleDone(result)
+		}
 	}
 
 	handleChange = (event) => {
@@ -105,33 +97,9 @@ export default class EditAccount extends React.Component {
 		this.setState({ changes })
 	}
 
-	renderActions = () => {
-		return (
-			<div className={classnames("edit_account_actions", { ["show"]: this.state.changes.length > 0 })}>
-				<div className="edit_account_actions_indicator">
-					{this.state.loading && <Icons.LoadingOutlined style={{ marginRight: "20px" }} />}
-					{this.state.changes.length} Changes
-				</div>
-				<div>
-					<antd.Button disabled={this.state.loading} type="primary" onClick={this.onSave}>
-						Save
-					</antd.Button>
-				</div>
-				<div>
-					<antd.Button disabled={this.state.loading} onClick={this.discardAll}>
-						Discard all
-					</antd.Button>
-				</div>
-			</div>
-		)
-	}
-
 	render() {
-		const { username, fullName, email } = this.state.values
-
 		return (
 			<div className="edit_account">
-				{this.renderActions()}
 				<div className="edit_account_wrapper">
 					<div className="edit_account_category">
 						<h2>
@@ -139,7 +107,7 @@ export default class EditAccount extends React.Component {
 						</h2>
 						<EditAccountField
 							id="username"
-							defaultValue={username}
+							defaultValue={this.state.values.username}
 							header={
 								<div>
 									<Icons.Tag /> Username
@@ -151,7 +119,7 @@ export default class EditAccount extends React.Component {
 						/>
 						<EditAccountField
 							id="fullName"
-							defaultValue={fullName}
+							defaultValue={this.state.values.fullName}
 							header={
 								<div>
 									<Icons.User /> Name
@@ -163,7 +131,7 @@ export default class EditAccount extends React.Component {
 						/>
 						<EditAccountField
 							id="email"
-							defaultValue={email}
+							defaultValue={this.state.values.email}
 							header={
 								<div>
 									<Icons.Mail /> Email
@@ -175,6 +143,16 @@ export default class EditAccount extends React.Component {
 						/>
 					</div>
 				</div>
+				<ActionsBar spaced>
+					<div>
+						{this.state.changes.length} Changes
+					</div>
+					<div>
+						<antd.Button loading={this.state.loading} disabled={this.state.loading} type="primary" onClick={this.onSave}>
+							Save
+						</antd.Button>
+					</div>
+				</ActionsBar>
 			</div>
 		)
 	}

@@ -1,9 +1,10 @@
 import React from "react"
 import * as antd from "antd"
+import { Translation } from "react-i18next"
 
 import { Icons } from "components/Icons"
-import { Skeleton } from "components"
-import { Session } from "models"
+import { Skeleton, ActionsBar } from "components"
+import { Session, User } from "models"
 
 import { AccountEditor, SessionsView, StatisticsView } from "./components"
 
@@ -62,6 +63,7 @@ export default class Account extends React.Component {
 	static bindApp = ["userController", "sessionController"]
 
 	state = {
+		hasManager: false,
 		isSelf: false,
 		user: null,
 		sessions: null
@@ -86,10 +88,17 @@ export default class Account extends React.Component {
 			state.user = await this.props.contexts.app.userController.getData({ username: requestedUser })
 		}
 
+		state.hasManager = await User.hasRole("manager")
+		state.hasAdmin = await User.hasRole("admin")
+
 		this.setState(state)
 	}
 
-	handleUpdateUserData = async (changes, callback) => {
+	handleSignOutAll = () => {
+		return this.props.contexts.app.sessionController.destroyAllSessions()
+	}
+
+	handleUpdateUserData = async (changes) => {
 		const update = {}
 
 		if (Array.isArray(changes)) {
@@ -98,36 +107,31 @@ export default class Account extends React.Component {
 			})
 		}
 
-		await this.api.put
-			.selfUser(update)
-			.then((data) => {
-				callback(false, data)
-			})
-			.catch((err) => {
-				callback(true, err)
-			})
-
-		window.app.eventBus.emit("reinitializeUser")
-	}
-
-	handleSignOutAll = () => {
-		return this.props.contexts.app.sessionController.destroyAllSessions()
+		return await this.api.put.user({ _id: this.state.user._id, update }).catch((err) => {
+			antd.message.error(err.message)
+			console.error(err)
+			return false
+		})
 	}
 
 	openUserEdit = () => {
 		window.app.DrawerController.open("editAccount", AccountEditor, {
 			props: {
 				keyboard: false,
-				width: "45%",
-				bodyStyle: {
-					overflow: "hidden",
-				},
 			},
 			componentProps: {
 				onSave: this.handleUpdateUserData,
 				user: this.state.user,
 			},
+			onDone: (ctx, value) => {
+				this.setState({ user: value })
+				ctx.close()
+			}
 		})
+	}
+
+	openRolesManager = () => {
+
 	}
 
 	render() {
@@ -154,6 +158,27 @@ export default class Account extends React.Component {
 						}
 					</div>
 				</div>
+
+				{(this.state.isSelf || this.state.hasManager) && <ActionsBar spaced padding="8px">
+					<antd.Button
+						icon={<Icons.Edit />}
+						shape="round"
+						onClick={this.openUserEdit}
+					>
+						<Translation>
+							{(t) => <>{t("Edit")}</>}
+						</Translation>
+					</antd.Button>
+					{this.state.hasAdmin && <antd.Button
+						icon={<Icons.Link />}
+						shape="round"
+						onClick={this.openRolesManager}
+					>
+						<Translation>
+							{(t) => <>{t("Manage roles")}</>}
+						</Translation>
+					</antd.Button>}
+				</ActionsBar>}
 
 				{this.state.isSelf && (
 					<SelfView

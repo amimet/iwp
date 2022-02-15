@@ -7,6 +7,12 @@ import { Token, Schematized } from '../../lib'
 import AvatarController from 'dicebar_lib'
 import _ from 'lodash'
 
+const AllowedUserUpdateKeys = [
+    "username",
+    "email",
+    "fullName",
+]
+
 export default {
     isAuth: (req, res) => {
         return res.json(`You look nice today 😎`)
@@ -129,9 +135,30 @@ export default {
                 return res.send(500).send(err)
             })
     },
-    update: async (req, res) => {
-        // TODO
-    },
+    update: Schematized({
+        required: ["_id", "update"],
+        select: ["_id", "update"],
+    },async (req, res) => {
+        let user = await User.findById(req.selection._id)
+
+        if (!user) {
+            return res.status(404).json({ error: "User not exists" })
+        }
+
+        AllowedUserUpdateKeys.forEach((key) => {
+            if (typeof req.selection.update[key] !== "undefined") {
+                user[key] = req.selection.update[key]
+            }
+        })
+
+        user.save()
+            .then(() => {
+                return res.send(user)
+            })
+            .catch((err) => {
+                return res.send(500).send(err)
+            })
+    }),
     login: async (req, res) => {
         passport.authenticate("local", { session: false }, async (error, user, options) => {
             if (error) {
