@@ -1,4 +1,5 @@
 {
+    "Dashboard": "Inicio",
     "main_welcome": "Bienvenido,",
     "assigned_for_you": "Asignado para usted",
     "no_assigned_workorders": "No hay trabajos asignados",
@@ -13,6 +14,8 @@
     "ended": "finalizado",
     "Expired": "Expirado",
     "expired": "expirado",
+    "Stopped": "Parado",
+    "stopped": "parado",
     "Pending": "Pendiente",
     "pending": "pendiente",
     "Finished": "Finalizado",
@@ -81,6 +84,11 @@
     "Section": "Sección",
     "Sections": "Secciones",
 
+    "Workshift": "Turno",
+    "workshift": "turno",
+    "Workshifts": "Turnos",
+    "workshifts": "turnos",
+
     "Operation": "Operación",
     "Operations": "Operaciones",
     "Stock Target": "Stock objetivo",
@@ -132,6 +140,16 @@
     "Marked amount target": "Cantidad objetivo marcada",
     "Marked amount stock": "Cantidad stock marcada",
 
+    "Notifications Sound": "Sonido de notificación",
+    "Play a sound when a notification is received.": "Reproducir un sonido cuando se recibe una notificación.",
+    "Vibration": "Vibración",
+    "Vibrate the device when a notification is received.": "Vibrar el dispositivo cuando se recibe una notificación.",
+    "Sound Volume": "Volumen de sonido",
+    "Set the volume of the sound when a notification is received.": "Establecer el volumen del sonido cuando se recibe una notificación.",
+    "Workorder Notifications": "Notificaciones de orden de trabajo",
+    "Display in-app notifications for workorders updates.": "Mostrar notificaciones para las actualizaciones de las ordenes de trabajo.",
+
+    "Accounts": "Cuentas",
     "Import": "Importar",
     "Export": "Exportar",
     "Refresh": "Actualizar",
