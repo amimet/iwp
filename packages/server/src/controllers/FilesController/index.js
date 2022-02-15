@@ -2,7 +2,7 @@ import path from "path"
 import fs from "fs"
 
 function resolveToUrl(filepath) {
-    return `${global.globalPublicURI}:${global.httpListenPort}/uploads/${filepath}`
+    return `${global.globalPublicURI}/uploads/${filepath}`
 }
 
 export default {
