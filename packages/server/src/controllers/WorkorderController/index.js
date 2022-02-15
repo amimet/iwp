@@ -41,7 +41,10 @@ function stepWorkorderUpdate(workorder) {
 
         // if all payloads are reached, mark workorder as finished
         if (workorder.payloads && workorder.payloads.every(payload => payload.quantityReached)) {
-            workorder.status = "finished"
+            // mark workorder as finished only the first time
+            if (!workorder.finished) {
+                workorder.status = "finished"
+            }
             workorder.finished = true
         }
 
@@ -256,7 +259,7 @@ export default {
 
             if (workorder) {
                 //FIXME: if update method fails, this will be added to the success array anyways
-                workorder = Methods.update(_id, update).catch((err) => {
+                workorder = await Methods.update(_id, update).catch((err) => {
                     return false
                 })
 
@@ -357,7 +360,7 @@ export default {
                     delete req.selection.section
                     break
                 case "finished":
-                    req.selection.status = "finished"
+                    req.selection.finished = true
                     delete req.selection.section
                     break
                 case "archived":
