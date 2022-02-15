@@ -90,7 +90,11 @@ export default class SettingsMenu extends React.Component {
 			case "select": {
 				item.props.onChange = (value) => this.handleUpdate(item, value)
 				item.props.defaultValue = this.state.settings[item.id]
-
+				break
+			}
+			case "slider":{
+				item.props.defaultValue = this.state.settings[item.id]
+				item.props.onAfterChange = (value) => this.handleUpdate(item, value)
 				break
 			}
 			default: {
