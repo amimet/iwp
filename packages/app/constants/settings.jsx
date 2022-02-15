@@ -18,6 +18,45 @@ export default [
         "emitEvent": "changeLanguage"
     },
     {
+        "id": "notifications_sound",
+        "group": "notifications",
+        "type": "Switch",
+        "icon": "MdVolumeUp",
+        "title": "Notifications Sound",
+        "description": "Play a sound when a notification is received.",
+    },
+    {
+        "id": "notifications_vibrate",
+        "group": "notifications",
+        "type": "Switch",
+        "icon": "MdVibration",
+        "title": "Vibration",
+        "description": "Vibrate the device when a notification is received.",
+        "emitEvent": "changeNotificationsVibrate"
+    },
+    {
+        "id": "notifications_sound_volume",
+        "group": "notifications",
+        "type": "Slider",
+        "icon": "MdVolumeUp",
+        "title": "Sound Volume",
+        "description": "Set the volume of the sound when a notification is received.",
+        "props": {
+            tipFormatter: (value) => {
+                return `${value}%`
+            }
+        },
+        "emitEvent": "changeNotificationsSoundVolume"
+    },
+    {
+        "id": "workorder_notifications",
+        "group": "notifications",
+        "type": "Switch",
+        "icon": "Bell",
+        "title": "Workorder Notifications",
+        "description": "Display in-app notifications for workorders updates.",
+    },
+    {
         "id": "edit_sidebar",
         "group": "sidebar",
         "type": "Button",
