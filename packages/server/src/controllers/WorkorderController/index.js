@@ -85,7 +85,9 @@ const Methods = {
         global.wsInterface.io.emit(`workorderFinished_${_id}`, workorder)
     },
     update: async (_id, update) => {
-        let workorder = await Workorder.findById(_id)
+        let workorder = await Workorder.findById(_id).catch(err => {
+            throw new Error(err)
+        })
 
         const allowedUpdates = ["commits", "payloads", "assigned", "expired", "finished", "status", "section", "name"]
 
@@ -233,19 +235,40 @@ export default {
         required: ["_id", "update"],
         select: ["_id", "update"],
     }, async (req, res) => {
-        let workorder = await Workorder.findById(req.selection._id).catch((err) => {
-            return res.status(404).json({
-                error: "Workorder not found",
-            })
-        })
+        let result = {
+            failed: [],
+            success: [],
+        }
+        let query = []
 
-        workorder = Methods.update(workorder, req.selection.update).catch((err) => {
-            return res.status(500).json({
-                error: err,
-            })
-        })
+        if (Array.isArray(req.selection._id)) {
+            query = req.selection._id
+        } else {
+            query.push(req.selection._id)
+        }
 
-        return res.json(workorder)
+        for await (const [index, _id] of query.entries()) {
+            let update = Array.isArray(req.selection._id) && Array.isArray(req.selection.update) ? req.selection.update[index] : req.selection.update
+
+            let workorder = await Workorder.findById(_id).catch((err) => {
+                return false
+            })
+
+            if (workorder) {
+                //FIXME: if update method fails, this will be added to the success array anyways
+                workorder = Methods.update(_id, update).catch((err) => {
+                    return false
+                })
+
+                result.success.push(workorder)
+            } else {
+                result.failed.push(_id)
+            }
+
+            continue
+        }
+
+        return res.json(result)
     }),
     set: Schematized({
         required: ["payloads", "section", "name"],
@@ -318,10 +341,6 @@ export default {
     }, async (req, res) => {
         let workorders = null
 
-        if (req.selection.section === "all") {
-            delete req.selection.section
-        }
-
         if (req.selection._id) {
             const data = await Workorder.findById(req.selection._id)
 
@@ -333,6 +352,23 @@ export default {
 
             workorders = [data]
         } else {
+            switch (req.selection.section) {
+                case "all":
+                    delete req.selection.section
+                    break
+                case "finished":
+                    req.selection.status = "finished"
+                    delete req.selection.section
+                    break
+                case "archived":
+                    req.selection.status = "archived"
+                    delete req.selection.section
+                    break
+                default:
+                    req.selection.status = { $nin: ["archived", "finished"] }
+                    break
+            }
+
             workorders = await Workorder.find(req.selection)
         }
 
