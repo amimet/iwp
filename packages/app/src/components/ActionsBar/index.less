@@ -1,6 +1,7 @@
 @actionsBar_height: fit-content;
 
 .actionsBar {
+	--ignore-dragger: true;
 	display: inline-block;
 	white-space: nowrap;
 
@@ -42,7 +43,8 @@
 			flex-direction: column;
 			align-items: flex-start;
 			justify-content: center;
-			
+			--ignore-dragger: true;
+
 			span {
 				height: fit-content;
 			}
