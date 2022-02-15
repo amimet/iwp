@@ -7,18 +7,20 @@
     "End": "Finalizar",
     "Stop": "Parar",
 
+    "Started": "Iniciado",
+    "started": "iniciado",
+    "Ended": "Finalizado",
+    "ended": "finalizado",
+    "Expired": "Expirado",
+    "expired": "expirado",
     "Pending": "Pendiente",
     "pending": "pendiente",
-
-    "Finished": "Terminado",
+    "Finished": "Finalizado",
     "finished": "terminado",
-
     "Cancelled": "Cancelado",
     "cancelled": "cancelado",
-
     "Assigned": "Asignado",
     "assigned": "asignado",
-
     "Ready": "Listo",
     "ready": "listo",
 
@@ -174,6 +176,17 @@
     "Do you want to delete these items?": "¿Desea eliminar estos elementos?",
     "This action cannot be undone, and will permanently delete the selected items.": "Esta acción no se puede deshacer, y eliminará permanentemente los elementos seleccionados.",
     
+    "Assigned operators": "Operadores asignados",
+    "Assigments": "Asignaciones",
+
+    "Update": "Actualizar",
+    "Update status": "Actualizar estado",
+
+    "Archived": "Archivado",
+    "archived": "archivado",
+    "Archive": "Archivar",
+    "archive": "archivar",
+
     "General": "General",
     "Sidebar": "Barra lateral",
     "Aspect": "Aspecto",
