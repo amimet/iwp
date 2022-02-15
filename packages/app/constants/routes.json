@@ -11,6 +11,11 @@
         "icon": "GitCommit"
     },
     {
+        "id": "fabric",
+        "title": "Fabric",
+        "icon": "Box"
+    },
+    {
         "id": "users",
         "title": "Users",
         "icon": "Users",
@@ -44,11 +49,7 @@
             }
         ]
     },
-    {
-        "id": "fabric",
-        "title": "Fabric",
-        "icon": "Box"
-    },
+   
     {
         "id": "vault",
         "title": "Vault",
