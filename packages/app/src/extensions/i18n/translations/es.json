@@ -47,12 +47,17 @@
     "State": "Estado",
     "Modify": "Modificar",
     "modify": "modificar",
+
+    "Notifications": "Notificaciones",
+    "Notification": "Notificación",
     
     "Manage operators": "Administrar operadores",
     "Manage users": "Administrar usuarios",
     "Manage groups": "Administrar grupos",
     "Manage workflows": "Administrar flujos de trabajo",
-
+    "Manage roles": "Administrar roles",
+    "Manage permissions": "Administrar permisos",
+    
     "Disable": "Deshabilitar",
     "Disabled": "Deshabilitado",
     "Discard": "Descartar",
