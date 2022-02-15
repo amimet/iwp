@@ -11,6 +11,8 @@
 			align-items: center;
 
 			user-select: none;
+			--webkit-user-select: none;
+
 			width: 100%;
 			height: fit-content;
 
@@ -59,11 +61,9 @@
 				border-radius: 8px;
 				margin-bottom: 12px;
 
-				h1 {
+				h1, h3 {
 					user-select: none;
-				}
-				h3 {
-					user-select: none;
+					--webkit-user-select: none;
 				}
 			}
 		}

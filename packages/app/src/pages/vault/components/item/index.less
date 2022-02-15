@@ -31,7 +31,7 @@
 	}
 
 	.nameInput:focus {
-		color: rgb(70, 70, 70);	
+		color: rgb(70, 70, 70);
 		border-color: var("--primaryColor");
 	}
 
@@ -55,8 +55,9 @@
 			}
 
 			&.selectable {
-				.ant-tag h4 {
-					user-select: all!important;
+				.ant-tag h4 {
+					user-select: all !important;
+					--webkit-user-select: all !important;
 				}
 			}
 		}
@@ -65,4 +66,5 @@
 
 .selectable {
 	user-select: all;
+	--webkit-user-select: all;
 }
