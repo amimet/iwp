@@ -31,7 +31,12 @@ export default class NavigationMenu extends React.Component {
 
         return items.map((group) => {
             return <div key={group.id} className="group">
-                <h2>{Icons[group.icon] && createIconRender(group.icon)}{group.title}</h2>
+                <h2>
+                    {Icons[group.icon] && createIconRender(group.icon)}
+                    <Translation>
+                        {(t) => t(group.title)}
+                    </Translation>
+                </h2>
                 <div className="items">
                     {
                         group.children.map((item) => {
@@ -65,9 +70,7 @@ export default class NavigationMenu extends React.Component {
 
     render() {
         return <div className="navigation">
-                {
-                    this.generateMenus(Items)
-                }
+            {this.generateMenus(Items)}
         </div>
     }
 }
