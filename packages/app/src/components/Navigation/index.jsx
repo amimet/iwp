@@ -1,4 +1,6 @@
 import React from "react"
+import { Translation } from "react-i18next"
+
 import Items from "schemas/routes.json"
 import { Icons, createIconRender } from "components/Icons"
 
@@ -10,21 +12,35 @@ export default class NavigationMenu extends React.Component {
         this.props.close()
     }
 
-    generateItems = () => {
-        // flatten items.children as new items
-        const items = []
-
-        Items.forEach((item) => {
+    generateMenus = (items) => {
+        // group items it has children to a new array and the rest to a general array
+        items = items.reduce((acc, item) => {
             if (item.children) {
-                item.children.forEach((child) => {
-                    items.push({ ...child, parent: item.id })
-                })
+                acc.push(item)
             } else {
-                items.push(item)
+                acc[0].children.push(item)
             }
-        })
 
-        return items
+            return acc
+        }, [{
+            id: "general",
+            title: "General",
+            icon: "Home",
+            children: []
+        }])
+
+        return items.map((group) => {
+            return <div key={group.id} className="group">
+                <h2>{Icons[group.icon] && createIconRender(group.icon)}{group.title}</h2>
+                <div className="items">
+                    {
+                        group.children.map((item) => {
+                            return this.renderItem(item)
+                        })
+                    }
+                </div>
+            </div>
+        })
     }
 
     renderItem = (item, index) => {
@@ -38,20 +54,20 @@ export default class NavigationMenu extends React.Component {
                 {Icons[item.icon] && createIconRender(item.icon)}
             </div>
             <div className="name">
-                <h1>{item.title ?? item.id}</h1>
+                <h1>
+                    <Translation>
+                        {(t) => t(item.title ?? item.id)}
+                    </Translation>
+                </h1>
             </div>
         </div>
     }
 
     render() {
         return <div className="navigation">
-            <div className="buttons">
                 {
-                    this.generateItems().map((item, index) => {
-                        return this.renderItem(item, index)
-                    })
+                    this.generateMenus(Items)
                 }
-            </div>
         </div>
     }
 }

@@ -2,70 +2,90 @@
 @buttonBorderRadius: 8px;
 
 .navigation {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+    width: 100%;
+    overflow: hidden;
 
-    height: 100%;
+    .group {
+        display: inline-flex;
+        flex-direction: column;
 
-    overflow-y: overlay;
-    overflow-x: hidden;
-
-    .buttons {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-    
         width: 100%;
-        height: fit-content;
-    
-        align-items: center;
-        justify-content: center;
-    
-        > div {
-            margin: 10px;
-        }
-    
-        .item {
-            display: flex;
-            flex-direction: column;
+        overflow: hidden;
+
+        .items {
+            // make an scrollable bar
+            display: inline-flex;
+            flex-direction: row;
             align-items: center;
-            justify-content: center;
-    
-            background-color: var(--background-color-accent);
-    
-            width: @buttonSize;
-            height: @buttonSize;
-    
-            border-radius: @buttonBorderRadius;
-            padding: 10px;
-    
-            transition: all 80ms ease-in-out;
+            
+            width: max-content;
+            white-space: nowrap;
+            overflow-x: scroll;
 
-            .icon {
-                svg {
-                    margin: 0 !important;
-                    font-size: 2rem;
+            justify-content: space-between;
+
+            .item {
+                --ignore-dragger: true;
+
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                margin: 0 10px;
+                padding: 10px;
+
+                width: @buttonSize!important;
+                height: @buttonSize!important;
+                
+                border-radius: @buttonBorderRadius;
+                
+                background-color: var(--background-color-accent);
+                transition: all 80ms ease-in-out;
+                
+                white-space: nowrap;
+                overflow: hidden;
+
+                .icon {
+                    svg {
+                        margin: 0 !important;
+                        font-size: 2rem;
+                    }
+                }
+                
+                .name {
+                    padding-top: 10px;
+                    color: var(--background-color-contrast);
+
+                    word-break: break-all;
+                    overflow: hidden;
+
+                    text-overflow: ellipsis;
+                    width: 100%;
+                    text-align: center;
+                    
+                    h1 {
+                        word-break: break-all;
+                        width: 100%;
+                        
+                        font-size: 1.1rem;
+                        margin: 0!important;
+                    }
                 }
             }
     
-            .name {
-                padding-top: 10px;
+            .item:active {
+                background-color: var(--background-color-primary);
                 color: var(--background-color-contrast);
-
-                h1 {
-                    font-size: 1.1rem;
-                    margin: 0!important;
-                }
+                transform: scale(0.9);
             }
         }
 
-        .item:active {
-            background-color: var(--background-color-primary);
-			color: var(--background-color-contrast);
-			transform: scale(0.9);
+        > div {
+            margin-bottom: 20px;
         }
     }
 }
