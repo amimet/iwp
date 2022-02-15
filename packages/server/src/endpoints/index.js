@@ -167,7 +167,7 @@ module.exports = [
         route: "/workorder",
         method: "PUT",
         middleware: ["withAuthentication", "useWS"],
-        fn: "WorkorderController.set",
+        fn: "WorkorderController.create",
     },
     {
         route: "/workorder",
@@ -175,6 +175,7 @@ module.exports = [
         middleware: ["withAuthentication", "useWS"],
         fn: "WorkorderController.delete",
     },
+    // Sections
     {
         route: "/section",
         method: "GET",

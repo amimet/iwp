@@ -270,7 +270,7 @@ export default {
 
         return res.json(result)
     }),
-    set: Schematized({
+    create: Schematized({
         required: ["payloads", "section", "name"],
     }, async (req, res) => {
         const { payloads, section, name, assigned, scheduledStart, scheduledFinish, workshift } = req.body
