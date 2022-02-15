@@ -42,7 +42,7 @@ import { StatusBar, Style } from "@capacitor/status-bar"
 import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
-import { API, SettingsController, Render, Splash, Theme, Sound, i18n } from "extensions"
+import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Workorder, Fabric, Navigation } from "components"
@@ -174,27 +174,6 @@ class App {
 		return {
 			// TODO: Open with popup controller instead drawer controller
 			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
-			newNotification: (notification = {}) => {
-				if (typeof notification === "string") {
-					notification = {
-						title: "New notification",
-						description: notification
-					}
-				}
-
-				antd.notification.open({
-					message: <Translation>
-						{(t) => t(notification.title)}
-					</Translation>,
-					description: <Translation>
-						{(t) => t(notification.description)}
-					</Translation>,
-					duration: notification.duration ?? 4,
-					icon: React.isValidElement(notification.icon) ? notification.icon : (Icons[notification.icon] ?? <Icons.Bell />),
-				})
-
-				window.app.SoundEngine.play("notification")
-			},
 			openCreateNew: () => {
 				const handler = React.createRef()
 
@@ -378,10 +357,12 @@ class App {
 		// declare WS Handlers
 
 		window.app.handleWSListener("workorderAssigned", async () => {
-			window.app.newNotification({
-				title: "New workorder assigned",
-				description: "Check the new list of workorder"
-			})
+			if (window.app.settings.get("workorder_notifications")) {
+				window.app.notifications.new({
+					title: "New workorder assigned",
+					description: "Check the new list of workorder"
+				})
+			}
 		})
 
 		this.eventBus.emit("render_initialization_done")
@@ -501,6 +482,7 @@ export default CreateEviteApp(App, {
 		SettingsController,
 		i18n.extension,
 		Sound.extension,
+		Notifications.extension,
 		API,
 		Render.extension,
 		Theme.extension,
