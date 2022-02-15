@@ -7,12 +7,45 @@ import QRCode from "qrcode"
 
 import { User } from "models"
 import { Icons } from "components/Icons"
-import { Skeleton, OperatorsAssignments } from "components"
+import { Skeleton, ActionsBar, OperatorsAssignments } from "components"
 
 import { PayloadsRender, PayloadInspector } from ".."
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
+
+const OperatorsAssignmentsWrapper = (props) => {
+	return <div>
+		<h1>
+			<Icons.Users />
+			<Translation>
+				{t => t("Assigned operators")}
+			</Translation>
+		</h1>
+
+		<OperatorsAssignments {...props} />
+	</div>
+}
+
+const StatementSelector = (props) => {
+	const statements = ["archived", "finished", "pending", "started", "expired",]
+
+	return <div>
+		<Translation>
+			{t => t("Select a statement to add to the workorder")}
+		</Translation>
+
+		<antd.Select
+			{...props}
+		>
+			{statements.map(statement => {
+				return <antd.Select.Option key={statement}>
+					{statement}
+				</antd.Select.Option>
+			})}
+		</antd.Select>
+	</div>
+}
 
 export default class WorkorderDetails extends React.Component {
 	state = {
@@ -143,7 +176,7 @@ export default class WorkorderDetails extends React.Component {
 	}
 
 	openOperatorSelector = () => {
-		window.app.DrawerController.open("OperatorSelector", OperatorsAssignments, {
+		window.app.DrawerController.open("OperatorSelector", OperatorsAssignmentsWrapper, {
 			componentProps: {
 				onAssignOperators: (operators) => {
 					this.onAssignOperator(operators)
@@ -154,6 +187,41 @@ export default class WorkorderDetails extends React.Component {
 				assigned: this.state.data.assigned,
 			}
 		})
+	}
+
+	openStatementSelector = () => {
+		antd.Modal.confirm({
+			title: <Translation>
+				{t => t("Select a statement")}
+			</Translation>,
+			content: <StatementSelector
+				onChange={(value) => {
+					this.onUpdateStatement(value)
+				}}
+			/>
+
+		})
+	}
+
+	handleStatementMenuClick = (e) => {
+		this.onUpdateStatement(e.key)
+	}
+
+	onUpdateStatement = async (statement) => {
+		const result = await this.api.put.updateWorkorder({
+			_id: this.id,
+			update: {
+				status: statement,
+			}
+		}).catch((err) => {
+			return false
+		})
+
+		if (result) {
+			ctx.unselectAll()
+		}
+
+		return result
 	}
 
 	onAssignOperator = async (data) => {
@@ -210,6 +278,19 @@ export default class WorkorderDetails extends React.Component {
 		const datesDiff = this.getDiffBetweenDates(data.scheduledStart, data.scheduledFinish)
 		const isExpired = this.isExpired(finishReached, data.status)
 
+		const StatementMenu = <antd.Menu
+			selectedKeys={[data.status]}
+			onClick={this.handleStatementMenuClick}
+		>
+			{["Archived", "Finished", "Pending", "Started", "Expired",].map(statement => {
+				return <antd.Menu.Item key={statement.toLowerCase()}>
+					<Translation>
+						{t => t(statement)}
+					</Translation>
+				</antd.Menu.Item>
+			})}
+		</antd.Menu>
+
 		return (
 			<div className={classnames("workorder_details", { ["mobile"]: window.isMobile })} id={this.id} ref={this.ref} >
 				<div className="workorder_details header">
@@ -219,20 +300,22 @@ export default class WorkorderDetails extends React.Component {
 						</antd.Tooltip>
 					</div>}
 					<div className="workorder_details header content">
-						{data.scheduledFinish ? <h1>
+						{data.scheduledFinish || data.finished ? <h1>
 							<antd.Badge.Ribbon
 								text={
 									<Translation>
-										{t => isExpired ? t("expired") : `${datesDiff.daysLeft} ${t("days left")}`}
+										{t => data.finished ? t("Finished") : (isExpired ? t("expired") : `${datesDiff.daysLeft} ${t("days left")}`)}
 									</Translation>
 								}
 								color={isExpired ? "red" : undefined}
 							><Icons.Box /> {data.name}
 
 							</antd.Badge.Ribbon>
-						</h1> : <h1><Icons.Box /> {data.name}</h1>}
+						</h1> :
+							<h1>
+								<Icons.Box /> {data.name}
+							</h1>}
 					</div>
-
 				</div>
 
 				<div className="workorder_details info">
@@ -269,9 +352,20 @@ export default class WorkorderDetails extends React.Component {
 							{data.commits?.length}
 						</div>
 					</div>
+					<div key="assignments">
+						<div className="name">
+							<Icons.Users />
+							<Translation>
+								{t => t("Assignments")}
+							</Translation>
+						</div>
+						<div className="value">
+							{data.assigned?.length}
+						</div>
+					</div>
 				</div>
 
-				{this.state.hasManager && <div className="manager_actions">
+				{this.state.hasManager && <ActionsBar spaced padding="8px">
 					<div>
 						<antd.Button
 							icon={<Icons.Edit />}
@@ -292,7 +386,20 @@ export default class WorkorderDetails extends React.Component {
 							</Translation>
 						</antd.Button>
 					</div>
-				</div>}
+					<div>
+						<antd.Dropdown
+							overlay={StatementMenu}
+						>
+							<antd.Button
+								icon={<Icons.Eye />}
+							>
+								<Translation>
+									{t => t("Update status")}
+								</Translation>
+							</antd.Button>
+						</antd.Dropdown>
+					</div>
+				</ActionsBar>}
 
 				<div className="workorder_details payloads">
 					<div className="header">
