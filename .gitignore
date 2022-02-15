@@ -23,6 +23,7 @@
 /**/**/yarn-error.log
 /**/**/dumps.log
 /**/**/corenode.log
+/**/**/__DockerVolumes
 
 # Temporal configurations
 /**/**/.aliaser
