@@ -17,18 +17,19 @@ export class SoundEngine {
         Object.keys(soundPack).forEach((key) => {
             const src = soundPack[key]
 
-            soundPack[key] = new Howl({
+            soundPack[key] = (options) => new Howl({
+                volume: window.app.settings.get("generalAudioVolume") ?? 0.5,
+                ...options,
                 src: [src],
-                volume: window.app.settings.get("audioVolume") ?? 0.2,
             })
         })
 
         return soundPack
     }
 
-    play = (name) => {
+    play = (name, options) => {
         if (this.sounds[name]) {
-            return this.sounds[name].play()
+            return this.sounds[name](options).play()
         } else {
             console.error(`Sound ${name} not found.`)
             return false
