@@ -1,4 +1,8 @@
 {
+    "workorder_notifications": true,
+    "notifications_sound": true,
+    "notifications_vibrate": true,
+    "notifications_sound_volume": 50,
     "collapseOnLooseFocus": true,
     "language": "es",
     "sidebarKeys": [
