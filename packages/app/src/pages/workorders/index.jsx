@@ -7,6 +7,7 @@ import classnames from "classnames"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
 
+import { User } from "models"
 import { Icons } from "components/Icons"
 import { ActionsBar, SelectableList, SearchButton, Skeleton } from "components"
 
@@ -44,11 +45,23 @@ const renderDate = (time) => {
 	)
 }
 
+const managerActions = [
+	<div key="archive" call="onArchive">
+		<Icons.Archive />
+		<Translation>
+			{t => t("Archive")}
+		</Translation>
+	</div>,
+	<div key="delete" type="danger" call="onDelete" shape="circle">
+		<Icons.Trash style={{ margin: 0 }} />
+	</div>,
+]
+
 export default class Workorders extends React.Component {
 	state = {
+		hasManager: false,
 		loading: true,
 		sections: [],
-		viewFinished: false,
 		selectedSection: "all",
 		searchValue: null,
 		workorders: null,
@@ -62,10 +75,8 @@ export default class Workorders extends React.Component {
 		})
 
 		window.app.handleWSListener("workorderUpdate", (data) => {
-			let workorders = this.state.workorders
-
-			workorders = workorders.map((workorder) => {
-				if (workorder.id === data.id) {
+			let workorders = this.state.workorders.map((workorder) => {
+				if (workorder._id === data._id) {
 					return data
 				}
 
@@ -77,17 +88,17 @@ export default class Workorders extends React.Component {
 
 		await this.loadSections()
 		await this.fetchWorkorders(this.state.selectedSection)
+
+		await this.setState({ hasManager: await User.hasRole("manager") })
 	}
 
-	fetchWorkorders = async (sectionId, viewFinished) => {
+	fetchWorkorders = async (sectionId) => {
 		sectionId = sectionId ?? this.state.selectedSection
-		viewFinished = viewFinished ?? this.state.viewFinished
 
 		await this.setState({ loading: true })
 
 		const data = await this.api.get.workorder(undefined, {
 			section: sectionId,
-			finished: this.state.viewFinished,
 		}).catch((err) => {
 			console.error(err)
 			return false
@@ -159,6 +170,7 @@ export default class Workorders extends React.Component {
 			content: <Translation>
 				{t => t("This action cannot be undone, and will permanently delete the selected items.")}
 			</Translation>,
+			okType: "danger",
 			onOk: () => {
 				return new Promise((resolve, reject) => {
 					this.api.delete
@@ -171,6 +183,37 @@ export default class Workorders extends React.Component {
 						.catch((err) => {
 							return reject(err)
 						})
+				})
+			},
+		})
+	}
+
+	onArchiveWorkorders = (ctx, keys) => {
+		antd.Modal.confirm({
+			title: <Translation>
+				{t => t("Do you want to archive these items?")}
+			</Translation>,
+			icon: <Icons.ExclamationCircleOutlined />,
+			content: <Translation>
+				{t => t("These items will be moved to the archive, and will no longer be visible to users. You can view them in the archive section.")}
+			</Translation>,
+			okType: "danger",
+			onOk: () => {
+				return new Promise(async (resolve, reject) => {
+					const result = await this.api.put.updateWorkorder({
+						_id: keys,
+						update: {
+							status: "archived",
+						}
+					}).catch((err) => {
+						reject(err)
+						return false
+					})
+
+					if (result) {
+						ctx.unselectAll()
+						return resolve()
+					}
 				})
 			},
 		})
@@ -270,15 +313,11 @@ export default class Workorders extends React.Component {
 	renderWorkorders = (list) => {
 		const actions = []
 
-		// TODO: Fetch user permissions and check if user has permission to delete
-		actions.push(
-			<div key="delete" call="onDelete">
-				<Icons.Trash />
-				<Translation>
-					{t => t("Delete")}
-				</Translation>
-			</div>,
-		)
+		if (this.state.hasManager) {
+			managerActions.forEach((action) => {
+				actions.push(action)
+			})
+		}
 
 		if (list.length === 0) {
 			return <antd.Result
@@ -294,6 +333,7 @@ export default class Workorders extends React.Component {
 			onDoubleClick={this.onDoubleClickItem}
 			events={{
 				onDelete: this.onDeleteWorkorders,
+				onArchive: this.onArchiveWorkorders,
 			}}
 			renderItem={this.renderItem}
 		/>
@@ -308,21 +348,6 @@ export default class Workorders extends React.Component {
 							<SearchButton
 								onSearch={this.onSearch}
 								onChange={this.onSearch}
-							/>
-						</div>
-						<div>
-							<span>
-								<Translation>
-									{t => t("View finished")}
-								</Translation>
-							</span>
-							<antd.Switch
-								value={this.state.viewFinished}
-								onChange={() => {
-									this.setState({ viewFinished: !this.state.viewFinished }, () => {
-										this.fetchWorkorders()
-									})
-								}}
 							/>
 						</div>
 						<div key="sectionSelection">
@@ -341,6 +366,16 @@ export default class Workorders extends React.Component {
 								<antd.Select.Option key="all" value="all">
 									<Translation>
 										{t => t("All")}
+									</Translation>
+								</antd.Select.Option>
+								<antd.Select.Option key="finished" value="finished">
+									<Translation>
+										{t => t("Finished")}
+									</Translation>
+								</antd.Select.Option>
+								<antd.Select.Option key="archived" value="archived">
+									<Translation>
+										{t => t("Archived")}
 									</Translation>
 								</antd.Select.Option>
 								{this.renderSectionsOptions()}
