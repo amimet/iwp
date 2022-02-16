@@ -219,15 +219,9 @@ module.exports = [
         fn: "UserController.getOne",
     },
     {
-        route: "/self_user",
-        method: "PUT",
-        middleware: "withAuthentication",
-        fn: "UserController.updateSelf",
-    },
-    {
-        route: "/user",
-        method: "PUT",
-        middleware: ["withAuthentication", "privileged"],
+        route: "/update_user",
+        method: "POST",
+        middleware: ["withAuthentication", "roles"],
         fn: "UserController.update",
     },
     {
