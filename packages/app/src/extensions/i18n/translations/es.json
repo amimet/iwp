@@ -51,6 +51,13 @@
     "Notifications": "Notificaciones",
     "Notification": "Notificación",
     
+    "Haptic": "Vibración",
+    "Haptic Feedback": "Vibración de respuesta",
+    "Enable haptic feedback on touch events.": "Habilitar vibración de respuesta cuando exista un evento de toque.",
+
+    "Selection press delay": "Retraso de presión de selección",
+    "Set the delay before the selection trigger is activated.": "Establecer el retraso antes de que el disparador de selección sea activado.",
+
     "Manage operators": "Administrar operadores",
     "Manage users": "Administrar usuarios",
     "Manage groups": "Administrar grupos",

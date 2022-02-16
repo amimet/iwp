@@ -23,15 +23,15 @@ export default [
         "type": "Switch",
         "icon": "MdVibration",
         "title": "Haptic Feedback",
-        "description": "Enable haptic feedback on touch events",
+        "description": "Enable haptic feedback on touch events.",
     },
     {
         "id": "selection_longPress_timeout",
         "group": "general",
         "type": "Slider",
         "icon": "MdTimer",
-        "title": "Selection Long Press Timeout",
-        "description": "The time in milliseconds to wait before triggering a long press event",
+        "title": "Selection press delay",
+        "description": "Set the delay before the selection trigger is activated.",
         "props": {
             min: 300,
             max: 2000,
