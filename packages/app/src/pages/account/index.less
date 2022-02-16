@@ -1,33 +1,61 @@
+@borderColor: #33333396;
+@borderRadius: 12px;
+
 .account_wrapper {
+	.card {
+		display: flex;
+		flex-direction: column;
+
+		.header {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+
+			z-index: 15;
+			width: 100%;
+			padding: 12px;
+
+			font-family: "Roboto Mono", monospace;
+			color: #333;
+		
+			border: 1px solid @borderColor;
+			border-radius: @borderRadius;
+		
+			word-break: break-all;
+		
+			img {
+				width: 70px;
+				height: 70px;
+			}
+		
+			h1 {
+				margin: 0;
+				font-size: 35px;
+				span {
+					font-size: 12px;
+				}
+			}		
+		}
+		
+		.extension {
+			position: relative;
+			display: inline-flex;
+			
+			top: -10px;
+			width: 100%;
+			padding: 19px 10px 10px 10px;
+			
+			border-top: 0;
+			border-right: 0;
+		
+			border-style: solid;
+			border-width: 1px;
+			border-color: transparent @borderColor @borderColor @borderColor;
+			border-radius: 0 0 @borderRadius @borderRadius;
+		}
+	}
+
 	> div {
 		margin-bottom: 10px;
-	}
-}
-
-.account_card {
-	display: inline-flex;
-	font-family: "Roboto Mono", monospace;
-
-	align-items: center;
-
-	width: 100%;
-	padding: 12px;
-	color: #333;
-	border: 1px solid #33333396;
-	border-radius: 12px;
-
-	word-break: break-all;
-
-	img {
-		width: 70px;
-		height: 70px;
-	}
-
-	h1 {
-		margin: 0;
-		font-size: 35px;
-		span {
-			font-size: 12px;
-		}
 	}
 }
