@@ -28,6 +28,7 @@ export { default as Navigation } from "./Navigation"
 export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 
+export * as AdminTools from "./AdminTools"
 export * as Workorder from "./Workorder"
 export * as Fabric from "./Fabric"
 export * as AboutApp from "./AboutApp"
