@@ -113,6 +113,44 @@ const Methods = {
 }
 
 export default {
+    wsEvents: {
+        "joinWorkload": async (socket, workloadUUID) => {
+            let workorder = await Workorder.findOne({
+                "payloads.uuid": workloadUUID,
+            })
+            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
+            
+            if (!workorder) {
+               return socket.emit(`joinWorkloadFailed`, "Workorder not found")
+            }
+
+            // TODO update to DB
+
+            global.wsInterface.io.emit(`workerJoinWorkload`, {
+                workloadUUID,
+                userId: userId
+            })
+            global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, userId)
+        },
+        "leaveWorkload": async (socket, workloadUUID) => {
+            let workorder = await Workorder.findOne({
+                "payloads.uuid": workloadUUID,
+            })
+            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
+            
+            if (!workorder) {
+               return socket.emit(`joinWorkloadFailed`, "Workorder not found")
+            }
+
+            // TODO update to DB
+
+            global.wsInterface.io.emit(`workerLeaveWorkload`, {
+                workloadUUID,
+                userId: userId
+            })
+            global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, userId)
+        },
+    },
     pushCommit: Schematized({
         required: ["workorderId", "payloadUUID", "quantity"],
         select: ["workorderId", "payloadUUID", "quantity", "tooks"],
