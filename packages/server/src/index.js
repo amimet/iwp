@@ -58,13 +58,16 @@ class Server {
         }
 
         global.httpListenPort = this.listenPort
-        global.globalPublicURI = this.env.globalPublicURI 
+        global.globalPublicURI = this.env.globalPublicURI
         global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
         global.jwtStrategy = this.options.jwtStrategy
         global.signLocation = this.env.signLocation
         global.wsInterface = {
             io: this.io,
             clients: this.WSClients,
+            findUserIdFromClientID: (clientId) => {
+                return this.WSClients.find(client => client.id === clientId).userId
+            },
             getClientSockets: (userId) => {
                 return this.WSClients.filter(client => client.userId === userId).map((client) => {
                     return client?.socket
@@ -138,13 +141,27 @@ class Server {
     }
 
     initWebsockets() {
+        let controllersEvents = []
+
+        Object.entries(this.controllers).forEach(([controllerName, controller]) => {
+            if (controller.wsEvents) {
+                Object.keys(controller.wsEvents).forEach((key) => {
+                    controllersEvents.push([key, controller.wsEvents[key]])
+                })
+            }
+        })
+
         this.instance.middlewares["useWS"] = (req, res, next) => {
             req.ws = global.wsInterface
             next()
         }
 
         this.io.on("connection", async (socket) => {
-            console.log(`[${socket.id}] connected`)
+            console.debug(`[${socket.id}] connected`)
+
+            for await (const [event, data] of controllersEvents) {
+                socket.on(event, (...args) => data(socket, ...args))
+            }
 
             socket.on("ping", () => {
                 socket.emit("pong")
