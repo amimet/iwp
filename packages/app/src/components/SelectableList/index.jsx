@@ -6,8 +6,8 @@ import _ from "lodash"
 import { Translation } from "react-i18next"
 
 import { Icons, createIconRender } from "components/Icons"
-import { ActionsBar } from "components"
-import { useLongPress } from "utils"
+import { ActionsBar, } from "components"
+import { useLongPress, Haptics } from "utils"
 
 import "./index.less"
 
@@ -98,7 +98,7 @@ const ListItem = React.memo((props) => {
 			},
 			{
 				shouldPreventDefault: true,
-				delay: 300,
+				delay: props.longPressDelay ?? 300,
 			}
 		),
 	}, renderChildren)
@@ -115,6 +115,12 @@ export default class SelectableList extends React.Component {
 			this.setState({
 				selectedKeys: [...this.props.defaultSelected],
 			})
+		}
+	}
+
+	handleFeedbackEvent = (event) => {
+		if (typeof Haptics[event] === "function") {
+			return Haptics[event]()
 		}
 	}
 
@@ -136,6 +142,8 @@ export default class SelectableList extends React.Component {
 				})
 			}
 
+			this.handleFeedbackEvent("selectionChanged")
+
 			this.setState({
 				selectionEnabled: true,
 				selectedKeys: updatedSelectedKeys,
@@ -144,6 +152,8 @@ export default class SelectableList extends React.Component {
 	}
 
 	unselectAll = () => {
+		this.handleFeedbackEvent("selectionEnd")
+
 		this.setState({
 			selectionEnabled: false,
 			selectedKeys: [],
@@ -153,12 +163,18 @@ export default class SelectableList extends React.Component {
 	selectKey = (key) => {
 		let list = this.state.selectedKeys ?? []
 		list.push(key)
+
+		this.handleFeedbackEvent("selectionStart")
+
 		return this.setState({ selectedKeys: list })
 	}
 
 	unselectKey = (key) => {
 		let list = this.state.selectedKeys ?? []
 		list = list.filter((_key) => key !== _key)
+
+		this.handleFeedbackEvent("selectionEnd")
+
 		return this.setState({ selectedKeys: list })
 	}
 
@@ -250,6 +266,10 @@ export default class SelectableList extends React.Component {
 		})
 	}
 
+	getLongPressDelay = () => {
+		return window.app.settings.get("selection_longPress_timeout")
+	}
+	
 	renderItems = (data) => {
 		return data.length > 0 ? data.map((item, index) => {
 			item.key = item.key ?? item.id ?? item._id
@@ -274,6 +294,7 @@ export default class SelectableList extends React.Component {
 			return <ListItem
 				item={item}
 				selected={selected}
+				longPressDelay={this.getLongPressDelay()}
 
 				onClickItem={this.onClickItem}
 				onDoubleClickItem={this.onDoubleClickItem}
