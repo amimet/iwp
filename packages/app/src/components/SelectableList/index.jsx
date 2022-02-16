@@ -125,6 +125,10 @@ export default class SelectableList extends React.Component {
 			} else {
 				this.handleFeedbackEvent("selectionEnd")
 			}
+		} else {
+			if (this.state.selectionEnabled) {
+				this.handleFeedbackEvent("selectionChange")
+			}
 		}
 	}
 
@@ -152,8 +156,6 @@ export default class SelectableList extends React.Component {
 				})
 			}
 
-			this.handleFeedbackEvent("selectionChanged")
-
 			this.setState({
 				selectionEnabled: true,
 				selectedKeys: updatedSelectedKeys,
@@ -172,16 +174,12 @@ export default class SelectableList extends React.Component {
 		let list = this.state.selectedKeys ?? []
 		list.push(key)
 
-		this.handleFeedbackEvent("selectionChanged")
-
 		return this.setState({ selectedKeys: list })
 	}
 
 	unselectKey = (key) => {
 		let list = this.state.selectedKeys ?? []
 		list = list.filter((_key) => key !== _key)
-
-		this.handleFeedbackEvent("selectionChanged")
 
 		return this.setState({ selectedKeys: list })
 	}
