@@ -118,6 +118,16 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.selectionEnabled !== this.state.selectionEnabled) {
+			if (this.state.selectionEnabled) {
+				this.handleFeedbackEvent("selectionStart")
+			} else {
+				this.handleFeedbackEvent("selectionEnd")
+			}
+		}
+	}
+
 	handleFeedbackEvent = (event) => {
 		if (typeof Haptics[event] === "function") {
 			return Haptics[event]()
@@ -152,7 +162,7 @@ export default class SelectableList extends React.Component {
 	}
 
 	unselectAll = () => {
-		this.handleFeedbackEvent("selectionEnd")
+		this.handleFeedbackEvent("selectionChanged")
 
 		this.setState({
 			selectionEnabled: false,
@@ -164,7 +174,7 @@ export default class SelectableList extends React.Component {
 		let list = this.state.selectedKeys ?? []
 		list.push(key)
 
-		this.handleFeedbackEvent("selectionStart")
+		this.handleFeedbackEvent("selectionChanged")
 
 		return this.setState({ selectedKeys: list })
 	}
@@ -173,7 +183,7 @@ export default class SelectableList extends React.Component {
 		let list = this.state.selectedKeys ?? []
 		list = list.filter((_key) => key !== _key)
 
-		this.handleFeedbackEvent("selectionEnd")
+		this.handleFeedbackEvent("selectionChanged")
 
 		return this.setState({ selectedKeys: list })
 	}
