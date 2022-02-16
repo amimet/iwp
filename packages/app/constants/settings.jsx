@@ -18,6 +18,34 @@ export default [
         "emitEvent": "changeLanguage"
     },
     {
+        "id": "haptic_feedback",
+        "group": "general",
+        "type": "Switch",
+        "icon": "MdVibration",
+        "title": "Haptic Feedback",
+        "description": "Enable haptic feedback on touch events",
+    },
+    {
+        "id": "selection_longPress_timeout",
+        "group": "general",
+        "type": "Slider",
+        "icon": "MdTimer",
+        "title": "Selection Long Press Timeout",
+        "description": "The time in milliseconds to wait before triggering a long press event",
+        "props": {
+            min: 300,
+            max: 2000,
+            step: 100,
+            marks: {
+                300: "0.3s",
+                600: "0.6s",
+                1000: "1s",
+                1500: "1.5s",
+                2000: "2s",
+            }
+        }
+    },
+    {
         "id": "notifications_sound",
         "group": "notifications",
         "type": "Switch",
