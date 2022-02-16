@@ -3,10 +3,10 @@ import * as antd from "antd"
 import { Translation } from "react-i18next"
 
 import { Icons } from "components/Icons"
-import { Skeleton, ActionsBar } from "components"
+import { Skeleton, ActionsBar, AdminTools } from "components"
 import { Session, User } from "models"
 
-import { AccountEditor, SessionsView, StatisticsView } from "./components"
+import { SessionsView, StatisticsView } from "./components"
 
 import "./index.less"
 
@@ -98,40 +98,16 @@ export default class Account extends React.Component {
 		return this.props.contexts.app.sessionController.destroyAllSessions()
 	}
 
-	handleUpdateUserData = async (changes) => {
-		const update = {}
+	openUserEdit = async () => {
+		const result = await AdminTools.open.dataManager(this.state.user)
 
-		if (Array.isArray(changes)) {
-			changes.forEach((change) => {
-				update[change.id] = change.value
-			})
+		if (result) {
+			this.setState({ user: result })
 		}
-
-		return await this.api.put.user({ _id: this.state.user._id, update }).catch((err) => {
-			antd.message.error(err.message)
-			console.error(err)
-			return false
-		})
 	}
 
-	openUserEdit = () => {
-		window.app.DrawerController.open("editAccount", AccountEditor, {
-			props: {
-				keyboard: false,
-			},
-			componentProps: {
-				onSave: this.handleUpdateUserData,
-				user: this.state.user,
-			},
-			onDone: (ctx, value) => {
-				this.setState({ user: value })
-				ctx.close()
-			}
-		})
-	}
-
-	openRolesManager = () => {
-
+	openRolesManager = async () => {
+		await AdminTools.open.rolesManager(this.state.user._id)
 	}
 
 	render() {
@@ -143,21 +119,31 @@ export default class Account extends React.Component {
 
 		return (
 			<div className="account_wrapper">
-				<div className="account_card">
-					<img src={user.avatar} />
-					<div style={{ margin: "0 15px" }}>
-						{Boolean(user.fullName) ?
-							<>
-								<h1>{user.fullName}</h1>
-								<span>@{user.username}#{user._id}</span>
-							</> :
-							<>
-								<h1>@{user.username}</h1>
-								<span>#{user._id}</span>
-							</>
-						}
+				<div className="card">
+					<div className="header">
+						<img src={user.avatar} />
+						<div style={{ margin: "0 15px" }}>
+							{Boolean(user.fullName) ?
+								<>
+									<h1>{user.fullName}</h1>
+									<span>@{user.username}#{user._id}</span>
+								</> :
+								<>
+									<h1>@{user.username}</h1>
+									<span>#{user._id}</span>
+								</>
+							}
+						</div>
+					</div>
+					<div className="extension">
+						<div className="rolesList">
+							{user.roles.map((role, index) => {
+								return <antd.Tag>{role}</antd.Tag>
+							})}
+						</div>
 					</div>
 				</div>
+
 
 				{(this.state.isSelf || this.state.hasManager) && <ActionsBar spaced padding="8px">
 					<antd.Button
