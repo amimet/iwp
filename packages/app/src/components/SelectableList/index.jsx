@@ -162,8 +162,6 @@ export default class SelectableList extends React.Component {
 	}
 
 	unselectAll = () => {
-		this.handleFeedbackEvent("selectionChanged")
-
 		this.setState({
 			selectionEnabled: false,
 			selectedKeys: [],
@@ -279,11 +277,11 @@ export default class SelectableList extends React.Component {
 	getLongPressDelay = () => {
 		return window.app.settings.get("selection_longPress_timeout")
 	}
-	
+
 	renderItems = (data) => {
 		return data.length > 0 ? data.map((item, index) => {
 			item.key = item.key ?? item.id ?? item._id
-			
+
 			if (item.children && Array.isArray(item.children)) {
 				return <div className="selectableList_group">
 					<h1>
@@ -292,7 +290,7 @@ export default class SelectableList extends React.Component {
 							{t => t(item.label)}
 						</Translation>
 					</h1>
-		
+
 					<div className="selectableList_subItems">
 						{this.renderItems(item.children)}
 					</div>
