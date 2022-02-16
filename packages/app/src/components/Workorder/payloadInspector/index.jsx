@@ -1,19 +1,39 @@
 import React from "react"
 import * as antd from "antd"
-import { Modal, Toast, Swiper, Image } from "antd-mobile"
+import { Modal, Toast } from "antd-mobile"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
-
 import moment from "moment"
 
 import { QuantityInput, Skeleton, ImageViewer } from "components"
-import { Icons, createIconRender } from "components/Icons"
+import { Icons } from "components/Icons"
 
 import FORMULAS from "schemas/fabricFormulas"
 
 import "./index.less"
 
 const excludedProperties = ["imagePreview"]
+
+const Worker = (props) => {
+    const [data, setData] = React.useState({})
+    const api = window.app.request
+
+    const fetchData = async () => {
+        const response = await api.get.user({ _id: props.userId })
+
+        if (response) {
+            setData(response)
+        }
+    }
+
+    React.useEffect(() => {
+        fetchData()
+    }, [])
+
+    return <div className="worker">
+        <h2>{data.fullName ?? data.username}</h2>
+    </div>
+}
 
 class Counter {
     constructor() {
@@ -38,6 +58,7 @@ export default class Inspector extends React.Component {
         workorder: null,
         data: null,
         running: false,
+        activeWorkers: [],
     }
 
     counter = new Counter()
@@ -71,6 +92,20 @@ export default class Inspector extends React.Component {
             workorder.commits.push(data.commit)
 
             this.setState({ workorder })
+        })
+
+        window.app.handleWSListener(`workerJoinWorkload_${this.uuid}`, (userId) => {
+            let activeWorkers = this.state.activeWorkers
+            activeWorkers.push(userId)
+
+            this.setState({ activeWorkers })
+        })
+
+        window.app.handleWSListener(`workerLeaveWorkload_${this.uuid}`, (userId) => {
+            let activeWorkers = this.state.activeWorkers
+            activeWorkers = activeWorkers.filter((id) => id !== userId)
+
+            this.setState({ activeWorkers })
         })
     }
 
@@ -141,9 +176,11 @@ export default class Inspector extends React.Component {
         if (to) {
             // TODO: emit event to server
             this.counter.update("start")
+            window.app.ws.sockets.main.emit("joinWorkload", this.uuid)
         } else {
             // TODO: emit event to server
             this.counter.update("stop")
+            window.app.ws.sockets.main.emit("leaveWorkload", this.uuid)
         }
     }
 
@@ -335,7 +372,7 @@ export default class Inspector extends React.Component {
                 </div>
             </div>
 
-            {!this.state.assistantMode && <div className="properties">
+            <div className="card">
                 <div className="property">
                     <div className="name">
                         <Translation>
@@ -349,32 +386,52 @@ export default class Inspector extends React.Component {
                     </div>
                 </div>
                 {this.renderProperties(this.state.data)}
-            </div>}
+            </div>
 
-            <div className="production">
-                <h3>
-                    <Icons.Disc />
-                    <Translation>
-                        {t => t("Production target")}
-                    </Translation>
-                </h3>
+            <div className="card">
+                <div>
+                    <antd.Badge count={this.state.activeWorkers.length}>
+                        <h3>
+                            <Icons.Users />
+                            <Translation>
+                                {t => t("Workers")}
+                            </Translation>
+                        </h3>
+                    </antd.Badge>
+                </div>
+                <div>
+                    {this.state.activeWorkers.map((id) => {
+                        return <Worker userId={id} />
+                    })}
+                </div>
+            </div>
 
-                <div className="content">
-                    <div className="counter">
-                        <div
-                            style={this.isQuantityProductionOverreached() ? { color: "red" } : undefined}
-                            className={quantityLeft === 0 ? "completed" : undefined}
-                        >
-                            {quantityCount}
-                        </div>
-                        <div>/</div>
-                        <div>
-                            {this.state.data.properties?.quantity ?? "?"}
+            <div className="card">
+                <div className="production">
+                    <h3>
+                        <Icons.Disc />
+                        <Translation>
+                            {t => t("Production target")}
+                        </Translation>
+                    </h3>
+
+                    <div className="content">
+                        <div className="counter">
+                            <div
+                                style={this.isQuantityProductionOverreached() ? { color: "red" } : undefined}
+                                className={quantityLeft === 0 ? "completed" : undefined}
+                            >
+                                {quantityCount}
+                            </div>
+                            <div>/</div>
+                            <div>
+                                {this.state.data.properties?.quantity ?? "?"}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <antd.Progress percent={percent} />
+                    <antd.Progress percent={percent} />
+                </div>
             </div>
 
             <div className="assistant">
