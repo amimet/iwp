@@ -122,27 +122,20 @@ export default {
     updatePassword: async (req, res) => {
         //TODO
     },
-    updateSelf: async (req, res) => {
-        Object.keys(req.body).forEach(key => {
-            req.user[key] = req.body[key]
-        })
-
-        User.findOneAndUpdate({ _id: req.user._id }, req.user)
-            .then(() => {
-                return res.send(req.user)
-            })
-            .catch((err) => {
-                return res.send(500).send(err)
-            })
-    },
     update: Schematized({
         required: ["_id", "update"],
         select: ["_id", "update"],
-    },async (req, res) => {
-        let user = await User.findById(req.selection._id)
+    }, async (req, res) => {
+        let user = await User.findById(req.selection._id).catch(() => {
+            return false
+        })
 
         if (!user) {
             return res.status(404).json({ error: "User not exists" })
+        }
+
+        if ((user._id !== req.user._id) && (req.hasRole("admin") === false)) {
+            return res.status(403).json({ error: "You are not allowed to update this user" })
         }
 
         AllowedUserUpdateKeys.forEach((key) => {
