@@ -13,22 +13,19 @@
 
 .user_item {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 
 	width: 100%;
 
-	> div {
-		margin: 7px;
-	}
-
 	.title {
-		width: 100%;
-		display: flex;
-	
+		display: inline-flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: space-between;
+		
+		width: 100%;
 	
+		margin-bottom: 10px;
+
 		h1 {
 			cursor: text;
 			margin: 0;
@@ -37,19 +34,14 @@
 
 		h3 {
 			font-family: "Roboto Mono", monospace !important;
+			color: var(--background-color-contrast);
 			cursor: text;
 			margin: 0;
 			font-size: 13px;
 		}
 	
-		.line {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			
-			> div {
-				margin-right: 8px;
-			}
+		> div {
+			margin-right: 10px;
 		}
 	}
 }

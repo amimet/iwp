@@ -53,21 +53,24 @@ export default class Users extends React.Component {
 
 	renderItem = (item) => {
 		return (
-			<div
-				key={item._id}
-				className="user_item"
-			>
-				<div>
-					<antd.Avatar shape="square" src={item.avatar} />
-				</div>
+			<div className="user_item">
 				<div className="title">
-					<div className="line">
+					<div>
+						<antd.Avatar shape="square" src={item.avatar} />
+					</div>
+					<div>
+						<h1>{item.fullName}</h1>
 						<div>
-							<h1>{item.fullName ?? item.username}</h1>
+							<h3>
+								@{item.username} #{item._id}
+							</h3>
 						</div>
 					</div>
 				</div>
-				<div>{this.renderRoles(item.roles)}</div>
+				<div>
+					<Icons.Link />
+					{this.renderRoles(item.roles)}
+				</div>
 			</div>
 		)
 	}
