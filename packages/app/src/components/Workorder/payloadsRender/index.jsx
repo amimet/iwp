@@ -18,7 +18,9 @@ const Payload = (props) => {
 			<div className="header">
 				<div className="title">
 					{props.preview && <div className="quantity">x{item.properties?.quantity}</div>}
-					<h2>{item.name}</h2>
+					<antd.Badge status="processing" count={props.indicator}>
+						<h2>{item.name}</h2>
+					</antd.Badge>
 				</div>
 				<div className="description">
 					<Translation>
@@ -70,6 +72,14 @@ export default (props) => {
 				preview: props.preview,
 				item,
 				onClickItem,
+			}
+
+			if (props.selfUserId && Array.isArray(item.activeWorkers)) {
+				item.activeWorkers.forEach(worker => {
+					if (worker.userId === props.selfUserId) {
+						payloadProps.indicator = "Active"
+					}
+				})
 			}
 
 			props.onDeleteItem && (payloadProps.onClickDelete = onClickDelete)
