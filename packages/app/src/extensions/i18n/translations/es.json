@@ -58,6 +58,9 @@
     "Selection press delay": "Retraso de presión de selección",
     "Set the delay before the selection trigger is activated.": "Establecer el retraso antes de que el disparador de selección sea activado.",
 
+    "Force Mobile Mode": "Forzar modo móvil",
+    "Force the application to run in mobile mode.": "Forzar la aplicación a ejecutarse en modo móvil.",
+    
     "Manage operators": "Administrar operadores",
     "Manage users": "Administrar usuarios",
     "Manage groups": "Administrar grupos",
