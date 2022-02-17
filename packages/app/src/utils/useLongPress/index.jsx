@@ -3,7 +3,12 @@ import { useCallback, useRef, useState } from "react"
 export default (
     onLongPress,
     onClick,
-    { shouldPreventDefault = true, delay = 300 } = {}
+    {
+        shouldPreventDefault = true,
+        delay = 300,
+        onTouchStart,
+        onTouchEnd,
+    } = {}
 ) => {
     const [longPressTriggered, setLongPressTriggered] = useState(false)
     const timeout = useRef()
@@ -17,6 +22,11 @@ export default (
                 })
                 target.current = event.target
             }
+
+            if (typeof onTouchStart === "function") {
+                onTouchStart()
+            }
+
             timeout.current = setTimeout(() => {
                 onLongPress(event)
                 setLongPressTriggered(true)
@@ -30,6 +40,11 @@ export default (
             timeout.current && clearTimeout(timeout.current)
             shouldTriggerClick && !longPressTriggered && onClick()
             setLongPressTriggered(false)
+
+            if (typeof onTouchEnd === "function") {
+                onTouchEnd()
+            }
+
             if (shouldPreventDefault && target.current) {
                 target.current.removeEventListener("touchend", preventDefault)
             }
