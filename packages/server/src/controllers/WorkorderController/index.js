@@ -181,7 +181,7 @@ export default {
             })
 
             if (!workorder) {
-                return socket.emit(`joinWorkloadFailed`, "Workorder not found")
+                return socket.emit(`responseError`, "Workorder not found")
             }
 
             const userId = global.wsInterface.findUserIdFromClientID(socket.id)
@@ -192,6 +192,8 @@ export default {
                 userId: userId
             })
             global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, userId)
+
+            return socket.emit("response", "ok")
         },
         "leaveWorkload": async (socket, workloadUUID) => {
             let workorder = await Workorder.findOne({
@@ -200,7 +202,7 @@ export default {
             const userId = global.wsInterface.findUserIdFromClientID(socket.id)
 
             if (!workorder) {
-                return socket.emit(`joinWorkloadFailed`, "Workorder not found")
+                return socket.emit(`responseError`, "Workorder not found")
             }
 
             // TODO update to DB
@@ -210,6 +212,8 @@ export default {
                 userId: userId
             })
             global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, userId)
+
+            return socket.emit("response", "ok")
         },
     },
     getCommits: Schematized({
