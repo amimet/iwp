@@ -61,6 +61,8 @@ export default {
 
                     window.app.ws = app.WSInterface
                     window.app.handleWSListener = app.handleWSListener
+                    window.app.WSRequest = app.WSRequest
+                    window.app.WSMainRequest = (...args) => app.WSMainRequest("main", ...args)
                 },
                 async (self) => {
                     self.apiBridge = await self.createApiBridge()
@@ -172,7 +174,18 @@ export default {
 
                     return bridge
                 },
+                WSRequest: (socket = "main", channel, ...args) => {
+                    return new Promise(async (resolve, reject) => {
+                        const request = await window.app.ws.sockets[socket].emit(channel, ...args)
 
+                        request.on("responseError", (...errors) => {
+                            return reject(...errors)
+                        })
+                        request.on("response", (...responses) => {
+                            return resolve(...responses)
+                        })
+                    })
+                }
             },
         },
     ],
