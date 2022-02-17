@@ -35,6 +35,16 @@ export default class User {
         return Array.isArray(roles) && roles.includes(role)
     }
 
+    static async selfUserId() {
+        const token = await Session.decodedToken()
+
+        if (!token) {
+            return false
+        }
+
+        return token.user_id
+    }
+
     getAssignedWorkorders = async () => {
         const token = await Session.decodedToken()
 
