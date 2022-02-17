@@ -30,17 +30,13 @@ export default class AssignedWorkorders extends React.Component {
 		})
 
 		window.app.handleWSListener("workorderUpdate", (update) => {
-			this.fetchAssignedWorkorders()
+			const currentWorkorder = this.state.list.find(item => item._id === update._id)
 
-			// this.setState({
-			// 	list: this.state.list.map((item) => {
-			// 		if (item._id === update._id) {
-			// 			return update
-			// 		}
-
-			// 		return item
-			// 	})
-			// })
+			if (currentWorkorder) {
+				if (update.finished) {
+					this.removeItem(update._id)
+				}
+			}
 		})
 
 		this.fetchAssignedWorkorders()
