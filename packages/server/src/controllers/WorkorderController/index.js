@@ -1,4 +1,4 @@
-import { Workorder } from "../../models"
+import { Workorder, User } from "../../models"
 import { Schematized } from "../../lib"
 import { nanoid } from "nanoid"
 import moment from "moment"
@@ -179,19 +179,71 @@ export default {
             let workorder = await Workorder.findOne({
                 "payloads.uuid": workloadUUID,
             })
+            let workload = workorder.payloads.find(payload => payload.uuid === workloadUUID)
 
             if (!workorder) {
-                return socket.emit(`responseError`, "Workorder not found")
+                return socket.emit(`responseError`, {
+                    message: "Workorder not found"
+                })
+            }
+            if (!workload) {
+                return socket.emit(`responseError`, {
+                    message: "Workload not found"
+                })
             }
 
             const userId = global.wsInterface.findUserIdFromClientID(socket.id)
-            // TODO update to DB
-
-            global.wsInterface.io.emit(`workerJoinWorkload`, {
-                workloadUUID,
-                userId: userId
+            const user = await User.findById(userId).catch(() => {
+                return false
             })
-            global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, userId)
+
+            if (!userId || !user) {
+                return socket.emit(`responseError`, {
+                    message: "Cannot find your user"
+                })
+            }
+            if (!Array.isArray(workload.activeWorkers)) {
+                workload.activeWorkers = []
+            }
+
+            const existOnActiveWorkers = workload.activeWorkers.find(worker => worker.userId === userId)
+
+            if (existOnActiveWorkers) {
+                return socket.emit(`responseError`, {
+                    message: "You are already working on this workload"
+                })
+            }
+
+            const worker = {
+                workloadUUID,
+                userId: userId,
+                fullName: user.fullName,
+                username: user.username,
+                avatar: user.avatar,
+            }
+
+            workorder.payloads.forEach((payload) => {
+                if (payload.uuid === workloadUUID) {
+                    if (!Array.isArray(payload.activeWorkers)) {
+                        payload.activeWorkers = []
+                    }
+
+                    payload.activeWorkers.push(worker)
+                }
+            })
+
+            workorder = await Methods.update(workorder._id, {
+                payloads: workorder.payloads
+            }).catch((err) => {
+                console.log(err)
+                return socket.emit("responseError", {
+                    message: err.message
+                })
+            })
+
+            global.wsInterface.io.emit(`workerJoinWorkload`, worker)
+
+            global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, worker)
 
             return socket.emit("response", "ok")
         },
@@ -199,19 +251,67 @@ export default {
             let workorder = await Workorder.findOne({
                 "payloads.uuid": workloadUUID,
             })
-            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
+            let workload = workorder.payloads.find(payload => payload.uuid === workloadUUID)
 
             if (!workorder) {
-                return socket.emit(`responseError`, "Workorder not found")
+                return socket.emit(`responseError`, {
+                    message: "Workorder not found"
+                })
+            }
+            if (!workload) {
+                return socket.emit(`responseError`, {
+                    message: "Workload not found"
+                })
             }
 
-            // TODO update to DB
+            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
+            const user = await User.findById(userId).catch(() => {
+                return false
+            })
+
+            if (!userId || !user) {
+                return socket.emit(`responseError`, {
+                    message: "Cannot find your user"
+                })
+            }
+            if (!Array.isArray(workload.activeWorkers)) {
+                workload.activeWorkers = []
+            }
+
+            const existOnActiveWorkers = workload.activeWorkers.find(worker => worker.userId === userId)
+
+            if (!existOnActiveWorkers) {
+                return socket.emit(`responseError`, {
+                    message: "You are not working on this workload, so you cannot leave it"
+                })
+            }
+
+            workorder.payloads.forEach((payload) => {
+                if (payload.uuid === workloadUUID) {
+                    if (Array.isArray(payload.activeWorkers)) {
+                        payload.activeWorkers = payload.activeWorkers.filter(worker => worker.userId !== userId)
+                    }
+                }
+            })
+
+            workorder = await Methods.update(workorder._id, {
+                payloads: workorder.payloads
+            }).catch((err) => {
+                console.log(err)
+
+                return socket.emit("responseError", {
+                    message: err.message
+                })
+            })
 
             global.wsInterface.io.emit(`workerLeaveWorkload`, {
                 workloadUUID,
-                userId: userId
+                userId
             })
-            global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, userId)
+            global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, {
+                workloadUUID,
+                userId
+            })
 
             return socket.emit("response", "ok")
         },
@@ -336,7 +436,7 @@ export default {
     create: Schematized({
         required: ["payloads", "section", "name"],
     }, async (req, res) => {
-        const { payloads, section, name, assigned, scheduledStart, scheduledFinish, workshift } = req.body
+        const { payloads, section, name, assigned, scheduledStart, scheduledFinish } = req.body
 
         const obj = {
             created: new Date().getTime(),
@@ -349,9 +449,14 @@ export default {
             section,
         }
 
-        // create on each payload an UUID property
-        payloads.forEach(item => {
-            item.uuid = nanoid()
+        // initialize payloads
+        payloads.forEach((payload) => {
+            if (!payload.uuid) {
+                payload.uuid = nanoid()
+            }
+            if (!payload.activeWorkers) {
+                payload.activeWorkers = Array()
+            }
         })
 
         const result = await Workorder.create(obj)
