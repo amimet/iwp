@@ -24,6 +24,26 @@
 		margin-bottom: 5px;
 	}
 
+	.float {
+		display: flex;
+		flex-direction: column;
+
+		position: sticky;
+		bottom: 0;
+		width: 100%;
+		padding: 20px 10px 0 10px;
+
+		border-radius: 10px;
+		background-color: #00000033;
+
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+
+		> div {
+			margin-bottom: 20px;
+		}
+	}
+
 	.card {
 		display: flex;
 		flex-direction: column;
@@ -94,12 +114,12 @@
 
 	.assistant {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 
 		.controls {
-			display: flex;
+			display: inline-flex;
 			flex-direction: row;
 			justify-content: space-around;
 			align-items: center;
@@ -108,17 +128,39 @@
 
 			//transition: all 150ms ease-in-out;
 
+			.holdButton {
+				outline: none;
+				border: 0;
+
+				background: linear-gradient(to left, var(--primaryColor) 50%, white 50.9%) right;
+				background-size: 200%;
+				transition: 100ms ease-out;
+				color: var(--background-color-accent);
+
+				&.holding {
+					color: var(--background-color-contrast);
+					background-position: left;
+					
+					&.duration500 {
+						transition: 500ms ease-out;
+					}
+
+					&.duration1000 {
+						transition: 1000ms ease-out;
+					}
+				}
+			}
+			
 			> div {
 				button {
 					--ignore-dragger: true;
-					width: 40vw;
-					height: 10vh;
 					margin-bottom: 20px;
+					padding: 5vw;
 				}
 			}
 
 			&.running {
-				flex-direction: column;
+				flex-direction: row;
 			}
 		}
 	}
