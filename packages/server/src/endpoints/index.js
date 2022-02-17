@@ -146,6 +146,12 @@ module.exports = [
         fn: "WorkorderController.getCommits",
     },
     {
+        route: "/active_tasks",
+        method: "GET",
+        middleware: ["withAuthentication"],
+        fn: "WorkorderController.getActiveTasks",
+    },
+    {
         route: "/workorder",
         method: "GET",
         middleware: "withAuthentication",

@@ -558,6 +558,15 @@ export default {
 
         return res.json(workorder)
     }),
+    getActiveTasks: async (req, res) => {
+        let userId = req.query.userId ?? req.decodedToken.user_id 
+
+        const workorders = await Workorder.find({
+            "payloads.activeWorkers": userId,
+        })
+
+        return res.json(workorders)
+    },
     getWorkorderAssignedToUserID: Schematized({
         select: ["_id"],
     }, async (req, res) => {
