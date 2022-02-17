@@ -39,7 +39,7 @@ html {
 	overflow: hidden;
 	height: 100%;
 	-webkit-overflow-scrolling: touch;
-	
+
 	background-color: var(--background-color-primary) !important;
 
 	svg {
@@ -54,7 +54,7 @@ body {
 	-webkit-app-region: no-drag;
 
 	height: 100%;
-	
+
 	user-select: none;
 	--webkit-user-select: none;
 
@@ -144,7 +144,14 @@ body {
 		margin: 0;
 	}
 
-	h1,h2,h3,h4,h5,h6,span,p {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	span,
+	p {
 		user-select: none;
 		-webkit-user-select: none;
 	}
@@ -215,7 +222,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	
+
 	user-select: none;
 	--webkit-user-select: none;
 }
@@ -234,4 +241,9 @@ body {
 	svg {
 		margin: 0;
 	}
+}
+
+*:not(input):not(textarea) {
+	-webkit-user-select: none; /* disable selection/Copy of UIWebView */
+	-webkit-touch-callout: none; /* disable the IOS popup when long-press on a link */
 }
