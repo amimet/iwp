@@ -1,4 +1,13 @@
 // Patch global prototypes
+Array.prototype.findAndUpdateObject = function (discriminator, obj) {
+	let index = this.findIndex(item => item[discriminator] === obj[discriminator])
+	if (index !== -1) {
+		this[index] = obj
+	}
+
+	return index
+}
+
 Array.prototype.move = function (from, to) {
 	this.splice(to, 0, this.splice(from, 1)[0])
 	return this

@@ -1,3 +1,13 @@
+Array.prototype.updateFromObjectKeys = function (obj) {
+	this.forEach((value, index) => {
+		if (obj[value] !== undefined) {
+			this[index] = obj[value]
+		}
+	})
+
+	return this
+}
+
 import path from "path"
 import LinebridgeServer from "linebridge/server"
 import bcrypt from "bcrypt"
