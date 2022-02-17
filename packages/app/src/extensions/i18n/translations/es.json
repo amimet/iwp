@@ -200,6 +200,8 @@
     "Assign the operators for the workorder.": "Asigne los operadores para la orden de trabajo.",
     "Define the payloads for the workorder.": "Defina las cargas para la orden de trabajo.",
     "Define the workloads for the workorder.": "Defina las cargas de trabajo para la orden de trabajo.",
+    "Leaving process running on background, dont forget to stop it when you are done": "Dejando el proceso en ejecución en segundo plano, no olvide detenerlo cuando haya terminado",
+    "Task remains opened, dont forget to stop it when you are done": "La tarea permanece abierta, no olvide detenerla cuando haya terminado",
     
     "Select a option": "Seleccione una opción",
     "Set the quantity produced": "Marque la cantidad producida",
