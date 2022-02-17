@@ -18,6 +18,15 @@ export default [
         "emitEvent": "changeLanguage"
     },
     {
+        "id": "forceMobileMode",
+        "group": "general",
+        "type": "Switch",
+        "icon": "MdSmartphone",
+        "title": "Force Mobile Mode",
+        "description": "Force the application to run in mobile mode.",
+        "emitEvent": "forceMobileMode"
+    },
+    {
         "id": "haptic_feedback",
         "group": "general",
         "type": "Switch",

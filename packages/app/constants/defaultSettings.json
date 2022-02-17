@@ -1,4 +1,5 @@
 {
+    "forceMobileMode": false,
     "workorder_notifications": true,
     "notifications_sound": true,
     "notifications_vibrate": true,
