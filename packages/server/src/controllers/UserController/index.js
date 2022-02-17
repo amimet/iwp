@@ -134,7 +134,7 @@ export default {
             return res.status(404).json({ error: "User not exists" })
         }
 
-        if ((user._id !== req.user._id) && (req.hasRole("admin") === false)) {
+        if ((user._id.toString() !== req.user._id.toString()) && (req.hasRole("admin") === false)) {
             return res.status(403).json({ error: "You are not allowed to update this user" })
         }
 
