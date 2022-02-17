@@ -219,6 +219,16 @@ class App {
 					}
 				})
 			},
+			openWorkloadInspector: (uuid) => {
+				window.app.DrawerController.open("PayloadInspector", Workorder.PayloadInspector, {
+					onDone: (ctx, data) => {
+						ctx.close()
+					},
+					componentProps: {
+						uuid: uuid,
+					}
+				})
+			},
 			openWorkorderDetails: (id) => {
 				window.app.DrawerController.open("workorder_details", Workorder.Details, {
 					componentProps: {
