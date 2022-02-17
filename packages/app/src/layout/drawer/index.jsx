@@ -120,6 +120,7 @@ export class Drawer extends React.Component {
 
 	close = () => {
 		this.toogleVisibility(false)
+		this.events.emit("beforeClose")
 
 		setTimeout(() => {
 			if (typeof this.options.onClose === "function") {
