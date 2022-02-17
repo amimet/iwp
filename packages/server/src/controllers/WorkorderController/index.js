@@ -94,6 +94,16 @@ const Methods = {
 
         const allowedUpdates = ["commits", "payloads", "assigned", "expired", "finished", "status", "section", "name"]
 
+        if (update.payloads) {
+            if (update.payloads?.length !== workorder.payloads?.length) {
+                update.payloads.forEach(payload => {
+                    if (!payload.uuid) {
+                        payload.uuid = nanoid()
+                    }
+                })
+            }
+        }
+
         allowedUpdates.forEach((key) => {
             if (update[key]) {
                 workorder[key] = update[key]
@@ -114,16 +124,67 @@ const Methods = {
 
 export default {
     wsEvents: {
+        "payloadCommit": async (socket, data = {}) => {
+            const { workorderId, payloadUUID, quantity, tooks } = data
+
+            if (!workorderId || !payloadUUID) {
+                return socket.emit("responseError", {
+                    message: "Missing data"
+                })
+            }
+
+            let workorder = await Workorder.findById(workorderId).catch(() => {
+                return false
+            })
+
+            if (!workorder) {
+                return socket.emit("responseError", {
+                    message: "Workorder not found"
+                })
+            }
+
+            if (typeof workorder.commits === "undefined" || !Array.isArray(workorder.commits)) {
+                workorder.commits = Array()
+            }
+
+            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
+
+            let commit = {
+                payloadUUID: payloadUUID,
+                quantity: quantity ?? 1,
+                user_id: userId,
+                timestamp: new Date().getTime(),
+                tooks: tooks ?? 0,
+            }
+
+            workorder.commits.push(commit)
+
+            workorder = Methods.update(workorderId, {
+                commits: workorder.commits,
+            }).catch((err) => {
+                console.log(err)
+                return socket.emit("responseError", {
+                    message: err.message
+                })
+            })
+
+            global.wsInterface.io.emit(`newCommit_${commit.payloadUUID}`, {
+                workorderId: workorderId,
+                commit,
+            })
+
+            return socket.emit("response", workorder)
+        },
         "joinWorkload": async (socket, workloadUUID) => {
             let workorder = await Workorder.findOne({
                 "payloads.uuid": workloadUUID,
             })
-            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
-            
+
             if (!workorder) {
-               return socket.emit(`joinWorkloadFailed`, "Workorder not found")
+                return socket.emit(`joinWorkloadFailed`, "Workorder not found")
             }
 
+            const userId = global.wsInterface.findUserIdFromClientID(socket.id)
             // TODO update to DB
 
             global.wsInterface.io.emit(`workerJoinWorkload`, {
@@ -137,9 +198,9 @@ export default {
                 "payloads.uuid": workloadUUID,
             })
             const userId = global.wsInterface.findUserIdFromClientID(socket.id)
-            
+
             if (!workorder) {
-               return socket.emit(`joinWorkloadFailed`, "Workorder not found")
+                return socket.emit(`joinWorkloadFailed`, "Workorder not found")
             }
 
             // TODO update to DB
@@ -151,49 +212,6 @@ export default {
             global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, userId)
         },
     },
-    pushCommit: Schematized({
-        required: ["workorderId", "payloadUUID", "quantity"],
-        select: ["workorderId", "payloadUUID", "quantity", "tooks"],
-    }, async (req, res) => {
-        let workorder = await Workorder.findById(req.selection.workorderId).catch(() => {
-            return false
-        })
-
-        if (!workorder) {
-            return res.status(404).send({
-                error: "Workorder not found",
-            })
-        }
-
-        if (typeof workorder.commits === "undefined" || !Array.isArray(workorder.commits)) {
-            workorder.commits = Array()
-        }
-
-        let commit = {
-            payloadUUID: req.selection.payloadUUID,
-            quantity: req.selection.quantity,
-            user_id: req.user._id,
-            timestamp: new Date().getTime(),
-            tooks: req.selection.tooks ?? 0,
-        }
-
-        workorder.commits.push(commit)
-
-        workorder = Methods.update(req.selection.workorderId, {
-            commits: workorder.commits,
-        }).catch((err) => {
-            return res.status(500).json({
-                error: err,
-            })
-        })
-
-        req.ws.io.emit(`newCommit_${commit.payloadUUID}`, {
-            workorderId: req.selection.workorderId,
-            commit,
-        })
-
-        return res.json(workorder.commits)
-    }),
     getCommits: Schematized({
         required: ["workorderId"],
         select: ["workorderId", "payloadUUID"],
