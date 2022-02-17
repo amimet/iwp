@@ -140,12 +140,6 @@ module.exports = [
         fn: "WorkorderController.update",
     },
     {
-        route: "/workorder_commit",
-        method: "POST",
-        middleware: ["withAuthentication", "useWS"],
-        fn: "WorkorderController.pushCommit",
-    },
-    {
         route: "/workorder_commits",
         method: "GET",
         middleware: ["withAuthentication"],
