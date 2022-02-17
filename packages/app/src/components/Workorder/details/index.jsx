@@ -63,6 +63,8 @@ export default class WorkorderDetails extends React.Component {
 			this.id = this.props.id
 		}
 
+		this.selfUserId = await User.selfUserId()
+
 		const qr = await this.createQR()
 		await this.fetchData()
 
@@ -421,6 +423,7 @@ export default class WorkorderDetails extends React.Component {
 					</div>
 					<div className="content">
 						<PayloadsRender
+							selfUserId={this.selfUserId}
 							onClickItem={(item) => this.openPayloadDetails(item)}
 							payloads={this.state.data.payloads}
 						/>
