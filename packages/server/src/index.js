@@ -66,7 +66,7 @@ class Server {
             io: this.io,
             clients: this.WSClients,
             findUserIdFromClientID: (clientId) => {
-                return this.WSClients.find(client => client.id === clientId).userId
+                return this.WSClients.find(client => client.id === clientId)?.userId ?? false
             },
             getClientSockets: (userId) => {
                 return this.WSClients.filter(client => client.userId === userId).map((client) => {
@@ -160,7 +160,16 @@ class Server {
             console.debug(`[${socket.id}] connected`)
 
             for await (const [event, data] of controllersEvents) {
-                socket.on(event, (...args) => data(socket, ...args))
+                socket.on(event, async (...args) => {
+                    try {
+                        await data(socket, ...args).catch((error) => {
+                            console.error(error)
+                            socket.emit("error", error)
+                        })
+                    } catch (error) {
+                        socket.emit("error", error)
+                    }
+                })
             }
 
             socket.on("ping", () => {
