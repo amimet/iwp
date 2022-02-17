@@ -21,10 +21,25 @@ export default (props) => {
         props.onOk(Number(value ?? 0))
     }
 
+    const setQuantityLeft = () => {
+        if (typeof props.fullFillQuantity === "number") {
+            setValue(props.fullFillQuantity)
+        }
+    }
+
     return <div className="number_picker">
         <div className="value">
             {value ?? 0}
         </div>
+
+        {props.fullFillQuantity && <div>
+            <antd.Button shape="round" onClick={setQuantityLeft}>
+                <Icons.MdDoneAll />
+                <Translation>
+                    {t => t("Mark remaining amount")}
+                </Translation>
+            </antd.Button>
+        </div>}
 
         <div className="actions">
             <div>
@@ -35,6 +50,7 @@ export default (props) => {
                     </Translation>
                 </antd.Button>
             </div>
+
             <div>
                 <antd.Button onClick={onClose}>
                     <Icons.X />
@@ -52,7 +68,7 @@ export default (props) => {
                 setValue(Number(`${value ?? ""}${e}`))
             }}
             onDelete={() => {
-                if(!value) { 
+                if (!value) {
                     return false
                 }
                 setValue(Number(`${value}`.slice(0, -1)))
