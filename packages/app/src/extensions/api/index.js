@@ -62,7 +62,7 @@ export default {
                     window.app.ws = app.WSInterface
                     window.app.handleWSListener = app.handleWSListener
                     window.app.WSRequest = app.WSRequest
-                    window.app.WSMainRequest = (...args) => app.WSMainRequest("main", ...args)
+                    window.app.WSMainRequest = (...args) => app.WSRequest("main", ...args)
                 },
                 async (self) => {
                     self.apiBridge = await self.createApiBridge()
