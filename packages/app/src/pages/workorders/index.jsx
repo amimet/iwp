@@ -73,6 +73,10 @@ export default class Workorders extends React.Component {
 		window.app.handleWSListener("newWorkorder", (data) => {
 			this.appendWorkorderToRender(data)
 		})
+		
+		window.app.handleWSListener("deletedWorkorder", (data) => {
+			this.deleteWorkorderFromRender(data)
+		})
 
 		window.app.handleWSListener("workorderUpdate", (data) => {
 			let workorders = this.state.workorders.map((workorder) => {
