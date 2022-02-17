@@ -63,12 +63,22 @@ export default class Layout extends React.Component {
 			this.setState({ isOnTransition: false })
 		})
 
-		if (window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
+		if (window.app.settings.get("forceMobileMode") || window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
 			window.isMobile = true
 			this.setLayout("mobile")
 		} else {
 			window.isMobile = false
 		}
+
+		window.app.eventBus.on("forceMobileMode", (to) => {
+			if (to) {
+				window.isMobile = true
+				this.setLayout("mobile")
+			} else {
+				window.isMobile = false
+				this.setLayout("default")
+			}
+		})
 	}
 
 	render() {
