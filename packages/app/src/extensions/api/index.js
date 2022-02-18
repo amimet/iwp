@@ -1,5 +1,5 @@
 import config from "config"
-import { Bridge } from "linebridge/client"
+import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
 import io from "socket.io-client"
 
