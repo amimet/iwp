@@ -44,6 +44,10 @@ export default (schema = {}, fn) => {
                         req.selection[key] = req.query[key]
                         continue
                     }
+
+                    if (typeof req.selection[key] === "undefined") {
+                        req.selection[key] = "undefined"
+                    }
                 }
             } else {
                 console.warn("[INVALID SCHEMA] schema.select is defined but is not an array")
