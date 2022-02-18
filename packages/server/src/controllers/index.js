@@ -1,9 +1,19 @@
-export { default as SectionController } from "./SectionController"
-export { default as RolesController } from "./RolesController"
-export { default as SessionController } from "./SessionController"
-export { default as UserController } from "./UserController"
-export { default as WorkorderController } from "./WorkorderController"
-export { default as FabricController } from "./FabricController"
-export { default as WorkshiftsController } from "./WorkshiftsController"
-export { default as ReportsController } from "./ReportsController"
-export { default as FilesController } from "./FilesController"
+import { default as SectionController } from "./SectionController"
+import { default as RolesController } from "./RolesController"
+import { default as SessionController } from "./SessionController"
+import { default as UserController } from "./UserController"
+import { default as WorkorderController } from "./WorkorderController"
+import { default as FabricController } from "./FabricController"
+import { default as WorkshiftsController } from "./WorkshiftsController"
+import { default as FilesController } from "./FilesController"
+
+export default [
+    SectionController,
+    RolesController,
+    SessionController,
+    UserController,
+    WorkorderController,
+    FabricController,
+    WorkshiftsController,
+    FilesController,
+]
