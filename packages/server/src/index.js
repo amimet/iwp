@@ -1,15 +1,15 @@
 Array.prototype.updateFromObjectKeys = function (obj) {
-	this.forEach((value, index) => {
-		if (obj[value] !== undefined) {
-			this[index] = obj[value]
-		}
-	})
+    this.forEach((value, index) => {
+        if (obj[value] !== undefined) {
+            this[index] = obj[value]
+        }
+    })
 
-	return this
+    return this
 }
 
 import path from "path"
-import LinebridgeServer from "linebridge/server"
+import LinebridgeServer from "linebridge/dist/server"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
 import passport from "passport"
@@ -38,20 +38,15 @@ class Server {
         this.env = process.env
         this.listenPort = this.env.listenPort ?? 3000
 
+        this.controllers = require("./controllers").default
         this.middlewares = require("./middlewares")
-        this.controllers = require("./controllers")
-        this.endpoints = require("./endpoints")
 
         this.instance = new LinebridgeServer({
-            listen: "0.0.0.0",
-            middlewares: this.middlewares,
-            controllers: this.controllers,
-            endpoints: this.endpoints,
             port: this.listenPort,
             headers: {
                 "Access-Control-Expose-Headers": "regenerated_token",
             },
-        })
+        }, this.controllers, this.middlewares)
 
         this.server = this.instance.httpServer
         this.io = new socketIo.Server(this.env.wsPort ?? 3001)
@@ -98,7 +93,7 @@ class Server {
         await this.initPassport()
         await this.initWebsockets()
 
-        await this.instance.init()
+        await this.instance.initialize()
     }
 
     connectToDB = () => {
