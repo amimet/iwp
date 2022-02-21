@@ -57,7 +57,6 @@ export default class WorkingTasks extends React.Component {
 
     renderTasks = () => {
         return this.state.tasks.map((task) => {
-            console.log(task)
             return <div key={task.workloadUUID} className="task" onClick={() => { this.openTask(task.workloadUUID) }}>
                 <Icons.Box />
                 {task.workloadUUID}
