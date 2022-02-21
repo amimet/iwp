@@ -37,20 +37,22 @@ class Server {
     constructor() {
         this.env = process.env
         this.listenPort = this.env.listenPort ?? 3000
+        this.wsListenPort = this.env.wsListenPort ?? 3001
 
         this.controllers = require("./controllers").default
         this.middlewares = require("./middlewares")
 
         this.instance = new LinebridgeServer({
             port: this.listenPort,
+            wsPort: this.wsListenPort,
             headers: {
                 "Access-Control-Expose-Headers": "regenerated_token",
             },
+            onWSClientConnection: this.onWSClientConnection,
+            onWSClientDisconnection: this.onWSClientDisconnection,
         }, this.controllers, this.middlewares)
 
-        this.server = this.instance.httpServer
-        this.io = new socketIo.Server(this.env.wsPort ?? 3001)
-        this.WSClients = []
+        this.server = this.instance.httpInterface
 
         this.options = {
             jwtStrategy: {
@@ -62,28 +64,27 @@ class Server {
             }
         }
 
+        this.instance.wsInterface["clients"] = []
+        this.instance.wsInterface["findUserIdFromClientID"] = (clientId) => {
+            return this.instance.wsInterface.clients.find(client => client.id === clientId)?.userId ?? false
+        }
+        this.instance.wsInterface["getClientSockets"] = (userId) => {
+            return this.instance.wsInterface.clients.filter(client => client.userId === userId).map((client) => {
+                return client?.socket
+            })
+        }
+        this.instance.wsInterface["broadcast"] = async (channel, ...args) => {
+            for await (const client of this.instance.wsInterface.clients) {
+                client.socket.emit(channel, ...args)
+            }
+        }
+
+        global.wsInterface = this.instance.wsInterface
         global.httpListenPort = this.listenPort
         global.globalPublicURI = this.env.globalPublicURI
         global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
         global.jwtStrategy = this.options.jwtStrategy
         global.signLocation = this.env.signLocation
-        global.wsInterface = {
-            io: this.io,
-            clients: this.WSClients,
-            findUserIdFromClientID: (clientId) => {
-                return this.WSClients.find(client => client.id === clientId)?.userId ?? false
-            },
-            getClientSockets: (userId) => {
-                return this.WSClients.filter(client => client.userId === userId).map((client) => {
-                    return client?.socket
-                })
-            },
-            broadcast: async (channel, ...args) => {
-                for await (const client of this.WSClients) {
-                    client.socket.emit(channel, ...args)
-                }
-            },
-        }
 
         this.initialize()
     }
@@ -122,6 +123,10 @@ class Server {
             req.jwtStrategy = this.options.jwtStrategy
             next()
         }
+        this.instance.middlewares["useWS"] = (req, res, next) => {
+            req.ws = global.wsInterface
+            next()
+        }
 
         passport.use(new LocalStrategy({
             usernameField: "username",
@@ -146,104 +151,73 @@ class Server {
     }
 
     initWebsockets() {
-        let controllersEvents = []
-
-        Object.entries(this.controllers).forEach(([controllerName, controller]) => {
-            if (controller.wsEvents) {
-                Object.keys(controller.wsEvents).forEach((key) => {
-                    controllersEvents.push([key, controller.wsEvents[key]])
-                })
-            }
-        })
-
-        this.instance.middlewares["useWS"] = (req, res, next) => {
-            req.ws = global.wsInterface
-            next()
+        const onAuthenticated = (socket, user_id) => {
+            this.attachClientSocket(socket, user_id)
+            socket.emit("authenticated")
         }
 
-        this.io.on("connection", async (socket) => {
-            console.debug(`[${socket.id}] connected`)
+        const onAuthenticatedFailed = (socket, error) => {
+            this.detachClientSocket(socket)
+            socket.emit("authenticateFailed", {
+                error,
+            })
+        }
 
-            for await (const [event, data] of controllersEvents) {
-                socket.on(event, async (...args) => {
-                    try {
-                        await data(socket, ...args).catch((error) => {
-                            console.error(error)
-                            socket.emit("error", error)
-                        })
-                    } catch (error) {
-                        socket.emit("error", error)
-                    }
-                })
-            }
-
-            socket.on("ping", () => {
-                socket.emit("pong")
+        this.instance.wsInterface.eventsChannels.push(["/main", "authenticate", async (socket, token) => {
+            const session = await Session.findOne({ token }).catch(err => {
+                return false
             })
 
-            const onAuthenticated = (user_id) => {
-                this.attachClientSocket(socket, user_id)
-                socket.emit("authenticated")
+            if (!session) {
+                return onAuthenticatedFailed(socket, "Session not found")
             }
 
-            const onAuthenticatedFailed = (error) => {
-                this.detachClientSocket(socket)
-                socket.emit("authenticateFailed", {
-                    error,
-                })
-            }
-
-            socket.on("authenticate", async (token) => {
-                const session = await Session.findOne({ token }).catch(err => {
-                    return false
-                })
-
-                if (!session) {
-                    return onAuthenticatedFailed("Session not found")
+            this.verifyJwt(token, (err, decoded) => {
+                if (err) {
+                    return onAuthenticatedFailed(socket, err)
+                } else {
+                    return onAuthenticated(socket, decoded.user_id)
                 }
-
-                this.verifyJwt(token, (err, decoded) => {
-                    if (err) {
-                        return onAuthenticatedFailed(err)
-                    } else {
-                        return onAuthenticated(decoded.user_id)
-                    }
-                })
             })
+        }])
+    }
 
-            socket.on("disconnect", () => {
-                console.log(`[${socket.id}] disconnected`)
-                this.detachClientSocket(socket)
-            })
-        })
+    onWSClientConnection = async (socket) => {
+        console.log(`🌐 Client connected: ${socket.id}`)
+    }
+
+    onWSClientDisconnection = async (socket) => {
+        console.log(`🌐 Client disconnected: ${socket.id}`)
+        this.detachClientSocket(socket)
     }
 
     attachClientSocket = async (client, userId) => {
-        const socket = this.WSClients.find(c => c.id === client.id)
+        const socket = this.instance.wsInterface.clients.find(c => c.id === client.id)
 
         if (socket) {
             socket.socket.disconnect()
         }
 
-        this.WSClients.push({
+        this.instance.wsInterface.clients.push({
             id: client.id,
             socket: client,
             userId,
         })
 
-        this.io.emit("user_connected", userId)
+        this.instance.wsInterface.io.emit("user_connected", userId)
     }
 
     detachClientSocket = async (client) => {
-        const socket = this.WSClients.find(c => c.id === client.id)
+        const socket = this.instance.wsInterface.clients.find(c => c.id === client.id)
 
         if (socket) {
             socket.socket.disconnect()
-            this.WSClients = this.WSClients.filter(c => c.id !== client.id)
+            this.instance.wsInterface.clients = this.instance.wsInterface.clients.filter(c => c.id !== client.id)
         }
 
-        this.io.emit("user_disconnected", client.id)
+        this.instance.wsInterface.io.emit("user_disconnected", client.id)
     }
+
 
     verifyJwt = (token, callback) => {
         jwt.verify(token, this.options.jwtStrategy.secretOrKey, async (err, decoded) => {
