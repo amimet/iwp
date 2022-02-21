@@ -70,15 +70,15 @@ export default class Workorders extends React.Component {
 	api = window.app.request
 
 	componentDidMount = async () => {
-		window.app.handleWSListener("newWorkorder", (data) => {
+		window.app.ws.listen("newWorkorder", (data) => {
 			this.appendWorkorderToRender(data)
 		})
 		
-		window.app.handleWSListener("deletedWorkorder", (data) => {
+		window.app.ws.listen("deletedWorkorder", (data) => {
 			this.deleteWorkorderFromRender(data)
 		})
 
-		window.app.handleWSListener("workorderUpdate", (data) => {
+		window.app.ws.listen("workorderUpdate", (data) => {
 			let workorders = this.state.workorders.map((workorder) => {
 				if (workorder._id === data._id) {
 					return data

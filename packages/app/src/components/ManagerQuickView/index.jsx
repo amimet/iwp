@@ -8,13 +8,13 @@ import "./index.less"
 export default (props) => {
     const [operators, setOperators] = React.useState([])
 
-    window.app.handleWSListener("userConnected", (user) => {
+    window.app.ws.listen("userConnected", (user) => {
         if (user.roles.includes("operator")) {
             setOperators((prev) => [...prev, user])
         }
     })
 
-    window.app.handleWSListener("userDisconnected", (user) => {
+    window.app.ws.listen("userDisconnected", (user) => {
         if (user.roles.includes("operator")) {
             setOperators((prev) => prev.filter((u) => u.id !== user.id))
         }

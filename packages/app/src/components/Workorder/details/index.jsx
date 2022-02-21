@@ -70,7 +70,7 @@ export default class WorkorderDetails extends React.Component {
 
 		await this.setState({ qrCanvas: qr, hasManager: await User.hasRole("manager") })
 
-		window.app.handleWSListener(`workorderUpdate_${this.id}`, (data) => {
+		window.app.ws.listen(`workorderUpdate_${this.id}`, (data) => {
 			this.setState({ data: data })
 		})
 	}

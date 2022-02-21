@@ -375,7 +375,7 @@ class App {
 		await this.initialization()
 		// declare WS Handlers
 
-		window.app.handleWSListener("workorderAssigned", async () => {
+		window.app.ws.listen("workorderAssigned", async () => {
 			if (window.app.settings.get("workorder_notifications")) {
 				window.app.notifications.new({
 					title: "New workorder assigned",

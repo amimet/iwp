@@ -207,7 +207,7 @@ export default class Inspector extends React.Component {
     }
 
     api = window.app.request
-    WSRequest = window.app.WSMainRequest
+    WSRequest = window.app.wsRequest
 
     componentDidMount = async () => {
         this.uuid = this.props.payload?.uuid ?? this.props.uuid
@@ -238,7 +238,7 @@ export default class Inspector extends React.Component {
             }
         }
 
-        window.app.handleWSListener(`newCommit_${this.uuid}`, (data) => {
+        window.app.ws.listen(`newCommit_${this.uuid}`, (data) => {
             let workorder = this.state.workorder
 
             if (!workorder.commits) {
@@ -250,14 +250,14 @@ export default class Inspector extends React.Component {
             this.setState({ workorder })
         })
 
-        window.app.handleWSListener(`workerJoinWorkload_${this.uuid}`, (data) => {
+        window.app.ws.listen(`workerJoinWorkload_${this.uuid}`, (data) => {
             let activeWorkers = this.state.data.activeWorkers ?? []
             activeWorkers.push(data)
 
             this.setState({ data: { ...this.state.data, activeWorkers } })
         })
 
-        window.app.handleWSListener(`workerLeaveWorkload_${this.uuid}`, (data) => {
+        window.app.ws.listen(`workerLeaveWorkload_${this.uuid}`, (data) => {
             let activeWorkers = this.state.data.activeWorkers ?? []
             activeWorkers = activeWorkers.filter((worker) => worker.userId !== data.userId)
 
@@ -338,7 +338,7 @@ export default class Inspector extends React.Component {
     toogleRunning = async (to) => {
         to = to ?? !this.state.running
 
-        await this.WSRequest(to ? "joinWorkload" : "leaveWorkload", this.uuid)
+        await this.WSRequest[to ? "joinWorkload" : "leaveWorkload"](this.uuid)
             .then(async () => {
                 Haptics.impact("Medium")
                 await this.setState({ running: to })
