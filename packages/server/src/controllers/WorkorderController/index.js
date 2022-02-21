@@ -409,7 +409,11 @@ export default class WorkorderController extends ComplexController {
             let userId = req.query?.userId ?? req.decodedToken.user_id
 
             const workorders = await Workorder.find({
-                "payloads.activeWorkers": userId,
+                "payloads.activeWorkers": {
+                    $elemMatch: {
+                        userId: userId
+                    }
+                },
             })
 
             return res.json(workorders)
