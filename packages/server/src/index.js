@@ -65,8 +65,8 @@ class Server {
         }
 
         this.instance.wsInterface["clients"] = []
-        this.instance.wsInterface["findUserIdFromClientID"] = (clientId) => {
-            return this.instance.wsInterface.clients.find(client => client.id === clientId)?.userId ?? false
+        this.instance.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
+            return this.instance.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
         }
         this.instance.wsInterface["getClientSockets"] = (userId) => {
             return this.instance.wsInterface.clients.filter(client => client.userId === userId).map((client) => {
@@ -206,12 +206,14 @@ class Server {
             socket.socket.disconnect()
         }
 
-        this.instance.wsInterface.clients.push({
+        const clientObj = {
             id: client.id,
             socket: client,
-            userId: userData._id,
+            userId: userData._id.toString(),
             user: userData,
-        })
+        }
+
+        this.instance.wsInterface.clients.push(clientObj)
 
         this.instance.wsInterface.io.emit("userConnected", userData)
     }
