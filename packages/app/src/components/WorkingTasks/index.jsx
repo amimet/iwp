@@ -67,7 +67,7 @@ export default class WorkingTasks extends React.Component {
 
     render() {
         return <div className="workingTasks">
-            <antd.Badge count={this.state.tasks.length ?? 0}>
+            <antd.Badge offset={[10, 0]} count={this.state.tasks.length ?? 0}>
                 <h2><Icons.MdHistory /> <Translation>{
                     t => t("Working Tasks")
                 }</Translation> </h2>
