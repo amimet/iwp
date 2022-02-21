@@ -379,7 +379,7 @@ export default class Inspector extends React.Component {
         const quantityLeft = this.countQuantityLeft()
 
         const makeCommit = async () => {
-            const commit = await this.WSRequest("payloadCommit", {
+            const commit = await this.WSRequest.payloadCommit({
                 workorderId: this.state.workorder._id,
                 payloadUUID: this.uuid,
                 quantity,
