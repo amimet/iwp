@@ -245,10 +245,8 @@ export default class WorkorderController extends ComplexController {
                 })
             })
 
-            console.log(global.wsInterface)
-
             global.wsInterface.io.emit(`workerJoinWorkload`, worker)
-
+            global.wsInterface.io.emit(`workerJoinWorkload_${worker.userId}`, worker)
             global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, worker)
 
             return socket.emit("response", "ok")
@@ -311,6 +309,10 @@ export default class WorkorderController extends ComplexController {
             })
 
             global.wsInterface.io.emit(`workerLeaveWorkload`, {
+                workloadUUID,
+                userId
+            })
+            global.wsInterface.io.emit(`workerLeaveWorkload_${userId}`, {
                 workloadUUID,
                 userId
             })
@@ -407,6 +409,7 @@ export default class WorkorderController extends ComplexController {
         }),
         "/active_tasks": async (req, res) => {
             let userId = req.query?.userId ?? req.decodedToken.user_id
+            let tasks = []
 
             const workorders = await Workorder.find({
                 "payloads.activeWorkers": {
@@ -416,7 +419,19 @@ export default class WorkorderController extends ComplexController {
                 },
             })
 
-            return res.json(workorders)
+            workorders.forEach((workorder) => {
+                workorder.payloads.forEach((payload) => {
+                    if (payload.activeWorkers) {
+                        payload.activeWorkers.forEach((worker) => {
+                            if (worker.userId === userId) {
+                                tasks.push(worker)
+                            }
+                        })
+                    }
+                })
+            })
+
+            return res.json(tasks)
         },
     }
 
