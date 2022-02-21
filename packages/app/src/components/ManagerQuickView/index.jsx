@@ -9,14 +9,22 @@ export default (props) => {
     const [operators, setOperators] = React.useState([])
 
     window.app.ws.listen("userConnected", (user) => {
+        console.log(user, operators)
+
         if (user.roles.includes("operator")) {
+            const alreadyOnList = operators.find((operator) => operator._id === user._id)
+
+            if (alreadyOnList) {
+                return false
+            }
+
             setOperators((prev) => [...prev, user])
         }
     })
 
-    window.app.ws.listen("userDisconnected", (user) => {
+    window.app.ws.listen("userDisconnected", (user_id) => {
         if (user.roles.includes("operator")) {
-            setOperators((prev) => prev.filter((u) => u.id !== user.id))
+            setOperators((prev) => prev.filter((operator) => operator._id !== user_id))
         }
     })
 
