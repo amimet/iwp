@@ -209,7 +209,7 @@ class Server {
         this.instance.wsInterface.clients.push({
             id: client.id,
             socket: client,
-            userId: userData.user_id,
+            userId: userData._id,
             user: userData,
         })
 
