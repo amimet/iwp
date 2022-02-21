@@ -56,7 +56,7 @@ export default class Main extends React.Component {
 						</div>}
 					</div>
 				</div>
-				
+
 				{!window.isMobile && <div>
 					<AppSearcher />
 				</div>}
@@ -79,9 +79,9 @@ export default class Main extends React.Component {
 					<div key="assignedWorkorders" className="widget">
 						<AssignedWorkorders />
 					</div>
-					{this.state.hasManager && <div key="managerQuickView" className="widget">
+					{/* {this.state.hasManager && <div key="managerQuickView" className="widget">
 						<ManagerQuickView />
-					</div>}
+					</div>} */}
 				</div>
 			</div>
 		)
