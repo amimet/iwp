@@ -210,7 +210,7 @@ export default class WorkorderController extends ComplexController {
                 workload.activeWorkers = []
             }
 
-            const existOnActiveWorkers = workload.activeWorkers.find(worker => worker.userId === userId)
+            const existOnActiveWorkers = workload.activeWorkers.find((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) === userId)
 
             if (existOnActiveWorkers) {
                 return socket.emit(`responseError`, {
@@ -282,7 +282,7 @@ export default class WorkorderController extends ComplexController {
                 workload.activeWorkers = []
             }
 
-            const existOnActiveWorkers = workload.activeWorkers.find(worker => worker.userId === userId)
+            const existOnActiveWorkers = workload.activeWorkers.find((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) === userId)
 
             if (!existOnActiveWorkers) {
                 return socket.emit(`responseError`, {
@@ -293,7 +293,7 @@ export default class WorkorderController extends ComplexController {
             workorder.payloads.forEach((payload) => {
                 if (payload.uuid === workloadUUID) {
                     if (Array.isArray(payload.activeWorkers)) {
-                        payload.activeWorkers = payload.activeWorkers.filter(worker => worker.userId !== userId)
+                        payload.activeWorkers = payload.activeWorkers.filter((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) !== userId)
                     }
                 }
             })
