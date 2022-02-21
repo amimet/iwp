@@ -172,11 +172,19 @@ class Server {
                 return onAuthenticatedFailed(socket, "Session not found")
             }
 
-            this.verifyJwt(token, (err, decoded) => {
+            this.verifyJwt(token, async (err, decoded) => {
                 if (err) {
                     return onAuthenticatedFailed(socket, err)
                 } else {
-                    return onAuthenticated(socket, decoded.user_id)
+                    const user = await User.findById(decoded.user_id).catch(err => {
+                        return false
+                    })
+
+                    if (!user) {
+                        return onAuthenticatedFailed(socket, "User not found")
+                    }
+
+                    return onAuthenticated(socket, user)
                 }
             })
         }])
@@ -191,7 +199,7 @@ class Server {
         this.detachClientSocket(socket)
     }
 
-    attachClientSocket = async (client, userId) => {
+    attachClientSocket = async (client, userData) => {
         const socket = this.instance.wsInterface.clients.find(c => c.id === client.id)
 
         if (socket) {
@@ -201,10 +209,11 @@ class Server {
         this.instance.wsInterface.clients.push({
             id: client.id,
             socket: client,
-            userId,
+            userId: userData.user_id,
+            user: userData,
         })
 
-        this.instance.wsInterface.io.emit("user_connected", userId)
+        this.instance.wsInterface.io.emit("userConnected", userData)
     }
 
     detachClientSocket = async (client) => {
@@ -215,9 +224,8 @@ class Server {
             this.instance.wsInterface.clients = this.instance.wsInterface.clients.filter(c => c.id !== client.id)
         }
 
-        this.instance.wsInterface.io.emit("user_disconnected", client.id)
+        this.instance.wsInterface.io.emit("userDisconnect", client.id)
     }
-
 
     verifyJwt = (token, callback) => {
         jwt.verify(token, this.options.jwtStrategy.secretOrKey, async (err, decoded) => {
