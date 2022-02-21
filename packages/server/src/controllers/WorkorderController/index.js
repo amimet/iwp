@@ -123,12 +123,11 @@ const Methods = {
     },
 }
 
-
 export default class WorkorderController extends ComplexController {
     static refName = "WorkorderController"
     static useMiddlewares = ["withAuthentication"]
 
-    on = {
+    channels = {
         "payloadCommit": async (socket, data = {}) => {
             const { workorderId, payloadUUID, quantity, tooks } = data
 
@@ -187,12 +186,12 @@ export default class WorkorderController extends ComplexController {
             let workload = workorder.payloads.find(payload => payload.uuid === workloadUUID)
 
             if (!workorder) {
-                return socket.emit(`responseError`, {
-                    message: "Workorder not found"
+                return socket.err({
+                    message: "Workorder not found",
                 })
             }
             if (!workload) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Workload not found"
                 })
             }
@@ -203,7 +202,7 @@ export default class WorkorderController extends ComplexController {
             })
 
             if (!userId || !user) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Cannot find your user"
                 })
             }
@@ -245,6 +244,8 @@ export default class WorkorderController extends ComplexController {
                     message: err.message
                 })
             })
+
+            console.log(global.wsInterface)
 
             global.wsInterface.io.emit(`workerJoinWorkload`, worker)
 
@@ -413,7 +414,6 @@ export default class WorkorderController extends ComplexController {
 
             return res.json(workorders)
         },
-
     }
 
     post = {
