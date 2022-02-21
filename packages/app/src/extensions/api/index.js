@@ -1,5 +1,5 @@
 import config from "config"
-import { Bridge } from "linebridge/client"
+import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
 import io from "socket.io-client"
 
@@ -33,7 +33,11 @@ export default {
         {
             initialization: [
                 async (app, main) => {
-                    app.WSInterface = await app.createWSBridge()
+                    app.apiBridge = await app.createApiBridge()
+
+                    app.WSInterface = app.apiBridge.wsInterface
+                    app.WSInterface.request = app.WSRequest
+                    app.WSInterface.listen = app.handleWSListener
                     app.WSSockets = app.WSInterface.sockets
                     app.WSInterface.mainSocketConnected = false
 
@@ -59,16 +63,11 @@ export default {
                         app.WSInterface.mainSocketConnected = false
                     })
 
+                    window.app.api = app.apiBridge
                     window.app.ws = app.WSInterface
-                    window.app.handleWSListener = app.handleWSListener
-                    window.app.WSRequest = app.WSRequest
-                    window.app.WSMainRequest = (...args) => app.WSRequest("main", ...args)
-                },
-                async (self) => {
-                    self.apiBridge = await self.createApiBridge()
 
-                    window.app.api = self.apiBridge
-                    window.app.request = self.apiBridge.endpoints
+                    window.app.request = app.apiBridge.endpoints
+                    window.app.wsRequest = app.apiBridge.wsEndpoints
                 },
             ],
             mutateContext: {
@@ -130,14 +129,6 @@ export default {
                         return await fn(...context)
                     })
                 },
-                createWSBridge: async () => {
-                    return new WSInterface({
-                        origin: config.ws.address,
-                        managerOptions: {
-                            autoConnect: false
-                        }
-                    })
-                },
                 createApiBridge: async () => {
                     const getSessionContext = async () => {
                         const obj = {}
@@ -168,6 +159,10 @@ export default {
 
                     const bridge = new Bridge({
                         origin: config.api.address,
+                        wsOrigin: config.ws.address,
+                        wsOptions: {
+                            autoConnect: false,
+                        },
                         onRequest: getSessionContext,
                         onResponse: handleResponse,
                     })

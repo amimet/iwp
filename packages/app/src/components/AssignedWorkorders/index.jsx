@@ -15,7 +15,7 @@ export default class AssignedWorkorders extends React.Component {
 	api = window.app.request
 
 	componentDidMount() {
-		window.app.handleWSListener("workorderAssigned", async (workorderId) => {
+		window.app.ws.listen("workorderAssigned", async (workorderId) => {
 			const data = await this.api.get.workorder(undefined, { _id: workorderId }).catch(() => {
 				return false
 			})
@@ -25,11 +25,11 @@ export default class AssignedWorkorders extends React.Component {
 			}
 		})
 
-		window.app.handleWSListener("workorderUnassigned", (workorderId) => {
+		window.app.ws.listen("workorderUnassigned", (workorderId) => {
 			this.removeItem(workorderId)
 		})
 
-		window.app.handleWSListener("workorderUpdate", (update) => {
+		window.app.ws.listen("workorderUpdate", (update) => {
 			const currentWorkorder = this.state.list.find(item => item._id === update._id)
 
 			if (currentWorkorder) {

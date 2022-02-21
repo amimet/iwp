@@ -1,3 +1,4 @@
+import { ComplexController } from "linebridge/dist/classes"
 import { Workorder, User } from "../../models"
 import { Schematized } from "../../lib"
 import { nanoid } from "nanoid"
@@ -122,8 +123,11 @@ const Methods = {
     },
 }
 
-export default {
-    wsEvents: {
+export default class WorkorderController extends ComplexController {
+    static refName = "WorkorderController"
+    static useMiddlewares = ["withAuthentication"]
+
+    channels = {
         "payloadCommit": async (socket, data = {}) => {
             const { workorderId, payloadUUID, quantity, tooks } = data
 
@@ -182,12 +186,12 @@ export default {
             let workload = workorder.payloads.find(payload => payload.uuid === workloadUUID)
 
             if (!workorder) {
-                return socket.emit(`responseError`, {
-                    message: "Workorder not found"
+                return socket.err({
+                    message: "Workorder not found",
                 })
             }
             if (!workload) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Workload not found"
                 })
             }
@@ -198,7 +202,7 @@ export default {
             })
 
             if (!userId || !user) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Cannot find your user"
                 })
             }
@@ -240,6 +244,8 @@ export default {
                     message: err.message
                 })
             })
+
+            console.log(global.wsInterface)
 
             global.wsInterface.io.emit(`workerJoinWorkload`, worker)
 
@@ -315,283 +321,313 @@ export default {
 
             return socket.emit("response", "ok")
         },
-    },
-    getCommits: Schematized({
-        required: ["workorderId"],
-        select: ["workorderId", "payloadUUID"],
-    }, async (req, res) => {
-        let workorder = await Workorder.findById(req.selection.workorderId)
+    }
 
-        if (!workorder) {
-            return res.status(404).send({
-                error: "Workorder not found",
-            })
-        }
+    get = {
+        "/workorder": Schematized({
+            select: ["_id", "section", "name", "finished"],
+        }, async (req, res) => {
+            let workorders = null
 
-        if (req.selection.payloadUUID) {
-            return res.json(workorder.commits.filter(commit => commit.payloadUUID === req.selection.payloadUUID))
-        }
+            if (req.selection._id) {
+                const data = await Workorder.findById(req.selection._id)
 
-        return res.json(workorder.commits)
-    }),
-    appendOperators: Schematized({
-        required: ["_id", "operators"],
-        select: ["_id", "operators"],
-    }, async (req, res) => {
-        let workorder = await Workorder.findById(req.selection._id)
-
-        if (workorder) {
-            if (Array.isArray(req.selection.operators) && Array.isArray(workorder.assigned)) {
-                for await (const operator of req.selection.operators) {
-                    if (!workorder.assigned.includes(operator)) {
-                        workorder.assigned.push(operator)
-
-                        const userSockets = req.ws.getClientSockets(operator)
-
-                        if (userSockets && Array.isArray(userSockets)) {
-                            userSockets.forEach((socket) => {
-                                socket.emit("workorderAssigned", workorder._id)
-                            })
-                        }
-                    }
-                }
-            } else {
-                return res.status(400).json({ error: "Invalid operators type. Must be an array." })
-            }
-
-            await Workorder.findByIdAndUpdate(req.selection._id, workorder)
-        }
-
-        return res.json(workorder)
-    }),
-    removeOperators: Schematized({
-        required: ["_id", "operators"],
-        select: ["_id", "operators"],
-    }, async (req, res) => {
-        let workorder = await Workorder.findById(req.selection._id)
-
-        if (workorder) {
-            if (Array.isArray(req.selection.operators) && Array.isArray(workorder.assigned)) {
-                for await (const operator of req.selection.operators) {
-                    if (workorder.assigned.includes(operator)) {
-                        workorder.assigned.splice(workorder.assigned.indexOf(operator), 1)
-                    }
-
-                    const userSockets = req.ws.getClientSockets(operator)
-
-                    if (userSockets && Array.isArray(userSockets)) {
-                        userSockets.forEach((socket) => {
-                            socket.emit("workorderUnassigned", workorder._id)
-                        })
-                    }
-                }
-            } else {
-                return res.status(400).json({ error: "Invalid operators type. Must be an array." })
-            }
-
-            await Workorder.findByIdAndUpdate(req.selection._id, workorder)
-        }
-
-        return res.json(workorder)
-    }),
-    update: Schematized({
-        required: ["_id", "update"],
-        select: ["_id", "update"],
-    }, async (req, res) => {
-        let result = {
-            failed: [],
-            success: [],
-        }
-        let query = []
-
-        if (Array.isArray(req.selection._id)) {
-            query = req.selection._id
-        } else {
-            query.push(req.selection._id)
-        }
-
-        for await (const [index, _id] of query.entries()) {
-            let update = Array.isArray(req.selection._id) && Array.isArray(req.selection.update) ? req.selection.update[index] : req.selection.update
-
-            let workorder = await Workorder.findById(_id).catch((err) => {
-                return false
-            })
-
-            if (workorder) {
-                //FIXME: if update method fails, this will be added to the success array anyways
-                workorder = await Methods.update(_id, update).catch((err) => {
-                    return false
-                })
-
-                result.success.push(workorder)
-            } else {
-                result.failed.push(_id)
-            }
-
-            continue
-        }
-
-        return res.json(result)
-    }),
-    create: Schematized({
-        required: ["payloads", "section", "name"],
-    }, async (req, res) => {
-        const { payloads, section, name, assigned, scheduledStart, scheduledFinish } = req.body
-
-        const obj = {
-            created: new Date().getTime(),
-            commits: [],
-            payloads,
-            assigned,
-            name,
-            scheduledStart,
-            scheduledFinish,
-            section,
-        }
-
-        // initialize payloads
-        payloads.forEach((payload) => {
-            if (!payload.uuid) {
-                payload.uuid = nanoid()
-            }
-            if (!payload.activeWorkers) {
-                payload.activeWorkers = Array()
-            }
-        })
-
-        const result = await Workorder.create(obj)
-
-        // TODO: send update with WS (USE METHODS)
-        if (Array.isArray(assigned) && assigned.length > 0) {
-            assigned.forEach((operator) => {
-                const userSockets = req.ws.getClientSockets(operator)
-
-                if (userSockets && Array.isArray(userSockets)) {
-                    userSockets.forEach((socket) => {
-                        socket.emit("workorderAssigned", result._id)
+                if (!data) {
+                    return res.status(404).send({
+                        error: "Workorder not found",
                     })
                 }
-            })
-        }
 
-        req.ws.io.emit("newWorkorder", result)
+                workorders = [data]
+            } else {
+                switch (req.selection.section) {
+                    case "all":
+                        delete req.selection.section
+                        break
+                    case "finished":
+                        req.selection.finished = true
+                        delete req.selection.section
+                        break
+                    case "archived":
+                        req.selection.status = "archived"
+                        delete req.selection.section
+                        break
+                    default:
+                        req.selection.status = { $nin: ["archived", "finished"] }
+                        break
+                }
 
-        return res.json(result)
-    }),
-    delete: Schematized({
-        required: ["id"],
-    }, async (req, res) => {
-        let deleted = []
-        let queue = []
-
-        const { id } = req.body
-
-        if (Array.isArray(id)) {
-            queue = id
-        } else {
-            queue.push(id)
-        }
-
-        for await (let _id of queue) {
-            const result = await Workorder.findByIdAndDelete({ _id })
-
-            if (result != null) {
-                deleted.push(_id)
+                workorders = await Workorder.find(req.selection)
             }
-        }
 
-        req.ws.io.emit("deletedWorkorder", deleted)
+            return res.json(req.selection._id ? workorders[0] : workorders)
+        }),
+        "/workorder_payload_UUID": Schematized({
+            required: ["uuid"],
+            select: ["uuid"],
+        }, async (req, res) => {
+            let workorder = await Workorder.findOne({
+                "payloads.uuid": req.selection.uuid,
+            })
 
-        return res.json({ deleted })
-    }),
-    get: Schematized({
-        select: ["_id", "section", "name", "finished"],
-    }, async (req, res) => {
-        let workorders = null
-
-        if (req.selection._id) {
-            const data = await Workorder.findById(req.selection._id)
-
-            if (!data) {
+            if (!workorder) {
                 return res.status(404).send({
                     error: "Workorder not found",
                 })
             }
 
-            workorders = [data]
-        } else {
-            switch (req.selection.section) {
-                case "all":
-                    delete req.selection.section
-                    break
-                case "finished":
-                    req.selection.finished = true
-                    delete req.selection.section
-                    break
-                case "archived":
-                    req.selection.status = "archived"
-                    delete req.selection.section
-                    break
-                default:
-                    req.selection.status = { $nin: ["archived", "finished"] }
-                    break
+            return res.json(workorder)
+        }),
+        "/assigned_workorders": Schematized({
+            select: ["_id"],
+        }, async (req, res) => {
+            // must exclude finished workorders
+            let workorders = await Workorder.find({ finished: false })
+            workorders = workorders.filter(workorder => workorder.assigned.includes(req.selection._id ?? req.user._id))
+
+            return res.json(workorders)
+        }),
+        "/workorder_commits": Schematized({
+            required: ["workorderId"],
+            select: ["workorderId", "payloadUUID"],
+        }, async (req, res) => {
+            let workorder = await Workorder.findById(req.selection.workorderId)
+
+            if (!workorder) {
+                return res.status(404).send({
+                    error: "Workorder not found",
+                })
             }
 
-            workorders = await Workorder.find(req.selection)
-        }
+            if (req.selection.payloadUUID) {
+                return res.json(workorder.commits.filter(commit => commit.payloadUUID === req.selection.payloadUUID))
+            }
 
-        return res.json(req.selection._id ? workorders[0] : workorders)
-    }),
-    getWorkorderWithPayloadUUID: Schematized({
-        required: ["uuid"],
-        select: ["uuid"],
-    }, async (req, res) => {
-        let workorder = await Workorder.findOne({
-            "payloads.uuid": req.selection.uuid,
-        })
+            return res.json(workorder.commits)
+        }),
+        "/active_tasks": async (req, res) => {
+            let userId = req.query?.userId ?? req.decodedToken.user_id
 
-        if (!workorder) {
-            return res.status(404).send({
-                error: "Workorder not found",
+            const workorders = await Workorder.find({
+                "payloads.activeWorkers": userId,
             })
-        }
 
-        return res.json(workorder)
-    }),
-    getActiveTasks: async (req, res) => {
-        let userId = req.query.userId ?? req.decodedToken.user_id 
+            return res.json(workorders)
+        },
+    }
 
-        const workorders = await Workorder.find({
-            "payloads.activeWorkers": userId,
-        })
+    post = {
+        "/regenerates_uuid": {
+            middlewares: ["privileged"],
+            fn: async (req, res) => {
+                let workorders = await Workorder.find()
 
-        return res.json(workorders)
-    },
-    getWorkorderAssignedToUserID: Schematized({
-        select: ["_id"],
-    }, async (req, res) => {
-        // must exclude finished workorders
-        let workorders = await Workorder.find({ finished: false })
-        workorders = workorders.filter(workorder => workorder.assigned.includes(req.selection._id ?? req.user._id))
+                workorders.forEach(async (workorder) => {
+                    if (workorder.payloads.length > 0) {
 
-        return res.json(workorders)
-    }),
-    regeneratesUUID: async (req, res) => {
-        let workorders = await Workorder.find()
+                        workorder.payloads.forEach((item) => {
+                            if (typeof item.uuid === "undefined") {
+                                item.uuid = nanoid()
+                            }
+                        })
 
-        workorders.forEach(async (workorder) => {
-            if (workorder.payloads.length > 0) {
-
-                workorder.payloads.forEach((item) => {
-                    if (typeof item.uuid === "undefined") {
-                        item.uuid = nanoid()
+                        await Workorder.findByIdAndUpdate(workorder._id, workorder)
                     }
                 })
 
-                await Workorder.findByIdAndUpdate(workorder._id, workorder)
-            }
-        })
+                return res.json(workorders)
+            },
+        },
+    }
 
-        return res.json(workorders)
-    },
+    put = {
+        "/workorder": {
+            middlewares: ["useWS"],
+            fn: Schematized({
+                required: ["payloads", "section", "name"],
+            }, async (req, res) => {
+                const { payloads, section, name, assigned, scheduledStart, scheduledFinish } = req.body
+
+                const obj = {
+                    created: new Date().getTime(),
+                    commits: [],
+                    payloads,
+                    assigned,
+                    name,
+                    scheduledStart,
+                    scheduledFinish,
+                    section,
+                }
+
+                // initialize payloads
+                payloads.forEach((payload) => {
+                    if (!payload.uuid) {
+                        payload.uuid = nanoid()
+                    }
+                    if (!payload.activeWorkers) {
+                        payload.activeWorkers = Array()
+                    }
+                })
+
+                const result = await Workorder.create(obj)
+
+                // TODO: send update with WS (USE METHODS)
+                if (Array.isArray(assigned) && assigned.length > 0) {
+                    assigned.forEach((operator) => {
+                        const userSockets = req.ws.getClientSockets(operator)
+
+                        if (userSockets && Array.isArray(userSockets)) {
+                            userSockets.forEach((socket) => {
+                                socket.emit("workorderAssigned", result._id)
+                            })
+                        }
+                    })
+                }
+
+                req.ws.io.emit("newWorkorder", result)
+
+                return res.json(result)
+            }),
+        },
+        "/workorder_operators": {
+            middlewares: ["useWS"],
+            fn: Schematized({
+                required: ["_id", "operators"],
+                select: ["_id", "operators"],
+            }, async (req, res) => {
+                let workorder = await Workorder.findById(req.selection._id)
+
+                if (workorder) {
+                    if (Array.isArray(req.selection.operators) && Array.isArray(workorder.assigned)) {
+                        for await (const operator of req.selection.operators) {
+                            if (!workorder.assigned.includes(operator)) {
+                                workorder.assigned.push(operator)
+
+                                const userSockets = req.ws.getClientSockets(operator)
+
+                                if (userSockets && Array.isArray(userSockets)) {
+                                    userSockets.forEach((socket) => {
+                                        socket.emit("workorderAssigned", workorder._id)
+                                    })
+                                }
+                            }
+                        }
+                    } else {
+                        return res.status(400).json({ error: "Invalid operators type. Must be an array." })
+                    }
+
+                    await Workorder.findByIdAndUpdate(req.selection._id, workorder)
+                }
+
+                return res.json(workorder)
+            }),
+        },
+        "/update_workorder": {
+            middlewares: ["privileged"],
+            fn: Schematized({
+                required: ["_id", "update"],
+                select: ["_id", "update"],
+            }, async (req, res) => {
+                let result = {
+                    failed: [],
+                    success: [],
+                }
+                let query = []
+
+                if (Array.isArray(req.selection._id)) {
+                    query = req.selection._id
+                } else {
+                    query.push(req.selection._id)
+                }
+
+                for await (const [index, _id] of query.entries()) {
+                    let update = Array.isArray(req.selection._id) && Array.isArray(req.selection.update) ? req.selection.update[index] : req.selection.update
+
+                    let workorder = await Workorder.findById(_id).catch((err) => {
+                        return false
+                    })
+
+                    if (workorder) {
+                        //FIXME: if update method fails, this will be added to the success array anyways
+                        workorder = await Methods.update(_id, update).catch((err) => {
+                            return false
+                        })
+
+                        result.success.push(workorder)
+                    } else {
+                        result.failed.push(_id)
+                    }
+
+                    continue
+                }
+
+                return res.json(result)
+            }),
+        },
+    }
+
+    delete = {
+        "/workorder": {
+            middlewares: ["privileged", "useWS"],
+            fn: Schematized({
+                required: ["id"],
+            }, async (req, res) => {
+                let deleted = []
+                let queue = []
+
+                const { id } = req.body
+
+                if (Array.isArray(id)) {
+                    queue = id
+                } else {
+                    queue.push(id)
+                }
+
+                for await (let _id of queue) {
+                    const result = await Workorder.findByIdAndDelete({ _id })
+
+                    if (result != null) {
+                        deleted.push(_id)
+                    }
+                }
+
+                req.ws.io.emit("deletedWorkorder", deleted)
+
+                return res.json({ deleted })
+            }),
+        },
+        "/workorder_operators": {
+            middlewares: ["useWS"],
+            fn: Schematized({
+                required: ["_id", "operators"],
+                select: ["_id", "operators"],
+            }, async (req, res) => {
+                let workorder = await Workorder.findById(req.selection._id)
+
+                if (workorder) {
+                    if (Array.isArray(req.selection.operators) && Array.isArray(workorder.assigned)) {
+                        for await (const operator of req.selection.operators) {
+                            if (workorder.assigned.includes(operator)) {
+                                workorder.assigned.splice(workorder.assigned.indexOf(operator), 1)
+                            }
+
+                            const userSockets = req.ws.getClientSockets(operator)
+
+                            if (userSockets && Array.isArray(userSockets)) {
+                                userSockets.forEach((socket) => {
+                                    socket.emit("workorderUnassigned", workorder._id)
+                                })
+                            }
+                        }
+                    } else {
+                        return res.status(400).json({ error: "Invalid operators type. Must be an array." })
+                    }
+
+                    await Workorder.findByIdAndUpdate(req.selection._id, workorder)
+                }
+
+                return res.json(workorder)
+            }),
+        },
+    }
 }
