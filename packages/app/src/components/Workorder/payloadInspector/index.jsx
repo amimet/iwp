@@ -223,7 +223,7 @@ export default class Inspector extends React.Component {
         if (this.props.payload) {
             await this.setState({ data: this.props.payload })
         } else {
-            const data = this.state.workorder.payloads.find((payload) => payload.payloadUUID === this.uuid)
+            const data = this.state.workorder.payloads.find((payload) => payload.uuid === this.uuid)
             await this.setState({ data })
         }
 
