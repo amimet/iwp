@@ -17,6 +17,15 @@ import "./index.less"
 const excludedProperties = ["imagePreview"]
 
 const Worker = (props) => {
+    if (!props.worker) {
+        return <div>
+            <h2>
+                <Translation>
+                    {t => t("No data available")}
+                </Translation>
+            </h2>
+        </div>
+    }
     const { fullName, username, avatar } = props.worker ?? {}
 
     return <div className="worker">
@@ -200,6 +209,7 @@ export default class Inspector extends React.Component {
         workorder: null,
         data: null,
         running: false,
+        activeWorkers: [],
     }
 
     api = window.app.request
@@ -223,16 +233,19 @@ export default class Inspector extends React.Component {
             await this.setState({ data })
         }
 
-        // detect if you are in active workers
-        if (this.state.data.activeWorkers) {
-            const activeWorkersId = this.state.data.activeWorkers.map((worker) => worker.userId)
+        // set active workers 
+        const activeTasks = await this.fetchActiveTasks()
+        console.log(activeTasks)
+        await this.setState({ activeWorkers: activeTasks })
 
-            if (activeWorkersId.includes(this.selfUserId)) {
-                this.setState({
-                    running: true,
-                })
-            }
+        // detect if you are in active workers
+        const isActive = activeTasks.find((task) => task.user_id === this.selfUserId)
+
+        if (isActive) {
+            await this.setState({ running: true })
         }
+
+
 
         window.app.ws.listen(`newCommit_${this.uuid}`, (data) => {
             let workorder = this.state.workorder
@@ -246,18 +259,20 @@ export default class Inspector extends React.Component {
             this.setState({ workorder })
         })
 
-        window.app.ws.listen(`workerJoinWorkload_${this.uuid}`, (data) => {
-            let activeWorkers = this.state.data.activeWorkers ?? []
+        window.app.ws.listen(`task.join.target.${this.uuid}`, (data) => {
+            let activeWorkers = this.state.activeWorkers
+
             activeWorkers.push(data)
 
-            this.setState({ data: { ...this.state.data, activeWorkers } })
+            this.setState({ activeWorkers })
         })
 
-        window.app.ws.listen(`workerLeaveWorkload_${this.uuid}`, (data) => {
-            let activeWorkers = this.state.data.activeWorkers ?? []
-            activeWorkers = activeWorkers.filter((worker) => worker.userId !== data.userId)
+        window.app.ws.listen(`task.leave.target.${this.uuid}`, (data) => {
+            let activeWorkers = this.state.activeWorkers
 
-            this.setState({ data: { ...this.state.data, activeWorkers } })
+            activeWorkers = activeWorkers.filter((worker) => worker.user_id !== data.user_id)
+
+            this.setState({ activeWorkers })
         })
 
         window.app.ws.listen(`workorderFinished_${typeof this.state.workorder._id === "object" ? this.state.workorder._id.toString() : this.state.workorder._id}`, async () => {
@@ -274,6 +289,17 @@ export default class Inspector extends React.Component {
                 })
             }
         })
+    }
+
+    fetchActiveTasks = async () => {
+        const result = await this.api.get.activeTasks(undefined, {
+            target_id: this.uuid,
+        }).catch((err) => {
+            console.error(err)
+            return false
+        })
+
+        return result
     }
 
     fetchWorkorderDataWithUUID = async () => {
@@ -338,8 +364,10 @@ export default class Inspector extends React.Component {
     toogleRunning = async (to) => {
         to = to ?? !this.state.running
 
-        await this.WSRequest[to ? "joinWorkload" : "leaveWorkload"](this.uuid)
-            .then(async () => {
+        await this.WSRequest[to ? "join_task" : "leave_task"]({
+            target_id: this.uuid,
+        })
+            .then(async (data) => {
                 Haptics.impact("Medium")
                 await this.setState({ running: to })
             })
@@ -543,7 +571,7 @@ export default class Inspector extends React.Component {
 
             <div className="card">
                 <div>
-                    <antd.Badge offset={[16, 6]} count={this.state.data.activeWorkers?.length}>
+                    <antd.Badge offset={[16, 6]} count={this.state.activeWorkers?.length}>
                         <h3>
                             <Icons.Users />
                             <Translation>
@@ -554,9 +582,9 @@ export default class Inspector extends React.Component {
                 </div>
                 <div>
                     {
-                        this.state.data.activeWorkers?.length > 0 ?
-                            this.state.data.activeWorkers?.map((worker) => {
-                                return <Worker worker={worker} self={worker.userId === this.selfUserId} />
+                        this.state.activeWorkers?.length > 0 ?
+                            this.state.activeWorkers?.map((worker) => {
+                                return <Worker worker={worker.user_data} self={worker.user_id === this.selfUserId} />
                             }) :
                             <antd.Empty description={<Translation>
                                 {t => t("No workers")}
