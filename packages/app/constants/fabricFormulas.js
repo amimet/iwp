@@ -4,23 +4,8 @@ export default {
         icon: "Box",
         defaultFields: [
             "description",
-        ],
-    },
-    operation: {
-        label: "Operation",
-        icon: "Settings",
-        defaultFields: [
-            "description",
-            "sections",
-            "monetary_value",
-        ],
-    },
-    phase: {
-        label: "Phase",
-        icon: "GitCommit",
-        defaultFields: [
-            "description",
-            "tasks",
+            "variants",
+            "images"
         ],
     },
     task: {

@@ -2,15 +2,53 @@ import React from "react"
 import * as antd from "antd"
 
 export default {
-    quantity: {
-        mutability: true,
-        mutabilityDefault: true,
-        label: "Quantity",
-        component: "inputNumber",
+    description: {
+        label: "Description",
+        description: "Description of the task. It should be a general description of the product. Do not include information that may vary. e.g. 'The product is a white shirt with a elastic red collar, size M'",
+        icon: "MdDescription",
+        component: "textarea",
+        updateEvent: "onChange",
+        onUpdate: (prev, update) => {
+            return update.target.value
+        },
+        props: {
+            size: "large",
+            autoSize: { minRows: 1, maxRows: 7 },
+            placeholder: "Describe something...",
+        }
+    },
+    variants: {
+        label: "Variants",
+        description: "Define variants for this item. Only the types of variations that may exist of a product should be included. e.g. Size, Color, Material, etc.",
+        icon: "MdSchema",
+        component: "select",
         updateEvent: "onChange",
         props: {
-            min: 0,
-            defaultValue: 1,
+            style: { width: "100%" },
+            mode: "tags",
+            size: "large",
+            placeholder: "Type with your keyboard to create variants...",
+            allowClear: true,
+            defaultValue: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+            tokenSeparators: [','],
+        },
+    },
+    images: {
+        label: "Images",
+        description: "Append some images to describe this item.",
+        icon: "MdImage",
+        component: "imageUploader",
+        updateEvent: "onUploadDone",
+        onUpdate: async (prev, update) => {
+            return update
+        },
+    },
+    operations: {
+        label: "Operations",
+        component: "select",
+        updateEvent: "onChange",
+        props: {
+            placeholder: "Select operations",
         },
     },
     stockTarget: {
@@ -57,78 +95,6 @@ export default {
             return data
         },
     },
-    operators: {
-        label: "Operators",
-        component: "select",
-        updateEvent: "onChange",
-        children: async () => {
-            const api = window.app.request
-
-            const operators = await api.get.users(undefined, { select: { roles: ["operator"] } }).catch((err) => {
-                console.error(err)
-                antd.message.error("Error fetching operators")
-                return false
-            })
-
-            if (operators) {
-                return operators.map(operator => {
-                    return <antd.Select.Option value={operator._id}>{operator.fullName ?? operator.username}</antd.Select.Option>
-                })
-            }
-
-            return null
-        },
-        props: {
-            style: { width: "100%" },
-            mode: "multiple",
-            placeholder: "Select operators",
-        },
-    },
-    description: {
-        label: "Description",
-        component: "textarea",
-        updateEvent: "onChange",
-        onUpdate: (prev, update) => {
-            return update.target.value
-        },
-        props: {
-            size: "large",
-            autoSize: { minRows: 1, maxRows: 7 },
-            placeholder: "Describe something...",
-        }
-    },
-    operations: {
-        label: "Operations",
-        component: "select",
-        updateEvent: "onChange",
-        props: {
-            placeholder: "Select operations",
-        },
-    },
-    tasks: {
-        label: "Tasks",
-        component: "select",
-        updateEvent: "onChange",
-        props: {
-            placeholder: "Select tasks",
-        },
-    },
-    section: {
-        label: "Section",
-        component: "select",
-        updateEvent: "onChange",
-        children: async () => {
-            const api = window.app.request
-            const sections = await api.get.sections()
-
-            return sections.map(section => {
-                return <antd.Select.Option value={section.name}>{section.name}</antd.Select.Option>
-            })
-        },
-        props: {
-            placeholder: "Select a section",
-        },
-    },
     monetary_value: {
         label: "Monetary Value",
         component: "inputNumber",
@@ -139,27 +105,6 @@ export default {
         props: {
             placeholder: "Enter monetary value",
         }
-    },
-    variants: {
-        label: "Variants",
-        component: "select",
-        updateEvent: "onChange",
-        // TODO: Fetch global variants from API
-        props: {
-            style: { width: "100%" },
-            mode: "tags",
-            placeholder: "Create variants",
-            tokenSeparators: [','],
-        },
-    },
-    imagePreview: {
-        // TODO
-        label: "Image Preview",
-        component: "imageUploader",
-        updateEvent: "onUploadDone",
-        onUpdate: async (prev, update) => {
-            return update
-        },
     },
     vaultItemTypeSelector: {
         label: "Type",
