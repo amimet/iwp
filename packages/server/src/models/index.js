@@ -13,6 +13,7 @@ function getSchemas() {
 
 const schemas = getSchemas()
 
+export const Config = mongoose.model("Config", schemas.Config, "config")
 export const FabricObject = mongoose.model("FabricObject", schemas.FabricObject, "fabricObjects")
 export const Workorder = mongoose.model("Workorder", schemas.Workorder, "workorder")
 export const Role = mongoose.model("Role", schemas.Role, "roles")
