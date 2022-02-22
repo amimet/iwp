@@ -137,7 +137,6 @@ const AssistantActions = (props = {}) => {
         </Translation>
     </antd.Button>
 
-
     const StepButton = <antd.Button
         size="large"
         icon={<Icons.Plus />}
@@ -181,6 +180,14 @@ const AssistantActions = (props = {}) => {
         1
     </antd.Button>
 
+    const CustomTokenButton = <antd.Button
+        icon={<Icons.MdGeneratingTokens />}
+    >
+        <Translation>
+            {t => t("Add others")}
+        </Translation>
+    </antd.Button>
+
     return <div className="assistant">
         <div className={classnames("controls", { ["running"]: props.running })}>
             <div>
@@ -200,6 +207,9 @@ const AssistantActions = (props = {}) => {
                 </antd.Button>
             </div>}
         </div>
+        {props.running && <div>
+            {CustomTokenButton}
+        </div>}
     </div>
 }
 
@@ -235,7 +245,7 @@ export default class Inspector extends React.Component {
 
         // set active workers 
         const activeTasks = await this.fetchActiveTasks()
-        console.log(activeTasks)
+
         await this.setState({ activeWorkers: activeTasks })
 
         // detect if you are in active workers
@@ -244,8 +254,6 @@ export default class Inspector extends React.Component {
         if (isActive) {
             await this.setState({ running: true })
         }
-
-
 
         window.app.ws.listen(`newCommit_${this.uuid}`, (data) => {
             let workorder = this.state.workorder
