@@ -66,12 +66,6 @@ const AssistantActions = (props = {}) => {
         }
     }
 
-    React.useEffect(() => {
-        if (props.disabled) {
-            setRunning(false)
-        }
-    })
-
     const holdRunningDelay = 1000
     const holdStepDelay = 500
 
@@ -83,6 +77,7 @@ const AssistantActions = (props = {}) => {
         className={classnames(
             "holdButton",
             {
+                ["disabled"]: props.disabled,
                 ["holding"]: runningHold,
                 [`duration${holdRunningDelay}`]: runningHold,
             },
@@ -141,6 +136,7 @@ const AssistantActions = (props = {}) => {
         className={classnames(
             "holdButton",
             {
+                ["disabled"]: props.disabled,
                 ["holding"]: stepHold,
             },
             `duration${holdStepDelay}`,
@@ -262,6 +258,10 @@ export default class Inspector extends React.Component {
             activeWorkers = activeWorkers.filter((worker) => worker.userId !== data.userId)
 
             this.setState({ data: { ...this.state.data, activeWorkers } })
+        })
+
+        window.app.ws.listen(`workorderFinished_${typeof this.state.workorder._id === "object" ? this.state.workorder._id.toString() : this.state.workorder._id}`, async () => {
+            await this.toogleRunning(false)
         })
 
         this.props.events.on("beforeClose", () => {
@@ -405,7 +405,7 @@ export default class Inspector extends React.Component {
         }
 
         if (quantityLeft <= 0) {
-            antd.Modal.confirm({
+            await antd.Modal.confirm({
                 title: <Translation>
                     {(t) => t("Production quantity already has been reached")}
                 </Translation>,
@@ -420,8 +420,7 @@ export default class Inspector extends React.Component {
             await makeCommit()
         }
 
-        if (this.countQuantityLeft() === 0) {
-            this.toogleRunning(false)
+        if (this.countQuantityLeft() === 0 && !this.state.workorder.finished) {
             this.onWorkpartFinished()
         }
     }
