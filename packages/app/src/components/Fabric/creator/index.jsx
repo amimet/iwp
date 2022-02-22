@@ -411,6 +411,12 @@ export default class FabricCreator extends React.Component {
                         {t => t(field.label)}
                     </Translation>
                 </h3>
+                <p className="description">
+                    <Icons.MdInfoOutline />
+                    <Translation>
+                        {t => t(field.description ?? "No description")}
+                    </Translation>
+                </p>
                 <div ignore-dragger="true" className="component">
                     <ReturnRender />
                 </div>
