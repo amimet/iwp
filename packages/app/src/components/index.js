@@ -27,7 +27,7 @@ export { default as ManagerQuickView } from "./ManagerQuickView"
 export { default as Navigation } from "./Navigation"
 export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
-export { default as WorkingTasks } from "./WorkingTasks"
+export { default as ActiveTasks } from "./ActiveTasks"
 
 export * as AdminTools from "./AdminTools"
 export * as Workorder from "./Workorder"

@@ -7,7 +7,7 @@ import { Icons } from "components/Icons"
 
 import "./index.less"
 
-export default class WorkingTasks extends React.Component {
+export default class ActiveTasks extends React.Component {
     state = {
         tasks: []
     }
@@ -18,20 +18,20 @@ export default class WorkingTasks extends React.Component {
 
         const userId = await User.selfUserId()
 
-        window.app.ws.listen(`workerJoinWorkload_${userId}`, (data) => {
+        window.app.ws.listen(`task.join.userId.${userId}`, (data) => {
             let tasks = this.state.tasks
 
-            tasks.push(data)
+            tasks.push(data.task)
 
             this.setState({
                 tasks: tasks
             })
         })
 
-        window.app.ws.listen(`workerLeaveWorkload_${userId}`, (data) => {
+        window.app.ws.listen(`task.leave.userId.${userId}`, (data) => {
             let tasks = this.state.tasks
 
-            tasks = tasks.filter(task => task.workloadUUID !== data.workloadUUID)
+            tasks = tasks.filter((task) => task._id !== data.task._id)
 
             this.setState({
                 tasks: tasks
@@ -57,9 +57,9 @@ export default class WorkingTasks extends React.Component {
 
     renderTasks = () => {
         return this.state.tasks.map((task) => {
-            return <div key={task.workloadUUID} className="task" onClick={() => { this.openTask(task.workloadUUID) }}>
+            return <div key={task.target_id} className="task" onClick={() => { this.openTask(task.target_id) }}>
                 <Icons.Box />
-                {task.workloadUUID}
+                {task.target_id}
             </div>
         })
     }
