@@ -6,6 +6,7 @@ import config from "config"
 import { Icons, createIconRender } from "components/Icons"
 import { sidebarKeys as defaultSidebarItems } from "schemas/defaultSettings"
 import sidebarItems from "schemas/routes.json"
+import { Translation } from "react-i18next"
 
 import { SidebarEditor } from "./components"
 import "./index.less"
@@ -164,7 +165,11 @@ export default class Sidebar extends React.Component {
 					<Menu.SubMenu
 						key={item.id}
 						icon={handleRenderIcon(item.icon)}
-						title={<span>{item.title}</span>}
+						title={<span>
+							<Translation>
+								{t => t(item.title)}
+							</Translation>
+						</span>}
 						{...item.props}
 					>
 						{this.renderMenuItems(item.children)}
@@ -174,7 +179,9 @@ export default class Sidebar extends React.Component {
 
 			return (
 				<Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>
-					{item.title ?? item.id}
+					<Translation>
+						{t => t(item.title ?? item.id)}
+					</Translation>
 				</Menu.Item>
 			)
 		})
@@ -289,7 +296,9 @@ export default class Sidebar extends React.Component {
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
 							<Menu.Item key="settings" icon={<Icons.Settings />}>
-								Settings
+								<Translation>
+									{t => t("Settings")}
+								</Translation>
 							</Menu.Item>
 
 							<Menu.Item key="account">
