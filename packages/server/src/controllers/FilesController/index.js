@@ -1,6 +1,7 @@
 import { ComplexController } from "linebridge/dist/classes"
 import path from "path"
 import fs from "fs"
+import stream from "stream"
 
 function resolveToUrl(filepath) {
     return `${global.globalPublicURI}/uploads/${filepath}`
@@ -8,39 +9,27 @@ function resolveToUrl(filepath) {
 
 export default class FilesController extends ComplexController {
     static refName = "FilesController"
-    static useMiddlewares = ["fileUpload"]
 
     get = {
-        "/uploads/:id": async (req, res) => {
-            try {
-                const { id } = req.params
+        "/uploads/:id": (req, res) => {
+            const filePath = path.join(global.uploadPath, req.params?.id)
 
-                const filePath = path.join(global.uploadPath, id)
+            const readStream = fs.createReadStream(filePath)
+            const passTrough = new stream.PassThrough()
 
-                const file = await fs.promises.readFile(filePath).catch(() => {
-                    return false
-                })
-
-                if (!file) {
-                    return res.status(404).json({
-                        error: "File not found",
-                    })
+            stream.pipeline(readStream, passTrough, (err) => {
+                if (err) {
+                    return res.status(400)
                 }
+            })
 
-                return res.sendFile(filePath)
-            } catch (error) {
-                console.log(error)
-
-                return res.status(500).json({
-                    error: "Cannot get file",
-                })
-            }
+            return passTrough.pipe(res)
         }
     }
 
     post = {
         "/upload": {
-            middlewares: ["withAuthentication"],
+            middlewares: ["withAuthentication", "fileUpload"],
             fn: async (req, res) => {
                 const urls = []
                 const failed = []
