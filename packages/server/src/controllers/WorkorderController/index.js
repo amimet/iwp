@@ -285,14 +285,14 @@ export default class WorkorderController extends ComplexController {
             const existOnActiveWorkers = workload.activeWorkers.find((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) === userId)
 
             if (existOnActiveWorkers) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "You are already working on this workload"
                 })
             }
 
             await Methods.joinWorkload(workloadUUID, workorder, user)
 
-            return socket.emit("response", "ok")
+            return socket.res("ok")
         },
         "leaveWorkload": async (socket, workloadUUID) => {
             let workorder = await Workorder.findOne({
@@ -301,12 +301,12 @@ export default class WorkorderController extends ComplexController {
             let workload = workorder.payloads.find(payload => payload.uuid === workloadUUID)
 
             if (!workorder) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Workorder not found"
                 })
             }
             if (!workload) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Workload not found"
                 })
             }
@@ -317,7 +317,7 @@ export default class WorkorderController extends ComplexController {
             })
 
             if (!userId || !user) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "Cannot find your user"
                 })
             }
@@ -328,14 +328,14 @@ export default class WorkorderController extends ComplexController {
             const existOnActiveWorkers = workload.activeWorkers.find((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) === userId)
 
             if (!existOnActiveWorkers) {
-                return socket.emit(`responseError`, {
+                return socket.err({
                     message: "You are not working on this workload, so you cannot leave it"
                 })
             }
 
             await Methods.leaveWorkload(workloadUUID, workorder, user)
 
-            return socket.emit("response", "ok")
+            return socket.res("ok")
         },
     }
 
@@ -420,34 +420,7 @@ export default class WorkorderController extends ComplexController {
             }
 
             return res.json(workorder.commits)
-        }),
-        "/active_tasks": async (req, res) => {
-            let userId = req.query?.userId ?? req.decodedToken.user_id
-            let tasks = []
-
-            const workorders = await Workorder.find({
-                "finished": false,
-                "payloads.activeWorkers": {
-                    $elemMatch: {
-                        userId: userId
-                    }
-                },
-            })
-
-            workorders.forEach((workorder) => {
-                workorder.payloads.forEach((payload) => {
-                    if (payload.activeWorkers) {
-                        payload.activeWorkers.forEach((worker) => {
-                            if (worker.userId === userId) {
-                                tasks.push(worker)
-                            }
-                        })
-                    }
-                })
-            })
-
-            return res.json(tasks)
-        },
+        })
     }
 
     post = {
