@@ -14,7 +14,7 @@ import FORMULAS from "schemas/fabricFormulas"
 
 import "./index.less"
 
-const excludedProperties = ["imagePreview"]
+const excludedProperties = ["images"]
 
 const Worker = (props) => {
     if (!props.worker) {
@@ -544,7 +544,7 @@ export default class Inspector extends React.Component {
 
         return <div className="payload_inspector">
             <div className="header">
-                {this.state.data?.properties?.imagePreview && <ImageViewer src={this.state.data?.properties?.imagePreview} />}
+                {this.state.data?.properties?.images && <ImageViewer src={this.state.data?.properties?.images} />}
                 <div>
                     <h1>{this.state.data.name}</h1>
                 </div>

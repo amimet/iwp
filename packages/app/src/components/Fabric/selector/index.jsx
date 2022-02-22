@@ -92,9 +92,9 @@ export default class BrowserSelector extends React.Component {
 	}
 
 	renderImagePreview = (item) => {
-		if (Array.isArray(item.properties.imagePreview)) {
+		if (Array.isArray(item.properties.images)) {
 			return <Swiper>
-				{item.properties.imagePreview.map((image) => {
+				{item.properties.images.map((image) => {
 					return <Swiper.Item>
 						<Image src={image} fit="cover" />
 					</Swiper.Item>
@@ -109,7 +109,7 @@ export default class BrowserSelector extends React.Component {
 	renderSelectedItem = (item) => {
 		return <div className="inspector">
 			<div className="header">
-				{item?.properties?.imagePreview && <ImageViewer src={item?.properties?.imagePreview} />}
+				{item?.properties?.images && <ImageViewer src={item?.properties?.images} />}
 				<Translation>
 					{(t) => <h1>{t(item.name)}</h1>}
 				</Translation>
