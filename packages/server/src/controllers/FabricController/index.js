@@ -89,7 +89,7 @@ export default class FabricController extends ComplexController {
 
     post = {
         "/fabric": {
-            middlewares: ["withAuthentication", "onlyAdmin"],
+            middlewares: ["withAuthentication", "permissions"],
             fn: Schematized({
                 select: ["_id", "mutation"],
             }, async (req, res) => {
@@ -119,7 +119,7 @@ export default class FabricController extends ComplexController {
 
     put = {
         "/fabric": {
-            middlewares: ["withAuthentication", "onlyAdmin"],
+            middlewares: ["withAuthentication", "permissions"],
             fn: Schematized({
                 required: ["type", "name", "properties"],
                 select: ["type", "name", "properties"],
@@ -144,7 +144,7 @@ export default class FabricController extends ComplexController {
             })
         },
         "/fabric_import": {
-            middlewares: ["withAuthentication", "onlyAdmin"],
+            middlewares: ["withAuthentication", "permissions"],
             fn: Schematized({
                 required: ["data"]
             }, async (req, res) => {
@@ -198,7 +198,7 @@ export default class FabricController extends ComplexController {
 
     delete = {
         "/fabric": {
-            middlewares: ["withAuthentication", "onlyAdmin"],
+            middlewares: ["withAuthentication", "permissions"],
             fn: Schematized({
                 select: ["_id", "type"],
             }, async (req, res) => {
