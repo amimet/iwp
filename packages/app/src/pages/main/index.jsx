@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { User } from "models"
-import { AppSearcher, ServerStatus, Clock, AssignedWorkorders, ManagerQuickView, WorkingTasks } from "components"
+import { AppSearcher, ServerStatus, Clock, AssignedWorkorders, ActiveTasks } from "components"
 import { Translation } from "react-i18next"
 
 import "./index.less"
@@ -73,8 +73,8 @@ export default class Main extends React.Component {
 				</div>}
 
 				<div className="widgets">
-					<div key="assignedWorkorders" className="widget">
-						<WorkingTasks />
+					<div key="activeTasks" className="widget">
+						<ActiveTasks />
 					</div>
 					<div key="assignedWorkorders" className="widget">
 						<AssignedWorkorders />
