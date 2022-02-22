@@ -29,7 +29,7 @@ export default class WorkshiftsController extends ComplexController {
 
     put = {
         "/workshift": {
-            middlewares: ["withAuthentication", "privileged"],
+            middlewares: ["withAuthentication", "onlyAdmin"],
             fn: Schematized({
                 required: ["name", "start", "end"],
                 select: ["name", "sectionId", "start", "end", "periodicity"],
@@ -72,7 +72,7 @@ export default class WorkshiftsController extends ComplexController {
 
     del = {
         "/workshift": {
-            middlewares: ["withAuthentication", "privileged"],
+            middlewares: ["withAuthentication", "onlyAdmin"],
             fn: async (req, res) => {
                 const { _id } = req.body
 

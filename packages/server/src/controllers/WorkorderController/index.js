@@ -425,7 +425,7 @@ export default class WorkorderController extends ComplexController {
 
     post = {
         "/regenerates_uuid": {
-            middlewares: ["privileged"],
+            middlewares: ["permissions"],
             fn: async (req, res) => {
                 let workorders = await Workorder.find()
 
@@ -530,7 +530,7 @@ export default class WorkorderController extends ComplexController {
             }),
         },
         "/update_workorder": {
-            middlewares: ["privileged"],
+            middlewares: ["permissions"],
             fn: Schematized({
                 required: ["_id", "update"],
                 select: ["_id", "update"],
@@ -575,7 +575,7 @@ export default class WorkorderController extends ComplexController {
 
     delete = {
         "/workorder": {
-            middlewares: ["privileged", "useWS"],
+            middlewares: ["permissions", "useWS"],
             fn: Schematized({
                 required: ["id"],
             }, async (req, res) => {
