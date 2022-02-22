@@ -205,6 +205,8 @@
     "Change primary color of the application.": "Cambia el color primario de la aplicación.",
     "Dark mode": "Modo oscuro",
     "Images": "Imágenes",
+    "Add others": "Añadir otros",
+    "Export tokens": "Exportar bonos de trabajo",
     "Description of the task. It should be a general description of the product. Do not include information that may vary. e.g. 'The product is a white shirt with a elastic red collar, size M'": "Descripción de la tarea. Debe ser una descripción general del producto. No incluya información que pueda variar. Por ejemplo, 'El producto es una camisa blanca con un collar de color rojo, tamaño M'",
     "Define variants for this item. Only the types of variations that may exist of a product should be included. e.g. Size, Color, Material, etc.": "Defina las variantes para este artículo. Sólo deben incluirse los tipos de variaciones que pueden existir de un producto. Por ejemplo, Tamaño, Color, Material, etc.",
     "Append some images to describe this item.": "Agregue algunas imágenes para describir este artículo."
