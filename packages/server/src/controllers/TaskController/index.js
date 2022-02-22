@@ -176,7 +176,6 @@ export default class TaskController extends ComplexController {
         "/active_tasks": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
-                required: ["target_id"],
                 select: ["target_id", "user_id"]
             }, async (req, res) => {
                 let tasks = await Task.find(req.selection).catch(() => {
