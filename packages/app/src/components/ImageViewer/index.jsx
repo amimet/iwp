@@ -3,6 +3,7 @@ import { Swiper } from "antd-mobile"
 import { LazyLoadImage } from "react-lazy-load-image-component"
 import classnames from "classnames"
 
+import "react-lazy-load-image-component/src/effects/blur.css"
 import "./index.less"
 
 const ImageViewer = (props) => {
@@ -39,6 +40,9 @@ const ImageViewer = (props) => {
                         wrapperClassName="image-wrapper"
                         onClick={() => {
                             openViewer()
+                        }}
+                        onError={(e) => {
+                            e.target.src = "/broken-image.svg"
                         }}
                     />
                 </Swiper.Item>
