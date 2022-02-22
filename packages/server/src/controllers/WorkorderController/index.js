@@ -41,11 +41,13 @@ function stepWorkorderUpdate(workorder) {
         }
 
         // if all payloads are reached, mark workorder as finished
-        if (workorder.payloads && workorder.payloads.every(payload => payload.quantityReached)) {
+        if (workorder.payloads && workorder.payloads.every((payload) => payload.quantityReached)) {
             // mark workorder as finished only the first time
             if (!workorder.finished) {
+                global.wsInterface.io.emit(`workorderFinished_${workorder._id.toString()}`, workorder)
                 workorder.status = "finished"
             }
+
             workorder.finished = true
         }
 
@@ -121,6 +123,76 @@ const Methods = {
 
         return workorder
     },
+    joinWorkload: async (workloadUUID, workorder, user) => {
+        const worker = {
+            workloadUUID,
+            userId: typeof user._id === "object" ? user._id.toString() : user._id,
+            fullName: user.fullName,
+            username: user.username,
+            avatar: user.avatar,
+        }
+
+        workorder.payloads.forEach((payload) => {
+            if (payload.uuid === workloadUUID) {
+                if (!Array.isArray(payload.activeWorkers)) {
+                    payload.activeWorkers = []
+                }
+
+                payload.activeWorkers.push(worker)
+            }
+        })
+
+        workorder = await Methods.update(workorder._id, {
+            payloads: workorder.payloads
+        }).catch((err) => {
+            console.log(err)
+            return socket.emit("responseError", {
+                message: err.message
+            })
+        })
+
+        global.wsInterface.io.emit(`workerJoinWorkload`, worker)
+        global.wsInterface.io.emit(`workerJoinWorkload_${worker.userId}`, worker)
+        global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, worker)
+
+        return workorder
+    },
+    leaveWorkload: async (workloadUUID, workorder, user) => {
+        const userId = typeof user._id === "object" ? user._id.toString() : user._id
+
+        workorder.payloads.forEach((payload) => {
+            if (payload.uuid === workloadUUID) {
+                if (Array.isArray(payload.activeWorkers)) {
+                    payload.activeWorkers = payload.activeWorkers.filter((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) !== userId)
+                }
+            }
+        })
+
+        workorder = await Methods.update(workorder._id, {
+            payloads: workorder.payloads
+        }).catch((err) => {
+            console.log(err)
+
+            return socket.emit("responseError", {
+                message: err.message
+            })
+        })
+
+        global.wsInterface.io.emit(`workerLeaveWorkload`, {
+            workloadUUID,
+            userId
+        })
+        global.wsInterface.io.emit(`workerLeaveWorkload_${userId}`, {
+            workloadUUID,
+            userId
+        })
+        global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, {
+            workloadUUID,
+            userId
+        })
+
+        return workorder
+    }
 }
 
 export default class WorkorderController extends ComplexController {
@@ -218,36 +290,7 @@ export default class WorkorderController extends ComplexController {
                 })
             }
 
-            const worker = {
-                workloadUUID,
-                userId: userId,
-                fullName: user.fullName,
-                username: user.username,
-                avatar: user.avatar,
-            }
-
-            workorder.payloads.forEach((payload) => {
-                if (payload.uuid === workloadUUID) {
-                    if (!Array.isArray(payload.activeWorkers)) {
-                        payload.activeWorkers = []
-                    }
-
-                    payload.activeWorkers.push(worker)
-                }
-            })
-
-            workorder = await Methods.update(workorder._id, {
-                payloads: workorder.payloads
-            }).catch((err) => {
-                console.log(err)
-                return socket.emit("responseError", {
-                    message: err.message
-                })
-            })
-
-            global.wsInterface.io.emit(`workerJoinWorkload`, worker)
-            global.wsInterface.io.emit(`workerJoinWorkload_${worker.userId}`, worker)
-            global.wsInterface.io.emit(`workerJoinWorkload_${workloadUUID}`, worker)
+            await Methods.joinWorkload(workloadUUID, workorder, user)
 
             return socket.emit("response", "ok")
         },
@@ -290,36 +333,7 @@ export default class WorkorderController extends ComplexController {
                 })
             }
 
-            workorder.payloads.forEach((payload) => {
-                if (payload.uuid === workloadUUID) {
-                    if (Array.isArray(payload.activeWorkers)) {
-                        payload.activeWorkers = payload.activeWorkers.filter((worker) => (typeof worker.userId === "object" ? worker.userId.toString() : worker.userId) !== userId)
-                    }
-                }
-            })
-
-            workorder = await Methods.update(workorder._id, {
-                payloads: workorder.payloads
-            }).catch((err) => {
-                console.log(err)
-
-                return socket.emit("responseError", {
-                    message: err.message
-                })
-            })
-
-            global.wsInterface.io.emit(`workerLeaveWorkload`, {
-                workloadUUID,
-                userId
-            })
-            global.wsInterface.io.emit(`workerLeaveWorkload_${userId}`, {
-                workloadUUID,
-                userId
-            })
-            global.wsInterface.io.emit(`workerLeaveWorkload_${workloadUUID}`, {
-                workloadUUID,
-                userId
-            })
+            await Methods.leaveWorkload(workloadUUID, workorder, user)
 
             return socket.emit("response", "ok")
         },
@@ -412,6 +426,7 @@ export default class WorkorderController extends ComplexController {
             let tasks = []
 
             const workorders = await Workorder.find({
+                "finished": false,
                 "payloads.activeWorkers": {
                     $elemMatch: {
                         userId: userId
