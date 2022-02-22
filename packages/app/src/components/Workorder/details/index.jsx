@@ -9,7 +9,7 @@ import { User } from "models"
 import { Icons } from "components/Icons"
 import { Skeleton, ActionsBar, OperatorsAssignments } from "components"
 
-import { PayloadsRender, PayloadInspector } from ".."
+import { PayloadsRender, PayloadInspector, WorkorderResult } from ".."
 import "./index.less"
 
 const dateFormat = "DD-MM-YYYY hh:mm"
@@ -259,6 +259,17 @@ export default class WorkorderDetails extends React.Component {
 		})
 	}
 
+	onExportWorkorder = async () => {
+		window.app.DrawerController.open("WorkorderResult", WorkorderResult, {
+			onDone: (ctx, data) => {
+				ctx.close()
+			},
+			componentProps: {
+				id: this.id,
+			}
+		})
+	}
+
 	isExpired = (isFinishReached, status) => {
 		if (status !== "completed" && isFinishReached) {
 			return true
@@ -384,22 +395,33 @@ export default class WorkorderDetails extends React.Component {
 							onClick={this.openOperatorSelector}
 						>
 							<Translation>
-								{t => t("Manage operators")}
+								{t => t("Operators")}
 							</Translation>
 						</antd.Button>
 					</div>
 					<div>
 						<antd.Dropdown
 							overlay={StatementMenu}
+							trigger={["click"]}
 						>
 							<antd.Button
 								icon={<Icons.Eye />}
 							>
 								<Translation>
-									{t => t("Update status")}
+									{t => t("Status")}
 								</Translation>
 							</antd.Button>
 						</antd.Dropdown>
+					</div>
+					<div>
+						<antd.Button
+							icon={<Icons.MdSaveAlt />}
+							onClick={this.onExportWorkorder}
+						>
+							<Translation>
+								{t => t("Export")}
+							</Translation>
+						</antd.Button>
 					</div>
 				</ActionsBar>}
 
