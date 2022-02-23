@@ -86,24 +86,24 @@ export default class TaskController extends ComplexController {
             await task.save()
 
             global.wsInterface.io.emit("task.leave", {
-                task: task,
+                task: task.toObject(),
                 user_id,
                 user_data,
             })
 
             global.wsInterface.io.emit(`task.leave.target.${target_id}`, {
-                task: task,
+                task: task.toObject(),
                 user_id,
                 user_data,
             })
 
             global.wsInterface.io.emit(`task.leave.userId.${user_id}`, {
-                task: task,
+                task: task.toObject(),
                 user_id,
                 user_data,
             })
 
-            return task
+            return task.toObject()
         },
     }
 
@@ -123,7 +123,7 @@ export default class TaskController extends ComplexController {
             this.methods.join({
                 ...payload,
                 user_id: userId,
-                user_data: user,
+                user_data: user.toObject(),
             })
                 .catch((error) => {
                     return socket.err({
@@ -131,10 +131,7 @@ export default class TaskController extends ComplexController {
                     })
                 })
                 .then((data) => {
-                    return socket.res({
-                        ...data,
-                        user_data: user,
-                    })
+                    return socket.res(data)
                 })
         },
         leave_task: async (socket, payload) => {
@@ -152,7 +149,7 @@ export default class TaskController extends ComplexController {
             this.methods.leave({
                 ...payload,
                 user_id: userId,
-                user_data: user,
+                user_data: user.toObject(),
             })
                 .catch((error) => {
                     return socket.err({
@@ -213,7 +210,7 @@ export default class TaskController extends ComplexController {
 
             const tasks = await Task.find({ target_id })
 
-            const timeSpent = tasks.reduce((acc, task) => {
+            const seconds = tasks.reduce((acc, task) => {
                 if (task.end) {
                     const start = moment(task.start)
                     const end = moment(task.end)
@@ -224,7 +221,7 @@ export default class TaskController extends ComplexController {
                 return acc
             }, 0)
 
-            return res.json({ timeSpent })
+            return res.json({ seconds })
         })
     }
 }
