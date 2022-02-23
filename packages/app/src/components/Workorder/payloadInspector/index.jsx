@@ -14,7 +14,7 @@ import FORMULAS from "schemas/fabricFormulas"
 
 import "./index.less"
 
-const excludedProperties = ["images"]
+const excludedProperties = ["images", "imagePreview", "quantity"]
 
 const Worker = (props) => {
     if (!props.worker) {
@@ -43,11 +43,37 @@ const Worker = (props) => {
     </div>
 }
 
+const SpentTimer = (props = {}) => {
+    const [time, setTime] = React.useState(0)
+
+    // update every second with the difference between now and the start time
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            const now = moment()
+            const diff = now.diff(props.startTime)
+            setTime(diff)
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [props.startTime])
+
+
+    return <div className="spentTimer">
+        <div className="spent">
+            <Icons.Clock />
+            {time === 0 ? <Translation>
+                {t => t("Calculating...")}
+            </Translation> : moment.utc(time).format("HH:mm:ss")}
+        </div>
+    </div>
+}
+
 const AssistantActions = (props = {}) => {
+    const [loading, setLoading] = React.useState(false)
     const [stepHold, setStepHold] = React.useState(false)
     const [runningHold, setRunningHold] = React.useState(false)
 
-    const handleRunning = (to) => {
+    const handleRunning = async (to) => {
         if (props.disabled) {
             return false
         }
@@ -55,7 +81,7 @@ const AssistantActions = (props = {}) => {
         to = to ?? !props.running
 
         if (typeof props.onToogleRunning === "function") {
-            props.onToogleRunning(to)
+            await props.onToogleRunning(to)
         }
     }
 
@@ -81,7 +107,8 @@ const AssistantActions = (props = {}) => {
     const RunningButton = <antd.Button
         type="primary"
         size="large"
-        disabled={props.disabled}
+        loading={loading}
+        disabled={loading || props.disabled}
         icon={props.running ? <Icons.Pause /> : <Icons.Clock />}
         className={classnames(
             "holdButton",
@@ -92,13 +119,16 @@ const AssistantActions = (props = {}) => {
             },
         )}
         {...useLongPress(
-            () => {
+            async () => {
                 if (props.disabled) {
                     return false
                 }
 
                 setRunningHold(false)
-                handleRunning()
+
+                setLoading(true)
+                await handleRunning()
+                setLoading(false)
             },
             () => {
                 if (props.disabled) {
@@ -109,7 +139,8 @@ const AssistantActions = (props = {}) => {
                     type: "info",
                     content: <Translation>
                         {t => t("Press and hold for 2 seconds to toogle running")}
-                    </Translation>
+                    </Translation>,
+                    duration: 2000,
                 })
             },
             {
@@ -132,15 +163,18 @@ const AssistantActions = (props = {}) => {
             }
         )}
     >
-        <Translation>
-            {t => t(props.running ? "Stop" : "Start")}
-        </Translation>
+        <span>
+            <Translation>
+                {t => t(props.running ? "Stop" : "Start")}
+            </Translation>
+        </span>
     </antd.Button>
 
     const StepButton = <antd.Button
         size="large"
         icon={<Icons.Plus />}
-        disabled={props.disabled}
+        loading={loading}
+        disabled={loading || props.disabled}
         className={classnames(
             "holdButton",
             {
@@ -177,18 +211,23 @@ const AssistantActions = (props = {}) => {
             }
         )}
     >
-        1
+        <span>
+            1
+        </span>
     </antd.Button>
 
     const CustomTokenButton = <antd.Button
         icon={<Icons.MdGeneratingTokens />}
     >
-        <Translation>
-            {t => t("Add others")}
-        </Translation>
+        <span>
+            <Translation>
+                {t => t("Add others")}
+            </Translation>
+        </span>
     </antd.Button>
 
     return <div className="assistant">
+        {props.running && props.startTime && <SpentTimer startTime={props.startTime} />}
         <div className={classnames("controls", { ["running"]: props.running })}>
             <div>
                 {RunningButton}
@@ -220,6 +259,7 @@ export default class Inspector extends React.Component {
         data: null,
         running: false,
         activeWorkers: [],
+        currentSpentTime: 0,
     }
 
     api = window.app.request
@@ -249,12 +289,16 @@ export default class Inspector extends React.Component {
         await this.setState({ activeWorkers: activeTasks })
 
         // detect if you are in active workers
-        const isActive = activeTasks.find((task) => task.user_id === this.selfUserId)
+        const activeTask = activeTasks.find((task) => task.user_id === this.selfUserId)
 
-        if (isActive) {
-            await this.setState({ running: true })
+        if (activeTask) {
+            await this.setState({ running: true, activeTask: activeTask })
         }
 
+        // update current spent time
+        await this.updateCurrentSpentTime()
+
+        // declare websocket events
         window.app.ws.listen(`newCommit_${this.uuid}`, (data) => {
             let workorder = this.state.workorder
 
@@ -293,10 +337,30 @@ export default class Inspector extends React.Component {
                     type: "info",
                     content: <Translation>
                         {t => t("Task remains opened, dont forget to stop it when you are done")}
-                    </Translation>
+                    </Translation>,
+                    duration: 3000,
                 })
             }
         })
+
+        this.toogleLoading(false)
+    }
+
+    updateCurrentSpentTime = async () => {
+        const spentTime = await this.fetchCurrentSpentTime()
+
+        await this.setState({ currentSpentTime: spentTime.seconds })
+    }
+
+    fetchCurrentSpentTime = async () => {
+        const result = await this.api.get.timeSpent(undefined, {
+            target_id: this.uuid,
+            user_id: this.selfUserId,
+        }).catch(() => {
+            return false
+        })
+
+        return result
     }
 
     fetchActiveTasks = async () => {
@@ -311,8 +375,6 @@ export default class Inspector extends React.Component {
     }
 
     fetchWorkorderDataWithUUID = async () => {
-        this.toogleLoading(true)
-
         const data = await this.api.get.workorderPayloadUuid(undefined, { uuid: this.uuid }).catch((err) => {
             console.error(err)
             antd.message.error(`Failed to load workorder: ${err}`)
@@ -320,7 +382,6 @@ export default class Inspector extends React.Component {
         })
 
         if (data) {
-            this.toogleLoading(false)
             return await this.setState({ workorder: data })
         }
     }
@@ -370,23 +431,31 @@ export default class Inspector extends React.Component {
     }
 
     toogleRunning = async (to) => {
-        to = to ?? !this.state.running
+        return new Promise(async (resolve, reject) => {
+            to = to ?? !this.state.running
 
-        await this.WSRequest[to ? "join_task" : "leave_task"]({
-            target_id: this.uuid,
-        })
-            .then(async (data) => {
-                Haptics.impact("Medium")
-                await this.setState({ running: to })
+            await this.WSRequest[to ? "join_task" : "leave_task"]({
+                target_id: this.uuid,
             })
-            .catch((err) => {
-                console.error(err)
-                Toast.show({
-                    icon: "fail",
-                    content: `Failed to ${to ? "join" : "leave"} workload: ${err.message}`,
+                .then(async (data) => {
+                    Haptics.impact("Medium")
+
+                    await this.updateCurrentSpentTime()
+                    await this.setState({ running: to, activeTask: data })
+
+                    return resolve()
                 })
-                return false
-            })
+                .catch((err) => {
+                    console.error(err)
+
+                    Toast.show({
+                        icon: "fail",
+                        content: `Failed to ${to ? "join" : "leave"} workload: ${err.message}`,
+                    })
+
+                    return resolve()
+                })
+        })
     }
 
     manualQuantityPicker = async () => {
@@ -562,19 +631,20 @@ export default class Inspector extends React.Component {
             </div>
 
             <div className="card">
+                {this.renderProperties(this.state.data)}
+
                 <div className="property">
                     <div className="name">
                         <Translation>
-                            {t => t("Type")}
+                            {t => t("Your spent time")}
                         </Translation>
                     </div>
                     <div className="value">
-                        <Translation>
-                            {t => t(String(this.state.data.type).toTitleCase())}
-                        </Translation>
+                        {
+                            this.state.currentSpentTime ? moment.duration(this.state.currentSpentTime, "seconds").humanize() : "-"
+                        }
                     </div>
                 </div>
-                {this.renderProperties(this.state.data)}
             </div>
 
             <div className="card">
@@ -636,6 +706,7 @@ export default class Inspector extends React.Component {
                     onMakeStep={this.onMakeStep}
                     onOpenManualInput={this.manualQuantityPicker}
                     onToogleRunning={this.toogleRunning}
+                    startTime={this.state.activeTask?.start}
                 />
             </div>
         </div>

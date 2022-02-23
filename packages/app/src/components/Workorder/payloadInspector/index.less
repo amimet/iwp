@@ -10,7 +10,27 @@
 	margin-bottom: 10px;
 
 	> div {
-		width:fit-content;
+		width: fit-content;
+
+		margin-right: 10px;
+	}
+}
+
+.spentTimer {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+
+	padding: 10px;
+	background-color: var(--background-color-primary);
+	border-radius: 8px;
+	margin-bottom: 10px;
+
+	font-family: "DM Mono", monospace;
+
+	> div {
+		width: fit-content;
 
 		margin-right: 10px;
 	}
@@ -58,7 +78,7 @@
 		-webkit-backdrop-filter: blur(4px);
 
 		> div {
-			margin-bottom: 20px;
+			margin-bottom: 14px;
 		}
 	}
 
@@ -92,7 +112,8 @@
 
 		display: flex;
 		flex-direction: column;
-		padding: 5px;
+
+		font-size: 16px;
 
 		.value {
 			display: inline-flex;
@@ -106,6 +127,11 @@
 			padding-left: 20px;
 
 			color: var(--background-color-contrast);
+
+			.ant-tag {
+				padding: 6px;
+				font-size: 16px;
+			}
 		}
 	}
 
@@ -145,14 +171,15 @@
 		align-items: center;
 
 		.controls {
-			display: inline-flex;
-			flex-direction: row;
-			justify-content: space-around;
-			align-items: center;
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			grid-template-rows: 1fr;
+			grid-column-gap: 0px;
+			grid-row-gap: 0px;
 
 			width: 100%;
 
-			//transition: all 150ms ease-in-out;
+			transition: all 150ms ease-in-out;
 
 			.holdButton {
 				outline: none;
@@ -164,9 +191,10 @@
 				color: var(--background-color-accent);
 
 				&.disabled {
-					background: var(--background-color-primary)!important;
-					color: var(--background-color-accent)!important;
+					background: var(--background-color-primary) !important;
+					color: var(--background-color-accent) !important;
 				}
+
 				&.holding {
 					color: var(--background-color-contrast);
 					background-position: left;
@@ -182,11 +210,20 @@
 			}
 
 			> div {
+				display: inline-flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+
 				margin-bottom: 10px;
-				
+
 				button {
 					--ignore-dragger: true;
 					padding: 3vw;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: center;
 				}
 			}
 
