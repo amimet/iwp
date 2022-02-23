@@ -379,8 +379,8 @@ class App {
 		this.eventBus.emit("render_initialization")
 
 		await this.initialization()
-		// declare WS Handlers
 
+		// declare WS Handlers
 		window.app.ws.listen("workorderAssigned", async () => {
 			if (window.app.settings.get("workorder_notifications")) {
 				window.app.notifications.new({
