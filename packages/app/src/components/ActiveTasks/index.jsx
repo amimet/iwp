@@ -9,16 +9,17 @@ import "./index.less"
 
 export default class ActiveTasks extends React.Component {
     state = {
-        tasks: []
+        tasks: [],
     }
+
     api = window.app.request
 
     componentDidMount = async () => {
-        await this.fetchWorkingTasks()
+        this.userId = await User.selfUserId()
 
-        const userId = await User.selfUserId()
+        await this.fetchSelfActiveTasks()
 
-        window.app.ws.listen(`task.join.userId.${userId}`, (data) => {
+        window.app.ws.listen(`task.join.userId.${this.userId}`, (data) => {
             let tasks = this.state.tasks
 
             tasks.push(data.task)
@@ -28,7 +29,7 @@ export default class ActiveTasks extends React.Component {
             })
         })
 
-        window.app.ws.listen(`task.leave.userId.${userId}`, (data) => {
+        window.app.ws.listen(`task.leave.userId.${this.userId}`, (data) => {
             let tasks = this.state.tasks
 
             tasks = tasks.filter((task) => task._id !== data.task._id)
@@ -39,8 +40,10 @@ export default class ActiveTasks extends React.Component {
         })
     }
 
-    fetchWorkingTasks = async () => {
-        const result = await this.api.get.activeTasks().catch((error) => {
+    fetchSelfActiveTasks = async () => {
+        const result = await this.api.get.activeTasks(undefined, {
+            user_id: this.userId,
+        }).catch((error) => {
             console.error(error)
             antd.message.error(error.message)
             return false
