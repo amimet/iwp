@@ -161,9 +161,12 @@ class App {
 		"websocket_latency_too_high": function () {
 			if (!this.latencyWarning) {
 				this.latencyWarning = true
-				Toast.show({
-					icon: "loading",
-					content: "Slow connection...",
+
+				antd.message.loading({
+					content: <Translation>
+						{(t) => t("Slow connection...")}
+					</Translation>,
+					key: "websocket_latency_too_high",
 					duration: 0,
 				})
 			}
@@ -171,9 +174,12 @@ class App {
 		"websocket_latency_normal": function () {
 			if (this.latencyWarning) {
 				this.latencyWarning = null
-				Toast.show({
-					icon: "success",
-					content: "Connection restored",
+
+				antd.message.destroy("websocket_latency_too_high")
+				antd.message.info({
+					content: <Translation>
+						{(t) => t("Connection restored")}
+					</Translation>,
 				})
 			}
 		}
