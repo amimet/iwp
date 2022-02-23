@@ -1,6 +1,7 @@
 import { ComplexController } from "linebridge/dist/classes"
 import path from "path"
 import fs from "fs"
+import stream from "stream"
 
 function resolveToUrl(filepath) {
     return `${global.globalPublicURI}/uploads/${filepath}`
@@ -12,7 +13,17 @@ export default class FilesController extends ComplexController {
     get = {
         "/uploads/:id": (req, res) => {
             const filePath = path.join(global.uploadPath, req.params?.id)
-            return res.sendFile(filePath)
+
+            const readStream = fs.createReadStream(filePath)
+            const passTrough = new stream.PassThrough()
+
+            stream.pipeline(readStream, passTrough, (err) => {
+                if (err) {
+                    return res.status(400)
+                }
+            })
+
+            return passTrough.pipe(res)
         }
     }
 
