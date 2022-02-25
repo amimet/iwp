@@ -14,7 +14,6 @@ import bcrypt from "bcrypt"
 import mongoose from "mongoose"
 import passport from "passport"
 import { User, Session } from "./models"
-import socketIo from "socket.io"
 import jwt from "jsonwebtoken"
 
 const { Buffer } = require("buffer")
@@ -92,7 +91,6 @@ class Server {
     async initialize() {
         await this.connectToDB()
         await this.initPassport()
-        await this.initWebsockets()
 
         await this.instance.initialize()
     }
@@ -150,48 +148,47 @@ class Server {
         this.server.use(passport.initialize())
     }
 
-    initWebsockets() {
+    onWSClientConnection = async (socket) => {
         const onAuthenticated = (socket, user_id) => {
             this.attachClientSocket(socket, user_id)
-            socket.emit("authenticated")
+            console.log(`🌐 Client connected: ${socket.id}`)
         }
 
         const onAuthenticatedFailed = (socket, error) => {
             this.detachClientSocket(socket)
-            socket.emit("authenticateFailed", {
-                error,
-            })
         }
 
-        this.instance.wsInterface.eventsChannels.push(["/main", "authenticate", async (socket, token) => {
-            const session = await Session.findOne({ token }).catch(err => {
-                return false
-            })
+        const authToken = socket.handshake.auth?.token
+        console.log(`AUTH TOKEN: ${authToken}`)
 
-            if (!session) {
-                return onAuthenticatedFailed(socket, "Session not found")
-            }
+        if (!authToken) {
+            socket.emit("unauthorized", "No auth token provided!")
+            return socket.disconnect()
+        }
 
-            this.verifyJwt(token, async (err, decoded) => {
-                if (err) {
-                    return onAuthenticatedFailed(socket, err)
-                } else {
-                    const user = await User.findById(decoded.user_id).catch(err => {
-                        return false
-                    })
+        const session = await Session.findOne({ authToken }).catch(err => {
+            return false
+        })
 
-                    if (!user) {
-                        return onAuthenticatedFailed(socket, "User not found")
-                    }
+        if (!session) {
+            return onAuthenticatedFailed(socket, "Session not found")
+        }
 
-                    return onAuthenticated(socket, user)
+        this.verifyJwt(authToken, async (err, decoded) => {
+            if (err) {
+                return onAuthenticatedFailed(socket, err)
+            } else {
+                const user = await User.findById(decoded.user_id).catch(err => {
+                    return false
+                })
+
+                if (!user) {
+                    return onAuthenticatedFailed(socket, "User not found")
                 }
-            })
-        }])
-    }
 
-    onWSClientConnection = async (socket) => {
-        console.log(`🌐 Client connected: ${socket.id}`)
+                return onAuthenticated(socket, user)
+            }
+        })
     }
 
     onWSClientDisconnection = async (socket) => {
