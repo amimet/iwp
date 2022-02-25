@@ -16,21 +16,21 @@ export default class Session {
     static tokenKey = config.app?.storage?.token ?? "token"
 
     static get token() {
-        if (window.app.isAppCapacitor()) {
+        if (navigator.userAgent === "capacitor") {
             return this.capStorage("get")
         }
         return cookies.get(this.tokenKey)
     }
 
     static set token(token) {
-        if (window.app.isAppCapacitor()) {
+        if (navigator.userAgent === "capacitor") {
             return this.capStorage("set", token)
         }
         return cookies.set(this.tokenKey, token)
     }
 
     static async delToken() {
-        if (window.app.isAppCapacitor()) {
+        if (navigator.userAgent === "capacitor") {
             return this.capStorage("remove")
         }
         return cookies.remove(Session.tokenKey)
