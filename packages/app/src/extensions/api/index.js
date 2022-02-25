@@ -1,31 +1,6 @@
 import config from "config"
 import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
-import io from "socket.io-client"
-
-class WSInterface {
-    constructor(params = {}) {
-        this.params = params
-        this.manager = new io.Manager(this.params.origin, {
-            autoConnect: true,
-            transports: ["websocket"],
-            ...this.params.managerOptions,
-        })
-        this.sockets = {}
-
-        this.register("/", "main")
-    }
-
-    register = (socket, as) => {
-        if (typeof socket !== "string") {
-            console.error("socket must be string")
-            return false
-        }
-
-        socket = this.manager.socket(socket)
-        return this.sockets[as ?? socket] = socket
-    }
-}
 
 export default {
     key: "apiBridge",
@@ -160,11 +135,18 @@ export default {
                     const bridge = new Bridge({
                         origin: config.api.address,
                         wsOrigin: config.ws.address,
-                        wsOptions: {
-                            autoConnect: false,
+                        wsMainSocketOptions: {
+                            auth: {
+                                token: await Session.token,
+                            },
                         },
                         onRequest: getSessionContext,
                         onResponse: handleResponse,
+                    }, {
+                        onUnauthorized: async (reason) => {
+                            console.error("[API] Unauthorized", reason)
+                            //window.app.eventBus.emit("invalid_session")
+                        }
                     })
 
                     return bridge
