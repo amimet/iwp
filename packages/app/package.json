@@ -42,7 +42,7 @@
     "js-cookie": "3.0.1",
     "jwt-decode": "3.1.2",
     "less": "4.1.2",
-    "linebridge": "0.10.13",
+    "linebridge": "0.10.14",
     "moment": "2.29.1",
     "nprogress": "^0.2.0",
     "plyr": "3.6.12",
