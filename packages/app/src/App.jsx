@@ -396,6 +396,16 @@ class App {
 	initialization = async () => {
 		console.debug(`[App] Initializing app`)
 
+		// before initialization tasks
+		const sessionToken = await Session.token
+
+		if (!sessionToken || sessionToken == null) {
+			console.debug(`[App] No session token found`)
+			window.app.eventBus.emit("forceToLogin")
+			
+			return false
+		}
+
 		const initializationTasks = [
 			async () => {
 				try {
